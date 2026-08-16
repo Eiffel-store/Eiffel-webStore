@@ -16,7 +16,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [language, setLanguageState] = useState<Language>(() => {
     const saved = localStorage.getItem('eiffel_language');
     if (saved === 'ar' || saved === 'en') return saved;
-    return 'en';
+    return 'ar';
   });
 
   const isRTL = language === 'ar';
