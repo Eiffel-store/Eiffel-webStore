@@ -10,7 +10,7 @@ export interface Product {
   subtitle: string;
   price: number;
   originalPrice?: number;
-  category: 'men' | 'kids' | 'accessories' | 'new-arrivals';
+  category: string; // 'men' | 'kids' | 'accessories' | 'offers' or custom category
   subCategory: string;
   images: string[];
   colors: ProductColor[];
@@ -27,6 +27,7 @@ export interface Product {
   rating: number;
   reviewCount: number;
   inStock: boolean;
+  createdAt?: string;
 }
 
 export interface CartItem {
@@ -36,23 +37,23 @@ export interface CartItem {
   selectedSize: string;
 }
 
-export interface JournalArticle {
+export interface CategoryItem {
   id: string;
-  title: string;
+  name: string;
+  nameEn: string;
   subtitle: string;
-  category: string;
-  date: string;
-  readTime: string;
-  coverImage: string;
-  author: string;
-  excerpt: string;
-  content: {
-    type: 'paragraph' | 'heading' | 'quote' | 'image' | 'product';
-    value?: string;
-    src?: string;
-    caption?: string;
-    productId?: string;
-  }[];
+  image: string;
+  itemCount: string;
+  subCategories: string[];
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discountPercentage: number;
+  minOrderAmount?: number;
+  isActive: boolean;
+  expiryDate?: string;
 }
 
 export interface StoreLocation {
@@ -66,6 +67,7 @@ export interface StoreLocation {
   type: 'Flagship' | 'Atelier' | 'Boutique';
   coordinates: { x: number; y: number }; // Percentage on map canvas
   image: string;
+  mapLink?: string;
 }
 
 export interface Address {
@@ -101,11 +103,26 @@ export interface Order {
   discount: number;
   tax: number;
   total: number;
-  status: 'Processing' | 'Shipped' | 'Delivered';
+  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
   trackingNumber: string;
   estimatedDelivery: string;
   shippingAddress: Address;
   paymentMethod: string;
+  customerNotes?: string;
+}
+
+export interface StoreSettings {
+  storeName: string;
+  tagline: string;
+  phone: string;
+  whatsappNumber: string;
+  facebookUrl: string;
+  instagramUrl: string;
+  announcementTextAr: string;
+  announcementTextEn: string;
+  currency: string;
+  freeShippingThreshold: number;
+  adminPin: string;
 }
 
 export interface User {

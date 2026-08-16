@@ -1,15 +1,15 @@
 import React from 'react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useStoreData } from '../../context/StoreDataContext';
 import { FacebookIcon, WhatsAppIcon } from './SocialIcons';
 
 export const FloatingContactButtons: React.FC = () => {
   const { isRTL } = useLanguage();
+  const { settings } = useStoreData();
 
-  // Facebook link provided by user
-  const facebookUrl = 'https://www.facebook.com/profile.php?id=100093268017929';
-  
-  // WhatsApp link (User can replace number e.g. https://wa.me/201000000000)
-  const whatsappUrl = 'https://wa.me/';
+  const facebookUrl = settings.facebookUrl || 'https://www.facebook.com/profile.php?id=100093268017929';
+  const cleanPhone = settings.whatsappNumber.replace(/[^0-9]/g, '');
+  const whatsappUrl = cleanPhone ? `https://wa.me/${cleanPhone}` : 'https://wa.me/';
 
   return (
     <div

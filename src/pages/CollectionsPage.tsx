@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { PRODUCTS, CATEGORIES } from '../data/products';
 import { ProductCard } from '../components/product/ProductCard';
 import { QuickViewModal } from '../components/product/QuickViewModal';
 import { CollectionBanner } from '../components/collection/CollectionBanner';
@@ -9,12 +8,14 @@ import { ActiveFilters } from '../components/collection/ActiveFilters';
 import { FilterDrawer } from '../components/collection/FilterDrawer';
 import { Product } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useStoreData } from '../context/StoreDataContext';
 
 export const CollectionsPage: React.FC = () => {
   const { category = 'men' } = useParams<{ category: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchKeyword = searchParams.get('search') || '';
   const { t, isRTL } = useLanguage();
+  const { products, categories } = useStoreData();
 
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('All');
   const [selectedSize, setSelectedSize] = useState<string>('All');
@@ -25,11 +26,14 @@ export const CollectionsPage: React.FC = () => {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
   // Category Metadata
-  const currentCategoryObj = CATEGORIES.find(c => c.id === category) || {
+  const currentCategoryObj = categories.find(c => c.id === category) || {
     id: category,
-    title: category.toUpperCase() + ' COLLECTION',
+    name: category.toUpperCase() + ' COLLECTION',
+    nameEn: category.toUpperCase(),
     subtitle: 'Brutalist Silhouettes & Precision Engineering',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCErD6tC4cxMIzFUUd37x4CYmKq52RgCrx4tv4AyEYiC9QIDgB499aw331BQtje-lLQUBw6jyjGDvGGtWeuT-hyT_mIVqVHhI8GiGeBUbZk1kLUc82ZatLT8bnAhQYMLj2M0jRAeM2JTI_HLjwbFO524e7x9BdufnA48VH87wA00MYsevKPI_kl0QZxzuuQlMXFj075TZfeXtph153k5xOAg2KuaAKnY5be_pYcBKwWOVmOhDcpLbz_ww'
+    image: `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`,
+    itemCount: '12 PIECES',
+    subCategories: []
   };
 
   const getCategoryTitle = () => {
@@ -41,23 +45,23 @@ export const CollectionsPage: React.FC = () => {
       if (category === 'new-arrivals') return 'أحدث الإصدارات';
     }
     if (category === 'offers') return 'SPECIAL OFFERS & ARCHIVE';
-    return currentCategoryObj.title;
+    return currentCategoryObj.name;
   };
 
   // Filter options available
   const subCategories = useMemo(() => {
-    const subs = PRODUCTS
+    const subs = products
       .filter(p => category === 'offers' || category === 'new-arrivals' || p.category === category || (category === 'men' && p.category !== 'kids'))
       .map(p => p.subCategory);
     return ['All', ...Array.from(new Set(subs))];
-  }, [category]);
+  }, [category, products]);
 
   const allSizes = ['All', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '46 (S)', '48 (M)', '50 (L)', '4-5Y', '6-7Y'];
   const allColors = ['All', 'Onyx Noir', 'Chalk White', 'Concrete Gray', 'Carbon Black', 'Ash Grey'];
 
   // Filtered Products
   const filteredProducts = useMemo(() => {
-    let list = PRODUCTS.filter(p => {
+    let list = products.filter(p => {
       // Category Match
       if (category === 'offers') {
         // Prefer items on sale or all promotional items

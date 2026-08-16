@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { PRODUCTS } from '../data/products';
 import { ProductCard } from '../components/product/ProductCard';
 import { QuickViewModal } from '../components/product/QuickViewModal';
 import { HeroSection } from '../components/home/HeroSection';
@@ -10,12 +9,14 @@ import { PromoEditorial } from '../components/home/PromoEditorial';
 import { ShopTheLook } from '../components/home/ShopTheLook';
 import { Product } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useStoreData } from '../context/StoreDataContext';
 
 export const HomePage: React.FC = () => {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const { t, isRTL } = useLanguage();
+  const { products } = useStoreData();
 
-  const newArrivals = PRODUCTS.filter(p => p.isNew || p.category === 'men').slice(0, 4);
+  const newArrivals = products.filter(p => p.isNew || p.category === 'men').slice(0, 4);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -43,7 +44,7 @@ export const HomePage: React.FC = () => {
             to="/collections/new-arrivals"
             className="font-label-bold text-xs tracking-widest text-primary dark:text-white hover:underline flex items-center gap-1 uppercase"
           >
-            <span>{t.viewAll} ({PRODUCTS.length})</span>
+            <span>{t.viewAll} ({products.length})</span>
             <ArrowRight className={`w-3.5 h-3.5 ${isRTL ? 'rotate-180' : ''}`} />
           </Link>
         </div>

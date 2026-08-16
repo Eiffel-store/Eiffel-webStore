@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Check } from 'lucide-react';
-import { PRODUCTS } from '../data/products';
 import { ProductCard } from '../components/product/ProductCard';
 import { ProductGallery } from '../components/product/ProductGallery';
 import { ProductInfo } from '../components/product/ProductInfo';
@@ -11,6 +10,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useStoreData } from '../context/StoreDataContext';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -19,8 +19,9 @@ export const ProductDetailPage: React.FC = () => {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
   const { t } = useLanguage();
+  const { products, getProductById } = useStoreData();
 
-  const product = PRODUCTS.find((p) => p.id === id) || PRODUCTS[0];
+  const product = (id ? getProductById(id) : undefined) || products[0];
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || 'M');
@@ -55,7 +56,7 @@ export const ProductDetailPage: React.FC = () => {
   };
 
   // Recommended products
-  const relatedProducts = PRODUCTS.filter(
+  const relatedProducts = products.filter(
     p => p.id !== product.id && (p.category === product.category || p.subCategory === product.subCategory)
   ).slice(0, 4);
 

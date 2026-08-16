@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useStoreData } from '../context/StoreDataContext';
 import { Address } from '../types';
 import { OrderConfirmation } from '../components/checkout/OrderConfirmation';
 import { CheckoutContactForm } from '../components/checkout/CheckoutContactForm';
@@ -14,6 +15,7 @@ import { CheckoutOrderSummary } from '../components/checkout/CheckoutOrderSummar
 export const CheckoutPage: React.FC = () => {
   const { cart, subtotal, discountAmount, clearCart } = useCart();
   const { user, placeOrder } = useAuth();
+  const { addOrder } = useStoreData();
   const { formatPrice } = useCurrency();
   const { t } = useLanguage();
 
@@ -78,6 +80,7 @@ export const CheckoutPage: React.FC = () => {
         shippingAddress,
         paymentMethod: paymentMethodString,
       });
+      addOrder(order);
       clearCart();
       setIsSubmitting(false);
       setOrderComplete(order);

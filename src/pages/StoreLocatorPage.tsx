@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { STORES } from '../data/stores';
 import { StoreLocation } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useStoreData } from '../context/StoreDataContext';
 import { StoreCard } from '../components/store/StoreCard';
 import { StoreMapCanvas } from '../components/store/StoreMapCanvas';
 import { AppointmentModal } from '../components/store/AppointmentModal';
 
 export const StoreLocatorPage: React.FC = () => {
   const { t } = useLanguage();
-  const [selectedStore, setSelectedStore] = useState<StoreLocation>(STORES[0]);
+  const { stores } = useStoreData();
+  const [selectedStore, setSelectedStore] = useState<StoreLocation>(stores[0] || {} as StoreLocation);
   const [appointmentModalStore, setAppointmentModalStore] = useState<StoreLocation | null>(null);
 
   return (
@@ -33,7 +34,7 @@ export const StoreLocatorPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
           {/* Store Cards List (5 cols) */}
           <div className="lg:col-span-5 space-y-4 max-h-[750px] overflow-y-auto pr-2 rtl:pr-0 rtl:pl-2">
-            {STORES.map((store) => (
+            {stores.map((store) => (
               <StoreCard
                 key={store.id}
                 store={store}
@@ -46,7 +47,7 @@ export const StoreLocatorPage: React.FC = () => {
 
           {/* Simulated Interactive Map Canvas (7 cols) */}
           <StoreMapCanvas
-            stores={STORES}
+            stores={stores}
             selectedStore={selectedStore}
             onSelectStore={setSelectedStore}
             onScheduleFitting={() => setAppointmentModalStore(selectedStore)}
