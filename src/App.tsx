@@ -11,6 +11,7 @@ import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { CartDrawer } from './components/cart/CartDrawer';
 import { SearchModal } from './components/search/SearchModal';
+import { ScrollToTop } from './components/common/ScrollToTop';
 
 import { HomePage } from './pages/HomePage';
 import { CollectionsPage } from './pages/CollectionsPage';
@@ -35,6 +36,7 @@ export const App: React.FC = () => {
             <WishlistProvider>
               <CartProvider>
                 <Router>
+                  <ScrollToTop />
                   <div className="flex flex-col min-h-screen bg-background text-on-surface transition-colors duration-200">
                     <Navbar onOpenSearch={() => setSearchOpen(true)} />
                     

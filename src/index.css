@@ -19,15 +19,25 @@
 
   * {
     border-color: #e5e5e8;
+    -webkit-tap-highlight-color: transparent;
   }
   
   .dark * {
     border-color: #27272a;
   }
 
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow-x: hidden;
+    background-color: var(--color-background);
+    color: var(--color-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Arabic body typography */
@@ -55,33 +65,38 @@
 
 /* Custom luxury scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f4f4f5;
 }
 
 .dark ::-webkit-scrollbar-track {
-  background: #1a1c1c;
+  background: #18181b;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #222222;
+  background: #d4d4d8;
+  border-radius: 9999px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #555555;
+  background: #3f3f46;
+  border-radius: 9999px;
 }
 
-/* Custom Image Hover Zoom */
+/* GPU Accelerated Image Hover */
 .luxury-image-hover {
-  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
 
 .group:hover .luxury-image-hover {
-  transform: scale(1.04);
+  transform: scale3d(1.035, 1.035, 1);
 }
 
 /* Watermark Text */
@@ -89,53 +104,129 @@
   font-family: 'Bebas Neue', 'IBM Plex Sans Arabic', sans-serif;
   font-size: clamp(80px, 18vw, 240px);
   line-height: 0.85;
-  color: rgba(0, 0, 0, 0.03);
+  color: rgba(0, 0, 0, 0.025);
   pointer-events: none;
   user-select: none;
 }
 
 .dark .watermark-text {
-  color: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.025);
 }
 
-/* Micro animations */
+/* ==========================================================================
+   HIGH-PERFORMANCE 60FPS GPU ANIMATIONS (NO LAYOUT REFLOWS)
+   ========================================================================== */
+
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale3d(0.96, 0.96, 1);
+  }
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
 }
 
 @keyframes slideInRight {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 1; transform: scale3d(1, 1, 1); }
+  50% { opacity: 0.75; transform: scale3d(1.05, 1.05, 1); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
 }
 
 [dir="ltr"] .animate-slide-right {
   animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes slideInLeft {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(0); }
+  will-change: transform;
 }
 
 [dir="rtl"] .animate-slide-right {
   animation: slideInLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform;
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 2.5s ease-in-out infinite;
+}
+
+/* Stagger delays for grid reveals */
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }
+
+/* Interactive touch feedback for buttons & cards */
+button:active:not(:disabled),
+a:active:not(:disabled),
+.luxury-tap:active {
+  transform: scale3d(0.98, 0.98, 1);
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Infinite marquee */
 @keyframes marquee {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(-50%); }
+  0% { transform: translate3d(0%, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
 }
 
 .animate-marquee {
   display: flex;
   width: 200%;
-  animation: marquee 25s linear infinite;
+  animation: marquee 28s linear infinite;
+  will-change: transform;
 }
 
 .animate-marquee:hover {
@@ -149,4 +240,16 @@
 }
 .scrollbar-none::-webkit-scrollbar {
   display: none;
+}
+
+/* Performance optimizations for mobile browsers */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
