@@ -11,11 +11,11 @@ export const HeroSection: React.FC = () => {
       {/* Background Image with subtle gradient */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCseUeu5hdr7LWtZska9tdU1nipaGbIV9oDB4qQIfpmf9TGBKI3WMIeHE7Dhi3cpBD1BLkDSNssElp43QgvSsbNFoyCtrgDtaWeFakgnquiUwsZGJutEtBBG2VrOwNvDhRXK2l4kEiDc6woEqKHLmR-wjLYVi085GjBUjBr9WGc_WUmlNMKBme8o3SAnoAIsLDlCOY_WmzxZ_2Siru3KoWJD9zwJNdMDng5OdcgPqc2VO_kGELw2iBIhg"
-          alt="EIFFEL Hero Campaign"
-          className="w-full h-full object-cover object-center opacity-65 scale-105 transition-transform duration-1000"
+          src={`${import.meta.env.BASE_URL}images/products/eiffel-outfit-flatlay.jpg`}
+          alt="EIFFEL Collection Campaign"
+          className="w-full h-full object-cover object-center opacity-60 scale-105 transition-transform duration-1000"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/70" />
       </div>
 
       {/* Hero Editorial Content */}
