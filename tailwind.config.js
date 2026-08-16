@@ -8,24 +8,24 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Core Brand Luxury Palette
-        "background": "#ffffff",
-        "surface": "#ffffff",
-        "primary": "#09090b",
-        "on-surface": "#09090b",
-        "secondary": "#64748b",
+        // Dynamic CSS Variable Brand Colors (Adapts automatically in Dark/Light modes)
+        "background": "var(--color-background)",
+        "surface": "var(--color-surface)",
+        "primary": "var(--color-primary)",
+        "on-surface": "var(--color-primary)",
+        "secondary": "var(--color-secondary)",
         
-        // Crisp Neutral Surfaces & Containers
-        "surface-container-lowest": "#ffffff",
-        "surface-container-low": "#f8f8f9",
-        "surface-container": "#f1f1f3",
-        "surface-container-high": "#e9e9ec",
-        "surface-container-highest": "#e2e2e5",
+        // Neutral Surfaces & Containers
+        "surface-container-lowest": "var(--color-surface)",
+        "surface-container-low": "var(--color-surface-container-low)",
+        "surface-container": "var(--color-border)",
+        "surface-container-high": "var(--color-surface-container-high)",
+        "surface-container-highest": "var(--color-surface-container-high)",
         
         // Inverted & Dark References
-        "inverse-surface": "#18181b",
-        "inverse-on-surface": "#f8f8f9",
-        "inverse-primary": "#ffffff",
+        "inverse-surface": "var(--color-surface-container-low)",
+        "inverse-on-surface": "var(--color-primary)",
+        "inverse-primary": "var(--color-background)",
         
         // Luxury Accents
         "gold-accent": "#c5a880",
@@ -35,8 +35,8 @@ export default {
         "success": "#16a34a",
         
         // Neutral Slate / Zinc Overrides
-        "outline": "#d4d4d8",
-        "outline-variant": "#e4e4e7",
+        "outline": "var(--color-border)",
+        "outline-variant": "var(--color-border)",
       },
       borderRadius: {
         "DEFAULT": "0px",

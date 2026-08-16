@@ -7,23 +7,25 @@
     --color-primary: #09090b;
     --color-background: #ffffff;
     --color-surface: #ffffff;
+    --color-surface-container-low: #f8f8f9;
+    --color-surface-container-high: #f0f0f3;
     --color-secondary: #64748b;
+    --color-border: #e5e5e8;
   }
 
   .dark {
     --color-primary: #ffffff;
     --color-background: #09090b;
     --color-surface: #121214;
+    --color-surface-container-low: #18181b;
+    --color-surface-container-high: #27272a;
     --color-secondary: #a1a1aa;
+    --color-border: #27272a;
   }
 
   * {
-    border-color: #e5e5e8;
+    border-color: var(--color-border);
     -webkit-tap-highlight-color: transparent;
-  }
-  
-  .dark * {
-    border-color: #27272a;
   }
 
   html {
@@ -70,20 +72,11 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f4f4f5;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: #18181b;
+  background: var(--color-background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d8;
-  border-radius: 9999px;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
+  background: var(--color-border);
   border-radius: 9999px;
 }
 
@@ -110,11 +103,11 @@
 }
 
 .dark .watermark-text {
-  color: rgba(255, 255, 255, 0.025);
+  color: rgba(255, 255, 255, 0.035);
 }
 
 /* ==========================================================================
-   HIGH-PERFORMANCE 60FPS GPU ANIMATIONS (NO LAYOUT REFLOWS)
+   HIGH-PERFORMANCE 60FPS GPU ANIMATIONS
    ========================================================================== */
 
 @keyframes fadeIn {
@@ -208,7 +201,7 @@
 .stagger-3 { animation-delay: 150ms; }
 .stagger-4 { animation-delay: 200ms; }
 
-/* Interactive touch feedback for buttons & cards */
+/* Interactive touch feedback */
 button:active:not(:disabled),
 a:active:not(:disabled),
 .luxury-tap:active {
