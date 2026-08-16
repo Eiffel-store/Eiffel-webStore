@@ -34,18 +34,20 @@ export const CollectionsPage: React.FC = () => {
 
   const getCategoryTitle = () => {
     if (isRTL) {
+      if (category === 'offers') return 'العروض والتخفيضات الحصرية';
       if (category === 'men') return 'تشكيلة الرجال';
       if (category === 'kids') return 'أزياء الأطفال';
       if (category === 'accessories') return 'القطع الجلدية والإكسسوارات';
-      if (category === 'new-arrivals') return 'مجموعة 04 / أحدث الإصدارات';
+      if (category === 'new-arrivals') return 'أحدث الإصدارات';
     }
+    if (category === 'offers') return 'SPECIAL OFFERS & ARCHIVE';
     return currentCategoryObj.title;
   };
 
   // Filter options available
   const subCategories = useMemo(() => {
     const subs = PRODUCTS
-      .filter(p => category === 'new-arrivals' || p.category === category || (category === 'men' && p.category !== 'kids'))
+      .filter(p => category === 'offers' || category === 'new-arrivals' || p.category === category || (category === 'men' && p.category !== 'kids'))
       .map(p => p.subCategory);
     return ['All', ...Array.from(new Set(subs))];
   }, [category]);
@@ -57,7 +59,11 @@ export const CollectionsPage: React.FC = () => {
   const filteredProducts = useMemo(() => {
     let list = PRODUCTS.filter(p => {
       // Category Match
-      if (category === 'new-arrivals') {
+      if (category === 'offers') {
+        // Prefer items on sale or all promotional items
+        if (p.originalPrice) return true;
+        return p.isBestSeller || p.isNew;
+      } else if (category === 'new-arrivals') {
         if (!p.isNew && p.category !== 'men') return false;
       } else if (category === 'men') {
         if (p.category !== 'men' && p.category !== 'accessories') return false;

@@ -50,7 +50,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
     { label: t.navMen, href: '/collections/men' },
     { label: t.navKids, href: '/collections/kids' },
     { label: t.navAccessories, href: '/collections/accessories' },
-    { label: t.navCollection04, href: '/collections/new-arrivals' },
+    { label: t.navCollection04, href: '/collections/offers' },
     { label: t.navJournal, href: '/journal' },
     { label: t.navStores, href: '/stores' }
   ];
