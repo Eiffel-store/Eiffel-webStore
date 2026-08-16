@@ -16,7 +16,6 @@ import {
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useTheme } from '../../context/ThemeContext';
-import { useCurrency, CURRENCIES } from '../../context/CurrencyContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { Logo } from './Logo';
 
@@ -28,11 +27,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   const { totalItems, openCart } = useCart();
   const { totalWishlist } = useWishlist();
   const { theme, toggleTheme } = useTheme();
-  const { currency, setCurrencyCode } = useCurrency();
-  const { language, toggleLanguage, setLanguage, t, isRTL } = useLanguage();
+  const { language, setLanguage, t, isRTL } = useLanguage();
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
@@ -61,7 +58,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   return (
     <>
       {/* Top Banner */}
-      <div className="bg-primary text-white dark:bg-zinc-900 dark:text-zinc-200 text-[10px] sm:text-[11px] py-1.5 px-3 sm:px-4 font-label-bold tracking-wider sm:tracking-widest text-center border-b border-black/10 flex items-center justify-between">
+      <div className="bg-primary text-white dark:bg-zinc-950 dark:text-zinc-200 text-[10px] sm:text-[11px] py-1.5 px-3 sm:px-4 font-label-bold tracking-wider sm:tracking-widest text-center border-b border-black/10 flex items-center justify-between">
         <div className="hidden md:block w-36 text-left rtl:text-right text-zinc-400 font-mono text-[10px]">
           {t.topBannerLocations}
         </div>
@@ -77,7 +74,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
 
       {/* Main Sticky Navbar */}
       <header
-        className={`sticky top-0 z-40 w-full bg-surface-container-lowest/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-surface-container dark:border-zinc-800 transition-all duration-200 ${
+        className={`sticky top-0 z-40 w-full bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-surface-container dark:border-zinc-850 transition-all duration-200 ${
           isScrolled ? 'h-[64px] sm:h-[70px] shadow-sm' : 'h-[68px] sm:h-[80px]'
         }`}
       >
@@ -136,7 +133,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
               </button>
 
               {langDropdownOpen && (
-                <div className="absolute right-0 rtl:right-auto rtl:left-0 mt-2 w-32 bg-surface-container-lowest dark:bg-zinc-900 border border-surface-container dark:border-zinc-700 shadow-xl py-1 z-50 animate-fade-in">
+                <div className="absolute right-0 rtl:right-auto rtl:left-0 mt-2 w-32 bg-white dark:bg-zinc-900 border border-surface-container dark:border-zinc-700 shadow-xl py-1 z-50 animate-fade-in">
                   <button
                     onClick={() => {
                       setLanguage('en');
@@ -144,7 +141,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
                     }}
                     className={`w-full text-left rtl:text-right px-3 py-2 text-xs font-mono flex items-center justify-between transition-colors ${
                       language === 'en'
-                        ? 'bg-surface-container dark:bg-zinc-800 text-primary dark:text-white font-bold'
+                        ? 'bg-surface-container-low dark:bg-zinc-800 text-primary dark:text-white font-bold'
                         : 'text-secondary dark:text-zinc-400 hover:bg-surface-container-low dark:hover:bg-zinc-800'
                     }`}
                   >
@@ -158,47 +155,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
                     }}
                     className={`w-full text-left rtl:text-right px-3 py-2 text-xs font-mono flex items-center justify-between transition-colors ${
                       language === 'ar'
-                        ? 'bg-surface-container dark:bg-zinc-800 text-primary dark:text-white font-bold'
+                        ? 'bg-surface-container-low dark:bg-zinc-800 text-primary dark:text-white font-bold'
                         : 'text-secondary dark:text-zinc-400 hover:bg-surface-container-low dark:hover:bg-zinc-800'
                     }`}
                   >
                     <span>العربية</span>
                     <span className="text-[10px] text-secondary">AR</span>
                   </button>
-                </div>
-              )}
-            </div>
-
-            {/* Currency Selector (Desktop) */}
-            <div className="relative hidden md:block">
-              <button
-                onClick={() => setCurrencyDropdownOpen(!currencyDropdownOpen)}
-                className="flex items-center gap-1 text-xs font-mono font-medium text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors py-1 px-2 border border-transparent hover:border-surface-container dark:hover:border-zinc-800"
-              >
-                <Globe className="w-3.5 h-3.5" />
-                <span>{currency.code}</span>
-                <ChevronDown className="w-3 h-3" />
-              </button>
-
-              {currencyDropdownOpen && (
-                <div className="absolute right-0 rtl:right-auto rtl:left-0 mt-2 w-32 bg-surface-container-lowest dark:bg-zinc-900 border border-surface-container dark:border-zinc-700 shadow-xl py-1 z-50 animate-fade-in">
-                  {Object.values(CURRENCIES).map((c) => (
-                    <button
-                      key={c.code}
-                      onClick={() => {
-                        setCurrencyCode(c.code);
-                        setCurrencyDropdownOpen(false);
-                      }}
-                      className={`w-full text-left rtl:text-right px-3 py-1.5 text-xs font-mono flex items-center justify-between transition-colors ${
-                        currency.code === c.code
-                          ? 'bg-surface-container dark:bg-zinc-800 text-primary dark:text-white font-bold'
-                          : 'text-secondary dark:text-zinc-400 hover:bg-surface-container-low dark:hover:bg-zinc-800'
-                      }`}
-                    >
-                      <span>{c.code}</span>
-                      <span className="text-secondary dark:text-zinc-500">{c.symbol}</span>
-                    </button>
-                  ))}
                 </div>
               )}
             </div>
@@ -269,7 +232,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
             className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className={`fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} w-[85vw] max-w-xs bg-surface-container-lowest dark:bg-zinc-950 shadow-2xl p-6 flex flex-col justify-between z-10 animate-fade-in border-r rtl:border-r-0 rtl:border-l border-surface-container dark:border-zinc-800`}>
+          <div className={`fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} w-[85vw] max-w-xs bg-white dark:bg-zinc-950 shadow-2xl p-6 flex flex-col justify-between z-10 animate-fade-in border-r rtl:border-r-0 rtl:border-l border-surface-container dark:border-zinc-800`}>
             <div>
               <div className="flex items-center justify-between pb-5 border-b border-surface-container dark:border-zinc-800">
                 <Logo size="sm" />
@@ -340,22 +303,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
               </div>
             </div>
 
-            {/* Mobile Currency & Copyright */}
+            {/* Mobile Footer & Copyright */}
             <div className="pt-5 border-t border-surface-container dark:border-zinc-800">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-label-bold text-secondary dark:text-zinc-400 uppercase">CURRENCY</span>
-                <select
-                  value={currency.code}
-                  onChange={(e) => setCurrencyCode(e.target.value)}
-                  className="bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 text-xs font-mono px-2 py-1 text-primary dark:text-white focus:outline-none"
-                >
-                  {Object.values(CURRENCIES).map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.code} ({c.symbol})
-                    </option>
-                  ))}
-                </select>
-              </div>
               <p className="text-[10px] text-secondary dark:text-zinc-500 font-mono text-center">
                 © {new Date().getFullYear()} EIFFEL STUDIO S.A.
               </p>
