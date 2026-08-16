@@ -12,6 +12,7 @@ import { Footer } from './components/common/Footer';
 import { CartDrawer } from './components/cart/CartDrawer';
 import { SearchModal } from './components/search/SearchModal';
 import { ScrollToTop } from './components/common/ScrollToTop';
+import { FloatingContactButtons } from './components/common/FloatingContactButtons';
 
 import { HomePage } from './pages/HomePage';
 import { CollectionsPage } from './pages/CollectionsPage';
@@ -64,6 +65,9 @@ export const App: React.FC = () => {
                     
                     {/* Global Search Modal */}
                     <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+
+                    {/* Floating Social Quick Action Buttons (WhatsApp & Facebook) */}
+                    <FloatingContactButtons />
                   </div>
                 </Router>
               </CartProvider>

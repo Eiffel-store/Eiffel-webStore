@@ -3,11 +3,16 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Check, ShieldCheck, Truck, RotateCcw, Sparkles } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { Logo } from './Logo';
+import { FacebookIcon, WhatsAppIcon } from './SocialIcons';
 
 export const Footer: React.FC = () => {
   const { t, isRTL } = useLanguage();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+
+  // Facebook and WhatsApp links
+  const facebookUrl = 'https://www.facebook.com/profile.php?id=100093268017929';
+  const whatsappUrl = 'https://wa.me/'; // User can replace with actual WhatsApp number e.g. https://wa.me/201000000000
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +72,7 @@ export const Footer: React.FC = () => {
       {/* Main Footer Links & Newsletter */}
       <div className="py-12 sm:py-16 px-4 sm:px-8 md:px-12">
         <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-12">
-          {/* Brand Manifesto & Newsletter */}
+          {/* Brand Manifesto, Socials & Newsletter */}
           <div className="md:col-span-5 space-y-4 sm:space-y-6">
             <Link to="/" className="inline-block hover:opacity-90 transition-opacity">
               <Logo size="lg" className="text-white" />
@@ -75,6 +80,29 @@ export const Footer: React.FC = () => {
             <p className="text-xs text-zinc-400 leading-relaxed max-w-md font-light">
               {t.footerManifesto}
             </p>
+
+            {/* Direct Social Media Links */}
+            <div className="flex items-center gap-3 pt-1">
+              <a
+                href={facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 bg-[#1877F2] text-white text-xs font-mono font-bold tracking-wider uppercase hover:bg-[#166fe5] transition-colors shadow-md"
+              >
+                <FacebookIcon className="w-4 h-4 fill-current" />
+                <span>{isRTL ? 'صفحتنا على فيسبوك' : 'FACEBOOK'}</span>
+              </a>
+
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 bg-[#25D366] text-white text-xs font-mono font-bold tracking-wider uppercase hover:bg-[#20ba5a] transition-colors shadow-md"
+              >
+                <WhatsAppIcon className="w-4 h-4 fill-current" />
+                <span>{isRTL ? 'واتساب' : 'WHATSAPP'}</span>
+              </a>
+            </div>
 
             {/* Newsletter Subscription */}
             <div className="pt-2">
@@ -116,7 +144,7 @@ export const Footer: React.FC = () => {
               </h4>
               <ul className="space-y-2 text-xs text-zinc-400 font-light">
                 <li><Link to="/collections/men" className="hover:text-white transition-colors">{t.navMen}</Link></li>
-                <li><Link to="/collections/new-arrivals" className="hover:text-white transition-colors">{t.navCollection04}</Link></li>
+                <li><Link to="/collections/offers" className="hover:text-white transition-colors font-bold text-white">{t.navCollection04}</Link></li>
                 <li><Link to="/collections/kids" className="hover:text-white transition-colors">{t.navKids}</Link></li>
                 <li><Link to="/collections/accessories" className="hover:text-white transition-colors">{t.navAccessories}</Link></li>
                 <li><Link to="/journal" className="hover:text-white transition-colors">{t.navJournal}</Link></li>
@@ -131,7 +159,7 @@ export const Footer: React.FC = () => {
                 <li><Link to="/account" className="hover:text-white transition-colors">{t.clientDashboard}</Link></li>
                 <li><Link to="/help" className="hover:text-white transition-colors">{t.helpCenterTitle}</Link></li>
                 <li><Link to="/help" className="hover:text-white transition-colors">{t.returnsNotice}</Link></li>
-                <li><Link to="/stores" className="hover:text-white transition-colors">{t.bookAppointment}</Link></li>
+                <li><Link to="/stores" className="hover:text-white transition-colors">{t.navStores}</Link></li>
               </ul>
             </div>
 
@@ -140,11 +168,9 @@ export const Footer: React.FC = () => {
                 {t.footerMaisons}
               </h4>
               <ul className="space-y-2 text-xs text-zinc-400 font-light">
-                <li><Link to="/stores" className="hover:text-white transition-colors">Paris Saint-Honoré</Link></li>
-                <li><Link to="/stores" className="hover:text-white transition-colors">New York SoHo</Link></li>
-                <li><Link to="/stores" className="hover:text-white transition-colors">Dubai DIFC</Link></li>
-                <li><Link to="/stores" className="hover:text-white transition-colors">Tokyo Aoyama</Link></li>
-                <li><Link to="/stores" className="hover:text-white transition-colors">Milano Montenapoleone</Link></li>
+                <li><Link to="/stores" className="hover:text-white transition-colors">زفتى (الفرع الرئيسي)</Link></li>
+                <li><Link to="/stores" className="hover:text-white transition-colors">نهطاي (على الطريق)</Link></li>
+                <li><span className="text-zinc-500 text-[11px]">محافظة الغربية، مصر</span></li>
               </ul>
             </div>
           </div>
@@ -153,7 +179,7 @@ export const Footer: React.FC = () => {
         {/* Bottom Legal / Copyright Strip */}
         <div className="max-w-[1440px] mx-auto pt-8 sm:pt-12 mt-8 sm:mt-12 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-[11px] sm:text-xs text-zinc-500 font-mono text-center sm:text-left rtl:sm:text-right">
           <div>
-            © {new Date().getFullYear()} EIFFEL STUDIO S.A. {t.footerCopyright}
+            © {new Date().getFullYear()} EIFFEL. {t.footerCopyright}
           </div>
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
             <Link to="/help" className="hover:text-zinc-300">{t.privacyPolicy}</Link>

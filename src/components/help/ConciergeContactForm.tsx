@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Send, Check, MessageSquare } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { FacebookIcon, WhatsAppIcon } from '../common/SocialIcons';
 
 interface ConciergeContactFormProps {
   onOpenLiveChat: () => void;
@@ -13,6 +14,10 @@ export const ConciergeContactForm: React.FC<ConciergeContactFormProps> = ({
   const [contactSubmitted, setContactSubmitted] = useState(false);
   const [contactMessage, setContactMessage] = useState('');
   const [contactEmail, setContactEmail] = useState('');
+
+  // Social links
+  const facebookUrl = 'https://www.facebook.com/profile.php?id=100093268017929';
+  const whatsappUrl = 'https://wa.me/'; // User can replace with actual WhatsApp number e.g. https://wa.me/201000000000
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +42,29 @@ export const ConciergeContactForm: React.FC<ConciergeContactFormProps> = ({
           </p>
         </div>
 
+        {/* Quick Social Contact Buttons */}
+        <div className="grid grid-cols-2 gap-3">
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 py-3 px-4 bg-[#25D366] text-white font-label-bold text-xs uppercase tracking-wider hover:bg-[#20ba5a] transition-colors shadow-sm"
+          >
+            <WhatsAppIcon className="w-4 h-4 fill-current" />
+            <span>{isRTL ? 'واتساب' : 'WhatsApp'}</span>
+          </a>
+
+          <a
+            href={facebookUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 py-3 px-4 bg-[#1877F2] text-white font-label-bold text-xs uppercase tracking-wider hover:bg-[#166fe5] transition-colors shadow-sm"
+          >
+            <FacebookIcon className="w-4 h-4 fill-current" />
+            <span>{isRTL ? 'فيسبوك' : 'Facebook'}</span>
+          </a>
+        </div>
+
         {contactSubmitted ? (
           <div className="p-6 bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container text-center space-y-2 animate-fade-in">
             <div className="w-10 h-10 rounded-full bg-green-100 text-green-700 mx-auto flex items-center justify-center">
@@ -58,7 +86,7 @@ export const ConciergeContactForm: React.FC<ConciergeContactFormProps> = ({
                 required
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
-                placeholder="alexandre@eiffel-client.com"
+                placeholder="client@eiffel-store.com"
                 className="w-full bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-700 p-3 text-xs text-primary dark:text-white font-mono focus:outline-none"
               />
             </div>
@@ -71,7 +99,7 @@ export const ConciergeContactForm: React.FC<ConciergeContactFormProps> = ({
                 required
                 value={contactMessage}
                 onChange={(e) => setContactMessage(e.target.value)}
-                placeholder={isRTL ? "يرجى ذكر رقم القطعة أو الاستفسار عن المقاسات أو الشحن..." : "Please specify piece reference ID, sizing question, or tracking number..."}
+                placeholder={isRTL ? "يرجى كتابة استفسارك أو المقاسات المطلوبة أو طلب فرع زفتى/نهطاي..." : "Please enter your question, sizing inquiry, or Zefta/Nahtay branch request..."}
                 className="w-full bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-700 p-3 text-xs text-primary dark:text-white focus:outline-none"
               />
             </div>
@@ -92,7 +120,7 @@ export const ConciergeContactForm: React.FC<ConciergeContactFormProps> = ({
             className="w-full py-3.5 border border-primary dark:border-white font-label-bold text-xs tracking-widest uppercase text-primary dark:text-white hover:bg-primary hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors flex items-center justify-center gap-2"
           >
             <MessageSquare className="w-4 h-4" />
-            <span>{t.startLiveChat}</span>
+            <span>{isRTL ? 'محادثة الموقع الفورية' : 'START LIVE CHAT'}</span>
           </button>
         </div>
       </div>
