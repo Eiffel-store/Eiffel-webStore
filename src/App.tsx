@@ -35,7 +35,7 @@ export const App: React.FC = () => {
           <AuthProvider>
             <WishlistProvider>
               <CartProvider>
-                <Router>
+                <Router basename={import.meta.env.BASE_URL}>
                   <ScrollToTop />
                   <div className="flex flex-col min-h-screen bg-background text-on-surface transition-colors duration-200">
                     <Navbar onOpenSearch={() => setSearchOpen(true)} />
