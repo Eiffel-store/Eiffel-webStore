@@ -24,6 +24,7 @@ export interface Product {
   isBestSeller?: boolean;
   isLimited?: boolean;
   tag?: string;
+  badge?: string;
   rating: number;
   reviewCount: number;
   inStock: boolean;
