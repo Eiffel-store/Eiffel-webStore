@@ -1,4 +1,4 @@
-import { StoreLocation } from '../types';
+import { StoreLocation } from '@/types';
 
 export const STORES: StoreLocation[] = [
   {

@@ -1,4 +1,4 @@
-import { Product } from '../types';
+import { Product } from '@/types';
 
 const getAsset = (filename: string): string => {
   return `${import.meta.env.BASE_URL}images/products/${filename}`;

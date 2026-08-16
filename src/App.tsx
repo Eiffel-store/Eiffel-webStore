@@ -1,43 +1,43 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { LanguageProvider } from './context/LanguageContext';
-import { ThemeProvider } from './context/ThemeContext';
-import { CurrencyProvider } from './context/CurrencyContext';
-import { CartProvider } from './context/CartContext';
-import { WishlistProvider } from './context/WishlistContext';
-import { AuthProvider } from './context/AuthContext';
-import { StoreDataProvider } from './context/StoreDataContext';
-import { AdminAuthProvider } from './context/AdminAuthContext';
 
-import { Navbar } from './components/common/Navbar';
-import { Footer } from './components/common/Footer';
-import { CartDrawer } from './components/cart/CartDrawer';
-import { SearchModal } from './components/search/SearchModal';
-import { ScrollToTop } from './components/common/ScrollToTop';
-import { FloatingContactButtons } from './components/common/FloatingContactButtons';
+// Shared App Core Providers & Components
+import {
+  LanguageProvider,
+  ThemeProvider,
+  CurrencyProvider,
+  StoreDataProvider,
+  Navbar,
+  Footer,
+  ScrollToTop,
+  FloatingContactButtons
+} from './shared';
 
-import { HomePage } from './pages/HomePage';
-import { CollectionsPage } from './pages/CollectionsPage';
-import { ProductDetailPage } from './pages/ProductDetailPage';
-import { CartPage } from './pages/CartPage';
-import { CheckoutPage } from './pages/CheckoutPage';
-import { WishlistPage } from './pages/WishlistPage';
-import { AccountPage } from './pages/AccountPage';
-import { StoreLocatorPage } from './pages/StoreLocatorPage';
-import { HelpCenterPage } from './pages/HelpCenterPage';
+// Feature Modules
+import {
+  AdminAuthProvider,
+  AdminProtectedRoute,
+  AdminLayout,
+  AdminLoginPage,
+  AdminDashboardPage,
+  AdminProductsPage,
+  AdminProductFormPage,
+  AdminOffersPage,
+  AdminCategoriesPage,
+  AdminBranchesPage,
+  AdminOrdersPage,
+  AdminSettingsPage
+} from './features/admin';
 
-// Admin Imports
-import { AdminProtectedRoute } from './components/admin/AdminProtectedRoute';
-import { AdminLayout } from './components/admin/AdminLayout';
-import { AdminLoginPage } from './pages/admin/AdminLoginPage';
-import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
-import { AdminProductsPage } from './pages/admin/AdminProductsPage';
-import { AdminProductFormPage } from './pages/admin/AdminProductFormPage';
-import { AdminOffersPage } from './pages/admin/AdminOffersPage';
-import { AdminCategoriesPage } from './pages/admin/AdminCategoriesPage';
-import { AdminBranchesPage } from './pages/admin/AdminBranchesPage';
-import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
-import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
+import { HomePage } from './features/home';
+import { CollectionsPage, ProductDetailPage } from './features/products';
+import { CartProvider, CartDrawer, CartPage } from './features/cart';
+import { CheckoutPage } from './features/checkout';
+import { WishlistProvider, WishlistPage } from './features/wishlist';
+import { AuthProvider, AccountPage } from './features/account';
+import { StoreLocatorPage } from './features/stores';
+import { HelpCenterPage } from './features/help';
+import { SearchModal } from './features/search';
 
 const StorefrontLayout: React.FC<{ onOpenSearch: () => void }> = ({ onOpenSearch }) => {
   return (
