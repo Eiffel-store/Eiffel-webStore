@@ -8,53 +8,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        "surface-container-high": "#e8e8e8",
+        // Core Brand Luxury Palette
+        "background": "#ffffff",
+        "surface": "#ffffff",
+        "primary": "#09090b",
+        "on-surface": "#09090b",
+        "secondary": "#64748b",
+        
+        // Crisp Neutral Surfaces & Containers
         "surface-container-lowest": "#ffffff",
-        "background": "#f9f9f9",
-        "inverse-surface": "#2f3131",
-        "on-secondary-fixed-variant": "#454747",
-        "on-tertiary": "#ffffff",
-        "surface-dim": "#dadada",
-        "primary": "#000000",
-        "on-surface": "#1a1c1c",
-        "primary-fixed-dim": "#c8c6c5",
-        "secondary": "#5d5f5f",
-        "outline": "#747878",
-        "inverse-on-surface": "#f0f1f1",
-        "surface-container": "#eeeeee",
-        "on-secondary-fixed": "#1a1c1c",
-        "surface-container-low": "#f3f3f4",
-        "secondary-fixed-dim": "#c6c6c7",
-        "surface-tint": "#5f5e5e",
-        "primary-container": "#1c1b1b",
-        "primary-fixed": "#e5e2e1",
-        "outline-variant": "#c4c7c7",
-        "on-primary-fixed-variant": "#474646",
-        "on-error": "#ffffff",
-        "on-tertiary-container": "#858383",
-        "on-primary": "#ffffff",
-        "surface-bright": "#f9f9f9",
-        "error": "#ba1a1a",
-        "on-primary-fixed": "#1c1b1b",
-        "tertiary-fixed": "#e5e2e1",
-        "secondary-fixed": "#e2e2e2",
-        "on-secondary": "#ffffff",
-        "on-tertiary-fixed-variant": "#474746",
-        "tertiary": "#000000",
-        "on-background": "#1a1c1c",
-        "on-primary-container": "#858383",
-        "surface-container-highest": "#e2e2e2",
-        "on-surface-variant": "#444748",
-        "surface": "#f9f9f9",
-        "inverse-primary": "#c8c6c5",
-        "surface-variant": "#e2e2e2",
-        "secondary-container": "#dcdddd",
-        "tertiary-container": "#1b1c1c",
-        "on-error-container": "#93000a",
-        "tertiary-fixed-dim": "#c8c6c5",
-        "error-container": "#ffdad6",
-        "on-secondary-container": "#5f6161",
-        "on-tertiary-fixed": "#1b1c1c"
+        "surface-container-low": "#f8f8f9",
+        "surface-container": "#f1f1f3",
+        "surface-container-high": "#e9e9ec",
+        "surface-container-highest": "#e2e2e5",
+        
+        // Inverted & Dark References
+        "inverse-surface": "#18181b",
+        "inverse-on-surface": "#f8f8f9",
+        "inverse-primary": "#ffffff",
+        
+        // Luxury Accents
+        "gold-accent": "#c5a880",
+        "gold-light": "#e8d5be",
+        "error": "#dc2626",
+        "error-container": "#fee2e2",
+        "success": "#16a34a",
+        
+        // Neutral Slate / Zinc Overrides
+        "outline": "#d4d4d8",
+        "outline-variant": "#e4e4e7",
       },
       borderRadius: {
         "DEFAULT": "0px",
@@ -88,17 +70,6 @@ export default {
         "bebas": ["Bebas Neue", "sans-serif"],
         "inter": ["Inter", "sans-serif"]
       },
-      fontSize: {
-        "headline-md": ["32px", { lineHeight: "32px", letterSpacing: "0.05em", fontWeight: "400" }],
-        "headline-lg-mobile": ["40px", { lineHeight: "40px", fontWeight: "400" }],
-        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
-        "label-bold": ["12px", { lineHeight: "16px", letterSpacing: "0.1em", fontWeight: "700" }],
-        "label-sm": ["11px", { lineHeight: "14px", fontWeight: "500" }],
-        "display-xl": ["120px", { lineHeight: "100px", letterSpacing: "-0.02em", fontWeight: "400" }],
-        "headline-lg": ["48px", { lineHeight: "48px", letterSpacing: "0.02em", fontWeight: "400" }],
-        "display-lg": ["80px", { lineHeight: "72px", letterSpacing: "0em", fontWeight: "400" }],
-        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }]
-      }
     },
   },
   plugins: [],
