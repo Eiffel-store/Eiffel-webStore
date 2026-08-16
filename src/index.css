@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #000000;
+    --color-background: #f9f9f9;
+    --color-surface: #ffffff;
+    --color-secondary: #5d5f5f;
+  }
+
+  .dark {
+    --color-primary: #ffffff;
+    --color-background: #121313;
+    --color-surface: #1c1e1e;
+    --color-secondary: #a3a6a6;
+  }
+
+  * {
+    border-color: #eeeeee;
+  }
+  
+  .dark * {
+    border-color: #2f3131;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Arabic body typography */
+  [dir="rtl"] body {
+    font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, .font-editorial {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  [dir="rtl"] h1,
+  [dir="rtl"] h2,
+  [dir="rtl"] h3,
+  [dir="rtl"] h4,
+  [dir="rtl"] .font-editorial {
+    font-family: 'IBM Plex Sans Arabic', 'Bebas Neue', sans-serif;
+    letter-spacing: normal;
+    text-transform: none;
+    font-weight: 700;
+  }
+}
+
+/* Custom luxury scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1a1c1c;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #222222;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #555555;
+}
+
+/* Custom Image Hover Zoom */
+.luxury-image-hover {
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+}
+
+.group:hover .luxury-image-hover {
+  transform: scale(1.04);
+}
+
+/* Watermark Text */
+.watermark-text {
+  font-family: 'Bebas Neue', 'IBM Plex Sans Arabic', sans-serif;
+  font-size: clamp(80px, 18vw, 240px);
+  line-height: 0.85;
+  color: rgba(0, 0, 0, 0.03);
+  pointer-events: none;
+  user-select: none;
+}
+
+.dark .watermark-text {
+  color: rgba(255, 255, 255, 0.03);
+}
+
+/* Micro animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+[dir="ltr"] .animate-slide-right {
+  animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+[dir="rtl"] .animate-slide-right {
+  animation: slideInLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Infinite marquee */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: 200%;
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
