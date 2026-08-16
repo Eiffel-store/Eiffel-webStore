@@ -18,6 +18,7 @@ import { useWishlist } from '../../context/WishlistContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useCurrency, CURRENCIES } from '../../context/CurrencyContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { Logo } from './Logo';
 
 interface NavbarProps {
   onOpenSearch: () => void;
@@ -60,7 +61,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   return (
     <>
       {/* Top Banner */}
-      <div className="bg-primary text-white dark:bg-zinc-900 dark:text-zinc-200 text-[11px] py-1.5 px-4 font-label-bold tracking-widest text-center border-b border-black/10 flex items-center justify-between">
+      <div className="bg-primary text-white dark:bg-zinc-900 dark:text-zinc-200 text-[10px] sm:text-[11px] py-1.5 px-3 sm:px-4 font-label-bold tracking-wider sm:tracking-widest text-center border-b border-black/10 flex items-center justify-between">
         <div className="hidden md:block w-36 text-left rtl:text-right text-zinc-400 font-mono text-[10px]">
           {t.topBannerLocations}
         </div>
@@ -77,26 +78,26 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
       {/* Main Sticky Navbar */}
       <header
         className={`sticky top-0 z-40 w-full bg-surface-container-lowest/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-surface-container dark:border-zinc-800 transition-all duration-200 ${
-          isScrolled ? 'h-[70px] shadow-sm' : 'h-[80px]'
+          isScrolled ? 'h-[64px] sm:h-[70px] shadow-sm' : 'h-[68px] sm:h-[80px]'
         }`}
       >
-        <div className="max-w-[1440px] mx-auto h-full px-4 sm:px-8 md:px-12 flex items-center justify-between">
+        <div className="max-w-[1440px] mx-auto h-full px-3 sm:px-8 md:px-12 flex items-center justify-between">
           {/* Left / Start: Mobile Menu Trigger & Main Links */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-3 sm:gap-8">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 text-primary dark:text-white hover:opacity-70 transition-opacity"
+              className="lg:hidden p-1.5 -ml-1.5 rtl:-ml-0 rtl:-mr-1.5 text-primary dark:text-white hover:opacity-70 transition-opacity"
               aria-label="Open mobile menu"
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
             {/* Brand Logo */}
             <Link
               to="/"
-              className="font-editorial text-3xl sm:text-4xl md:text-4xl tracking-tighter text-primary dark:text-white hover:opacity-85 transition-opacity"
+              className="hover:opacity-90 transition-opacity flex items-center py-1"
             >
-              EIFFEL
+              <Logo size="md" />
             </Link>
 
             {/* Desktop Navigation Links */}
@@ -121,17 +122,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
           </div>
 
           {/* Right / End Actions */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             {/* Language Switcher */}
             <div className="relative">
               <button
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                className="flex items-center gap-1.5 text-xs font-label-bold text-primary dark:text-white py-1 px-2.5 border border-surface-container dark:border-zinc-800 hover:border-primary dark:hover:border-white transition-colors uppercase"
+                className="flex items-center gap-1 text-[11px] sm:text-xs font-label-bold text-primary dark:text-white py-1 px-2 border border-surface-container dark:border-zinc-800 hover:border-primary dark:hover:border-white transition-colors uppercase"
                 title="Switch Language / تغيير اللغة"
               >
-                <Languages className="w-3.5 h-3.5" />
+                <Languages className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 <span>{language === 'en' ? 'EN' : 'العربية'}</span>
-                <ChevronDown className="w-3 h-3 text-secondary" />
+                <ChevronDown className="w-2.5 h-2.5 text-secondary" />
               </button>
 
               {langDropdownOpen && (
@@ -168,7 +169,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
               )}
             </div>
 
-            {/* Currency Selector */}
+            {/* Currency Selector (Desktop) */}
             <div className="relative hidden md:block">
               <button
                 onClick={() => setCurrencyDropdownOpen(!currencyDropdownOpen)}
@@ -205,7 +206,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
             {/* Dark/Light Mode Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors"
+              className="p-1.5 sm:p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -214,7 +215,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
             {/* Search Trigger */}
             <button
               onClick={onOpenSearch}
-              className="p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors"
+              className="p-1.5 sm:p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors"
               aria-label="Search"
             >
               <Search className="w-4 h-4" />
@@ -223,18 +224,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
             {/* Wishlist Link */}
             <Link
               to="/wishlist"
-              className="relative p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors"
+              className="relative p-1.5 sm:p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors"
               aria-label="Wishlist"
             >
               <Heart className="w-4 h-4" />
               {totalWishlist > 0 && (
-                <span className="absolute top-1 right-1 rtl:right-auto rtl:left-1 w-4 h-4 bg-primary dark:bg-white text-white dark:text-black font-mono text-[9px] font-bold rounded-full flex items-center justify-center">
+                <span className="absolute top-0.5 right-0.5 rtl:right-auto rtl:left-0.5 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-primary dark:bg-white text-white dark:text-black font-mono text-[8px] sm:text-[9px] font-bold rounded-full flex items-center justify-center">
                   {totalWishlist}
                 </span>
               )}
             </Link>
 
-            {/* Account Link */}
+            {/* Account Link (Desktop) */}
             <Link
               to="/account"
               className="hidden sm:flex p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors"
@@ -246,13 +247,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
             {/* Cart Trigger */}
             <button
               onClick={openCart}
-              className="relative flex items-center gap-2 p-2 bg-primary text-white dark:bg-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors px-3 py-2 font-label-bold text-xs tracking-wider"
+              className="relative flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-primary text-white dark:bg-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors px-2.5 sm:px-3 py-1.5 sm:py-2 font-label-bold text-xs tracking-wider"
               aria-label="Shopping Bag"
             >
-              <ShoppingBag className="w-4 h-4" />
+              <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline font-mono">({totalItems})</span>
               {totalItems > 0 && (
-                <span className="sm:hidden absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-4 h-4 bg-error text-white font-mono text-[9px] font-bold rounded-full flex items-center justify-center">
+                <span className="sm:hidden absolute -top-1 -right-1 rtl:-right-auto rtl:-left-1 w-4 h-4 bg-error text-white font-mono text-[9px] font-bold rounded-full flex items-center justify-center">
                   {totalItems}
                 </span>
               )}
@@ -265,16 +266,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden overflow-hidden">
           <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className={`fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} max-w-xs w-full bg-surface-container-lowest dark:bg-zinc-950 shadow-2xl p-6 flex flex-col justify-between z-10 animate-fade-in border-r rtl:border-r-0 rtl:border-l border-surface-container dark:border-zinc-800`}>
+          <div className={`fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} w-[85vw] max-w-xs bg-surface-container-lowest dark:bg-zinc-950 shadow-2xl p-6 flex flex-col justify-between z-10 animate-fade-in border-r rtl:border-r-0 rtl:border-l border-surface-container dark:border-zinc-800`}>
             <div>
-              <div className="flex items-center justify-between pb-6 border-b border-surface-container dark:border-zinc-800">
-                <span className="font-editorial text-3xl text-primary dark:text-white">EIFFEL</span>
+              <div className="flex items-center justify-between pb-5 border-b border-surface-container dark:border-zinc-800">
+                <Logo size="sm" />
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 text-primary dark:text-white"
+                  className="p-1.5 text-primary dark:text-white"
                   aria-label="Close menu"
                 >
                   <X className="w-6 h-6" />
@@ -282,13 +283,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
               </div>
 
               {/* Mobile Nav Links */}
-              <nav className="py-6 flex flex-col gap-4">
+              <nav className="py-5 flex flex-col gap-3.5">
                 {navLinks.map((link) => (
                   <Link
                     key={link.label}
                     to={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="font-editorial text-2xl tracking-wide text-primary dark:text-white hover:opacity-70 transition-opacity"
+                    className="font-editorial text-xl tracking-wide text-primary dark:text-white hover:opacity-70 transition-opacity py-1"
                   >
                     {link.label}
                   </Link>
@@ -296,11 +297,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
               </nav>
 
               {/* Language & Account in Mobile */}
-              <div className="pt-6 border-t border-surface-container dark:border-zinc-800 flex flex-col gap-3">
-                <div className="flex gap-2 mb-2">
+              <div className="pt-5 border-t border-surface-container dark:border-zinc-800 flex flex-col gap-3">
+                <div className="flex gap-2 mb-1">
                   <button
                     onClick={() => setLanguage('en')}
-                    className={`flex-1 py-2 text-xs font-mono font-bold border ${
+                    className={`flex-1 py-2 text-xs font-mono font-bold border transition-colors ${
                       language === 'en'
                         ? 'bg-primary text-white dark:bg-white dark:text-black border-primary'
                         : 'border-surface-container text-secondary'
@@ -310,7 +311,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
                   </button>
                   <button
                     onClick={() => setLanguage('ar')}
-                    className={`flex-1 py-2 text-xs font-mono font-bold border ${
+                    className={`flex-1 py-2 text-xs font-mono font-bold border transition-colors ${
                       language === 'ar'
                         ? 'bg-primary text-white dark:bg-white dark:text-black border-primary'
                         : 'border-surface-container text-secondary'
@@ -323,7 +324,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
                 <Link
                   to="/account"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 font-label-bold text-xs tracking-wider text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white uppercase"
+                  className="flex items-center gap-3 font-label-bold text-xs tracking-wider text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white uppercase py-1"
                 >
                   <User className="w-4 h-4" />
                   <span>{t.navAccount}</span>
@@ -331,7 +332,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
                 <Link
                   to="/help"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 font-label-bold text-xs tracking-wider text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white uppercase"
+                  className="flex items-center gap-3 font-label-bold text-xs tracking-wider text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white uppercase py-1"
                 >
                   <Globe className="w-4 h-4" />
                   <span>{t.helpCenterTitle}</span>
@@ -340,8 +341,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
             </div>
 
             {/* Mobile Currency & Copyright */}
-            <div className="pt-6 border-t border-surface-container dark:border-zinc-800">
-              <div className="flex items-center justify-between mb-4">
+            <div className="pt-5 border-t border-surface-container dark:border-zinc-800">
+              <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-label-bold text-secondary dark:text-zinc-400 uppercase">CURRENCY</span>
                 <select
                   value={currency.code}
