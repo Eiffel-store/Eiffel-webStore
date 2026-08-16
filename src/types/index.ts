@@ -108,12 +108,16 @@ export interface Order {
   paymentMethod: string;
 }
 
-export interface Review {
-  id: string;
-  author: string;
-  rating: number;
-  date: string;
-  title: string;
-  comment: string;
-  verified: boolean;
+export interface User {
+  name: string;
+  email: string;
+  tier: 'EIFFEL PRIVÉ' | 'EIFFEL NOIR' | 'MEMBER';
+  tierPoints: number;
+  phone: string;
+  memberSince: string;
+  addresses: Address[];
+  paymentMethods: PaymentMethod[];
+  orders: Order[];
 }
+
+export type UserProfile = User;
