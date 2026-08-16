@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect width="200" height="200" rx="40" fill="#000000" />
+  <g fill="#FFFFFF" transform="translate(0, 20)">
+    <!-- Top Spear / Spire Tip -->
+    <path d="M100 2 L106 18 L100 26 L94 18 Z" />
+    <!-- Spire Neck -->
+    <path d="M96 28 H104 L107 55 H93 Z" />
+    <!-- Main Tower Body & Legs with Arch -->
+    <path d="M91 58 H109 L115 88 H125 L135 118 H118 L107 92 H93 L82 118 H65 L75 88 H85 Z" />
+    <!-- Lower Arch Underpass -->
+    <path d="M78 118 Q100 95 122 118 L138 118 L124 88 H76 L62 118 Z" />
+    <!-- Center Triangular Window A -->
+    <path d="M93 74 H107 L103 86 H97 Z" fill="#000000" />
+    <!-- Left Wing -->
+    <g>
+      <path d="M90 44 C72 38 48 39 30 45 C45 49 68 50 87 52 Z" />
+      <path d="M86 54 C66 52 42 56 29 65 C44 65 67 62 83 62 Z" />
+      <path d="M82 65 C64 66 45 74 34 85 C47 80 66 74 79 73 Z" />
+      <path d="M78 76 C65 80 50 91 42 102 C52 94 67 86 75 83 Z" />
+    </g>
+    <!-- Right Wing -->
+    <g>
+      <path d="M110 44 C128 38 152 39 170 45 C155 49 132 50 113 52 Z" />
+      <path d="M114 54 C134 52 158 56 171 65 C156 65 133 62 117 62 Z" />
+      <path d="M118 65 C136 66 155 74 166 85 C153 80 134 74 121 73 Z" />
+      <path d="M122 76 C135 80 150 91 158 102 C148 94 133 86 125 83 Z" />
+    </g>
+  </g>
+</svg>
