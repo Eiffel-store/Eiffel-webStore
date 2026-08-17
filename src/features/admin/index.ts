@@ -8,6 +8,7 @@ export * from './pages/AdminLoginPage';
 export * from './pages/AdminDashboardPage';
 export * from './pages/AdminProductsPage';
 export * from './pages/AdminProductFormPage';
+export * from './pages/AdminHomePageEditor';
 export * from './pages/AdminOffersPage';
 export * from './pages/AdminCategoriesPage';
 export * from './pages/AdminBranchesPage';
@@ -20,6 +21,10 @@ export * from './components/dashboard/AdminStatCards';
 export * from './components/dashboard/AdminQuickNav';
 export * from './components/dashboard/AdminRecentOrders';
 export * from './components/dashboard/AdminCatalogPreview';
+
+export * from './components/home-editor/AdminHeroBannerForm';
+export * from './components/home-editor/AdminPromoBannerForm';
+export * from './components/home-editor/AdminShopLookForm';
 
 export * from './components/products/AdminProductFilterBar';
 export * from './components/products/AdminProductTable';

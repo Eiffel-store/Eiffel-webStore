@@ -172,3 +172,60 @@ export interface AuthResult {
   tierPoints?: number;
   phone?: string;
 }
+
+export interface HeroBannerSettings {
+  tagEn: string;
+  tagAr: string;
+  titleEn: string;
+  titleAr: string;
+  subtitleEn: string;
+  subtitleAr: string;
+  buttonTextEn: string;
+  buttonTextAr: string;
+  buttonLink: string;
+  secondaryButtonTextEn: string;
+  secondaryButtonTextAr: string;
+  secondaryButtonLink: string;
+  imageUrl: string;
+}
+
+export interface PromoBannerSettings {
+  badgeEn: string;
+  badgeAr: string;
+  titleEn: string;
+  titleAr: string;
+  descriptionEn: string;
+  descriptionAr: string;
+  buttonTextEn: string;
+  buttonTextAr: string;
+  buttonLink: string;
+  discountBadgeEn: string;
+  discountBadgeAr: string;
+  imageUrl: string;
+}
+
+export interface LookbookHotspot {
+  id: string;
+  x: number; // percentage 0-100
+  y: number; // percentage 0-100
+  titleEn: string;
+  titleAr: string;
+  price: number;
+  productId?: string;
+}
+
+export interface ShopTheLookSettings {
+  titleEn: string;
+  titleAr: string;
+  subtitleEn: string;
+  subtitleAr: string;
+  imageUrl: string;
+  collectionLink: string;
+  hotspots: LookbookHotspot[];
+}
+
+export interface HomePageSettings {
+  hero: HeroBannerSettings;
+  promoEditorial: PromoBannerSettings;
+  shopTheLook: ShopTheLookSettings;
+}

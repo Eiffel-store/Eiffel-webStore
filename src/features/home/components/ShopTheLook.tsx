@@ -4,23 +4,26 @@ import { useStoreData, useCurrency, useLanguage } from '@/shared';
 import { useCart } from '@/features/cart';
 
 export const ShopTheLook: React.FC = () => {
-  const { products = [] } = useStoreData();
+  const { products = [], homeSettings } = useStoreData();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
   const { isRTL } = useLanguage();
 
+  const look = homeSettings?.shopTheLook;
+  const title = isRTL ? (look?.titleAr || 'تسوق الإطلالة') : (look?.titleEn || 'Shop The Look');
+  const subtitle = isRTL ? (look?.subtitleAr || 'تنسيق الإطلالة الكاملة') : (look?.subtitleEn || 'Curated Ensemble');
+  const mainImage = look?.imageUrl || products?.[0]?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
   const lookProducts = (products || []).slice(0, 3);
-  const mainImage = products?.[0]?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
 
   return (
     <section className="py-12 sm:py-20 px-3 sm:px-8 md:px-12 max-w-[1440px] mx-auto w-full">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-10 pb-3 sm:pb-4 border-b border-surface-container dark:border-zinc-800">
         <div>
           <span className="text-[10px] sm:text-xs font-label-bold text-secondary dark:text-zinc-400 uppercase tracking-widest">
-            {isRTL ? 'تنسيق الإطلالة الكاملة' : 'Curated Ensemble'}
+            {subtitle}
           </span>
           <h2 className="font-editorial text-3xl sm:text-5xl text-primary dark:text-white mt-1">
-            {isRTL ? 'تسوق الإطلالة' : 'Shop The Look'}
+            {title}
           </h2>
         </div>
       </div>
@@ -30,8 +33,8 @@ export const ShopTheLook: React.FC = () => {
         <div className="lg:col-span-7 relative aspect-[3/4] sm:aspect-[4/3] lg:aspect-[3/4] bg-zinc-950 overflow-hidden shadow-xl group">
           <img
             src={mainImage}
-            alt="Editorial Look"
-            className="w-full h-full object-cover"
+            alt={title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
           <div className="absolute inset-0 bg-black/20" />
         </div>

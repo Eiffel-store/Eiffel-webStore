@@ -1,73 +1,86 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShoppingBag } from 'lucide-react';
+import { ArrowRight, ShoppingBag, Sparkles } from 'lucide-react';
 import { useStoreData, useCurrency, useLanguage } from '@/shared';
 import { useCart } from '@/features/cart';
 
 export const PromoEditorial: React.FC = () => {
-  const { products } = useStoreData();
+  const { products, homeSettings } = useStoreData();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
   const { t, isRTL } = useLanguage();
+
+  const promo = homeSettings?.promoEditorial;
 
   const featuredProduct = (products && products.length > 0)
     ? (products.find(p => p && p.originalPrice && p.originalPrice > p.price) || products[0])
     : null;
 
-  if (!featuredProduct) return null;
-
-  const mainImg = featuredProduct.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
+  const badge = isRTL ? (promo?.badgeAr || t.promoCapsule) : (promo?.badgeEn || t.promoCapsule);
+  const title = isRTL ? (promo?.titleAr || featuredProduct?.name || 'EIFFEL CAPSULE') : (promo?.titleEn || featuredProduct?.name || 'EIFFEL CAPSULE');
+  const description = isRTL ? (promo?.descriptionAr || featuredProduct?.subtitle || t.promoDesc) : (promo?.descriptionEn || featuredProduct?.subtitle || t.promoDesc);
+  const buttonText = isRTL ? (promo?.buttonTextAr || t.acquirePiece) : (promo?.buttonTextEn || t.acquirePiece);
+  const buttonLink = promo?.buttonLink || (featuredProduct ? `/product/${featuredProduct.id}` : '/collections/offers');
+  const discountBadge = isRTL ? (promo?.discountBadgeAr || t.promoTailoringNotice) : (promo?.discountBadgeEn || t.promoTailoringNotice);
+  const mainImg = promo?.imageUrl || featuredProduct?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
 
   return (
     <section className="bg-surface-container-low dark:bg-zinc-900 py-10 sm:py-16 px-3 sm:px-8 md:px-12 border-y border-surface-container dark:border-zinc-800">
       <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
-        <div className="lg:col-span-7 relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-zinc-950 shadow-md">
+        {/* Banner Media */}
+        <div className="lg:col-span-7 relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-zinc-950 shadow-md group">
           <img
             src={mainImg}
-            alt={featuredProduct.name || 'Featured product'}
-            className="w-full h-full object-cover"
+            alt={title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
-          <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3 bg-primary text-white dark:bg-white dark:text-black text-[9px] sm:text-[10px] font-label-bold tracking-widest px-2.5 py-1 uppercase shadow-md">
-            {t.promoCapsule}
+          <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3 bg-primary text-white dark:bg-white dark:text-black text-[9px] sm:text-[10px] font-label-bold tracking-widest px-2.5 py-1 uppercase shadow-md flex items-center gap-1">
+            <Sparkles className="w-3 h-3 text-amber-400" />
+            <span>{badge}</span>
           </div>
         </div>
 
+        {/* Content Side */}
         <div className="lg:col-span-5 flex flex-col justify-center space-y-4 sm:space-y-6 lg:pl-6 rtl:lg:pl-0 rtl:lg:pr-6">
           <div>
             <span className="text-[10px] sm:text-xs font-label-bold tracking-widest text-secondary dark:text-zinc-400 uppercase">
               {t.exclusiveBadge}
             </span>
             <h2 className="font-editorial text-3xl sm:text-5xl text-primary dark:text-white leading-[1.0] sm:leading-[0.95] mt-1">
-              {featuredProduct.name}
+              {title}
             </h2>
           </div>
           <p className="text-xs sm:text-sm text-secondary dark:text-zinc-300 leading-relaxed font-light">
-            {featuredProduct.subtitle || t.promoDesc}
+            {description}
           </p>
 
-          <div className="flex flex-wrap items-baseline gap-3 pt-1">
-            <span className="font-mono text-xl sm:text-2xl font-bold text-primary dark:text-white">{formatPrice(featuredProduct.price || 0)}</span>
-            {featuredProduct.originalPrice && (
-              <span className="text-xs font-mono text-secondary line-through">{formatPrice(featuredProduct.originalPrice)}</span>
-            )}
-            <span className="text-xs font-label-bold text-green-600 dark:text-green-400">{t.promoTailoringNotice}</span>
-          </div>
+          {featuredProduct && (
+            <div className="flex flex-wrap items-baseline gap-3 pt-1">
+              <span className="font-mono text-xl sm:text-2xl font-bold text-primary dark:text-white">{formatPrice(featuredProduct.price || 0)}</span>
+              {featuredProduct.originalPrice && (
+                <span className="text-xs font-mono text-secondary line-through">{formatPrice(featuredProduct.originalPrice)}</span>
+              )}
+              <span className="text-xs font-label-bold text-emerald-600 dark:text-emerald-400">{discountBadge}</span>
+            </div>
+          )}
 
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <Link
-              to={`/product/${featuredProduct.id}`}
+              to={buttonLink}
               className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-widest uppercase hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all flex items-center justify-center gap-2 shadow-md"
             >
-              <span>{t.acquirePiece}</span>
+              <span>{buttonText}</span>
               <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
             </Link>
-            <button
-              onClick={() => addToCart(featuredProduct)}
-              className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 border border-primary dark:border-white font-label-bold text-xs tracking-widest uppercase text-primary dark:text-white hover:bg-primary hover:text-white dark:hover:bg-white dark:hover:text-black transition-all flex items-center justify-center gap-2"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              <span>{t.quickAdd}</span>
-            </button>
+            {featuredProduct && (
+              <button
+                onClick={() => addToCart(featuredProduct)}
+                className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 border border-primary dark:border-white font-label-bold text-xs tracking-widest uppercase text-primary dark:text-white hover:bg-primary hover:text-white dark:hover:bg-white dark:hover:text-black transition-all flex items-center justify-center gap-2"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                <span>{t.quickAdd}</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

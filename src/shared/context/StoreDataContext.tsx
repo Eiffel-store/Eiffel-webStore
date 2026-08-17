@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Product, StoreLocation, CategoryItem, Coupon, Order, StoreSettings } from '@/types';
+import { Product, StoreLocation, CategoryItem, Coupon, Order, StoreSettings, HomePageSettings } from '@/types';
 import { PRODUCTS as INITIAL_PRODUCTS, CATEGORIES as INITIAL_CATEGORIES } from '@/data/products';
 import { STORES as INITIAL_STORES } from '@/data/stores';
 import { productService } from '@/services/productService';
@@ -38,6 +38,51 @@ const DEFAULT_SETTINGS: StoreSettings = {
   adminPin: '8899'
 };
 
+export const DEFAULT_HOME_SETTINGS: HomePageSettings = {
+  hero: {
+    tagEn: 'AUTUMN / WINTER 2026 CAMPAIGN',
+    tagAr: 'تشكيلة خريف / شتاء 2026 الحصرية',
+    titleEn: 'ARCHITECTURAL FORM',
+    titleAr: 'الهيبة المعمارية الفاخرة',
+    subtitleEn: 'Heavyweight Egyptian Giza Cotton engineered with brutalist discipline and precision tailoring.',
+    subtitleAr: 'قطن مصري فاخر ثقيل محاك بانضباط معماري وقصات حصرية فائقة الدقة.',
+    buttonTextEn: 'EXPLORE COLLECTION',
+    buttonTextAr: 'استكشف التشكيلة',
+    buttonLink: '/collections/men',
+    secondaryButtonTextEn: 'VIEW LOOKBOOK',
+    secondaryButtonTextAr: 'عرض الكتالوج',
+    secondaryButtonLink: '/collections/new-arrivals',
+    imageUrl: `${import.meta.env.BASE_URL}images/products/eiffel-outfit-flatlay.jpg`
+  },
+  promoEditorial: {
+    badgeEn: 'LIMITED EDITION CAPSULE',
+    badgeAr: 'إصدار محدود خاص',
+    titleEn: 'EIFFEL HEAVY OVERSHIRT',
+    titleAr: 'قميص إيفل المعماري الثقيل',
+    descriptionEn: 'Double-faced heavyweight textile structure designed for effortless elegance and enduring comfort.',
+    descriptionAr: 'نسيج فاخر مزدوج الوجه مصمم ليمنحك حضوراً واثقاً وراحة فائقة طوال اليوم.',
+    buttonTextEn: 'ACQUIRE PIECE',
+    buttonTextAr: 'اطلب القطعة الآن',
+    buttonLink: '/collections/offers',
+    discountBadgeEn: 'UP TO 30% OFF',
+    discountBadgeAr: 'خصم يصل إلى 30%',
+    imageUrl: 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop'
+  },
+  shopTheLook: {
+    titleEn: 'SHOP THE COMPLETE LOOK',
+    titleAr: 'تسوق الإطلالة الكاملة',
+    subtitleEn: 'Curated Ensemble for the Modern Man',
+    subtitleAr: 'تنسيق متناسق متكامل للرجل العصري',
+    imageUrl: `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`,
+    collectionLink: '/collections/men',
+    hotspots: [
+      { id: 'h-1', x: 50, y: 30, titleEn: 'Heavyweight Cardigan', titleAr: 'كارديجان ثقيل', price: 650 },
+      { id: 'h-2', x: 48, y: 55, titleEn: 'Relaxed Tailored Pant', titleAr: 'بنطال تيلورد مريح', price: 480 },
+      { id: 'h-3', x: 52, y: 80, titleEn: 'Leather Minimal Chelsea', titleAr: 'حذاء تشيلسي كلاسيك', price: 890 }
+    ]
+  }
+};
+
 interface StoreDataContextType {
   products: Product[];
   categories: CategoryItem[];
@@ -45,6 +90,7 @@ interface StoreDataContextType {
   coupons: Coupon[];
   orders: Order[];
   settings: StoreSettings;
+  homeSettings: HomePageSettings;
   isLoading: boolean;
 
   // Products CRUD
@@ -76,6 +122,7 @@ interface StoreDataContextType {
 
   // Settings
   updateSettings: (updates: Partial<StoreSettings>) => void;
+  updateHomeSettings: (updates: Partial<HomePageSettings>) => void;
 
   // Backup / Restore
   exportData: () => string;
@@ -116,10 +163,37 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [coupons, setCoupons] = useState<Coupon[]>(DEFAULT_COUPONS);
   const [orders, setOrders] = useState<Order[]>([]);
   const [localSettings, setLocalSettings] = useState<StoreSettings>(DEFAULT_SETTINGS);
+  const [homeSettings, setHomeSettings] = useState<HomePageSettings>(() => {
+    try {
+      const saved = localStorage.getItem('eiffel_home_settings');
+      return saved ? { ...DEFAULT_HOME_SETTINGS, ...JSON.parse(saved) } : DEFAULT_HOME_SETTINGS;
+    } catch {
+      return DEFAULT_HOME_SETTINGS;
+    }
+  });
 
   const products = (serverProducts && serverProducts.length > 0) ? serverProducts : localProducts;
   const categories = (serverCategories && serverCategories.length > 0) ? serverCategories : localCategories;
   const settings = serverSettings || localSettings;
+
+  // Home Page Settings
+  const updateHomeSettings = (updates: Partial<HomePageSettings>) => {
+    setHomeSettings(prev => {
+      const updated = {
+        ...prev,
+        ...updates,
+        hero: updates.hero ? { ...prev.hero, ...updates.hero } : prev.hero,
+        promoEditorial: updates.promoEditorial ? { ...prev.promoEditorial, ...updates.promoEditorial } : prev.promoEditorial,
+        shopTheLook: updates.shopTheLook ? { ...prev.shopTheLook, ...updates.shopTheLook } : prev.shopTheLook,
+      };
+      try {
+        localStorage.setItem('eiffel_home_settings', JSON.stringify(updated));
+      } catch (err) {
+        console.error('Failed to save home settings', err);
+      }
+      return updated;
+    });
+  };
 
   // Mutations
   const createProductMutation = useMutation({
@@ -263,7 +337,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const exportData = (): string => {
-    return JSON.stringify({ products, categories, stores, coupons, orders, settings }, null, 2);
+    return JSON.stringify({ products, categories, stores, coupons, orders, settings, homeSettings }, null, 2);
   };
 
   const importData = (jsonData: string): boolean => {
@@ -273,6 +347,10 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (data.coupons) setCoupons(data.coupons);
       if (data.products) setLocalProducts(data.products);
       if (data.categories) setLocalCategories(data.categories);
+      if (data.homeSettings) {
+        setHomeSettings(data.homeSettings);
+        localStorage.setItem('eiffel_home_settings', JSON.stringify(data.homeSettings));
+      }
       return true;
     } catch {
       return false;
@@ -285,6 +363,8 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setStores(INITIAL_STORES);
     setCoupons(DEFAULT_COUPONS);
     setLocalSettings(DEFAULT_SETTINGS);
+    setHomeSettings(DEFAULT_HOME_SETTINGS);
+    localStorage.removeItem('eiffel_home_settings');
     queryClient.invalidateQueries();
   };
 
@@ -297,6 +377,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         coupons,
         orders,
         settings,
+        homeSettings,
         isLoading: isProductsLoading,
         addProduct,
         updateProduct,
@@ -316,6 +397,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         updateOrderStatus,
         deleteOrder,
         updateSettings,
+        updateHomeSettings,
         exportData,
         importData,
         resetAllToDefault

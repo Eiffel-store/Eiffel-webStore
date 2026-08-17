@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   Plus,
-  ShieldCheck
+  ShieldCheck,
+  LayoutTemplate
 } from 'lucide-react';
 import { useAdminAuth } from '@/features/admin';
 import { useStoreData } from '@/shared';
@@ -32,6 +33,7 @@ export const AdminLayout: React.FC = () => {
   const navItems = [
     { label: isRTL ? 'لوحة المعلومات' : 'Dashboard', href: '/admin', icon: LayoutDashboard, end: true },
     { label: isRTL ? 'إدارة المنتجات' : 'Products', href: '/admin/products', icon: ShoppingBag, badge: products.length },
+    { label: isRTL ? 'الصفحة الرئيسية' : 'Home Page & Banners', href: '/admin/home', icon: LayoutTemplate },
     { label: isRTL ? 'العروض والكوبونات' : 'Offers & Coupons', href: '/admin/offers', icon: Tag },
     { label: isRTL ? 'الأقسام والتصنيفات' : 'Categories', href: '/admin/categories', icon: Grid },
     { label: isRTL ? 'إدارة الفروع' : 'Branches & Stores', href: '/admin/branches', icon: MapPin },

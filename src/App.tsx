@@ -23,6 +23,7 @@ import {
   AdminDashboardPage,
   AdminProductsPage,
   AdminProductFormPage,
+  AdminHomePageEditor,
   AdminOffersPage,
   AdminCategoriesPage,
   AdminBranchesPage,
@@ -94,6 +95,7 @@ export const App: React.FC = () => {
                             <Route path="products" element={<AdminProductsPage />} />
                             <Route path="products/new" element={<AdminProductFormPage />} />
                             <Route path="products/edit/:id" element={<AdminProductFormPage />} />
+                            <Route path="home" element={<AdminHomePageEditor />} />
                             <Route path="offers" element={<AdminOffersPage />} />
                             <Route path="categories" element={<AdminCategoriesPage />} />
                             <Route path="branches" element={<AdminBranchesPage />} />
