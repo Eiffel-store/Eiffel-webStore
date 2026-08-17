@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Upload } from 'lucide-react';
+import { ShoppingBag, Upload, Loader2 } from 'lucide-react';
 import { ShopTheLookSettings } from '@/types';
 import { useLanguage } from '@/shared';
+import { uploadService } from '@/services/uploadService';
 
 interface AdminShopLookFormProps {
   shopLook: ShopTheLookSettings;
@@ -14,18 +15,32 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
 }) => {
   const { isRTL } = useLanguage();
   const [urlInput, setUrlInput] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === 'string') {
-        onChange({ ...shopLook, imageUrl: reader.result });
+    setIsUploading(true);
+    try {
+      const res = await uploadService.uploadImage(file);
+      if (res?.fileUrl) {
+        onChange({ ...shopLook, imageUrl: res.fileUrl });
+        return;
       }
-    };
-    reader.readAsDataURL(file);
+      throw new Error('No URL returned');
+    } catch {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          onChange({ ...shopLook, imageUrl: reader.result });
+        }
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
   };
 
   const handleApplyUrl = () => {

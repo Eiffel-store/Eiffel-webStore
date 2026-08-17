@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Image as ImageIcon, Upload, Link as LinkIcon, Sparkles } from 'lucide-react';
+import { Image as ImageIcon, Upload, Link as LinkIcon, Sparkles, Loader2 } from 'lucide-react';
 import { HeroBannerSettings } from '@/types';
 import { useLanguage } from '@/shared';
+import { uploadService } from '@/services/uploadService';
 
 interface AdminHeroBannerFormProps {
   hero: HeroBannerSettings;
@@ -14,18 +15,34 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
 }) => {
   const { isRTL } = useLanguage();
   const [urlInput, setUrlInput] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === 'string') {
-        onChange({ ...hero, imageUrl: reader.result });
+    setIsUploading(true);
+    try {
+      // 1. Attempt live server upload
+      const res = await uploadService.uploadImage(file);
+      if (res?.fileUrl) {
+        onChange({ ...hero, imageUrl: res.fileUrl });
+        return;
       }
-    };
-    reader.readAsDataURL(file);
+      throw new Error('No URL returned');
+    } catch {
+      // 2. Offline / local fallback to Data URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          onChange({ ...hero, imageUrl: reader.result });
+        }
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
   };
 
   const handleApplyUrl = () => {
