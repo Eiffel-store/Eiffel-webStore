@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Product, StoreLocation, CategoryItem, Coupon, Order, StoreSettings } from '@/types';
 import { PRODUCTS as INITIAL_PRODUCTS, CATEGORIES as INITIAL_CATEGORIES } from '@/data/products';
@@ -6,7 +6,6 @@ import { STORES as INITIAL_STORES } from '@/data/stores';
 import { productService } from '@/services/productService';
 import { categoryService } from '@/services/categoryService';
 import { orderService } from '@/services/orderService';
-import { couponService } from '@/services/couponService';
 import { settingsService } from '@/services/settingsService';
 
 const INITIAL_CATEGORIES_DATA: CategoryItem[] = INITIAL_CATEGORIES.map(c => ({
@@ -92,32 +91,35 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // 1. React Query: Fetch Products with initial fallback
   const { data: serverProducts, isLoading: isProductsLoading } = useQuery({
     queryKey: ['products'],
-    queryFn: () => productService.getAll(),
+    queryFn: () => productService.getAll().catch(() => INITIAL_PRODUCTS),
     placeholderData: INITIAL_PRODUCTS,
   });
 
   // 2. React Query: Fetch Categories
   const { data: serverCategories } = useQuery({
     queryKey: ['categories'],
-    queryFn: () => categoryService.getAll(),
+    queryFn: () => categoryService.getAll().catch(() => INITIAL_CATEGORIES_DATA),
     placeholderData: INITIAL_CATEGORIES_DATA,
   });
 
   // 3. React Query: Fetch Settings
   const { data: serverSettings } = useQuery({
     queryKey: ['settings'],
-    queryFn: () => settingsService.getSettings(),
+    queryFn: () => settingsService.getSettings().catch(() => DEFAULT_SETTINGS),
     placeholderData: DEFAULT_SETTINGS,
   });
 
-  // 4. Local & Server States
+  // 4. Local & Server States with smart offline fallback
+  const [localProducts, setLocalProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [localCategories, setLocalCategories] = useState<CategoryItem[]>(INITIAL_CATEGORIES_DATA);
   const [stores, setStores] = useState<StoreLocation[]>(INITIAL_STORES);
   const [coupons, setCoupons] = useState<Coupon[]>(DEFAULT_COUPONS);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [localSettings, setLocalSettings] = useState<StoreSettings>(DEFAULT_SETTINGS);
 
-  const products = (serverProducts && serverProducts.length > 0) ? serverProducts : INITIAL_PRODUCTS;
-  const categories = (serverCategories && serverCategories.length > 0) ? serverCategories : INITIAL_CATEGORIES_DATA;
-  const settings = serverSettings || DEFAULT_SETTINGS;
+  const products = (serverProducts && serverProducts.length > 0) ? serverProducts : localProducts;
+  const categories = (serverCategories && serverCategories.length > 0) ? serverCategories : localCategories;
+  const settings = serverSettings || localSettings;
 
   // Mutations
   const createProductMutation = useMutation({
@@ -159,15 +161,18 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const addProduct = (newProdData: Omit<Product, 'id'>): Product => {
     const id = `prod-${Date.now()}`;
     const newProduct: Product = { ...newProdData, id, createdAt: new Date().toISOString() };
+    setLocalProducts(prev => [newProduct, ...prev]);
     createProductMutation.mutate(newProduct);
     return newProduct;
   };
 
   const updateProduct = (id: string, updates: Partial<Product>) => {
+    setLocalProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
     updateProductMutation.mutate({ id, updates });
   };
 
   const deleteProduct = (id: string) => {
+    setLocalProducts(prev => prev.filter(p => p.id !== id));
     deleteProductMutation.mutate(id);
   };
 
@@ -179,18 +184,24 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const addCategory = (catData: Omit<CategoryItem, 'id'>) => {
     const id = catData.nameEn ? catData.nameEn.toLowerCase().replace(/\s+/g, '-') : `cat-${Date.now()}`;
     const newCat: CategoryItem = { ...catData, id };
+    setLocalCategories(prev => [...prev, newCat]);
     categoryService.create(newCat).then(() => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
+    }).catch(() => {
+      // offline fallback
     });
   };
 
   const updateCategory = (id: string, updates: Partial<CategoryItem>) => {
-    // Local / Server sync
+    setLocalCategories(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
   };
 
   const deleteCategory = (id: string) => {
+    setLocalCategories(prev => prev.filter(c => c.id !== id));
     categoryService.delete(id).then(() => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
+    }).catch(() => {
+      // offline fallback
     });
   };
 
@@ -205,7 +216,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const deleteStore = (id: string) => {
-    setStores(prev => prev.map(s => s.id === id ? s : s).filter(s => s.id !== id));
+    setStores(prev => prev.filter(s => s.id !== id));
   };
 
   // Coupon Methods
@@ -232,10 +243,12 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Order Methods
   const addOrder = (order: Order) => {
+    setOrders(prev => [order, ...prev]);
     createOrderMutation.mutate(order);
   };
 
   const updateOrderStatus = (orderId: string, status: Order['status']) => {
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
     updateOrderStatusMutation.mutate({ id: orderId, status });
   };
 
@@ -245,6 +258,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Settings
   const updateSettings = (updates: Partial<StoreSettings>) => {
+    setLocalSettings(prev => ({ ...prev, ...updates }));
     updateSettingsMutation.mutate(updates);
   };
 
@@ -257,6 +271,8 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const data = JSON.parse(jsonData);
       if (data.stores) setStores(data.stores);
       if (data.coupons) setCoupons(data.coupons);
+      if (data.products) setLocalProducts(data.products);
+      if (data.categories) setLocalCategories(data.categories);
       return true;
     } catch {
       return false;
@@ -264,6 +280,11 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const resetAllToDefault = () => {
+    setLocalProducts(INITIAL_PRODUCTS);
+    setLocalCategories(INITIAL_CATEGORIES_DATA);
+    setStores(INITIAL_STORES);
+    setCoupons(DEFAULT_COUPONS);
+    setLocalSettings(DEFAULT_SETTINGS);
     queryClient.invalidateQueries();
   };
 

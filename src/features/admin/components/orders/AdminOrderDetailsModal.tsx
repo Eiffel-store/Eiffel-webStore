@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Package, Truck, User, MapPin } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Order } from '@/types';
 import { useCurrency, useLanguage } from '@/shared';
 

@@ -14,6 +14,7 @@ interface CartContextType {
   subtotal: number;
   totalItems: number;
   discountCode: string;
+  discountPercentage: number;
   discountAmount: number;
   applyDiscount: (code: string) => { success: boolean; message: string };
   removeDiscount: () => void;
@@ -32,6 +33,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const subtotal = store.getSubtotal();
   const totalItems = store.getItemCount();
   const discountAmount = store.getDiscountAmount();
+  const discountPercentage = store.appliedCoupon?.discountPercentage || 0;
   const discountCode = store.appliedCoupon?.code || '';
 
   const freeShippingRemaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
@@ -84,6 +86,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         subtotal,
         totalItems,
         discountCode,
+        discountPercentage,
         discountAmount,
         applyDiscount,
         removeDiscount,

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { ShieldCheck, Mail, Lock, ArrowRight, ArrowLeft, AlertCircle, Eye, EyeOff, Loader2, Sparkles } from 'lucide-react';
+import { ShieldCheck, Mail, Lock, ArrowRight, ArrowLeft, AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useLanguage } from '@/shared';
 
@@ -12,7 +12,7 @@ export const AdminLoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const { loginAdminWithCredentials, isAdminAuthenticated } = useAdminAuth();
-  const { t, isRTL } = useLanguage();
+  const { isRTL } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 

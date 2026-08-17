@@ -14,6 +14,7 @@ export const CartPage: React.FC = () => {
     updateQuantity,
     subtotal,
     discountCode,
+    discountPercentage,
     discountAmount,
     applyDiscount,
     removeDiscount,
@@ -30,10 +31,10 @@ export const CartPage: React.FC = () => {
   const [giftWrap, setGiftWrap] = useState(false);
   const [orderNote, setOrderNote] = useState('');
 
-  const discountValue = subtotal * discountAmount;
+  const discountValue = discountAmount;
   const giftWrapFee = giftWrap ? 15 : 0;
-  const shippingFee = freeShippingRemaining === 0 ? 0 : 25;
-  const estimatedTotal = subtotal - discountValue + giftWrapFee + shippingFee;
+  const shippingFee = freeShippingRemaining === 0 ? 0 : 65;
+  const estimatedTotal = Math.max(0, subtotal - discountValue + giftWrapFee + shippingFee);
 
   const handleApply = (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,6 +119,7 @@ export const CartPage: React.FC = () => {
                 subtotal={subtotal}
                 discountValue={discountValue}
                 discountCode={discountCode}
+                discountPercentage={discountPercentage}
                 discountAmount={discountAmount}
                 giftWrap={giftWrap}
                 shippingFee={shippingFee}

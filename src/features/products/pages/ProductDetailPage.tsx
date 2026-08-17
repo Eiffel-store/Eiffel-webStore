@@ -24,8 +24,8 @@ export const ProductDetailPage: React.FC = () => {
   const product = (id ? getProductById(id) : undefined) || products[0];
 
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || 'M');
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]?.name || 'Noir');
+  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || 'M');
+  const [selectedColor, setSelectedColor] = useState(product?.colors?.[0]?.name || 'Noir');
   const [quantity, setQuantity] = useState(1);
   const [activeAccordion, setActiveAccordion] = useState<string | null>('details');
   const [showSizeGuide, setShowSizeGuide] = useState(false);
@@ -34,8 +34,8 @@ export const ProductDetailPage: React.FC = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     setSelectedImage(0);
-    setSelectedSize(product.sizes[0] || 'M');
-    setSelectedColor(product.colors[0]?.name || 'Noir');
+    setSelectedSize(product?.sizes?.[0] || 'M');
+    setSelectedColor(product?.colors?.[0]?.name || 'Noir');
   }, [id, product]);
 
   const isSaved = isInWishlist(product.id);

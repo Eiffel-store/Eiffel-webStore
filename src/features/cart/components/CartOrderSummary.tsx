@@ -7,6 +7,7 @@ interface CartOrderSummaryProps {
   subtotal: number;
   discountValue: number;
   discountCode: string | null;
+  discountPercentage?: number;
   discountAmount: number;
   giftWrap: boolean;
   shippingFee: number;
@@ -23,7 +24,7 @@ export const CartOrderSummary: React.FC<CartOrderSummaryProps> = ({
   subtotal,
   discountValue,
   discountCode,
-  discountAmount,
+  discountPercentage = 0,
   giftWrap,
   shippingFee,
   estimatedTotal,
@@ -65,7 +66,7 @@ export const CartOrderSummary: React.FC<CartOrderSummaryProps> = ({
           <div className="flex items-center justify-between p-2.5 bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-800 text-xs">
             <span className="flex items-center gap-1.5 font-mono text-primary dark:text-white">
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              {t.privilegeDiscount}: <strong>{discountCode}</strong> ({(discountAmount * 100).toFixed(0)}%)
+              {t.privilegeDiscount}: <strong>{discountCode}</strong> ({discountPercentage > 0 ? `${discountPercentage}%` : ''})
             </span>
             <button onClick={onRemoveDiscount} className="text-error font-label-bold hover:underline">
               {t.remove}
@@ -100,7 +101,7 @@ export const CartOrderSummary: React.FC<CartOrderSummaryProps> = ({
         <div className="flex justify-between">
           <span>{t.estimatedShipping}</span>
           <span className="font-mono text-primary dark:text-white font-medium">
-            {shippingFee === 0 ? t.complimentary : formatPrice(25)}
+            {shippingFee === 0 ? t.complimentary : formatPrice(shippingFee)}
           </span>
         </div>
         <div className="flex justify-between text-sm font-bold text-primary dark:text-white pt-3 border-t border-surface-container dark:border-zinc-800">

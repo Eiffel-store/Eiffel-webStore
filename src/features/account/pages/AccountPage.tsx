@@ -17,7 +17,7 @@ import { Address, PaymentMethod, User } from '@/types';
 
 export const AccountPage: React.FC = () => {
   const { user, isAuthenticated, role, logout } = useAuthStore();
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
   const { data: serverOrders = [] } = useMyOrders();
 
   const [activeTab, setActiveTab] = useState<AccountTabKey>('overview');

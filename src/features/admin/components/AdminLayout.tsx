@@ -12,22 +12,16 @@ import {
   ExternalLink,
   Menu,
   X,
-  Sun,
-  Moon,
   Plus,
-  Bell,
-  ArrowRight,
   ShieldCheck
 } from 'lucide-react';
 import { useAdminAuth } from '@/features/admin';
 import { useStoreData } from '@/shared';
-import { useTheme } from '@/shared';
 import { useLanguage } from '@/shared';
 
 export const AdminLayout: React.FC = () => {
   const { logoutAdmin } = useAdminAuth();
   const { orders, products } = useStoreData();
-  const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, isRTL } = useLanguage();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const location = useLocation();

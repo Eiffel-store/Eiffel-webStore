@@ -1,25 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Check, ShieldCheck, Truck, RotateCcw, Sparkles } from 'lucide-react';
+import { ShieldCheck, Truck, RotateCcw, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/shared';
 import { Logo } from './Logo';
 import { FacebookIcon, WhatsAppIcon } from './SocialIcons';
 
 export const Footer: React.FC = () => {
   const { t, isRTL } = useLanguage();
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
 
   const facebookUrl = 'https://www.facebook.com/profile.php?id=100093268017929';
   const whatsappUrl = 'https://wa.me/201009326801';
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setSubscribed(true);
-    setTimeout(() => setSubscribed(false), 4000);
-    setEmail('');
-  };
 
   return (
     <footer className="bg-primary text-white dark:bg-black border-t border-zinc-800 transition-colors">

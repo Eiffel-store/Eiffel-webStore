@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Trash2, Heart, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Trash2, Heart } from 'lucide-react';
 import { useWishlist } from '@/features/wishlist';
 import { useCart } from '@/features/cart';
 import { useCurrency } from '@/shared';
@@ -10,7 +10,7 @@ export const WishlistPage: React.FC = () => {
   const { wishlist, removeFromWishlist, clearWishlist } = useWishlist();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-background text-on-surface py-12 px-4 sm:px-8 md:px-12">
@@ -95,7 +95,7 @@ export const WishlistPage: React.FC = () => {
 
                   <button
                     onClick={() => {
-                      addToCart(product, product.sizes[0] || 'M', product.colors[0]?.name || 'Noir', 1);
+                      addToCart(product, product.sizes?.[0] || 'M', product.colors?.[0]?.name || 'Noir', 1);
                       removeFromWishlist(product.id);
                     }}
                     className="w-full py-3 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-widest uppercase flex items-center justify-center gap-2 hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors"

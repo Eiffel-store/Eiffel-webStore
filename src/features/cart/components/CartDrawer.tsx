@@ -17,7 +17,6 @@ export const CartDrawer: React.FC = () => {
     discountAmount,
     applyDiscount,
     removeDiscount,
-    freeShippingThreshold,
     freeShippingRemaining,
     freeShippingProgress
   } = useCart();
@@ -147,6 +146,39 @@ export const CartDrawer: React.FC = () => {
           {/* Footer & Checkout */}
           {cart.length > 0 && (
             <div className="p-4 sm:p-6 bg-surface-container-low dark:bg-zinc-900 border-t border-surface-container dark:border-zinc-800 space-y-4">
+              {/* Quick Coupon Input */}
+              <div className="pb-2 border-b border-surface-container dark:border-zinc-800">
+                {!discountCode ? (
+                  <form onSubmit={handleApplyCoupon} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value)}
+                      placeholder={t.promoCodePlaceholder}
+                      className="flex-1 bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-700 px-2.5 py-1.5 text-xs font-mono uppercase text-primary dark:text-white focus:outline-none"
+                    />
+                    <button
+                      type="submit"
+                      className="px-3 py-1.5 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs uppercase hover:bg-neutral-800 transition-colors"
+                    >
+                      {t.apply}
+                    </button>
+                  </form>
+                ) : (
+                  <div className="flex items-center justify-between text-xs font-mono text-emerald-500">
+                    <span>{t.privilegeDiscount}: {discountCode}</span>
+                    <button onClick={removeDiscount} className="text-red-500 hover:underline text-[11px]">
+                      {t.remove}
+                    </button>
+                  </div>
+                )}
+                {couponMsg && (
+                  <p className={`text-[10px] mt-1 ${couponMsg.success ? 'text-emerald-500' : 'text-red-500'}`}>
+                    {couponMsg.message}
+                  </p>
+                )}
+              </div>
+
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between text-secondary dark:text-zinc-400">
                   <span>{t.subtotal}</span>

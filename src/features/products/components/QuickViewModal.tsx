@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { X, ShoppingBag, Heart, Check } from 'lucide-react';
+import { X, ShoppingBag, Heart } from 'lucide-react';
 import { Product } from '@/types';
 import { useCart } from '@/features/cart';
 import { useWishlist } from '@/features/wishlist';
-import { useCurrency, useLanguage } from '@/shared';
+import { useCurrency } from '@/shared';
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -14,7 +14,6 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
-  const { isRTL } = useLanguage();
 
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
@@ -40,6 +39,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
       <div className="relative bg-white dark:bg-zinc-950 border border-surface-container dark:border-zinc-800 w-full max-w-3xl overflow-hidden shadow-2xl">
         <button
           onClick={onClose}
+          aria-label="Close Quick View"
           className="absolute top-4 right-4 rtl:right-auto rtl:left-4 p-1.5 text-secondary hover:text-primary dark:text-zinc-400 dark:hover:text-white z-20"
         >
           <X className="w-5 h-5" />
@@ -47,12 +47,27 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
 
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Gallery */}
-          <div className="relative aspect-[3/4] bg-zinc-900">
-            <img
-              src={images[selectedImage] || images[0]}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
+          <div className="flex flex-col bg-zinc-900">
+            <div className="relative aspect-[3/4] w-full">
+              <img
+                src={images[selectedImage] || images[0]}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            {images.length > 1 && (
+              <div className="flex gap-2 p-2 bg-zinc-950 overflow-x-auto">
+                {images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImage(idx)}
+                    className={`w-12 h-14 shrink-0 border ${selectedImage === idx ? 'border-white' : 'border-zinc-800 opacity-60'}`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Details */}

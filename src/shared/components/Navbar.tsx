@@ -29,7 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   const { totalItems, openCart } = useCart();
   const { totalWishlist } = useWishlist();
   const { theme, toggleTheme } = useTheme();
-  const { language, setLanguage, t, isRTL } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const { user, isAuthenticated, role, logout } = useAuthStore();
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Percent, Plus, Trash2, CheckCircle, XCircle } from 'lucide-react';
-import { Coupon } from '@/types';
 import { useLanguage, useCurrency, useStoreData } from '@/shared';
 
 export const AdminCouponsManager: React.FC = () => {

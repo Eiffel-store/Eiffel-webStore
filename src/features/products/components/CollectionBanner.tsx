@@ -15,7 +15,7 @@ export const CollectionBanner: React.FC<CollectionBannerProps> = ({
   subtitle,
   image,
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { isRTL } = useLanguage();
 
   const getBreadcrumbCategory = () => {
     const cat = category.toLowerCase();

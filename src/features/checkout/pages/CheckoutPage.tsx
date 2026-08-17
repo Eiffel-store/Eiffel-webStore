@@ -40,9 +40,9 @@ export const CheckoutPage: React.FC = () => {
   const [cardCvc, setCardCvc] = useState('842');
   const [cardName, setCardName] = useState('TAREK MANSOUR');
 
-  const discountValue = subtotal * discountAmount;
+  const discountValue = discountAmount;
   const shippingFee = shippingMethod === 'white-glove' ? 10 : 0;
-  const totalAmount = subtotal - discountValue + shippingFee;
+  const totalAmount = Math.max(0, subtotal - discountValue + shippingFee);
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
