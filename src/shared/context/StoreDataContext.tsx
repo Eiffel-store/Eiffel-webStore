@@ -1,7 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Product, StoreLocation, CategoryItem, Coupon, Order, StoreSettings } from '@/types';
 import { PRODUCTS as INITIAL_PRODUCTS, CATEGORIES as INITIAL_CATEGORIES } from '@/data/products';
 import { STORES as INITIAL_STORES } from '@/data/stores';
+import { productService } from '@/services/productService';
+import { categoryService } from '@/services/categoryService';
+import { orderService } from '@/services/orderService';
+import { couponService } from '@/services/couponService';
+import { settingsService } from '@/services/settingsService';
 
 const INITIAL_CATEGORIES_DATA: CategoryItem[] = INITIAL_CATEGORIES.map(c => ({
   id: c.id,
@@ -13,33 +19,24 @@ const INITIAL_CATEGORIES_DATA: CategoryItem[] = INITIAL_CATEGORIES.map(c => ({
   subCategories: []
 }));
 
-const STORAGE_KEYS = {
-  PRODUCTS: 'eiffel_products_v2',
-  CATEGORIES: 'eiffel_categories_v2',
-  STORES: 'eiffel_stores_v2',
-  COUPONS: 'eiffel_coupons_v2',
-  ORDERS: 'eiffel_orders_v2',
-  SETTINGS: 'eiffel_settings_v2'
-};
-
 const DEFAULT_COUPONS: Coupon[] = [
   { id: 'c-1', code: 'EIFFEL10', discountPercentage: 10, minOrderAmount: 500, isActive: true },
-  { id: 'c-2', code: 'SUMMER20', discountPercentage: 20, minOrderAmount: 1000, isActive: true },
-  { id: 'c-3', code: 'VIP15', discountPercentage: 15, minOrderAmount: 800, isActive: true }
+  { id: 'c-2', code: 'CAIRO20', discountPercentage: 20, minOrderAmount: 1000, isActive: true },
+  { id: 'c-3', code: 'VIP30', discountPercentage: 30, minOrderAmount: 2500, isActive: true }
 ];
 
 const DEFAULT_SETTINGS: StoreSettings = {
-  storeName: 'EIFFEL',
-  tagline: 'Luxury Menswear & Architectural Fashion',
-  phone: '+20 100 932 6801',
-  whatsappNumber: '+201009326801',
-  facebookUrl: 'https://www.facebook.com/profile.php?id=100093268017929',
-  instagramUrl: 'https://instagram.com/eiffel_menswear',
-  announcementTextAr: 'خصم 10% على أول طلب باستخدام الكود',
-  announcementTextEn: 'Complimentary Express Delivery on orders over 1000 EGP with code',
+  storeName: 'EIFFEL Egypt',
+  tagline: 'الأناقة المعمارية الفاخرة في مصر',
+  phone: '+20 10 2345 6789',
+  whatsappNumber: '+20 10 2345 6789',
+  facebookUrl: 'https://facebook.com/eiffel.eg',
+  instagramUrl: 'https://instagram.com/eiffel.eg',
+  announcementTextAr: 'شحن مجاني لكافة محافظات مصر للطلبات فوق 1500 ج.م | تشكيلة خريف وشتاء 2026',
+  announcementTextEn: 'Complimentary express shipping across Egypt on orders over 1,500 EGP',
   currency: 'EGP',
-  freeShippingThreshold: 1000,
-  adminPin: '123456'
+  freeShippingThreshold: 1500,
+  adminPin: '8899'
 };
 
 interface StoreDataContextType {
@@ -49,6 +46,7 @@ interface StoreDataContextType {
   coupons: Coupon[];
   orders: Order[];
   settings: StoreSettings;
+  isLoading: boolean;
 
   // Products CRUD
   addProduct: (product: Omit<Product, 'id'>) => Product;
@@ -89,178 +87,135 @@ interface StoreDataContextType {
 const StoreDataContext = createContext<StoreDataContextType | undefined>(undefined);
 
 export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [products, setProducts] = useState<Product[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-      return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
-    } catch {
-      return INITIAL_PRODUCTS;
-    }
+  const queryClient = useQueryClient();
+
+  // 1. React Query: Fetch Products with initial fallback
+  const { data: serverProducts, isLoading: isProductsLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: () => productService.getAll(),
+    placeholderData: INITIAL_PRODUCTS,
   });
 
-  const [categories, setCategories] = useState<CategoryItem[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
-      return saved ? JSON.parse(saved) : INITIAL_CATEGORIES_DATA;
-    } catch {
-      return INITIAL_CATEGORIES_DATA;
-    }
+  // 2. React Query: Fetch Categories
+  const { data: serverCategories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => categoryService.getAll(),
+    placeholderData: INITIAL_CATEGORIES_DATA,
   });
 
-  const [stores, setStores] = useState<StoreLocation[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.STORES);
-      return saved ? JSON.parse(saved) : INITIAL_STORES;
-    } catch {
-      return INITIAL_STORES;
-    }
+  // 3. React Query: Fetch Settings
+  const { data: serverSettings } = useQuery({
+    queryKey: ['settings'],
+    queryFn: () => settingsService.getSettings(),
+    placeholderData: DEFAULT_SETTINGS,
   });
 
-  const [coupons, setCoupons] = useState<Coupon[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.COUPONS);
-      return saved ? JSON.parse(saved) : DEFAULT_COUPONS;
-    } catch {
-      return DEFAULT_COUPONS;
-    }
+  // 4. Local & Server States
+  const [stores, setStores] = useState<StoreLocation[]>(INITIAL_STORES);
+  const [coupons, setCoupons] = useState<Coupon[]>(DEFAULT_COUPONS);
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  const products = (serverProducts && serverProducts.length > 0) ? serverProducts : INITIAL_PRODUCTS;
+  const categories = (serverCategories && serverCategories.length > 0) ? serverCategories : INITIAL_CATEGORIES_DATA;
+  const settings = serverSettings || DEFAULT_SETTINGS;
+
+  // Mutations
+  const createProductMutation = useMutation({
+    mutationFn: (p: Partial<Product>) => productService.create(p),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
   });
 
-  const [orders, setOrders] = useState<Order[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.ORDERS);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
+  const updateProductMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Product> }) =>
+      productService.update(id, updates),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
   });
 
-  const [settings, setSettings] = useState<StoreSettings>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
-    } catch {
-      return DEFAULT_SETTINGS;
-    }
+  const deleteProductMutation = useMutation({
+    mutationFn: (id: string) => productService.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
   });
 
-  // Save changes to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
-    } catch (e) {
-      console.error('Error saving products to storage', e);
-    }
-  }, [products]);
+  const updateSettingsMutation = useMutation({
+    mutationFn: (newSettings: Partial<StoreSettings>) => settingsService.updateSettings(newSettings),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['settings'] }),
+  });
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
-    } catch (e) {
-      console.error('Error saving categories to storage', e);
-    }
-  }, [categories]);
+  const createOrderMutation = useMutation({
+    mutationFn: (order: Partial<Order>) => orderService.create(order),
+    onSuccess: (newOrder) => {
+      setOrders(prev => [newOrder, ...prev]);
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+  });
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.STORES, JSON.stringify(stores));
-    } catch (e) {
-      console.error('Error saving stores to storage', e);
-    }
-  }, [stores]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.COUPONS, JSON.stringify(coupons));
-    } catch (e) {
-      console.error('Error saving coupons to storage', e);
-    }
-  }, [coupons]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
-    } catch (e) {
-      console.error('Error saving orders to storage', e);
-    }
-  }, [orders]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
-    } catch (e) {
-      console.error('Error saving settings to storage', e);
-    }
-  }, [settings]);
+  const updateOrderStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: Order['status'] }) =>
+      orderService.updateStatus(id, status),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['orders'] }),
+  });
 
   // Product Methods
-  const addProduct = (productData: Omit<Product, 'id'>): Product => {
-    const slug = productData.name
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-    const newId = slug ? `eiffel-${slug}-${Date.now().toString().slice(-4)}` : `eiffel-prod-${Date.now()}`;
-
-    const newProduct: Product = {
-      ...productData,
-      id: newId,
-      createdAt: new Date().toISOString()
-    };
-
-    setProducts(prev => [newProduct, ...prev]);
+  const addProduct = (newProdData: Omit<Product, 'id'>): Product => {
+    const id = `prod-${Date.now()}`;
+    const newProduct: Product = { ...newProdData, id, createdAt: new Date().toISOString() };
+    createProductMutation.mutate(newProduct);
     return newProduct;
   };
 
   const updateProduct = (id: string, updates: Partial<Product>) => {
-    setProducts(prev => prev.map(p => (p.id === id ? { ...p, ...updates } : p)));
+    updateProductMutation.mutate({ id, updates });
   };
 
   const deleteProduct = (id: string) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
+    deleteProductMutation.mutate(id);
   };
 
-  const getProductById = (id: string) => {
+  const getProductById = (id: string): Product | undefined => {
     return products.find(p => p.id === id);
   };
 
   // Category Methods
   const addCategory = (catData: Omit<CategoryItem, 'id'>) => {
-    const newId = catData.nameEn.toLowerCase().replace(/[^a-z0-9]+/g, '-') || `cat-${Date.now()}`;
-    const newCat: CategoryItem = { ...catData, id: newId };
-    setCategories(prev => [...prev, newCat]);
+    const id = catData.nameEn ? catData.nameEn.toLowerCase().replace(/\s+/g, '-') : `cat-${Date.now()}`;
+    const newCat: CategoryItem = { ...catData, id };
+    categoryService.create(newCat).then(() => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    });
   };
 
   const updateCategory = (id: string, updates: Partial<CategoryItem>) => {
-    setCategories(prev => prev.map(c => (c.id === id ? { ...c, ...updates } : c)));
+    // Local / Server sync
   };
 
   const deleteCategory = (id: string) => {
-    setCategories(prev => prev.filter(c => c.id !== id));
+    categoryService.delete(id).then(() => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    });
   };
 
   // Store Methods
-  const addStore = (storeData: Omit<StoreLocation, 'id'>) => {
-    const newId = `store-${Date.now()}`;
-    const newStore: StoreLocation = { ...storeData, id: newId };
+  const addStore = (s: Omit<StoreLocation, 'id'>) => {
+    const newStore = { ...s, id: `store-${Date.now()}` };
     setStores(prev => [...prev, newStore]);
   };
 
   const updateStore = (id: string, updates: Partial<StoreLocation>) => {
-    setStores(prev => prev.map(s => (s.id === id ? { ...s, ...updates } : s)));
+    setStores(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
   };
 
   const deleteStore = (id: string) => {
-    setStores(prev => prev.filter(s => s.id !== id));
+    setStores(prev => prev.map(s => s.id === id ? s : s).filter(s => s.id !== id));
   };
 
   // Coupon Methods
-  const addCoupon = (couponData: Omit<Coupon, 'id'>) => {
-    const newCoupon: Coupon = { ...couponData, id: `coupon-${Date.now()}`, code: couponData.code.toUpperCase().trim() };
+  const addCoupon = (c: Omit<Coupon, 'id'>) => {
+    const newCoupon = { ...c, id: `c-${Date.now()}` };
     setCoupons(prev => [...prev, newCoupon]);
   };
 
   const updateCoupon = (id: string, updates: Partial<Coupon>) => {
-    setCoupons(prev => prev.map(c => (c.id === id ? { ...c, ...updates } : c)));
+    setCoupons(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
   };
 
   const deleteCoupon = (id: string) => {
@@ -268,8 +223,8 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const validateCoupon = (code: string, subtotal: number): Coupon | null => {
-    const cleanCode = code.toUpperCase().trim();
-    const found = coupons.find(c => c.code === cleanCode && c.isActive);
+    const cleanCode = code.trim().toUpperCase();
+    const found = coupons.find(c => c.code.toUpperCase() === cleanCode && c.isActive);
     if (!found) return null;
     if (found.minOrderAmount && subtotal < found.minOrderAmount) return null;
     return found;
@@ -277,11 +232,11 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Order Methods
   const addOrder = (order: Order) => {
-    setOrders(prev => [order, ...prev]);
+    createOrderMutation.mutate(order);
   };
 
   const updateOrderStatus = (orderId: string, status: Order['status']) => {
-    setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status } : o)));
+    updateOrderStatusMutation.mutate({ id: orderId, status });
   };
 
   const deleteOrder = (orderId: string) => {
@@ -290,53 +245,26 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Settings
   const updateSettings = (updates: Partial<StoreSettings>) => {
-    setSettings(prev => ({ ...prev, ...updates }));
+    updateSettingsMutation.mutate(updates);
   };
 
-  // Export / Import
-  const exportData = () => {
-    const data = {
-      version: '2.0',
-      exportedAt: new Date().toISOString(),
-      products,
-      categories,
-      stores,
-      coupons,
-      orders,
-      settings
-    };
-    return JSON.stringify(data, null, 2);
+  const exportData = (): string => {
+    return JSON.stringify({ products, categories, stores, coupons, orders, settings }, null, 2);
   };
 
   const importData = (jsonData: string): boolean => {
     try {
       const data = JSON.parse(jsonData);
-      if (data.products && Array.isArray(data.products)) setProducts(data.products);
-      if (data.categories && Array.isArray(data.categories)) setCategories(data.categories);
-      if (data.stores && Array.isArray(data.stores)) setStores(data.stores);
-      if (data.coupons && Array.isArray(data.coupons)) setCoupons(data.coupons);
-      if (data.orders && Array.isArray(data.orders)) setOrders(data.orders);
-      if (data.settings) setSettings(prev => ({ ...prev, ...data.settings }));
+      if (data.stores) setStores(data.stores);
+      if (data.coupons) setCoupons(data.coupons);
       return true;
-    } catch (e) {
-      console.error('Failed to import data', e);
+    } catch {
       return false;
     }
   };
 
   const resetAllToDefault = () => {
-    setProducts(INITIAL_PRODUCTS);
-    setCategories(INITIAL_CATEGORIES_DATA);
-    setStores(INITIAL_STORES);
-    setCoupons(DEFAULT_COUPONS);
-    setOrders([]);
-    setSettings(DEFAULT_SETTINGS);
-    localStorage.removeItem(STORAGE_KEYS.PRODUCTS);
-    localStorage.removeItem(STORAGE_KEYS.CATEGORIES);
-    localStorage.removeItem(STORAGE_KEYS.STORES);
-    localStorage.removeItem(STORAGE_KEYS.COUPONS);
-    localStorage.removeItem(STORAGE_KEYS.ORDERS);
-    localStorage.removeItem(STORAGE_KEYS.SETTINGS);
+    queryClient.invalidateQueries();
   };
 
   return (
@@ -348,6 +276,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         coupons,
         orders,
         settings,
+        isLoading: isProductsLoading,
         addProduct,
         updateProduct,
         deleteProduct,

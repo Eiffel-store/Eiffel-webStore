@@ -10,7 +10,7 @@ export interface Product {
   subtitle: string;
   price: number;
   originalPrice?: number;
-  category: string; // 'men' | 'kids' | 'accessories' | 'offers' or custom category
+  category: string;
   subCategory: string;
   images: string[];
   colors: ProductColor[];
@@ -66,7 +66,7 @@ export interface StoreLocation {
   phone: string;
   email: string;
   type: 'Flagship' | 'Atelier' | 'Boutique';
-  coordinates: { x: number; y: number }; // Percentage on map canvas
+  coordinates: { x: number; y: number };
   image: string;
   mapLink?: string;
 }
@@ -127,9 +127,11 @@ export interface StoreSettings {
 }
 
 export interface User {
+  id?: string | number;
   name: string;
   email: string;
-  tier: 'EIFFEL PRIVÉ' | 'EIFFEL NOIR' | 'MEMBER';
+  role?: 'ROLE_ADMIN' | 'ROLE_STAFF' | 'ROLE_CUSTOMER';
+  tier: 'EIFFEL PRIVÉ' | 'EIFFEL NOIR' | 'MEMBER' | string;
   tierPoints: number;
   phone: string;
   memberSince: string;
@@ -139,3 +141,34 @@ export interface User {
 }
 
 export type UserProfile = User;
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string | null;
+  data: T;
+  timestamp?: string;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password?: string;
+  pin?: string;
+}
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  password?: string;
+  phone?: string;
+}
+
+export interface AuthResult {
+  token: string;
+  id: number;
+  name: string;
+  email: string;
+  role: 'ROLE_ADMIN' | 'ROLE_STAFF' | 'ROLE_CUSTOMER';
+  tier?: string;
+  tierPoints?: number;
+  phone?: string;
+}

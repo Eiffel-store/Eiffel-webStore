@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Image as ImageIcon, Upload, Check } from 'lucide-react';
+import { Plus, Trash2, Image as ImageIcon, Upload, Check, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/shared';
+import { uploadService } from '@/services/uploadService';
 
 interface ProductFormMediaProps {
   images: string[];
@@ -13,26 +14,37 @@ export const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
 }) => {
   const { isRTL } = useLanguage();
   const [imageUrlInput, setImageUrlInput] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          const resultStr = reader.result as string;
-          onChange(images[0] === '' ? [resultStr] : [...images, resultStr]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const fileList = Array.from(files);
+      const results = await uploadService.uploadMultipleImages(fileList);
+      const uploadedUrls = results.map(r => r.fileUrl);
+
+      const currentImages = images.filter(img => img.trim() !== '');
+      onChange([...currentImages, ...uploadedUrls]);
+    } catch (err: any) {
+      console.error('File upload failed', err);
+      setUploadError(err.message || 'فشل رفع الصور إلى السيرفر');
+    } finally {
+      setIsUploading(false);
+      // Reset input value
+      e.target.value = '';
+    }
   };
 
   const handleAddImageUrl = () => {
     if (!imageUrlInput.trim()) return;
-    onChange(images[0] === '' ? [imageUrlInput.trim()] : [...images, imageUrlInput.trim()]);
+    const currentImages = images.filter(img => img.trim() !== '');
+    onChange([...currentImages, imageUrlInput.trim()]);
     setImageUrlInput('');
   };
 
@@ -53,24 +65,42 @@ export const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-zinc-800 gap-2">
         <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2">
           <ImageIcon className="w-4 h-4 text-zinc-400" />
-          <span>{isRTL ? '2. صور المنتج (Media Gallery)' : '2. Product Images'}</span>
+          <span>{isRTL ? '2. صور المنتج (رفع ملفات حقيقية أو روابط)' : '2. Product Images'}</span>
         </h2>
         <span className="text-[11px] text-zinc-500 font-mono">
           {isRTL ? 'الصورة الأولى هي الصورة الرئيسية للمنتج' : 'First image is used as primary thumbnail'}
         </span>
       </div>
 
+      {uploadError && (
+        <div className="p-3 bg-red-950/50 border border-red-800 text-red-300 text-xs rounded">
+          {uploadError}
+        </div>
+      )}
+
       {/* Add Image Controls: File Upload & URL */}
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
         {/* Upload from device */}
-        <div className="sm:col-span-4">
-          <label className="flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-dashed border-zinc-700 text-xs font-medium cursor-pointer transition-colors">
-            <Upload className="w-4 h-4 text-emerald-400" />
-            <span>{isRTL ? 'رفع صور من الجهاز' : 'Upload from Device'}</span>
+        <div className="sm:col-span-5">
+          <label className={`flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-dashed border-zinc-700 text-xs font-medium cursor-pointer transition-colors ${
+            isUploading ? 'opacity-50 pointer-events-none' : ''
+          }`}>
+            {isUploading ? (
+              <>
+                <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
+                <span>{isRTL ? 'جاري رفع الصور للسيرفر...' : 'Uploading to Server...'}</span>
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4 text-emerald-400" />
+                <span>{isRTL ? 'رفع صور من جهازك (ملفات حقيقية)' : 'Upload from Device (Real Files)'}</span>
+              </>
+            )}
             <input
               type="file"
               multiple
               accept="image/*"
+              disabled={isUploading}
               onChange={handleFileUpload}
               className="hidden"
             />
@@ -78,7 +108,7 @@ export const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
         </div>
 
         {/* Add from URL */}
-        <div className="sm:col-span-8 flex gap-2">
+        <div className="sm:col-span-7 flex gap-2">
           <input
             type="url"
             value={imageUrlInput}
