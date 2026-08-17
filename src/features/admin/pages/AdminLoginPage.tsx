@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { ShieldCheck, Lock, ArrowRight, ArrowLeft, KeyRound, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import { useAdminAuth } from '@/features/admin';
+import { ShieldCheck, Mail, Lock, ArrowRight, ArrowLeft, AlertCircle, Eye, EyeOff, Loader2, Sparkles } from 'lucide-react';
+import { useAdminAuth } from '../context/AdminAuthContext';
 import { useLanguage } from '@/shared';
 
 export const AdminLoginPage: React.FC = () => {
-  const [pin, setPin] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { loginAdmin, isAdminAuthenticated } = useAdminAuth();
-  const { isRTL } = useLanguage();
+
+  const { loginAdminWithCredentials, isAdminAuthenticated } = useAdminAuth();
+  const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,20 +24,25 @@ export const AdminLoginPage: React.FC = () => {
     }
   }, [isAdminAuthenticated, navigate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    setTimeout(() => {
-      const success = loginAdmin(pin);
-      if (success) {
-        navigate(from, { replace: true });
-      } else {
-        setError(isRTL ? 'رمز الدخول غير صحيح، يرجى المحاولة مرة أخرى.' : 'Invalid Admin PIN/Password. Default: 123456');
-        setLoading(false);
-      }
-    }, 400);
+    const res = await loginAdminWithCredentials(email.trim(), password);
+    setLoading(false);
+
+    if (res.success) {
+      navigate(from, { replace: true });
+    } else {
+      setError(res.message);
+    }
+  };
+
+  const handleQuickFill = (fillEmail: string, fillPass: string) => {
+    setEmail(fillEmail);
+    setPassword(fillPass);
+    setError('');
   };
 
   return (
@@ -59,13 +66,13 @@ export const AdminLoginPage: React.FC = () => {
         {/* Logo & Header */}
         <div className="text-center mb-8">
           <div className="w-12 h-12 bg-white text-black rounded mx-auto flex items-center justify-center mb-4 shadow-lg">
-            <Lock className="w-6 h-6" />
+            <ShieldCheck className="w-6 h-6" />
           </div>
-          <h1 className="font-editorial text-3xl font-bold tracking-widest text-white uppercase">
+          <h1 className="font-editorial text-2xl sm:text-3xl font-bold tracking-widest text-white uppercase">
             EIFFEL CONTROL
           </h1>
           <p className="text-xs text-zinc-400 mt-2 font-mono">
-            {isRTL ? 'لوحة تحكم وإدارة المتجر الإلكتروني' : 'Storefront Administration Portal'}
+            {isRTL ? 'تسجيل دخول الإدارة والموظفين' : 'Executive & Staff Administration'}
           </p>
         </div>
 
@@ -77,57 +84,112 @@ export const AdminLoginPage: React.FC = () => {
           </div>
         )}
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Login Form with Email & Password */}
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-xs font-label-bold uppercase tracking-wider text-zinc-300 mb-2">
-              {isRTL ? 'رمز الدخول أو كلمة المرور (Admin PIN)' : 'Master Admin PIN / Password'}
+              {isRTL ? 'البريد الإلكتروني للإدارة' : 'Staff / Admin Email'}
             </label>
             <div className="relative">
+              <Mail className="absolute left-3.5 rtl:left-auto rtl:right-3.5 top-3.5 w-4 h-4 text-zinc-500" />
               <input
-                type={showPassword ? 'text' : 'password'}
-                value={pin}
+                type="email"
+                value={email}
                 onChange={(e) => {
-                  setPin(e.target.value);
+                  setEmail(e.target.value);
                   setError('');
                 }}
-                placeholder={isRTL ? 'أدخل كلمة المرور (الافتراضي: 123456)' : 'Enter PIN (Default: 123456)'}
+                placeholder="admin@eiffel.com"
                 required
                 autoFocus
-                className="w-full bg-zinc-900 border border-zinc-700 focus:border-white px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none transition-colors"
+                className="w-full bg-zinc-900 border border-zinc-700 focus:border-white pl-10 rtl:pl-4 rtl:pr-10 pr-4 py-3 text-xs sm:text-sm text-white placeholder:text-zinc-600 focus:outline-none transition-colors font-mono"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-label-bold uppercase tracking-wider text-zinc-300 mb-2">
+              {isRTL ? 'كلمة المرور' : 'Password'}
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3.5 rtl:left-auto rtl:right-3.5 top-3.5 w-4 h-4 text-zinc-500" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError('');
+                }}
+                placeholder="••••••••"
+                required
+                className="w-full bg-zinc-900 border border-zinc-700 focus:border-white pl-10 rtl:pl-4 rtl:pr-10 pr-10 py-3 text-xs sm:text-sm text-white placeholder:text-zinc-600 focus:outline-none transition-colors font-mono"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                className="absolute right-3 rtl:right-auto rtl:left-3 top-3.5 text-zinc-500 hover:text-zinc-300 transition-colors"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            <p className="text-[11px] text-zinc-500 mt-1.5 font-mono">
-              {isRTL ? 'الرمز الافتراضي: 123456 أو eiffel2026' : 'Default PIN: 123456 or eiffel2026'}
-            </p>
           </div>
 
           <button
             type="submit"
-            disabled={loading || !pin}
-            className="w-full py-3.5 bg-white text-black hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed font-label-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg"
+            disabled={loading}
+            className="w-full py-3.5 bg-white text-black font-label-bold text-xs tracking-widest uppercase hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 mt-4 cursor-pointer"
           >
             {loading ? (
-              <span className="inline-block animate-spin w-4 h-4 border-2 border-black border-t-transparent rounded-full" />
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>{isRTL ? 'جاري التحقق والربط...' : 'Authenticating...'}</span>
+              </>
             ) : (
               <>
-                <span>{isRTL ? 'تسجيل الدخول للوحة التحكم' : 'Authenticate & Enter'}</span>
-                <ShieldCheck className="w-4 h-4" />
+                <span>{isRTL ? 'دخول لوحة التحكم' : 'Authenticate & Enter'}</span>
+                <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
               </>
             )}
           </button>
         </form>
-      </div>
 
-      <div className="mt-8 text-center text-[11px] text-zinc-600 font-mono">
-        EIFFEL ARCHITECTURAL TAILORING © 2026 — STORE ENGINE v2.0
+        {/* Quick Demo Credentials */}
+        <div className="mt-8 pt-6 border-t border-zinc-800">
+          <div className="flex items-center justify-between mb-3 text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
+            <span>{isRTL ? 'حسابات الإدارة الجاهزة (Quick Fill):' : 'Pre-configured Staff Accounts:'}</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleQuickFill('admin@eiffel.com', 'admin123')}
+              className="p-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-left rtl:text-right transition-colors group"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-amber-400">👑 Admin</span>
+                <span className="text-[9px] text-zinc-500 font-mono">Full</span>
+              </div>
+              <p className="text-[10px] text-zinc-400 font-mono mt-0.5">admin@eiffel.com</p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleQuickFill('staff@eiffel.com', 'staff123')}
+              className="p-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-left rtl:text-right transition-colors group"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-sky-400">💼 Staff</span>
+                <span className="text-[9px] text-zinc-500 font-mono">Ops</span>
+              </div>
+              <p className="text-[10px] text-zinc-400 font-mono mt-0.5">staff@eiffel.com</p>
+            </button>
+          </div>
+        </div>
+
+        {/* Security Notice */}
+        <div className="mt-6 text-center text-[10px] font-mono text-zinc-500">
+          SECURE 256-BIT JWT ENCRYPTION • RESTRICTED ACCESS
+        </div>
       </div>
     </div>
   );

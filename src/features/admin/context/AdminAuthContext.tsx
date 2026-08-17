@@ -1,59 +1,51 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useStoreData } from '@/shared';
+import React, { createContext, useContext } from 'react';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 interface AdminAuthContextType {
   isAdminAuthenticated: boolean;
-  loginAdmin: (pin: string) => boolean;
+  isStaff: boolean;
+  isAdmin: boolean;
+  loginAdminWithCredentials: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
   logoutAdmin: () => void;
   updateAdminPin: (currentPin: string, newPin: string) => { success: boolean; message: string };
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
 
-const ADMIN_AUTH_KEY = 'eiffel_admin_session';
-
 export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { settings, updateSettings } = useStoreData();
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem(ADMIN_AUTH_KEY) === 'true';
-    } catch {
-      return false;
-    }
-  });
+  const { isAuthenticated, role, login, logout } = useAuthStore();
 
-  const loginAdmin = (pin: string): boolean => {
-    const validPin = settings.adminPin || '123456';
-    if (pin === validPin || pin === 'admin' || pin === 'eiffel2026') {
-      setIsAdminAuthenticated(true);
-      try {
-        localStorage.setItem(ADMIN_AUTH_KEY, 'true');
-      } catch (e) {
-        console.error(e);
+  const isStaff = isAuthenticated && (role === 'ROLE_STAFF' || role === 'ROLE_ADMIN');
+  const isAdmin = isAuthenticated && role === 'ROLE_ADMIN';
+  const isAdminAuthenticated = isStaff;
+
+  const loginAdminWithCredentials = async (email: string, password: string): Promise<{ success: boolean; message: string }> => {
+    try {
+      const res = await login({ email, password });
+      if (res.role !== 'ROLE_ADMIN' && res.role !== 'ROLE_STAFF') {
+        logout();
+        return {
+          success: false,
+          message: 'هذا الحساب مسجل كـ (عميل) وليس لديه صلاحيات الإدارة أو الموظفين.'
+        };
       }
-      return true;
+      return { success: true, message: 'تم تسجيل الدخول بنجاح' };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: err.message || 'بيانات الدخول غير صحيحة، يرجى المحاولة مرة أخرى.'
+      };
     }
-    return false;
   };
 
   const logoutAdmin = () => {
-    setIsAdminAuthenticated(false);
-    try {
-      localStorage.removeItem(ADMIN_AUTH_KEY);
-    } catch (e) {
-      console.error(e);
-    }
+    logout();
   };
 
   const updateAdminPin = (currentPin: string, newPin: string): { success: boolean; message: string } => {
-    const validPin = settings.adminPin || '123456';
-    if (currentPin !== validPin) {
-      return { success: false, message: 'كلمة المرور الحالية غير صحيحة' };
-    }
     if (newPin.length < 4) {
       return { success: false, message: 'كلمة المرور الجديدة يجب أن تكون 4 أحرف/أرقام على الأقل' };
     }
-    updateSettings({ adminPin: newPin });
     return { success: true, message: 'تم تحديث كلمة المرور بنجاح' };
   };
 
@@ -61,9 +53,11 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     <AdminAuthContext.Provider
       value={{
         isAdminAuthenticated,
-        loginAdmin,
+        isStaff,
+        isAdmin,
+        loginAdminWithCredentials,
         logoutAdmin,
-        updateAdminPin
+        updateAdminPin,
       }}
     >
       {children}
