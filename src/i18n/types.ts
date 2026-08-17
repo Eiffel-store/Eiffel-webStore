@@ -1,6 +1,29 @@
 export type Language = 'en' | 'ar';
 
 export interface TranslationDictionary {
+  // Auth & Client Portal
+  signIn: string;
+  register: string;
+  signOut: string;
+  fullName: string;
+  password: string;
+  phone: string;
+  clientSignIn: string;
+  createAccount: string;
+  authSubtitle: string;
+  demoAccounts: string;
+  clientRole: string;
+  staffRole: string;
+  adminRole: string;
+  adminLoginPrompt: string;
+  adminPanel: string;
+  adminPrivileges: string;
+  openAdminPanel: string;
+  verifying: string;
+  accountCreatedSuccess: string;
+  instantLogin: string;
+  confirmRegister: string;
+
   // Top Banner & Header
   topBannerPromo: string;
   topBannerLocations: string;

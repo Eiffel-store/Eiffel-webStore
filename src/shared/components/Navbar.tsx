@@ -71,7 +71,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
           {(role === 'ROLE_ADMIN' || role === 'ROLE_STAFF') && (
             <Link to="/admin" className="text-amber-400 hover:underline flex items-center gap-1 font-bold">
               <ShieldCheck className="w-3 h-3" />
-              <span>لوحة الإدارة</span>
+              <span>{t.adminPanel}</span>
             </Link>
           )}
           <Link to="/help" className="hover:underline">{t.help}</Link>
@@ -279,7 +279,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
                     onClick={() => setMobileMenuOpen(false)}
                     className="block text-center py-2 bg-primary text-white dark:bg-white dark:text-black text-xs font-bold uppercase tracking-wider"
                   >
-                    {isRTL ? 'تسجيل الدخول / إنشاء حساب' : 'Sign In / Register'}
+                    {t.signIn} / {t.register}
                   </Link>
                 )}
               </div>
@@ -303,7 +303,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
                     onClick={() => setMobileMenuOpen(false)}
                     className="block text-sm font-bold text-amber-400 hover:underline pt-2 border-t border-zinc-800"
                   >
-                    🛡️ {isRTL ? 'لوحة تحكم الإدارة' : 'Admin Panel'}
+                    🛡️ {t.adminPanel}
                   </Link>
                 )}
               </div>

@@ -1,6 +1,28 @@
 import { TranslationDictionary } from '../types';
 
 export const ar: TranslationDictionary = {
+  signIn: "تسجيل الدخول",
+  register: "حساب جديد",
+  signOut: "تسجيل الخروج",
+  fullName: "الاسم بالكامل",
+  password: "كلمة المرور",
+  phone: "رقم الهاتف (مصر)",
+  clientSignIn: "تسجيل دخول العملاء",
+  createAccount: "إنشاء حساب جديد",
+  authSubtitle: "تمتع بتجربة تسوق راقية مع الشحن السريع في مصر",
+  demoAccounts: "حسابات التجربة السريعة (Demo Quick Fill)",
+  clientRole: "عميل (Client)",
+  staffRole: "موظف (Staff)",
+  adminRole: "أدمن (Admin)",
+  adminLoginPrompt: "الدخول كمسؤول إدارة النظام (Admin Panel)",
+  adminPanel: "لوحة تحكم الإدارة",
+  adminPrivileges: "أنت مسجل بصلاحيات الإدارة",
+  openAdminPanel: "فتح لوحة الإدارة",
+  verifying: "جاري التحقق...",
+  accountCreatedSuccess: "تم إنشاء حسابك بنجاح! جاري تسجيل الدخول...",
+  instantLogin: "دخول فوري",
+  confirmRegister: "تأكيد التسجيل",
+
   topBannerPromo: "شحن سريع مجاني لجميع محافظات مصر للطلبات التي تتجاوز 3,000 ج.م — الرمز:",
   topBannerLocations: "محافظة الغربية • زفتى • نهطاي",
   help: "المساعدة وخدمة العملاء",

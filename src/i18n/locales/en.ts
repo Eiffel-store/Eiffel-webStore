@@ -1,6 +1,28 @@
 import { TranslationDictionary } from '../types';
 
 export const en: TranslationDictionary = {
+  signIn: "Sign In",
+  register: "Register",
+  signOut: "Sign Out",
+  fullName: "Full Name",
+  password: "Password",
+  phone: "Phone Number (Egypt)",
+  clientSignIn: "Client Sign In",
+  createAccount: "Create an Account",
+  authSubtitle: "Bespoke architectural luxury across Egypt",
+  demoAccounts: "Fast Demo Accounts",
+  clientRole: "Client",
+  staffRole: "Staff",
+  adminRole: "Admin",
+  adminLoginPrompt: "Executive Staff Login",
+  adminPanel: "Admin Panel",
+  adminPrivileges: "You have Staff/Admin Privileges",
+  openAdminPanel: "Open Admin Panel",
+  verifying: "Verifying...",
+  accountCreatedSuccess: "Account created successfully! Logging in...",
+  instantLogin: "Sign In",
+  confirmRegister: "Create Account",
+
   topBannerPromo: "COMPLIMENTARY EXPRESS DELIVERY ACROSS EGYPT ON ORDERS OVER 3,000 EGP — CODE:",
   topBannerLocations: "GHARBIA • ZEFTA • NAHTAY",
   help: "HELP & SUPPORT",

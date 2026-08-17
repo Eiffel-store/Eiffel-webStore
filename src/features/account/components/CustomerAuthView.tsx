@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useLanguage } from '@/shared';
 
 export const CustomerAuthView: React.FC = () => {
-  const { isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
   const { login, register, isLoading, error, clearError } = useAuthStore();
 
@@ -31,7 +31,7 @@ export const CustomerAuthView: React.FC = () => {
         }
       } else {
         await register({ name, email, password, phone });
-        setSuccessMsg(isRTL ? 'تم إنشاء حسابك بنجاح! جاري تسجيل الدخول...' : 'Account created successfully!');
+        setSuccessMsg(t.accountCreatedSuccess);
       }
     } catch (err) {
       console.error('Auth error:', err);
@@ -61,12 +61,10 @@ export const CustomerAuthView: React.FC = () => {
             EIFFEL CLIENT PRIVÉ
           </span>
           <h1 className="font-editorial text-2xl sm:text-3xl text-primary dark:text-white mt-1">
-            {mode === 'login'
-              ? (isRTL ? 'تسجيل دخول العملاء' : 'Client Sign In')
-              : (isRTL ? 'إنشاء حساب جديد' : 'Create an Account')}
+            {mode === 'login' ? t.clientSignIn : t.createAccount}
           </h1>
           <p className="text-xs text-secondary dark:text-zinc-400 mt-1">
-            {isRTL ? 'تمتع بتجربة تسوق راقية مع الشحن السريع في مصر' : 'Bespoke architectural luxury across Egypt'}
+            {t.authSubtitle}
           </p>
         </div>
 
@@ -81,7 +79,7 @@ export const CustomerAuthView: React.FC = () => {
                 : 'text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white'
             }`}
           >
-            {isRTL ? 'تسجيل الدخول' : 'Sign In'}
+            {t.signIn}
           </button>
           <button
             type="button"
@@ -92,7 +90,7 @@ export const CustomerAuthView: React.FC = () => {
                 : 'text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white'
             }`}
           >
-            {isRTL ? 'حساب جديد' : 'Register'}
+            {t.register}
           </button>
         </div>
 
@@ -117,7 +115,7 @@ export const CustomerAuthView: React.FC = () => {
             <>
               <div>
                 <label className="block text-[11px] font-label-bold uppercase tracking-wider text-secondary dark:text-zinc-400 mb-1.5">
-                  {isRTL ? 'الاسم بالكامل' : 'Full Name'}
+                  {t.fullName}
                 </label>
                 <div className="relative">
                   <UserIcon className="absolute left-3 rtl:left-auto rtl:right-3 top-3 w-4 h-4 text-zinc-400" />
@@ -126,7 +124,7 @@ export const CustomerAuthView: React.FC = () => {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder={isRTL ? 'طارق منصور' : 'Tarek Mansour'}
+                    placeholder="Tarek Mansour"
                     className="w-full pl-9 rtl:pl-3 rtl:pr-9 pr-3 py-2.5 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 text-xs text-primary dark:text-white placeholder:text-zinc-500 focus:outline-none focus:border-primary dark:focus:border-white transition-colors"
                   />
                 </div>
@@ -134,7 +132,7 @@ export const CustomerAuthView: React.FC = () => {
 
               <div>
                 <label className="block text-[11px] font-label-bold uppercase tracking-wider text-secondary dark:text-zinc-400 mb-1.5">
-                  {isRTL ? 'رقم الهاتف (مصر)' : 'Phone Number (Egypt)'}
+                  {t.phone}
                 </label>
                 <div className="relative">
                   <Phone className="absolute left-3 rtl:left-auto rtl:right-3 top-3 w-4 h-4 text-zinc-400" />
@@ -152,7 +150,7 @@ export const CustomerAuthView: React.FC = () => {
 
           <div>
             <label className="block text-[11px] font-label-bold uppercase tracking-wider text-secondary dark:text-zinc-400 mb-1.5">
-              {isRTL ? 'البريد الإلكتروني' : 'Email Address'}
+              {t.emailLabel}
             </label>
             <div className="relative">
               <Mail className="absolute left-3 rtl:left-auto rtl:right-3 top-3 w-4 h-4 text-zinc-400" />
@@ -169,7 +167,7 @@ export const CustomerAuthView: React.FC = () => {
 
           <div>
             <label className="block text-[11px] font-label-bold uppercase tracking-wider text-secondary dark:text-zinc-400 mb-1.5">
-              {isRTL ? 'كلمة المرور' : 'Password'}
+              {t.password}
             </label>
             <div className="relative">
               <Lock className="absolute left-3 rtl:left-auto rtl:right-3 top-3 w-4 h-4 text-zinc-400" />
@@ -192,11 +190,11 @@ export const CustomerAuthView: React.FC = () => {
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>{isRTL ? 'جاري التحقق...' : 'Verifying...'}</span>
+                <span>{t.verifying}</span>
               </>
             ) : (
               <>
-                <span>{mode === 'login' ? (isRTL ? 'دخول فوري' : 'Sign In') : (isRTL ? 'تأكيد التسجيل' : 'Create Account')}</span>
+                <span>{mode === 'login' ? t.instantLogin : t.confirmRegister}</span>
                 <ArrowRight className={`w-3.5 h-3.5 ${isRTL ? 'rotate-180' : ''}`} />
               </>
             )}
@@ -206,7 +204,7 @@ export const CustomerAuthView: React.FC = () => {
         {/* Quick Demo Fill Buttons */}
         <div className="mt-8 pt-6 border-t border-surface-container dark:border-zinc-800">
           <span className="block text-center text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-3">
-            {isRTL ? 'حسابات التجربة السريعة (Demo Quick Fill)' : 'Fast Demo Accounts'}
+            {t.demoAccounts}
           </span>
           <div className="grid grid-cols-3 gap-2">
             <button
@@ -214,21 +212,21 @@ export const CustomerAuthView: React.FC = () => {
               onClick={() => handleDemoLogin('client@eiffel.com', 'client123')}
               className="px-2 py-1.5 bg-surface-container-low dark:bg-zinc-900 hover:bg-zinc-800 border border-surface-container dark:border-zinc-800 text-[10px] font-mono text-primary dark:text-zinc-300 transition-colors"
             >
-              عميل (Client)
+              {t.clientRole}
             </button>
             <button
               type="button"
               onClick={() => handleDemoLogin('staff@eiffel.com', 'staff123')}
               className="px-2 py-1.5 bg-surface-container-low dark:bg-zinc-900 hover:bg-zinc-800 border border-surface-container dark:border-zinc-800 text-[10px] font-mono text-primary dark:text-zinc-300 transition-colors"
             >
-              موظف (Staff)
+              {t.staffRole}
             </button>
             <button
               type="button"
               onClick={() => handleDemoLogin('admin@eiffel.com', 'admin123')}
               className="px-2 py-1.5 bg-surface-container-low dark:bg-zinc-900 hover:bg-zinc-800 border border-surface-container dark:border-zinc-800 text-[10px] font-mono text-primary dark:text-zinc-300 transition-colors"
             >
-              أدمن (Admin)
+              {t.adminRole}
             </button>
           </div>
         </div>
@@ -240,7 +238,7 @@ export const CustomerAuthView: React.FC = () => {
             className="text-[11px] font-mono text-zinc-400 hover:text-primary dark:hover:text-white flex items-center justify-center gap-1 transition-colors"
           >
             <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-            <span>{isRTL ? 'الدخول كمسؤول إدارة النظام (Admin Panel)' : 'Executive Staff Login'}</span>
+            <span>{t.adminLoginPrompt}</span>
           </Link>
         </div>
       </div>

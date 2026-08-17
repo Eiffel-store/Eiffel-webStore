@@ -17,7 +17,7 @@ import { Address, PaymentMethod, User } from '@/types';
 
 export const AccountPage: React.FC = () => {
   const { user, isAuthenticated, role, logout } = useAuthStore();
-  const { isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
   const { data: serverOrders = [] } = useMyOrders();
 
   const [activeTab, setActiveTab] = useState<AccountTabKey>('overview');
@@ -81,13 +81,13 @@ export const AccountPage: React.FC = () => {
           <div className="mb-6 p-3 bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs text-amber-300 font-mono">
               <ShieldCheck className="w-4 h-4 text-amber-400" />
-              <span>{isRTL ? 'أنت مسجل بصلاحيات الإدارة' : 'You have Staff/Admin Privileges'}</span>
+              <span>{t.adminPrivileges}</span>
             </div>
             <Link
               to="/admin"
               className="px-3 py-1 bg-amber-500 text-black text-xs font-bold uppercase tracking-wider hover:bg-amber-400 transition-colors"
             >
-              {isRTL ? 'فتح لوحة الإدارة' : 'Open Admin Panel'}
+              {t.openAdminPanel}
             </Link>
           </div>
         )}
@@ -100,7 +100,7 @@ export const AccountPage: React.FC = () => {
             className="self-start sm:self-auto px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 text-xs font-label-bold tracking-wider uppercase flex items-center gap-1.5 transition-colors"
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>{isRTL ? 'تسجيل الخروج' : 'Sign Out'}</span>
+            <span>{t.signOut}</span>
           </button>
         </div>
 
