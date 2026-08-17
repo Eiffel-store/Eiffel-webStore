@@ -25,27 +25,54 @@ export const CollectionsPage: React.FC = () => {
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
-  // Category Metadata
+  // Category Metadata Object
   const currentCategoryObj = categories.find(c => c.id === category) || {
     id: category,
-    name: category.toUpperCase() + ' COLLECTION',
-    nameEn: category.toUpperCase(),
-    subtitle: 'Brutalist Silhouettes & Precision Engineering',
+    name: category === 'men' ? 'تشكيلة الرجال' : category === 'kids' ? 'أزياء الأطفال' : category === 'accessories' ? 'القطع الجلدية والإكسسوارات' : category.toUpperCase(),
+    nameEn: category === 'men' ? "MEN'S COLLECTION" : category === 'kids' ? "KIDS COLLECTION" : category === 'accessories' ? "TIMEPIECES & ACCESSORIES" : category.toUpperCase(),
+    subtitle: 'قصات معمارية انسيابية وخامات قطن الجيزة الفاخر',
+    subtitleEn: 'Architectural Silhouettes & Precision Tailoring',
     image: `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`,
     itemCount: '12 PIECES',
     subCategories: []
   };
 
   const getCategoryTitle = () => {
+    const cat = category.toLowerCase();
     if (isRTL) {
-      if (category === 'offers') return 'العروض والتخفيضات الحصرية';
-      if (category === 'men') return 'تشكيلة الرجال';
-      if (category === 'kids') return 'أزياء الأطفال';
-      if (category === 'accessories') return 'القطع الجلدية والإكسسوارات';
-      if (category === 'new-arrivals') return 'أحدث الإصدارات';
+      if (cat === 'offers') return 'العروض والتخفيضات الحصرية';
+      if (cat === 'men') return 'تشكيلة الرجال';
+      if (cat === 'kids') return 'أزياء الأطفال';
+      if (cat === 'accessories') return 'القطع الجلدية والإكسسوارات';
+      if (cat === 'new-arrivals') return 'أحدث الإصدارات';
+      return currentCategoryObj.name;
+    } else {
+      if (cat === 'offers') return 'SPECIAL OFFERS & ARCHIVE';
+      if (cat === 'men') return "MEN'S COLLECTION";
+      if (cat === 'kids') return "KIDS COLLECTION";
+      if (cat === 'accessories') return "TIMEPIECES & ACCESSORIES";
+      if (cat === 'new-arrivals') return "NEW ARRIVALS";
+      return currentCategoryObj.nameEn || currentCategoryObj.name;
     }
-    if (category === 'offers') return 'SPECIAL OFFERS & ARCHIVE';
-    return currentCategoryObj.name;
+  };
+
+  const getCategorySubtitle = () => {
+    const cat = category.toLowerCase();
+    if (isRTL) {
+      if (cat === 'offers') return 'تخفيضات موسمية وباقات أطقم متكاملة بأسعار مميزة للشحن داخل مصر';
+      if (cat === 'men') return 'قصات معمارية انسيابية وخامات قطن الجيزة الفاخر للرجال';
+      if (cat === 'kids') return 'أزياء راقية ومريحة للأولاد والبنات بجودة وخامات تدوم طويلاً';
+      if (cat === 'accessories') return 'ساعات يد ستيل، محافظ، حقائب كروس، وأساور جلدية فاخرة';
+      if (cat === 'new-arrivals') return 'أحدث تشكيلات الموسم متوفرة للشحن الفوري لكافة المحافظات';
+      return currentCategoryObj.subtitle;
+    } else {
+      if (cat === 'offers') return 'Seasonal markdowns, bundled sets & archive selections across Egypt';
+      if (cat === 'men') return 'Architectural silhouettes, relaxed fits & premium Egyptian cotton';
+      if (cat === 'kids') return 'Contemporary junior tailoring, varsity knits & premium summer sets';
+      if (cat === 'accessories') return 'Steel chronographs, fine leather goods & handcrafted wristwear';
+      if (cat === 'new-arrivals') return 'Latest seasonal releases ready for express nationwide delivery';
+      return (currentCategoryObj as any).subtitleEn || 'Architectural Silhouettes & Precision Engineering';
+    }
   };
 
   // Filter options available
@@ -64,7 +91,6 @@ export const CollectionsPage: React.FC = () => {
     let list = products.filter(p => {
       // Category Match
       if (category === 'offers') {
-        // Prefer items on sale or all promotional items
         if (p.originalPrice) return true;
         return p.isBestSeller || p.isNew;
       } else if (category === 'new-arrivals') {
@@ -78,13 +104,13 @@ export const CollectionsPage: React.FC = () => {
       }
 
       // Keyword search if present
-      if (searchKeyword) {
-        const query = searchKeyword.toLowerCase();
-        const matches =
-          p.name.toLowerCase().includes(query) ||
-          p.subtitle.toLowerCase().includes(query) ||
-          p.subCategory.toLowerCase().includes(query);
-        if (!matches) return false;
+      if (searchKeyword.trim() !== '') {
+        const kw = searchKeyword.toLowerCase();
+        const matchesKw =
+          (p.name && p.name.toLowerCase().includes(kw)) ||
+          (p.subtitle && p.subtitle.toLowerCase().includes(kw)) ||
+          (p.description && p.description.toLowerCase().includes(kw));
+        if (!matchesKw) return false;
       }
 
       // SubCategory
@@ -93,12 +119,12 @@ export const CollectionsPage: React.FC = () => {
       }
 
       // Size
-      if (selectedSize !== 'All' && !p.sizes.some(s => s.includes(selectedSize))) {
+      if (selectedSize !== 'All' && (!p.sizes || !p.sizes.includes(selectedSize))) {
         return false;
       }
 
       // Color
-      if (selectedColor !== 'All' && !p.colors.some(c => c.name.includes(selectedColor))) {
+      if (selectedColor !== 'All' && (!p.colors || !p.colors.some(c => c.name.toLowerCase().includes(selectedColor.toLowerCase())))) {
         return false;
       }
 
@@ -111,11 +137,11 @@ export const CollectionsPage: React.FC = () => {
     } else if (sortBy === 'price-high') {
       list.sort((a, b) => b.price - a.price);
     } else if (sortBy === 'rating') {
-      list.sort((a, b) => b.rating - a.rating);
+      list.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     }
 
     return list;
-  }, [category, searchKeyword, selectedSubCategory, selectedSize, selectedColor, sortBy]);
+  }, [category, products, searchKeyword, selectedSubCategory, selectedSize, selectedColor, sortBy]);
 
   const clearFilters = () => {
     setSelectedSubCategory('All');
@@ -129,11 +155,11 @@ export const CollectionsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-on-surface">
-      {/* 1. COLLECTION EDITORIAL BANNER */}
+      {/* 1. Category Hero Banner */}
       <CollectionBanner
         category={category}
         title={getCategoryTitle()}
-        subtitle={currentCategoryObj.subtitle}
+        subtitle={getCategorySubtitle()}
         image={currentCategoryObj.image}
       />
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Clock, Phone, ExternalLink } from 'lucide-react';
+import { MapPin, Clock, Phone } from 'lucide-react';
 import { useLanguage } from '@/shared';
 import { StoreLocation } from '@/types';
 
@@ -16,7 +16,25 @@ export const StoreCard: React.FC<StoreCardProps> = ({
   onSelect,
   onBookAppointment,
 }) => {
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
+
+  const isNahtay = store.id?.includes('nahtay') || store.name?.includes('Nahtay') || store.name?.includes('نهطاي');
+
+  const displayName = isRTL
+    ? (isNahtay ? 'إيفل بوتيك — نهطاي' : 'إيفل الرئيسي — زفتى')
+    : (isNahtay ? 'Eiffel Boutique — Nahtay' : 'Eiffel Flagship — Zifta');
+
+  const displayCity = isRTL
+    ? (isNahtay ? 'نهطاي (الغربية)' : 'زفتى (الغربية)')
+    : (isNahtay ? 'NAHTAY (GHARBIA)' : 'ZIFTA (GHARBIA)');
+
+  const displayAddress = isRTL
+    ? (isNahtay ? 'نهطاي، على الطريق بجوار كشري الإمبراطور، محافظة الغربية، مصر' : 'زفتى، المحطة أمام قاعة هوليوود، محافظة الغربية، مصر')
+    : (isNahtay ? 'Nahtay, Main Highway, Beside El-Emperator, Gharbia, Egypt' : 'Zifta, Station St., In front of Hollywood Hall, Gharbia, Egypt');
+
+  const displayHours = isRTL
+    ? 'يومياً: 11:00 صباحاً – 12:00 منتصف الليل'
+    : 'Daily: 11:00 AM – 12:00 AM';
 
   return (
     <div
@@ -29,7 +47,7 @@ export const StoreCard: React.FC<StoreCardProps> = ({
     >
       <div className="flex justify-between items-start mb-2">
         <span className="font-editorial text-2xl text-primary dark:text-white">
-          {store.city.toUpperCase()}
+          {displayCity}
         </span>
         <span className="text-[10px] font-label-bold uppercase px-2 py-0.5 bg-surface-container dark:bg-zinc-800 text-secondary dark:text-zinc-300">
           {store.type}
@@ -37,21 +55,21 @@ export const StoreCard: React.FC<StoreCardProps> = ({
       </div>
 
       <h4 className="font-editorial text-lg text-primary dark:text-white">
-        {store.name}
+        {displayName}
       </h4>
 
       <div className="mt-3 space-y-1.5 text-xs text-secondary dark:text-zinc-400 font-light">
         <p className="flex items-start gap-2">
           <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-primary dark:text-white" />
-          <span>{store.address}</span>
+          <span>{displayAddress}</span>
         </p>
         <p className="flex items-center gap-2">
           <Clock className="w-3.5 h-3.5 shrink-0 text-primary dark:text-white" />
-          <span>{store.hours}</span>
+          <span>{displayHours}</span>
         </p>
         <p className="flex items-center gap-2">
           <Phone className="w-3.5 h-3.5 shrink-0 text-primary dark:text-white" />
-          <span>{store.phone}</span>
+          <span>{store.phone || '+20 100 932 6801'}</span>
         </p>
       </div>
 
@@ -61,21 +79,10 @@ export const StoreCard: React.FC<StoreCardProps> = ({
             e.stopPropagation();
             onBookAppointment();
           }}
-          className="py-2 px-4 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-[11px] tracking-wider uppercase hover:bg-neutral-800 transition-colors"
+          className="w-full py-2.5 bg-primary text-white dark:bg-white dark:text-black text-xs font-label-bold tracking-widest uppercase hover:opacity-90 transition-opacity text-center"
         >
-          {t.bookAppointment}
+          {t.scheduleFitting}
         </button>
-
-        <a
-          href={`https://maps.google.com/?q=${encodeURIComponent(store.address)}`}
-          target="_blank"
-          rel="noreferrer"
-          onClick={(e) => e.stopPropagation()}
-          className="text-xs font-label-bold text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white flex items-center gap-1 uppercase"
-        >
-          <span>{t.getDirections}</span>
-          <ExternalLink className="w-3 h-3" />
-        </a>
       </div>
     </div>
   );

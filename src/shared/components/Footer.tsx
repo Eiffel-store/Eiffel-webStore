@@ -10,9 +10,8 @@ export const Footer: React.FC = () => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
-  // Facebook and WhatsApp links
   const facebookUrl = 'https://www.facebook.com/profile.php?id=100093268017929';
-  const whatsappUrl = 'https://wa.me/'; // User can replace with actual WhatsApp number e.g. https://wa.me/201000000000
+  const whatsappUrl = 'https://wa.me/201009326801';
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,7 +89,7 @@ export const Footer: React.FC = () => {
                 className="flex items-center gap-2 px-4 py-2 bg-[#1877F2] text-white text-xs font-mono font-bold tracking-wider uppercase hover:bg-[#166fe5] transition-colors shadow-md"
               >
                 <FacebookIcon className="w-4 h-4 fill-current" />
-                <span>{isRTL ? 'صفحتنا على فيسبوك' : 'FACEBOOK'}</span>
+                <span>FACEBOOK</span>
               </a>
 
               <a
@@ -100,43 +99,12 @@ export const Footer: React.FC = () => {
                 className="flex items-center gap-2 px-4 py-2 bg-[#25D366] text-white text-xs font-mono font-bold tracking-wider uppercase hover:bg-[#20ba5a] transition-colors shadow-md"
               >
                 <WhatsAppIcon className="w-4 h-4 fill-current" />
-                <span>{isRTL ? 'واتساب' : 'WHATSAPP'}</span>
+                <span>WHATSAPP</span>
               </a>
-            </div>
-
-            {/* Newsletter Subscription */}
-            <div className="pt-2">
-              <span className="text-xs font-label-bold tracking-widest uppercase text-zinc-300 block mb-1.5">
-                {t.footerJoinRegistry}
-              </span>
-              <p className="text-[11px] text-zinc-400 mb-3 font-light">
-                {t.footerJoinDesc}
-              </p>
-              <form onSubmit={handleSubscribe} className="flex max-w-md">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t.footerEmailPlaceholder}
-                  required
-                  className="flex-1 bg-zinc-900 border border-zinc-700 px-3 sm:px-4 py-2.5 sm:py-3 text-xs font-mono text-white placeholder:text-zinc-500 uppercase focus:outline-none focus:border-white transition-colors"
-                />
-                <button
-                  type="submit"
-                  className="px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-black font-label-bold text-xs tracking-widest uppercase hover:bg-zinc-200 transition-colors shrink-0 flex items-center gap-1 shadow-md"
-                >
-                  {subscribed ? <Check className="w-4 h-4 text-green-600" /> : <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />}
-                </button>
-              </form>
-              {subscribed && (
-                <p className="text-xs text-green-400 font-mono mt-2 animate-fade-in">
-                  {t.footerRegisteredSuccess}
-                </p>
-              )}
             </div>
           </div>
 
-          {/* Directory Links */}
+          {/* Nav Columns */}
           <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8">
             <div>
               <h4 className="font-label-bold text-xs tracking-widest uppercase text-zinc-200 mb-3 sm:mb-4 pb-2 border-b border-zinc-800">
@@ -144,9 +112,9 @@ export const Footer: React.FC = () => {
               </h4>
               <ul className="space-y-2 text-xs text-zinc-400 font-light">
                 <li><Link to="/collections/men" className="hover:text-white transition-colors">{t.navMen}</Link></li>
-                <li><Link to="/collections/offers" className="hover:text-white transition-colors font-bold text-white">{t.navCollection04}</Link></li>
                 <li><Link to="/collections/kids" className="hover:text-white transition-colors">{t.navKids}</Link></li>
                 <li><Link to="/collections/accessories" className="hover:text-white transition-colors">{t.navAccessories}</Link></li>
+                <li><Link to="/collections/offers" className="hover:text-white transition-colors">{t.navCollection04}</Link></li>
               </ul>
             </div>
 
@@ -167,9 +135,21 @@ export const Footer: React.FC = () => {
                 {t.footerMaisons}
               </h4>
               <ul className="space-y-2 text-xs text-zinc-400 font-light">
-                <li><Link to="/stores" className="hover:text-white transition-colors">زفتى (الفرع الرئيسي)</Link></li>
-                <li><Link to="/stores" className="hover:text-white transition-colors">نهطاي (على الطريق)</Link></li>
-                <li><span className="text-zinc-500 text-[11px]">محافظة الغربية، مصر</span></li>
+                <li>
+                  <Link to="/stores" className="hover:text-white transition-colors">
+                    {isRTL ? 'زفتى (الفرع الرئيسي)' : 'Zifta (Flagship Atelier)'}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/stores" className="hover:text-white transition-colors">
+                    {isRTL ? 'نهطاي (على الطريق)' : 'Nahtay (Roadside Boutique)'}
+                  </Link>
+                </li>
+                <li>
+                  <span className="text-zinc-500 text-[11px]">
+                    {isRTL ? 'محافظة الغربية، مصر' : 'Gharbia Governorate, Egypt'}
+                  </span>
+                </li>
               </ul>
             </div>
           </div>
