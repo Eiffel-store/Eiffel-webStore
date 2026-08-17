@@ -4,13 +4,13 @@ import { useStoreData, useCurrency, useLanguage } from '@/shared';
 import { useCart } from '@/features/cart';
 
 export const ShopTheLook: React.FC = () => {
-  const { products } = useStoreData();
+  const { products = [] } = useStoreData();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
   const { isRTL } = useLanguage();
 
-  const lookProducts = products.slice(0, 3);
-  const mainImage = products[0]?.images[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1200&auto=format&fit=crop';
+  const lookProducts = (products || []).slice(0, 3);
+  const mainImage = products?.[0]?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
 
   return (
     <section className="py-12 sm:py-20 px-3 sm:px-8 md:px-12 max-w-[1440px] mx-auto w-full">
@@ -42,35 +42,39 @@ export const ShopTheLook: React.FC = () => {
             {isRTL ? 'القطع المكونة للإطلالة' : 'Pieces in this look'}
           </h3>
           <div className="space-y-3">
-            {lookProducts.map((product) => (
-              <div
-                key={product.id}
-                className="flex items-center justify-between p-3 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 hover:border-primary dark:hover:border-white transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="w-14 h-18 object-cover bg-zinc-800"
-                  />
-                  <div>
-                    <h4 className="font-editorial text-sm font-bold text-primary dark:text-white line-clamp-1">
-                      {product.name}
-                    </h4>
-                    <p className="text-[11px] text-secondary dark:text-zinc-400 font-mono">
-                      {formatPrice(product.price)}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => addToCart(product)}
-                  className="px-3 py-2 bg-primary text-white dark:bg-white dark:text-black text-[11px] font-label-bold tracking-wider uppercase hover:opacity-90 flex items-center gap-1 shrink-0"
+            {lookProducts.map((product) => {
+              if (!product) return null;
+              const prodImg = product?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
+              return (
+                <div
+                  key={product.id}
+                  className="flex items-center justify-between p-3 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 hover:border-primary dark:hover:border-white transition-colors"
                 >
-                  <ShoppingBag className="w-3.5 h-3.5" />
-                  <span>{isRTL ? 'إضافة' : 'Add'}</span>
-                </button>
-              </div>
-            ))}
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={prodImg}
+                      alt={product.name || 'Product'}
+                      className="w-14 h-18 object-cover bg-zinc-800"
+                    />
+                    <div>
+                      <h4 className="font-editorial text-sm font-bold text-primary dark:text-white line-clamp-1">
+                        {product.name}
+                      </h4>
+                      <p className="text-[11px] text-secondary dark:text-zinc-400 font-mono">
+                        {formatPrice(product.price || 0)}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => addToCart(product)}
+                    className="px-3 py-2 bg-primary text-white dark:bg-white dark:text-black text-[11px] font-label-bold tracking-wider uppercase hover:opacity-90 flex items-center gap-1 shrink-0"
+                  >
+                    <ShoppingBag className="w-3.5 h-3.5" />
+                    <span>{isRTL ? 'إضافة' : 'Add'}</span>
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

@@ -1,96 +1,77 @@
 import React, { useState } from 'react';
-import { Heart, Share2 } from 'lucide-react';
-import { useLanguage } from '@/shared';
 import { Product } from '@/types';
+import { Heart } from 'lucide-react';
 
-interface ProductGalleryProps {
-  product: Product;
-  selectedImage: number;
-  setSelectedImage: (idx: number) => void;
-  isSaved: boolean;
-  onToggleWishlist: () => void;
+export interface ProductGalleryProps {
+  product?: Product;
+  images?: string[];
+  productName?: string;
+  selectedImage?: number;
+  setSelectedImage?: (idx: number) => void;
+  isSaved?: boolean;
+  onToggleWishlist?: () => void;
 }
+
+const FALLBACK_IMG = 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
 
 export const ProductGallery: React.FC<ProductGalleryProps> = ({
   product,
-  selectedImage,
-  setSelectedImage,
-  isSaved,
-  onToggleWishlist,
+  images = [],
+  productName,
+  selectedImage: controlledSelected,
+  setSelectedImage: setControlledSelected,
+  isSaved = false,
+  onToggleWishlist
 }) => {
-  const { t } = useLanguage();
-  const [copiedLink, setCopiedLink] = useState(false);
+  const [internalSelected, setInternalSelected] = useState(0);
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
-  };
+  const activeIndex = controlledSelected !== undefined ? controlledSelected : internalSelected;
+  const setActiveIndex = setControlledSelected || setInternalSelected;
+
+  const rawImages = (product?.images && product.images.length > 0) ? product.images : (images.length > 0 ? images : [FALLBACK_IMG]);
+  const safeImages = rawImages.filter(img => img && img.trim() !== '');
+  const finalImages = safeImages.length > 0 ? safeImages : [FALLBACK_IMG];
+
+  const displayName = productName || product?.name || 'Product';
 
   return (
     <div className="lg:col-span-7 flex flex-col gap-4">
-      {/* Main Stage Image */}
-      <div className="relative aspect-[4/5] w-full bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 overflow-hidden group">
+      {/* Main Large Image */}
+      <div className="relative aspect-[3/4] w-full bg-zinc-950 overflow-hidden shadow-xl border border-surface-container dark:border-zinc-850 group">
         <img
-          src={product.images[selectedImage] || product.images[0]}
-          alt={product.name}
-          className="w-full h-full object-cover object-center cursor-zoom-in group-hover:scale-105 transition-transform duration-700"
+          src={finalImages[activeIndex] || finalImages[0]}
+          alt={displayName}
+          className="w-full h-full object-cover luxury-image-hover"
         />
 
-        {/* Tag Overlays */}
-        <div className="absolute top-4 left-4 rtl:left-auto rtl:right-4 flex flex-col gap-1.5">
-          {product.isNew && (
-            <span className="bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-widest px-3 py-1 uppercase">
-              {t.newBadge}
-            </span>
-          )}
-          {product.tag && (
-            <span className="bg-surface-container-lowest/90 dark:bg-zinc-900/90 text-primary dark:text-white font-label-bold text-[10px] tracking-wider px-2.5 py-1 uppercase border border-surface-container dark:border-zinc-700">
-              {product.tag}
-            </span>
-          )}
-        </div>
-
-        {/* Share & Wishlist quick actions on image */}
-        <div className="absolute top-4 right-4 rtl:right-auto rtl:left-4 flex flex-col gap-2">
+        {onToggleWishlist && (
           <button
             onClick={onToggleWishlist}
-            className={`p-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border border-surface-container dark:border-zinc-700 hover:scale-105 transition-all ${
-              isSaved ? 'text-error' : 'text-primary dark:text-white'
+            className={`absolute top-4 right-4 rtl:right-auto rtl:left-4 p-3 rounded-full transition-all ${
+              isSaved
+                ? 'bg-primary text-white dark:bg-white dark:text-black shadow-lg'
+                : 'bg-black/60 text-white hover:bg-black/80 backdrop-blur-sm'
             }`}
-            aria-label="Wishlist"
           >
-            <Heart className={`w-5 h-5 ${isSaved ? 'fill-error' : ''}`} />
+            <Heart className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
           </button>
-          <button
-            onClick={handleShare}
-            className="p-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border border-surface-container dark:border-zinc-700 hover:scale-105 text-primary dark:text-white transition-all relative"
-            title="Share link"
-          >
-            <Share2 className="w-5 h-5" />
-            {copiedLink && (
-              <span className="absolute right-full rtl:right-auto rtl:left-full mr-2 rtl:mr-0 rtl:ml-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-black text-white text-[10px] font-mono whitespace-nowrap">
-                COPIED
-              </span>
-            )}
-          </button>
-        </div>
+        )}
       </div>
 
-      {/* Thumbnail Strip */}
-      {product.images.length > 1 && (
-        <div className="grid grid-cols-4 gap-4">
-          {product.images.map((img, idx) => (
+      {/* Thumbnails */}
+      {finalImages.length > 1 && (
+        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3">
+          {finalImages.map((img, idx) => (
             <button
               key={idx}
-              onClick={() => setSelectedImage(idx)}
-              className={`aspect-[4/5] overflow-hidden border transition-all ${
-                selectedImage === idx
-                  ? 'border-primary dark:border-white ring-2 ring-primary dark:ring-white'
-                  : 'border-surface-container dark:border-zinc-800 opacity-60 hover:opacity-100'
+              onClick={() => setActiveIndex(idx)}
+              className={`relative aspect-[3/4] overflow-hidden bg-zinc-900 border transition-all ${
+                activeIndex === idx
+                  ? 'border-primary dark:border-white ring-1 ring-primary dark:ring-white'
+                  : 'border-zinc-800 opacity-60 hover:opacity-100'
               }`}
             >
-              <img src={img} alt="" className="w-full h-full object-cover" />
+              <img src={img} alt={`${displayName} Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
             </button>
           ))}
         </div>

@@ -10,17 +10,21 @@ export const PromoEditorial: React.FC = () => {
   const { formatPrice } = useCurrency();
   const { t, isRTL } = useLanguage();
 
-  const featuredProduct = products.find(p => p.originalPrice && p.originalPrice > p.price) || products[0];
+  const featuredProduct = (products && products.length > 0)
+    ? (products.find(p => p && p.originalPrice && p.originalPrice > p.price) || products[0])
+    : null;
 
   if (!featuredProduct) return null;
+
+  const mainImg = featuredProduct.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
 
   return (
     <section className="bg-surface-container-low dark:bg-zinc-900 py-10 sm:py-16 px-3 sm:px-8 md:px-12 border-y border-surface-container dark:border-zinc-800">
       <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
         <div className="lg:col-span-7 relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-zinc-950 shadow-md">
           <img
-            src={featuredProduct.images[0]}
-            alt={featuredProduct.name}
+            src={mainImg}
+            alt={featuredProduct.name || 'Featured product'}
             className="w-full h-full object-cover"
           />
           <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3 bg-primary text-white dark:bg-white dark:text-black text-[9px] sm:text-[10px] font-label-bold tracking-widest px-2.5 py-1 uppercase shadow-md">
@@ -42,7 +46,7 @@ export const PromoEditorial: React.FC = () => {
           </p>
 
           <div className="flex flex-wrap items-baseline gap-3 pt-1">
-            <span className="font-mono text-xl sm:text-2xl font-bold text-primary dark:text-white">{formatPrice(featuredProduct.price)}</span>
+            <span className="font-mono text-xl sm:text-2xl font-bold text-primary dark:text-white">{formatPrice(featuredProduct.price || 0)}</span>
             {featuredProduct.originalPrice && (
               <span className="text-xs font-mono text-secondary line-through">{formatPrice(featuredProduct.originalPrice)}</span>
             )}

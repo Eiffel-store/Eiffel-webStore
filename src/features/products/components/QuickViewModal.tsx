@@ -1,184 +1,114 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { X, Heart, ShoppingBag, ArrowRight } from 'lucide-react';
+import { X, ShoppingBag, Heart, Check } from 'lucide-react';
 import { Product } from '@/types';
 import { useCart } from '@/features/cart';
 import { useWishlist } from '@/features/wishlist';
-import { useCurrency } from '@/shared';
-import { useLanguage } from '@/shared';
+import { useCurrency, useLanguage } from '@/shared';
 
 interface QuickViewModalProps {
-  product: Product;
+  product: Product | null;
   onClose: () => void;
 }
 
 export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose }) => {
   const { addToCart } = useCart();
-  const { toggleWishlist, isInWishlist } = useWishlist();
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
-  const { t, isRTL } = useLanguage();
-  const navigate = useNavigate();
+  const { isRTL } = useLanguage();
 
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || 'M');
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]?.name || 'Noir');
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState(0);
 
-  const isSaved = isInWishlist(product.id);
+  if (!product) return null;
+
+  const inWishlist = isInWishlist(product.id);
+  const images = (product.images && product.images.length > 0) ? product.images : ['https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop'];
+  const sizes = product.sizes || ['48 (M)', '50 (L)', '52 (XL)'];
+  const colors = product.colors || [{ name: 'Noir', hex: '#000' }];
+
+  const activeColor = selectedColor || colors[0]?.name || 'Standard';
+  const activeSize = selectedSize || sizes[0] || 'M';
 
   const handleAddToCart = () => {
-    addToCart(product, selectedSize, selectedColor, 1);
+    addToCart(product, activeSize, activeColor, 1);
     onClose();
-  };
-
-  const handleViewDetails = () => {
-    onClose();
-    navigate(`/product/${product.id}`);
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm animate-fade-in"
-        onClick={onClose}
-      />
-
-      <div className="relative bg-surface-container-lowest dark:bg-zinc-950 w-full max-w-3xl border border-surface-container dark:border-zinc-800 shadow-2xl z-10 animate-fade-in overflow-hidden">
-        {/* Close Button */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+      <div className="relative bg-white dark:bg-zinc-950 border border-surface-container dark:border-zinc-800 w-full max-w-3xl overflow-hidden shadow-2xl">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 rtl:right-auto rtl:left-4 z-20 p-2 bg-surface-container-lowest/80 dark:bg-zinc-900/80 text-primary dark:text-white hover:opacity-70"
-          aria-label="Close"
+          className="absolute top-4 right-4 rtl:right-auto rtl:left-4 p-1.5 text-secondary hover:text-primary dark:text-zinc-400 dark:hover:text-white z-20"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-12">
-          {/* Left Gallery (6 cols) */}
-          <div className="md:col-span-6 bg-surface-container-low dark:bg-zinc-900 relative">
-            <div className="aspect-[4/5] w-full overflow-hidden">
-              <img
-                src={product.images[selectedImage] || product.images[0]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            {product.images.length > 1 && (
-              <div className="flex gap-2 p-3 overflow-x-auto bg-surface-container-lowest dark:bg-zinc-950 border-t border-surface-container dark:border-zinc-800">
-                {product.images.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImage(idx)}
-                    className={`w-12 h-14 shrink-0 overflow-hidden border ${
-                      selectedImage === idx ? 'border-primary dark:border-white ring-1 ring-primary' : 'border-surface-container opacity-60'
-                    }`}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
+        <div className="grid grid-cols-1 md:grid-cols-2">
+          {/* Gallery */}
+          <div className="relative aspect-[3/4] bg-zinc-900">
+            <img
+              src={images[selectedImage] || images[0]}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
           </div>
 
-          {/* Right Content (6 cols) */}
-          <div className="md:col-span-6 p-6 flex flex-col justify-between space-y-6">
+          {/* Details */}
+          <div className="p-6 flex flex-col justify-between space-y-4">
             <div>
-              <div className="flex items-center justify-between text-[10px] font-mono text-secondary uppercase">
-                <span>{product.subCategory}</span>
-                <span>{t.madeInItaly}</span>
+              <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest">{product.category}</span>
+              <h2 className="font-editorial text-2xl font-bold text-primary dark:text-white mt-1">{product.name}</h2>
+              <p className="text-xs text-secondary dark:text-zinc-400 mt-1">{product.subtitle}</p>
+              <div className="mt-3 font-mono text-lg font-bold text-primary dark:text-white">{formatPrice(product.price || 0)}</div>
+            </div>
+
+            {/* Colors */}
+            <div>
+              <label className="block text-[11px] font-label-bold uppercase text-zinc-400 mb-1.5">Color: {activeColor}</label>
+              <div className="flex gap-2">
+                {colors.map((c, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedColor(c.name)}
+                    className={`w-6 h-6 rounded-full border-2 ${activeColor === c.name ? 'border-primary dark:border-white ring-2 ring-primary' : 'border-zinc-700'}`}
+                    style={{ backgroundColor: c.hex }}
+                  />
+                ))}
               </div>
+            </div>
 
-              <h3 className="font-editorial text-2xl sm:text-3xl text-primary dark:text-white mt-1">
-                {product.name}
-              </h3>
-              <p className="text-xs text-secondary dark:text-zinc-400 mt-1 font-light line-clamp-2">
-                {product.subtitle}
-              </p>
-
-              <div className="flex items-baseline gap-3 my-4">
-                <span className="font-mono text-xl font-bold text-primary dark:text-white">
-                  {formatPrice(product.price)}
-                </span>
-                {product.originalPrice && (
-                  <span className="text-xs font-mono text-secondary line-through">
-                    {formatPrice(product.originalPrice)}
-                  </span>
-                )}
-              </div>
-
-              {/* Color Picker */}
-              <div className="space-y-2 mb-4">
-                <span className="text-[10px] font-label-bold text-secondary uppercase">
-                  {t.colorway} <strong className="text-primary dark:text-white">{selectedColor}</strong>
-                </span>
-                <div className="flex gap-2">
-                  {product.colors.map((c) => (
-                    <button
-                      key={c.name}
-                      onClick={() => setSelectedColor(c.name)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 border text-xs uppercase font-label-bold ${
-                        selectedColor === c.name
-                          ? 'border-primary dark:border-white bg-surface-container-high dark:bg-zinc-800'
-                          : 'border-surface-container dark:border-zinc-800 text-secondary'
-                      }`}
-                    >
-                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: c.hex }} />
-                      <span className="text-[10px]">{c.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Size Picker */}
-              <div className="space-y-2 mb-6">
-                <span className="text-[10px] font-label-bold text-secondary uppercase">
-                  {t.selectSize}
-                </span>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {product.sizes.map((sz) => (
-                    <button
-                      key={sz}
-                      onClick={() => setSelectedSize(sz)}
-                      className={`py-2 text-xs font-label-bold border transition-all text-center uppercase ${
-                        selectedSize === sz
-                          ? 'bg-primary text-white dark:bg-white dark:text-black border-primary'
-                          : 'border-surface-container dark:border-zinc-800 text-secondary hover:border-primary'
-                      }`}
-                    >
-                      {sz.split(' ')[0]}
-                    </button>
-                  ))}
-                </div>
+            {/* Sizes */}
+            <div>
+              <label className="block text-[11px] font-label-bold uppercase text-zinc-400 mb-1.5">Size: {activeSize}</label>
+              <div className="flex flex-wrap gap-2">
+                {sizes.map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedSize(s)}
+                    className={`px-3 py-1.5 text-xs font-mono border ${activeSize === s ? 'bg-primary text-white dark:bg-white dark:text-black border-primary dark:border-white' : 'border-zinc-700 text-zinc-300'}`}
+                  >
+                    {s}
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Actions */}
-            <div className="space-y-2 pt-4 border-t border-surface-container dark:border-zinc-800">
-              <div className="flex gap-2">
-                <button
-                  onClick={handleAddToCart}
-                  className="flex-1 py-3.5 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-widest uppercase flex items-center justify-center gap-2 hover:bg-neutral-800 transition-colors"
-                >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>{t.addToBag}</span>
-                </button>
-                <button
-                  onClick={() => toggleWishlist(product)}
-                  className={`p-3 border border-surface-container dark:border-zinc-800 transition-colors ${
-                    isSaved ? 'text-error' : 'text-primary dark:text-white'
-                  }`}
-                  aria-label="Wishlist"
-                >
-                  <Heart className={`w-4 h-4 ${isSaved ? 'fill-error' : ''}`} />
-                </button>
-              </div>
-
+            <div className="flex gap-2 pt-2">
               <button
-                onClick={handleViewDetails}
-                className="w-full py-2.5 text-xs font-label-bold tracking-wider text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors uppercase flex items-center justify-center gap-1"
+                onClick={handleAddToCart}
+                className="flex-1 py-3 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-wider uppercase hover:opacity-90 flex items-center justify-center gap-2"
               >
-                <span>{t.viewAll} / FULL DETAILS</span>
-                <ArrowRight className={`w-3 h-3 ${isRTL ? 'rotate-180' : ''}`} />
+                <ShoppingBag className="w-4 h-4" />
+                <span>Add to Bag</span>
+              </button>
+              <button
+                onClick={() => toggleWishlist(product)}
+                className="p-3 border border-zinc-700 text-zinc-300 hover:text-white"
+              >
+                <Heart className={`w-4 h-4 ${inWishlist ? 'fill-current text-red-500' : ''}`} />
               </button>
             </div>
           </div>
