@@ -9,14 +9,16 @@ import {
   X,
   Sun,
   Moon,
-  Globe,
   ChevronDown,
-  Languages
+  Languages,
+  ShieldCheck,
+  LogOut
 } from 'lucide-react';
 import { useCart } from '@/features/cart';
 import { useWishlist } from '@/features/wishlist';
 import { useTheme } from '@/shared';
 import { useLanguage } from '@/shared';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { Logo } from './Logo';
 
 interface NavbarProps {
@@ -28,6 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   const { totalWishlist } = useWishlist();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t, isRTL } = useLanguage();
+  const { user, isAuthenticated, role, logout } = useAuthStore();
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
@@ -58,13 +61,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
     <>
       {/* Top Banner */}
       <div className="bg-primary text-white dark:bg-zinc-950 dark:text-zinc-200 text-[10px] sm:text-[11px] py-1.5 px-3 sm:px-4 font-label-bold tracking-wider sm:tracking-widest text-center border-b border-black/10 flex items-center justify-between">
-        <div className="hidden md:block w-36 text-left rtl:text-right text-zinc-400 font-mono text-[10px]">
+        <div className="hidden md:block w-44 text-left rtl:text-right text-zinc-400 font-mono text-[10px]">
           {t.topBannerLocations}
         </div>
         <div className="flex-1 text-center truncate">
           {t.topBannerPromo} <strong>EIFFEL10</strong>
         </div>
-        <div className="hidden md:flex w-36 justify-end items-center gap-4 text-[10px] text-zinc-300">
+        <div className="hidden md:flex w-44 justify-end items-center gap-3 text-[10px] text-zinc-300">
+          {(role === 'ROLE_ADMIN' || role === 'ROLE_STAFF') && (
+            <Link to="/admin" className="text-amber-400 hover:underline flex items-center gap-1 font-bold">
+              <ShieldCheck className="w-3 h-3" />
+              <span>لوحة الإدارة</span>
+            </Link>
+          )}
           <Link to="/help" className="hover:underline">{t.help}</Link>
           <span>•</span>
           <Link to="/stores" className="hover:underline">{t.atelier}</Link>
@@ -197,13 +206,23 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
               )}
             </Link>
 
-            {/* Account Link (Desktop) */}
+            {/* Account Link (Desktop) with Name or User Icon */}
             <Link
               to="/account"
-              className="hidden sm:flex p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors"
+              className="hidden sm:flex items-center gap-1.5 p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors"
               aria-label="Account"
             >
-              <User className="w-4 h-4" />
+              <div className="relative">
+                <User className="w-4 h-4" />
+                {isAuthenticated && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white dark:ring-zinc-950" />
+                )}
+              </div>
+              {isAuthenticated && user && (
+                <span className="text-xs font-label-bold tracking-wider max-w-[80px] truncate">
+                  {user.name.split(' ')[0]}
+                </span>
+              )}
             </Link>
 
             {/* Cart Trigger */}
@@ -224,89 +243,74 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
         </div>
       </header>
 
-      {/* Mobile Navigation Drawer */}
+      {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden overflow-hidden">
-          <div
-            className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-          <div className={`fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} w-[85vw] max-w-xs bg-white dark:bg-zinc-950 shadow-2xl p-6 flex flex-col justify-between z-10 animate-fade-in border-r rtl:border-r-0 rtl:border-l border-surface-container dark:border-zinc-800`}>
+        <div className="fixed inset-0 z-50 lg:hidden bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-y-0 left-0 rtl:left-auto rtl:right-0 w-4/5 max-w-sm bg-white dark:bg-zinc-950 p-6 shadow-2xl flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between pb-5 border-b border-surface-container dark:border-zinc-800">
+              <div className="flex items-center justify-between pb-6 border-b border-surface-container dark:border-zinc-800">
                 <Logo size="sm" />
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-1.5 text-primary dark:text-white"
-                  aria-label="Close menu"
+                  className="p-2 text-secondary hover:text-primary dark:text-zinc-400 dark:hover:text-white"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Mobile Nav Links */}
-              <nav className="py-5 flex flex-col gap-3.5">
+              {/* User Bar in Mobile Menu */}
+              <div className="py-4 border-b border-surface-container dark:border-zinc-800">
+                {isAuthenticated && user ? (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-primary dark:text-white">{user.name}</p>
+                      <p className="text-[10px] text-zinc-400 font-mono">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={logout}
+                      className="p-1.5 text-red-500 hover:bg-red-500/10 rounded text-xs flex items-center gap-1"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <Link
+                    to="/account"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-center py-2 bg-primary text-white dark:bg-white dark:text-black text-xs font-bold uppercase tracking-wider"
+                  >
+                    {isRTL ? 'تسجيل الدخول / إنشاء حساب' : 'Sign In / Register'}
+                  </Link>
+                )}
+              </div>
+
+              {/* Mobile Links */}
+              <div className="py-6 space-y-4">
                 {navLinks.map((link) => (
                   <Link
                     key={link.label}
                     to={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="font-editorial text-xl tracking-wide text-primary dark:text-white hover:opacity-70 transition-opacity py-1"
+                    className="block text-base font-editorial font-bold text-primary dark:text-white hover:opacity-70"
                   >
                     {link.label}
                   </Link>
                 ))}
-              </nav>
 
-              {/* Language & Account in Mobile */}
-              <div className="pt-5 border-t border-surface-container dark:border-zinc-800 flex flex-col gap-3">
-                <div className="flex gap-2 mb-1">
-                  <button
-                    onClick={() => setLanguage('en')}
-                    className={`flex-1 py-2 text-xs font-mono font-bold border transition-colors ${
-                      language === 'en'
-                        ? 'bg-primary text-white dark:bg-white dark:text-black border-primary'
-                        : 'border-surface-container text-secondary'
-                    }`}
+                {(role === 'ROLE_ADMIN' || role === 'ROLE_STAFF') && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-sm font-bold text-amber-400 hover:underline pt-2 border-t border-zinc-800"
                   >
-                    English (EN)
-                  </button>
-                  <button
-                    onClick={() => setLanguage('ar')}
-                    className={`flex-1 py-2 text-xs font-mono font-bold border transition-colors ${
-                      language === 'ar'
-                        ? 'bg-primary text-white dark:bg-white dark:text-black border-primary'
-                        : 'border-surface-container text-secondary'
-                    }`}
-                  >
-                    العربية (AR)
-                  </button>
-                </div>
-
-                <Link
-                  to="/account"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 font-label-bold text-xs tracking-wider text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white uppercase py-1"
-                >
-                  <User className="w-4 h-4" />
-                  <span>{t.navAccount}</span>
-                </Link>
-                <Link
-                  to="/help"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 font-label-bold text-xs tracking-wider text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white uppercase py-1"
-                >
-                  <Globe className="w-4 h-4" />
-                  <span>{t.helpCenterTitle}</span>
-                </Link>
+                    🛡️ {isRTL ? 'لوحة تحكم الإدارة' : 'Admin Panel'}
+                  </Link>
+                )}
               </div>
             </div>
 
-            {/* Mobile Footer & Copyright */}
-            <div className="pt-5 border-t border-surface-container dark:border-zinc-800">
-              <p className="text-[10px] text-secondary dark:text-zinc-500 font-mono text-center">
-                © {new Date().getFullYear()} EIFFEL STUDIO S.A.
-              </p>
+            <div className="pt-6 border-t border-surface-container dark:border-zinc-800 text-xs text-zinc-400 font-mono">
+              EIFFEL LUXURY MENSWEAR • CAIRO, EG
             </div>
           </div>
         </div>

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { CATEGORIES } from '@/data/products';
-import { useLanguage } from '@/shared';
+import { useStoreData, useLanguage } from '@/shared';
 
 export const CategoryGrid: React.FC = () => {
+  const { categories } = useStoreData();
   const { t, isRTL } = useLanguage();
 
   return (
@@ -28,25 +28,25 @@ export const CategoryGrid: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-        {CATEGORIES.map((cat) => (
+        {categories.map((cat) => (
           <Link
             key={cat.id}
-            to={cat.href}
+            to={`/collections/${cat.id}`}
             className="group relative aspect-[3/4] overflow-hidden bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 shadow-sm"
           >
             <img
               src={cat.image}
-              alt={cat.title}
+              alt={cat.name}
               className="w-full h-full object-cover luxury-image-hover group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300" />
             
             <div className="absolute inset-x-0 bottom-0 p-3 sm:p-6 text-white flex flex-col justify-end">
               <span className="font-mono text-[9px] sm:text-[10px] tracking-widest text-zinc-300 uppercase">
-                {cat.count} {t.categoriesPieces}
+                {cat.itemCount || '12 PIECES'}
               </span>
               <h3 className="font-editorial text-lg sm:text-3xl tracking-tight text-white mt-0.5 sm:mt-1 group-hover:translate-x-1 transition-transform">
-                {isRTL && cat.id === 'men' ? 'تشكيلة الرجال' : isRTL && cat.id === 'kids' ? 'أزياء الأطفال' : isRTL && cat.id === 'accessories' ? 'القطع الجلدية' : isRTL ? 'مجموعة 04' : cat.title}
+                {isRTL ? cat.name : (cat.nameEn || cat.name)}
               </h3>
               <p className="hidden sm:block text-xs text-zinc-300 mt-1 line-clamp-1 font-light">
                 {cat.subtitle}

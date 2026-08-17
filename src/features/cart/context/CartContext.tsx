@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
 import { CartItem, Product } from '@/types';
+import { useCartStore } from '@/stores/useCartStore';
 
 interface CartContextType {
   cart: CartItem[];
@@ -23,119 +24,63 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// 60 USD is 3,000 EGP in Egyptian market
-const FREE_SHIPPING_THRESHOLD = 60;
+const FREE_SHIPPING_THRESHOLD = 1500; // EGP in Egypt
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('eiffel_cart');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const store = useCartStore();
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [discountCode, setDiscountCode] = useState('');
-  const [discountAmount, setDiscountAmount] = useState(0);
+  const subtotal = store.getSubtotal();
+  const totalItems = store.getItemCount();
+  const discountAmount = store.getDiscountAmount();
+  const discountCode = store.appliedCoupon?.code || '';
 
-  useEffect(() => {
-    localStorage.setItem('eiffel_cart', JSON.stringify(cart));
-  }, [cart]);
-
-  const openCart = () => setIsOpen(true);
-  const closeCart = () => setIsOpen(false);
+  const freeShippingRemaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const freeShippingProgress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
 
   const addToCart = (product: Product, size?: string, color?: string, quantity: number = 1) => {
-    const selectedSize = size || product.sizes[0] || 'M';
-    const selectedColor = color || product.colors[0]?.name || 'Noir';
-
-    setCart(prev => {
-      const existingIndex = prev.findIndex(
-        item => item.product.id === product.id && item.selectedSize === selectedSize && item.selectedColor === selectedColor
-      );
-
-      if (existingIndex > -1) {
-        const updated = [...prev];
-        updated[existingIndex] = {
-          ...updated[existingIndex],
-          quantity: updated[existingIndex].quantity + quantity
-        };
-        return updated;
-      } else {
-        return [...prev, { product, selectedSize, selectedColor, quantity }];
-      }
-    });
-
-    setIsOpen(true);
+    const selectedSize = size || (product.sizes && product.sizes[0]) || 'M';
+    const selectedColor = color || (product.colors && product.colors[0]?.name) || 'Standard';
+    store.addToCart(product, quantity, selectedColor, selectedSize);
   };
 
   const removeFromCart = (productId: string, selectedSize: string, selectedColor: string) => {
-    setCart(prev =>
-      prev.filter(
-        item => !(item.product.id === productId && item.selectedSize === selectedSize && item.selectedColor === selectedColor)
-      )
-    );
+    store.removeFromCart(productId, selectedColor, selectedSize);
   };
 
   const updateQuantity = (productId: string, selectedSize: string, selectedColor: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId, selectedSize, selectedColor);
-      return;
-    }
-    setCart(prev =>
-      prev.map(item => {
-        if (item.product.id === productId && item.selectedSize === selectedSize && item.selectedColor === selectedColor) {
-          return { ...item, quantity };
-        }
-        return item;
-      })
-    );
+    store.updateQuantity(productId, selectedColor, selectedSize, quantity);
   };
 
-  const clearCart = () => {
-    setCart([]);
-    setDiscountCode('');
-    setDiscountAmount(0);
-  };
-
-  const applyDiscount = (code: string): { success: boolean; message: string } => {
-    const cleanCode = code.trim().toUpperCase();
-    if (cleanCode === 'EIFFEL10' || cleanCode === 'EGYPT10') {
-      setDiscountCode(cleanCode);
-      setDiscountAmount(0.1); // 10%
-      return { success: true, message: '10% Egyptian Client Privilege Code Applied' };
-    } else if (cleanCode === 'ATELIER20' || cleanCode === 'CAIRO20') {
-      setDiscountCode(cleanCode);
-      setDiscountAmount(0.2); // 20%
-      return { success: true, message: '20% Runway VIP Code Applied' };
+  const applyDiscount = (code: string) => {
+    const clean = code.trim().toUpperCase();
+    if (clean === 'EIFFEL10') {
+      store.applyCoupon({ id: 'c-1', code: 'EIFFEL10', discountPercentage: 10, isActive: true });
+      return { success: true, message: 'تم تطبيق خصم 10% بنجاح' };
+    } else if (clean === 'CAIRO20' || clean === 'SUMMER20') {
+      store.applyCoupon({ id: 'c-2', code: 'CAIRO20', discountPercentage: 20, isActive: true });
+      return { success: true, message: 'تم تطبيق خصم 20% بنجاح' };
+    } else if (clean === 'VIP30') {
+      store.applyCoupon({ id: 'c-3', code: 'VIP30', discountPercentage: 30, isActive: true });
+      return { success: true, message: 'تم تطبيق خصم 30% VIP بنجاح' };
     }
-    return { success: false, message: 'Invalid or expired promotional code.' };
+    return { success: false, message: 'كود الخصم غير صالح أو منتهي الصلاحية' };
   };
 
   const removeDiscount = () => {
-    setDiscountCode('');
-    setDiscountAmount(0);
+    store.removeCoupon();
   };
-
-  const subtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-
-  const freeShippingRemaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
-  const freeShippingProgress = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
 
   return (
     <CartContext.Provider
       value={{
-        cart,
-        isOpen,
-        openCart,
-        closeCart,
+        cart: store.items,
+        isOpen: store.isOpen,
+        openCart: store.openCart,
+        closeCart: store.closeCart,
         addToCart,
         removeFromCart,
         updateQuantity,
-        clearCart,
+        clearCart: store.clearCart,
         subtotal,
         totalItems,
         discountCode,
