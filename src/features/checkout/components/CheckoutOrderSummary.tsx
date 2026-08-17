@@ -1,6 +1,5 @@
 import React from 'react';
-import { useCurrency } from '@/shared';
-import { useLanguage } from '@/shared';
+import { useCurrency, useLanguage } from '@/shared';
 import { CartItem } from '@/types';
 
 interface CheckoutOrderSummaryProps {
@@ -12,7 +11,7 @@ interface CheckoutOrderSummaryProps {
 }
 
 export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
-  cart,
+  cart = [],
   subtotal,
   discountValue,
   shippingFee,
@@ -22,32 +21,35 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
   const { t } = useLanguage();
 
   return (
-    <div className="sticky top-28 p-6 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 space-y-6">
+    <div className="sticky top-28 p-6 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 space-y-6 shadow-xl">
       <h3 className="font-editorial text-2xl text-primary dark:text-white tracking-wider pb-3 border-b border-surface-container dark:border-zinc-800">
         {t.bagSummary} ({cart.length})
       </h3>
 
       <div className="max-h-72 overflow-y-auto divide-y divide-surface-container/80 dark:divide-zinc-800">
-        {cart.map((item, idx) => (
-          <div key={idx} className="py-3 flex gap-3 items-center">
-            <img
-              src={item.product.images[0]}
-              alt=""
-              className="w-14 h-16 object-cover bg-zinc-950"
-            />
-            <div className="flex-1">
-              <h4 className="font-editorial text-base text-primary dark:text-white line-clamp-1">
-                {item.product.name}
-              </h4>
-              <p className="text-[11px] text-secondary dark:text-zinc-400 font-mono">
-                {item.selectedSize} • {item.selectedColor} (x{item.quantity})
-              </p>
+        {cart.map((item, idx) => {
+          const img = item?.product?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
+          return (
+            <div key={idx} className="py-3 flex gap-3 items-center">
+              <img
+                src={img}
+                alt={item?.product?.name || 'Item'}
+                className="w-14 h-16 object-cover bg-zinc-950"
+              />
+              <div className="flex-1">
+                <h4 className="font-editorial text-base text-primary dark:text-white line-clamp-1">
+                  {item?.product?.name || 'Product'}
+                </h4>
+                <p className="text-[11px] text-secondary dark:text-zinc-400 font-mono">
+                  {item.selectedSize} • {item.selectedColor} (x{item.quantity})
+                </p>
+              </div>
+              <span className="font-mono text-xs font-bold text-primary dark:text-white">
+                {formatPrice((item?.product?.price || 0) * item.quantity)}
+              </span>
             </div>
-            <span className="font-mono text-xs font-bold text-primary dark:text-white">
-              {formatPrice(item.product.price * item.quantity)}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Price Details */}
