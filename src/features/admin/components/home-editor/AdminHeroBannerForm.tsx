@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image as ImageIcon, Upload, Link as LinkIcon, Sparkles, Loader2 } from 'lucide-react';
+import { Upload, Link as LinkIcon, Sparkles, Loader2 } from 'lucide-react';
 import { HeroBannerSettings } from '@/types';
 import { useLanguage } from '@/shared';
 import { uploadService } from '@/services/uploadService';
@@ -87,12 +87,17 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className="flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-dashed border-zinc-700 text-xs font-medium cursor-pointer transition-colors">
-              <Upload className="w-4 h-4 text-emerald-400" />
-              <span>{isRTL ? 'رفع صورة من الجهاز' : 'Upload from Device'}</span>
+              {isUploading ? (
+                <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+              ) : (
+                <Upload className="w-4 h-4 text-emerald-400" />
+              )}
+              <span>{isUploading ? (isRTL ? 'جاري الرفع...' : 'Uploading...') : (isRTL ? 'رفع صورة من الجهاز' : 'Upload from Device')}</span>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleFileUpload}
+                disabled={isUploading}
                 className="hidden"
               />
             </label>

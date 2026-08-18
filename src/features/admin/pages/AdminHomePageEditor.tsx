@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, AlertCircle, ExternalLink, RefreshCw, LayoutTemplate } from 'lucide-react';
+import { Check, ExternalLink, LayoutTemplate } from 'lucide-react';
 import { useStoreData, useLanguage } from '@/shared';
 import { HomePageSettings } from '@/types';
 import { AdminHeroBannerForm } from '../components/home-editor/AdminHeroBannerForm';
