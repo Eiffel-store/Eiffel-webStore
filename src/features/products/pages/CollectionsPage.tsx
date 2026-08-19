@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
 import { QuickViewModal } from '../components/QuickViewModal';
@@ -7,7 +7,7 @@ import { CollectionFiltersBar, SortOption } from '../components/CollectionFilter
 import { ActiveFilters } from '../components/ActiveFilters';
 import { FilterDrawer } from '../components/FilterDrawer';
 import { Product } from '@/types';
-import { useLanguage, useStoreData, EiffelLoader, EmptyState } from '@/shared';
+import { useLanguage, useStoreData, EiffelLoader, EmptyState, Pagination } from '@/shared';
 
 export const CollectionsPage: React.FC = () => {
   const { category = 'men' } = useParams<{ category: string }>();
@@ -23,6 +23,10 @@ export const CollectionsPage: React.FC = () => {
   const [gridCols, setGridCols] = useState<1 | 2 | 4>(2);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
 
   // Category Metadata Object
   const currentCategoryObj = categories.find(c => c.id === category) || {
@@ -142,6 +146,17 @@ export const CollectionsPage: React.FC = () => {
     return list;
   }, [category, products, searchKeyword, selectedSubCategory, selectedSize, selectedColor, sortBy]);
 
+  // Reset page on filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [category, searchKeyword, selectedSubCategory, selectedSize, selectedColor, sortBy]);
+
+  const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1;
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredProducts.slice(start, start + pageSize);
+  }, [filteredProducts, currentPage, pageSize]);
+
   const clearFilters = () => {
     setSelectedSubCategory('All');
     setSelectedSize('All');
@@ -215,23 +230,45 @@ export const CollectionsPage: React.FC = () => {
             actionLink={!hasActiveFilters ? (category !== 'men' ? '/collections/men' : '/') : undefined}
           />
         ) : (
-          <div
-            className={`grid gap-3 sm:gap-6 ${
-              gridCols === 1
-                ? 'grid-cols-1 max-w-md mx-auto sm:max-w-none sm:grid-cols-2 lg:grid-cols-4'
-                : gridCols === 2
-                ? 'grid-cols-2 lg:grid-cols-4'
-                : 'grid-cols-2 lg:grid-cols-4'
-            }`}
-          >
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onQuickView={(p) => setQuickViewProduct(p)}
+          <>
+            <div
+              className={`grid gap-3 sm:gap-6 ${
+                gridCols === 1
+                  ? 'grid-cols-1 max-w-md mx-auto sm:max-w-none sm:grid-cols-2 lg:grid-cols-4'
+                  : gridCols === 2
+                  ? 'grid-cols-2 lg:grid-cols-4'
+                  : 'grid-cols-2 lg:grid-cols-4'
+              }`}
+            >
+              {paginatedProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onQuickView={(p) => setQuickViewProduct(p)}
+                />
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredProducts.length}
+                pageSize={pageSize}
+                onPageChange={(p) => {
+                  setCurrentPage(p);
+                  window.scrollTo({ top: 350, behavior: 'smooth' });
+                }}
+                onPageSizeChange={(s) => {
+                  setPageSize(s);
+                  setCurrentPage(1);
+                }}
+                pageSizeOptions={[12, 24, 48]}
+                className="mt-10"
               />
-            ))}
-          </div>
+            )}
+          </>
         )}
       </section>
 

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useStoreData, useLanguage, EiffelLoader, EmptyState } from '@/shared';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useStoreData, useLanguage, EiffelLoader, EmptyState, Pagination } from '@/shared';
 import { Order } from '@/types';
 import { AdminOrderFilterBar } from '../components/orders/AdminOrderFilterBar';
 import { AdminOrdersTable } from '../components/orders/AdminOrdersTable';
@@ -13,17 +13,34 @@ export const AdminOrdersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  const filteredOrders = orders.filter((o) => {
-    const matchesStatus = statusFilter === 'all' || o.status === statusFilter;
-    const matchesSearch =
-      o.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (o.shippingAddress?.firstName && o.shippingAddress.firstName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (o.shippingAddress?.lastName && o.shippingAddress.lastName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (o.shippingAddress?.phone && o.shippingAddress.phone.includes(searchQuery)) ||
-      (o.shippingAddress?.city && o.shippingAddress.city.toLowerCase().includes(searchQuery.toLowerCase()));
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-    return matchesStatus && matchesSearch;
-  });
+  const filteredOrders = useMemo(() => {
+    return orders.filter((o) => {
+      const matchesStatus = statusFilter === 'all' || o.status === statusFilter;
+      const matchesSearch =
+        o.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (o.shippingAddress?.firstName && o.shippingAddress.firstName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (o.shippingAddress?.lastName && o.shippingAddress.lastName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (o.shippingAddress?.phone && o.shippingAddress.phone.includes(searchQuery)) ||
+        (o.shippingAddress?.city && o.shippingAddress.city.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      return matchesStatus && matchesSearch;
+    });
+  }, [orders, statusFilter, searchQuery]);
+
+  // Reset to page 1 on filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, searchQuery]);
+
+  const totalPages = Math.ceil(filteredOrders.length / pageSize) || 1;
+  const paginatedOrders = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredOrders.slice(start, start + pageSize);
+  }, [filteredOrders, currentPage, pageSize]);
 
   const handleUpdateStatus = (id: string, status: Order['status']) => {
     updateOrderStatus(id, status);
@@ -75,13 +92,30 @@ export const AdminOrdersPage: React.FC = () => {
           }}
         />
       ) : (
-        /* Orders Table */
-        <AdminOrdersTable
-          orders={filteredOrders}
-          onSelectOrder={setSelectedOrder}
-          onUpdateStatus={handleUpdateStatus}
-          onDeleteOrder={deleteOrder}
-        />
+        /* Orders Table & Pagination */
+        <div className="space-y-4">
+          <AdminOrdersTable
+            orders={paginatedOrders}
+            onSelectOrder={setSelectedOrder}
+            onUpdateStatus={handleUpdateStatus}
+            onDeleteOrder={deleteOrder}
+          />
+
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredOrders.length}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(s) => {
+                setPageSize(s);
+                setCurrentPage(1);
+              }}
+              pageSizeOptions={[10, 25, 50]}
+            />
+          )}
+        </div>
       )}
 
       {/* Order Details & Printing Modal */}

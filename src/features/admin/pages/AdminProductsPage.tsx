@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import { useStoreData, useLanguage, EiffelLoader, EmptyState } from '@/shared';
+import { useStoreData, useLanguage, EiffelLoader, EmptyState, Pagination } from '@/shared';
 import { Product } from '@/types';
 import { AdminProductFilterBar } from '../components/products/AdminProductFilterBar';
 import { AdminProductTable } from '../components/products/AdminProductTable';
@@ -16,25 +16,42 @@ export const AdminProductsPage: React.FC = () => {
   const [stockFilter, setStockFilter] = useState('all');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
   // Filter products
-  const filteredProducts = products.filter((p) => {
-    const matchesSearch =
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.id.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredProducts = useMemo(() => {
+    return products.filter((p) => {
+      const matchesSearch =
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.id.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCategory =
-      selectedCategory === 'all' ||
-      p.category === selectedCategory ||
-      (selectedCategory === 'offers' && p.originalPrice && p.originalPrice > p.price);
+      const matchesCategory =
+        selectedCategory === 'all' ||
+        p.category === selectedCategory ||
+        (selectedCategory === 'offers' && p.originalPrice && p.originalPrice > p.price);
 
-    const matchesStock =
-      stockFilter === 'all' ||
-      (stockFilter === 'in-stock' && p.inStock) ||
-      (stockFilter === 'out-of-stock' && !p.inStock);
+      const matchesStock =
+        stockFilter === 'all' ||
+        (stockFilter === 'in-stock' && p.inStock) ||
+        (stockFilter === 'out-of-stock' && !p.inStock);
 
-    return matchesSearch && matchesCategory && matchesStock;
-  });
+      return matchesSearch && matchesCategory && matchesStock;
+    });
+  }, [products, searchQuery, selectedCategory, stockFilter]);
+
+  // Reset to page 1 on filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, stockFilter]);
+
+  const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1;
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredProducts.slice(start, start + pageSize);
+  }, [filteredProducts, currentPage, pageSize]);
 
   const handleDelete = (id: string) => {
     deleteProduct(id);
@@ -101,12 +118,29 @@ export const AdminProductsPage: React.FC = () => {
           }}
         />
       ) : (
-        /* Products Table */
-        <AdminProductTable
-          products={filteredProducts}
-          onToggleStock={handleToggleStock}
-          onDeletePrompt={setDeleteConfirmId}
-        />
+        /* Products Table & Pagination */
+        <div className="space-y-4">
+          <AdminProductTable
+            products={paginatedProducts}
+            onToggleStock={handleToggleStock}
+            onDeletePrompt={setDeleteConfirmId}
+          />
+
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredProducts.length}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(s) => {
+                setPageSize(s);
+                setCurrentPage(1);
+              }}
+              pageSizeOptions={[10, 20, 50]}
+            />
+          )}
+        </div>
       )}
 
       {/* Delete Confirmation Modal */}
