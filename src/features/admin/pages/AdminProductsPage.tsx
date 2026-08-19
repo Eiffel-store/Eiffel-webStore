@@ -126,7 +126,7 @@ export const AdminProductsPage: React.FC = () => {
             onDeletePrompt={setDeleteConfirmId}
           />
 
-          {totalPages > 1 && (
+          {filteredProducts.length > 0 && (
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -137,7 +137,7 @@ export const AdminProductsPage: React.FC = () => {
                 setPageSize(s);
                 setCurrentPage(1);
               }}
-              pageSizeOptions={[10, 20, 50]}
+              pageSizeOptions={[5, 10, 20, 50]}
             />
           )}
         </div>

@@ -101,7 +101,7 @@ export const AdminOrdersPage: React.FC = () => {
             onDeleteOrder={deleteOrder}
           />
 
-          {totalPages > 1 && (
+          {filteredOrders.length > 0 && (
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -112,7 +112,7 @@ export const AdminOrdersPage: React.FC = () => {
                 setPageSize(s);
                 setCurrentPage(1);
               }}
-              pageSizeOptions={[10, 25, 50]}
+              pageSizeOptions={[5, 10, 25, 50]}
             />
           )}
         </div>

@@ -250,7 +250,7 @@ export const CollectionsPage: React.FC = () => {
             </div>
 
             {/* Pagination Controls */}
-            {totalPages > 1 && (
+            {filteredProducts.length > 0 && (
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -264,7 +264,7 @@ export const CollectionsPage: React.FC = () => {
                   setPageSize(s);
                   setCurrentPage(1);
                 }}
-                pageSizeOptions={[12, 24, 48]}
+                pageSizeOptions={[8, 12, 24, 48]}
                 className="mt-10"
               />
             )}
