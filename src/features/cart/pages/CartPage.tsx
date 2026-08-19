@@ -36,10 +36,10 @@ export const CartPage: React.FC = () => {
   const shippingFee = freeShippingRemaining === 0 ? 0 : 65;
   const estimatedTotal = Math.max(0, subtotal - discountValue + giftWrapFee + shippingFee);
 
-  const handleApply = (e: React.FormEvent) => {
+  const handleApply = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputCode) return;
-    const res = applyDiscount(inputCode);
+    const res = await applyDiscount(inputCode);
     setPromoMessage({ text: res.message, isError: !res.success });
     if (res.success) setInputCode('');
   };

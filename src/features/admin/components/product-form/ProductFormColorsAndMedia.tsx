@@ -140,9 +140,8 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
   // Remove a color
   const handleRemoveColor = (index: number) => {
     const updatedColors = colors.filter((_, i) => i !== index);
-    const safeColors = updatedColors.length === 0 ? [{ name: 'Default', hex: '#000000' }] : updatedColors;
-    onColorsChange(safeColors);
-    syncTotalImages(safeColors, images);
+    onColorsChange(updatedColors);
+    syncTotalImages(updatedColors, images);
   };
 
   // Update color fields directly

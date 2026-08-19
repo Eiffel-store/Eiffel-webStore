@@ -13,29 +13,29 @@ export const AdminBranchesPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
 
   const [formStore, setFormStore] = useState<Omit<StoreLocation, 'id'>>({
-    city: 'Gharbia (الغربية)',
-    name: 'Eiffel Flagship — Zefta',
-    address: 'زفتى، المحطة أمام قاعة هوليوود، محافظة الغربية، مصر',
-    hours: 'Daily: 11:00 AM – 12:00 AM (يومياً: 11 صباحاً – 12 منتصف الليل)',
-    phone: '+20 100 932 6801',
-    email: 'contact@eiffel-store.com',
-    type: 'Flagship',
+    city: '',
+    name: '',
+    address: '',
+    hours: '',
+    phone: '',
+    email: '',
+    type: 'Boutique',
     coordinates: { x: 50, y: 50 },
-    image: `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`
+    image: ''
   });
 
   const handleOpenEdit = (store: StoreLocation) => {
     setEditingStore(store);
     setFormStore({
-      city: store.city,
-      name: store.name,
-      address: store.address,
-      hours: store.hours,
-      phone: store.phone,
-      email: store.email,
-      type: store.type,
+      city: store.city || '',
+      name: store.name || '',
+      address: store.address || '',
+      hours: store.hours || '',
+      phone: store.phone || '',
+      email: store.email || '',
+      type: store.type || 'Boutique',
       coordinates: store.coordinates || { x: 50, y: 50 },
-      image: store.image
+      image: store.image || ''
     });
     setShowModal(true);
   };
@@ -64,8 +64,8 @@ export const AdminBranchesPage: React.FC = () => {
           </h1>
           <p className="text-xs text-zinc-400 mt-0.5">
             {isRTL
-              ? 'التحكم في بيانات وعناوين ومواعيد عمل فروع إيفل (زفتى / نهطاي) وإضافة فروع جديدة.'
-              : 'Manage addresses, hours, and contacts for Eiffel boutiques (Zefta & Nahtay).'}
+              ? 'التحكم في بيانات وعناوين ومواعيد عمل فروع إيفل وإضافة فروع جديدة.'
+              : 'Manage addresses, hours, and contacts for Eiffel boutiques.'}
           </p>
         </div>
 
@@ -73,15 +73,15 @@ export const AdminBranchesPage: React.FC = () => {
           onClick={() => {
             setEditingStore(null);
             setFormStore({
-              city: 'Gharbia',
-              name: 'Eiffel Branch',
-              address: 'محافظة الغربية، مصر',
-              hours: 'Daily: 11:00 AM – 12:00 AM',
-              phone: '+20 100 932 6801',
-              email: 'contact@eiffel-store.com',
+              city: '',
+              name: '',
+              address: '',
+              hours: '',
+              phone: '',
+              email: '',
               type: 'Boutique',
               coordinates: { x: 50, y: 50 },
-              image: `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`
+              image: ''
             });
             setShowModal(true);
           }}

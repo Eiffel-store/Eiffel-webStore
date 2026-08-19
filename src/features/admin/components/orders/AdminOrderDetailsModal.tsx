@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Phone, MessageSquare, MapPin, CreditCard, User } from 'lucide-react';
+import { X, Phone, MessageSquare, MapPin, CreditCard, User, ExternalLink } from 'lucide-react';
 import { Order } from '@/types';
 import { useCurrency, useLanguage } from '@/shared';
 
@@ -73,11 +73,23 @@ export const AdminOrderDetailsModal: React.FC<AdminOrderDetailsModalProps> = ({
           <div className="space-y-1 text-zinc-300">
             <div className="flex items-start gap-1.5">
               <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-              <div>
+              <div className="space-y-1">
                 <span className="font-bold text-white block">{order.shippingAddress?.city || 'مصر'}</span>
                 <span className="text-zinc-400 block">{order.shippingAddress?.street}</span>
                 {order.shippingAddress?.apartment && (
                   <span className="text-zinc-500 block">شقة/ملاحظات: {order.shippingAddress?.apartment}</span>
+                )}
+                {(order.shippingAddress?.mapUrl || (order.shippingAddress?.latitude && order.shippingAddress?.longitude)) && (
+                  <a
+                    href={order.shippingAddress.mapUrl || `https://maps.google.com/?q=${order.shippingAddress.latitude},${order.shippingAddress.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded text-[11px] font-mono mt-1 transition-colors"
+                  >
+                    <MapPin className="w-3.5 h-3.5" />
+                    <span>📍 موقع العميل على Google Maps</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 )}
               </div>
             </div>

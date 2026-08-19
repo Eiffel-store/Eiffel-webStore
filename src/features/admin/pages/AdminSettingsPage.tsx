@@ -14,6 +14,12 @@ export const AdminSettingsPage: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setError] = useState('');
 
+  React.useEffect(() => {
+    if (settings) {
+      setFormSettings(settings);
+    }
+  }, [settings]);
+
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
     updateSettings(formSettings);

@@ -16,19 +16,19 @@ export const AdminCategoriesPage: React.FC = () => {
     name: '',
     nameEn: '',
     subtitle: '',
-    image: `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`,
-    itemCount: '12 PIECES',
-    subCategories: ['T-Shirts', 'Polos', 'Hoodies']
+    image: '',
+    itemCount: '',
+    subCategories: []
   });
 
   const handleOpenEdit = (cat: CategoryItem) => {
     setEditingCategory(cat);
     setFormCategory({
-      name: cat.name,
-      nameEn: cat.nameEn || cat.name,
+      name: cat.name || '',
+      nameEn: cat.nameEn || cat.name || '',
       subtitle: cat.subtitle || '',
-      image: cat.image,
-      itemCount: cat.itemCount,
+      image: cat.image || '',
+      itemCount: cat.itemCount || '',
       subCategories: cat.subCategories || []
     });
     setShowAddModal(true);
@@ -70,8 +70,8 @@ export const AdminCategoriesPage: React.FC = () => {
               name: '',
               nameEn: '',
               subtitle: '',
-              image: `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`,
-              itemCount: '10 PIECES',
+              image: '',
+              itemCount: '',
               subCategories: []
             });
             setShowAddModal(true);

@@ -86,7 +86,7 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
 
   const handleRemoveColor = (index: number) => {
     const updated = colors.filter((_, i) => i !== index);
-    onColorsChange(updated.length === 0 ? [{ name: 'Default', hex: '#000000' }] : updated);
+    onColorsChange(updated);
   };
 
   const handleUpdateColorImage = (index: number, imageUrl: string) => {

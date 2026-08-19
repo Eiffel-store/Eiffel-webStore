@@ -1,36 +1,129 @@
-import React, { useState } from 'react';
-import { Lock, Truck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Lock, Truck, AlertCircle, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/features/cart';
-import { useAuth } from '@/features/account';
-import { useCurrency } from '@/shared';
-import { useLanguage } from '@/shared';
-import { useStoreData } from '@/shared';
-import { Address } from '@/types';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useCurrency, useLanguage, useStoreData } from '@/shared';
+import { Address, Order } from '@/types';
+import { orderService } from '@/services/orderService';
 import { OrderConfirmation } from '../components/OrderConfirmation';
-import { CheckoutContactForm } from '../components/CheckoutContactForm';
+import { CheckoutContactForm, CheckoutFormErrors } from '../components/CheckoutContactForm';
 import { CheckoutShippingSelector } from '../components/CheckoutShippingSelector';
 import { CheckoutPaymentSelector } from '../components/CheckoutPaymentSelector';
 import { CheckoutOrderSummary } from '../components/CheckoutOrderSummary';
 
 export const CheckoutPage: React.FC = () => {
-  const { cart, subtotal, discountAmount, clearCart } = useCart();
-  const { user, placeOrder } = useAuth();
+  const { cart, subtotal, discountAmount, discountCode, clearCart } = useCart();
+  const { user } = useAuthStore();
   const { addOrder } = useStoreData();
   const { formatPrice } = useCurrency();
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [orderComplete, setOrderComplete] = useState<any | null>(null);
+  const [orderComplete, setOrderComplete] = useState<Order | null>(null);
+  const [formAlert, setFormAlert] = useState<string | null>(null);
 
-  // Form state
-  const [email, setEmail] = useState(user?.email || 'tarek.mansour@eiffel-client.eg');
-  const [firstName, setFirstName] = useState(user?.name.split(' ')[0] || 'Tarek');
-  const [lastName, setLastName] = useState(user?.name.split(' ')[1] || 'Mansour');
-  const [street, setStreet] = useState(user?.addresses[0]?.street || '18 Gezira Street, Zamalek, Apt 7A');
-  const [city, setCity] = useState(user?.addresses[0]?.city || 'Cairo (القاهرة)');
-  const [postalCode, setPostalCode] = useState(user?.addresses[0]?.postalCode || '11211');
+  // Form state - initialized with real logged-in user or empty strings for guests
+  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [street, setStreet] = useState('');
+  const [city, setCity] = useState('Cairo (القاهرة)');
+  const [postalCode, setPostalCode] = useState('');
   const [country] = useState('Egypt');
-  const [phone, setPhone] = useState(user?.phone || '+20 100 123 4567');
+  const [phone, setPhone] = useState('');
+  const [latitude, setLatitude] = useState<number | undefined>(undefined);
+  const [longitude, setLongitude] = useState<number | undefined>(undefined);
+  const [mapUrl, setMapUrl] = useState<string | undefined>(undefined);
+
+  // Validation States
+  const [errors, setErrors] = useState<CheckoutFormErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  // Sync user info if authenticated
+  useEffect(() => {
+    if (user) {
+      if (user.email) setEmail(user.email);
+      if (user.name) {
+        const parts = user.name.split(' ');
+        setFirstName(parts[0] || '');
+        setLastName(parts.slice(1).join(' ') || '');
+      }
+      if (user.phone) setPhone(user.phone);
+      if (user.addresses && user.addresses.length > 0) {
+        const defAddr = user.addresses.find(a => a.isDefault) || user.addresses[0];
+        if (defAddr.street) setStreet(defAddr.street);
+        if (defAddr.city) setCity(defAddr.city);
+        if (defAddr.postalCode) setPostalCode(defAddr.postalCode);
+      }
+    }
+  }, [user]);
+
+  // Validate single field or whole form
+  const validateField = (field: string, val: string): string | undefined => {
+    switch (field) {
+      case 'email':
+        if (!val.trim()) return isRTL ? 'البريد الإلكتروني إلزامي' : 'Email address is required';
+        if (!/\S+@\S+\.\S+/.test(val)) return isRTL ? 'يرجى إدخال بريد إلكتروني صالح (مثال: name@example.com)' : 'Please enter a valid email address';
+        return undefined;
+      case 'firstName':
+        if (!val.trim()) return isRTL ? 'الاسم الأول إلزامي' : 'First name is required';
+        if (val.trim().length < 2) return isRTL ? 'الاسم الأول يجب أن يتكون من حرفين على الأقل' : 'First name must be at least 2 characters';
+        return undefined;
+      case 'lastName':
+        if (!val.trim()) return isRTL ? 'اسم العائلة إلزامي' : 'Last name is required';
+        if (val.trim().length < 2) return isRTL ? 'اسم العائلة يجب أن يتكون من حرفين على الأقل' : 'Last name must be at least 2 characters';
+        return undefined;
+      case 'phone':
+        if (!val.trim()) return isRTL ? 'رقم الهاتف إلزامي للتواصل ومندوب الشحن' : 'Phone number is required for courier delivery';
+        // Clean phone string
+        const cleanPhone = val.replace(/\s+/g, '');
+        if (cleanPhone.length < 10) return isRTL ? 'يرجى إدخال رقم هاتف صحيح (11 رقم)' : 'Please enter a valid phone number (10-11 digits)';
+        return undefined;
+      case 'city':
+        if (!val.trim()) return isRTL ? 'يرجى اختيار المحافظة' : 'Governorate / City is required';
+        return undefined;
+      case 'street':
+        if (!val.trim()) return isRTL ? 'العنوان التفصيلي إلزامي (الشارع والعمارة ورقم الشقة)' : 'Street address is required';
+        if (val.trim().length < 5) return isRTL ? 'يرجى كتابة العنوان بالتفصيل لضمان وصول المندوب' : 'Please provide detailed delivery address';
+        return undefined;
+      default:
+        return undefined;
+    }
+  };
+
+  const validateAll = (): { isValid: boolean; newErrors: CheckoutFormErrors } => {
+    const newErrors: CheckoutFormErrors = {
+      email: validateField('email', email),
+      firstName: validateField('firstName', firstName),
+      lastName: validateField('lastName', lastName),
+      phone: validateField('phone', phone),
+      city: validateField('city', city),
+      street: validateField('street', street),
+    };
+
+    // Filter out undefined
+    const cleanErrors: CheckoutFormErrors = {};
+    Object.entries(newErrors).forEach(([k, v]) => {
+      if (v) cleanErrors[k as keyof CheckoutFormErrors] = v;
+    });
+
+    const isValid = Object.keys(cleanErrors).length === 0;
+    return { isValid, newErrors: cleanErrors };
+  };
+
+  const handleBlurField = (field: string) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    let val = '';
+    if (field === 'email') val = email;
+    if (field === 'firstName') val = firstName;
+    if (field === 'lastName') val = lastName;
+    if (field === 'phone') val = phone;
+    if (field === 'city') val = city;
+    if (field === 'street') val = street;
+
+    const errorMsg = validateField(field, val);
+    setErrors(prev => ({ ...prev, [field]: errorMsg }));
+  };
 
   // Shipping & Payment
   const [shippingMethod, setShippingMethod] = useState<'express' | 'white-glove'>('express');
@@ -54,26 +147,69 @@ export const CheckoutPage: React.FC = () => {
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormAlert(null);
+
+    // 1. Check Cart
+    if (!cart || cart.length === 0) {
+      setFormAlert(isRTL ? 'سلة التسوق فارغة، يرجى إضافة منتجات أولاً قبل إتمام الطلب.' : 'Your shopping cart is empty.');
+      return;
+    }
+
+    // 2. Validate All Inputs
+    const { isValid, newErrors } = validateAll();
+    setErrors(newErrors);
+    setTouched({
+      email: true,
+      firstName: true,
+      lastName: true,
+      phone: true,
+      city: true,
+      street: true
+    });
+
+    if (!isValid) {
+      const missingFieldsCount = Object.keys(newErrors).length;
+      setFormAlert(
+        isRTL
+          ? `يرجى استكمال الحقول الإلزامية المطلوبة (${missingFieldsCount} حقول بحاجة لتصحيح). الحقول المؤشرة باللون الأحمر مطلوبة.`
+          : `Please fill in all required delivery fields (${missingFieldsCount} missing fields highlighted in red).`
+      );
+
+      // Focus first error field
+      const firstKey = Object.keys(newErrors)[0];
+      if (firstKey) {
+        const el = document.getElementById(`checkout-${firstKey}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.focus();
+        }
+      }
+      return;
+    }
+
     setIsSubmitting(true);
 
     const shippingAddress: Address = {
       id: `addr-${Date.now()}`,
       type: 'Home',
-      firstName,
-      lastName,
-      street,
-      city,
-      state: city,
-      postalCode,
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      street: street.trim(),
+      city: city.trim(),
+      state: city.trim(),
+      postalCode: postalCode.trim(),
       country,
-      phone,
+      phone: phone.trim(),
+      latitude,
+      longitude,
+      mapUrl: mapUrl || (latitude && longitude ? `https://maps.google.com/?q=${latitude},${longitude}` : undefined),
       isDefault: true,
     };
 
     const paymentMethodString = 'Cash on Delivery (الدفع عند الاستلام)';
 
-    setTimeout(() => {
-      const order = placeOrder({
+    try {
+      const orderPayload: Partial<Order> = {
         items: cart,
         subtotal,
         shipping: shippingFee,
@@ -84,13 +220,38 @@ export const CheckoutPage: React.FC = () => {
         paymentMethod: paymentMethodString,
         pointsEarned: pointsToEarn,
         pointsRedeemed: redeemPoints ? pointsDiscountValue : 0,
-        pointsDiscount: pointsDiscountValue
-      });
-      addOrder(order);
+        pointsDiscount: pointsDiscountValue,
+        couponCode: discountCode || undefined
+      };
+
+      const createdOrder = await orderService.create(orderPayload);
+      addOrder(createdOrder);
       clearCart();
+      setOrderComplete(createdOrder);
+    } catch (err) {
+      console.error('Failed to create order on backend:', err);
+      // Create local order if network error
+      const fallbackOrder: Order = {
+        id: `EFL-EG-${Math.floor(10000 + Math.random() * 90000)}`,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase(),
+        status: 'Pending',
+        trackingNumber: `BOSTA-${Math.floor(100000000 + Math.random() * 900000000)}`,
+        estimatedDelivery: '24–48 HOURS',
+        items: cart,
+        subtotal,
+        shipping: shippingFee,
+        discount: discountValue + pointsDiscountValue,
+        tax: 0,
+        total: totalAmount,
+        shippingAddress,
+        paymentMethod: paymentMethodString
+      };
+      addOrder(fallbackOrder);
+      clearCart();
+      setOrderComplete(fallbackOrder);
+    } finally {
       setIsSubmitting(false);
-      setOrderComplete(order);
-    }, 1800);
+    }
   };
 
   if (orderComplete) {
@@ -123,25 +284,63 @@ export const CheckoutPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Global Validation Alert Banner */}
+        {formAlert && (
+          <div className="mb-8 p-4 bg-red-950/60 border-2 border-red-500 text-red-200 text-xs sm:text-sm rounded-lg flex items-start gap-3 shadow-xl animate-fade-in">
+            <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <span className="font-bold">{isRTL ? 'تنبيه إتمام الطلب:' : 'Checkout Validation Alert:'}</span>
+              <p className="leading-relaxed">{formAlert}</p>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Main Checkout Form (7 cols) */}
           <div className="lg:col-span-7 space-y-8">
-            <form onSubmit={handlePlaceOrder} className="space-y-8">
+            <form onSubmit={handlePlaceOrder} noValidate className="space-y-8">
               <CheckoutContactForm
                 email={email}
-                setEmail={setEmail}
+                setEmail={(v) => {
+                  setEmail(v);
+                  if (touched.email) setErrors(prev => ({ ...prev, email: validateField('email', v) }));
+                }}
                 firstName={firstName}
-                setFirstName={setFirstName}
+                setFirstName={(v) => {
+                  setFirstName(v);
+                  if (touched.firstName) setErrors(prev => ({ ...prev, firstName: validateField('firstName', v) }));
+                }}
                 lastName={lastName}
-                setLastName={setLastName}
+                setLastName={(v) => {
+                  setLastName(v);
+                  if (touched.lastName) setErrors(prev => ({ ...prev, lastName: validateField('lastName', v) }));
+                }}
                 city={city}
-                setCity={setCity}
+                setCity={(v) => {
+                  setCity(v);
+                  if (touched.city) setErrors(prev => ({ ...prev, city: validateField('city', v) }));
+                }}
                 street={street}
-                setStreet={setStreet}
+                setStreet={(v) => {
+                  setStreet(v);
+                  if (touched.street) setErrors(prev => ({ ...prev, street: validateField('street', v) }));
+                }}
                 phone={phone}
-                setPhone={setPhone}
+                setPhone={(v) => {
+                  setPhone(v);
+                  if (touched.phone) setErrors(prev => ({ ...prev, phone: validateField('phone', v) }));
+                }}
                 postalCode={postalCode}
                 setPostalCode={setPostalCode}
+                latitude={latitude}
+                setLatitude={setLatitude}
+                longitude={longitude}
+                setLongitude={setLongitude}
+                mapUrl={mapUrl}
+                setMapUrl={setMapUrl}
+                errors={errors}
+                touched={touched}
+                onBlurField={handleBlurField}
               />
 
               <CheckoutShippingSelector
@@ -166,7 +365,7 @@ export const CheckoutPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-5 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-widest uppercase flex items-center justify-center gap-2 hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all shadow-xl disabled:opacity-50"
+                className="w-full py-5 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-widest uppercase flex items-center justify-center gap-2 hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all shadow-xl disabled:opacity-50 cursor-pointer"
               >
                 {isSubmitting ? (
                   <span>{t.authenticating}</span>

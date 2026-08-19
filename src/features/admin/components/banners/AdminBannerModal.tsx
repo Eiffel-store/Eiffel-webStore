@@ -168,6 +168,65 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
   const [mobileUrlInput, setMobileUrlInput] = useState('');
   const [linkMode, setLinkMode] = useState<'preset' | 'product' | 'custom'>('preset');
 
+  React.useEffect(() => {
+    if (banner) {
+      setFormData({
+        placement: defaultPlacement,
+        type: 'IMAGE',
+        isActive: true,
+        displayOrder: 1,
+        titleEn: '',
+        titleAr: '',
+        subtitleEn: '',
+        subtitleAr: '',
+        tagEn: '',
+        tagAr: '',
+        buttonTextEn: 'EXPLORE COLLECTION',
+        buttonTextAr: 'استكشف التشكيلة',
+        buttonLink: '/collections/men',
+        secondaryButtonTextEn: '',
+        secondaryButtonTextAr: '',
+        secondaryButtonLink: '',
+        discountCode: '',
+        desktopImageUrl: '',
+        mobileImageUrl: '',
+        startDate: '',
+        endDate: '',
+        targetAudience: 'ALL',
+        ...banner
+      });
+      setDesktopUrlInput(banner.desktopImageUrl || '');
+      setMobileUrlInput(banner.mobileImageUrl || '');
+    } else {
+      setFormData({
+        placement: defaultPlacement,
+        type: 'IMAGE',
+        isActive: true,
+        displayOrder: 1,
+        titleEn: '',
+        titleAr: '',
+        subtitleEn: '',
+        subtitleAr: '',
+        tagEn: '',
+        tagAr: '',
+        buttonTextEn: 'EXPLORE COLLECTION',
+        buttonTextAr: 'استكشف التشكيلة',
+        buttonLink: '/collections/men',
+        secondaryButtonTextEn: '',
+        secondaryButtonTextAr: '',
+        secondaryButtonLink: '',
+        discountCode: '',
+        desktopImageUrl: '',
+        mobileImageUrl: '',
+        startDate: '',
+        endDate: '',
+        targetAudience: 'ALL'
+      });
+      setDesktopUrlInput('');
+      setMobileUrlInput('');
+    }
+  }, [banner, defaultPlacement, isOpen]);
+
   if (!isOpen) return null;
 
   // Apply a full campaign preset into the form with 1 click
@@ -438,9 +497,6 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
                       {c.code} ({c.discountPercentage}% OFF)
                     </option>
                   ))}
-                  <option value="EIFFEL10">EIFFEL10 (10% OFF)</option>
-                  <option value="CAIRO20">CAIRO20 (20% OFF)</option>
-                  <option value="VIP30">VIP30 (30% OFF)</option>
                 </select>
               </div>
             </div>

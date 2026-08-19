@@ -2,6 +2,7 @@ import React, { createContext, useContext } from 'react';
 import { CartItem, Product } from '@/types';
 import { useCartStore } from '@/stores/useCartStore';
 import { useStoreData } from '@/shared';
+import { couponService } from '@/services/couponService';
 
 interface CartContextType {
   cart: CartItem[];
@@ -17,7 +18,7 @@ interface CartContextType {
   discountCode: string;
   discountPercentage: number;
   discountAmount: number;
-  applyDiscount: (code: string) => { success: boolean; message: string };
+  applyDiscount: (code: string) => Promise<{ success: boolean; message: string }>;
   removeDiscount: () => void;
   freeShippingThreshold: number;
   freeShippingRemaining: number;
@@ -30,7 +31,7 @@ const FREE_SHIPPING_THRESHOLD = 1500; // EGP in Egypt
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const store = useCartStore();
-  const { products = [], decrementStock, incrementStock } = useStoreData();
+  const { products = [], coupons = [], decrementStock, incrementStock } = useStoreData();
 
   const subtotal = store.getSubtotal();
   const totalItems = store.getItemCount();
@@ -131,17 +132,25 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     store.clearCart();
   };
 
-  const applyDiscount = (code: string) => {
+  const applyDiscount = async (code: string): Promise<{ success: boolean; message: string }> => {
     const clean = code.trim().toUpperCase();
-    if (clean === 'EIFFEL10') {
-      store.applyCoupon({ id: 'c-1', code: 'EIFFEL10', discountPercentage: 10, isActive: true });
-      return { success: true, message: 'تم تطبيق خصم 10% بنجاح' };
-    } else if (clean === 'CAIRO20' || clean === 'SUMMER20') {
-      store.applyCoupon({ id: 'c-2', code: 'CAIRO20', discountPercentage: 20, isActive: true });
-      return { success: true, message: 'تم تطبيق خصم 20% بنجاح' };
-    } else if (clean === 'VIP30') {
-      store.applyCoupon({ id: 'c-3', code: 'VIP30', discountPercentage: 30, isActive: true });
-      return { success: true, message: 'تم تطبيق خصم 30% VIP بنجاح' };
+    try {
+      const validated = await couponService.validate(clean, subtotal);
+      if (validated) {
+        store.applyCoupon(validated);
+        return { success: true, message: `تم تطبيق كود الخصم (${validated.code}) بنجاح (${validated.discountPercentage}%)` };
+      }
+    } catch (err: any) {
+      // Check in cached coupons list
+      const matched = (coupons || []).find(c => c.code.toUpperCase() === clean && c.isActive);
+      if (matched) {
+        if (matched.minOrderAmount && subtotal < matched.minOrderAmount) {
+          return { success: false, message: `الحد الأدنى لتطبيق هذا الكوبون هو ${matched.minOrderAmount} ج.م` };
+        }
+        store.applyCoupon(matched);
+        return { success: true, message: `تم تطبيق كود الخصم (${matched.code}) بنجاح (${matched.discountPercentage}%)` };
+      }
+      return { success: false, message: err?.message || 'كود الخصم غير صالح أو منتهي الصلاحية' };
     }
     return { success: false, message: 'كود الخصم غير صالح أو منتهي الصلاحية' };
   };
