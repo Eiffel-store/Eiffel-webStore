@@ -7,8 +7,7 @@ import { CollectionFiltersBar, SortOption } from '../components/CollectionFilter
 import { ActiveFilters } from '../components/ActiveFilters';
 import { FilterDrawer } from '../components/FilterDrawer';
 import { Product } from '@/types';
-import { useLanguage } from '@/shared';
-import { useStoreData } from '@/shared';
+import { useLanguage, useStoreData, EiffelLoader, EmptyState } from '@/shared';
 
 export const CollectionsPage: React.FC = () => {
   const { category = 'men' } = useParams<{ category: string }>();
@@ -193,27 +192,28 @@ export const CollectionsPage: React.FC = () => {
         )}
 
         {/* Results Counter */}
-        <div className="flex justify-between items-center text-[11px] sm:text-xs font-mono text-secondary dark:text-zinc-400 mb-4 sm:mb-6 px-1">
-          <span>{t.showingSilhouettes} ({filteredProducts.length})</span>
-          <span>{t.curatedCollection}</span>
-        </div>
-
-        {/* Empty State vs Product Cards Grid */}
-        {filteredProducts.length === 0 ? (
-          <div className="py-24 text-center px-4">
-            <h3 className="font-editorial text-2xl sm:text-3xl text-primary dark:text-white mb-2">
-              {t.noPiecesFound}
-            </h3>
-            <p className="text-xs text-secondary dark:text-zinc-400 max-w-sm mx-auto mb-6 font-light">
-              {t.noPiecesFoundDesc}
-            </p>
-            <button
-              onClick={clearFilters}
-              className="px-6 py-3 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-widest uppercase"
-            >
-              {t.resetFilters}
-            </button>
+        {!isLoading && (
+          <div className="flex justify-between items-center text-[11px] sm:text-xs font-mono text-secondary dark:text-zinc-400 mb-4 sm:mb-6 px-1">
+            <span>{t.showingSilhouettes} ({filteredProducts.length})</span>
+            <span>{t.curatedCollection}</span>
           </div>
+        )}
+
+        {/* Loading State vs Empty State vs Product Cards Grid */}
+        {isLoading ? (
+          <EiffelLoader message={isRTL ? `جاري تحميل ${getCategoryTitle()}...` : `Loading ${getCategoryTitle()}...`} />
+        ) : filteredProducts.length === 0 ? (
+          <EmptyState
+            title={hasActiveFilters
+              ? t.noPiecesFound
+              : (isRTL ? `لا توجد منتجات مضافة في قسم ${getCategoryTitle()} حالياً` : `No products currently available in ${getCategoryTitle()}`)}
+            description={hasActiveFilters
+              ? t.noPiecesFoundDesc
+              : (isRTL ? 'يتم تحضير وإضافة أحدث تشكيلات وإصدارات هذا القسم في المشغل قريباً. تفضل باستكشاف تشكيلة الرجال أو العروض المتاحة.' : 'New pieces are being crafted. Explore our active collections.')}
+            actionText={hasActiveFilters ? t.resetFilters : (category !== 'men' ? (isRTL ? 'استكشف تشكيلة الرجال' : "Explore Men's Collection") : (isRTL ? 'العودة للرئيسية' : 'Back to Home'))}
+            onAction={hasActiveFilters ? clearFilters : undefined}
+            actionLink={!hasActiveFilters ? (category !== 'men' ? '/collections/men' : '/') : undefined}
+          />
         ) : (
           <div
             className={`grid gap-3 sm:gap-6 ${

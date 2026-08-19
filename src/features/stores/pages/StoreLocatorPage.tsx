@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { StoreLocation } from '@/types';
-import { useLanguage } from '@/shared';
-import { useStoreData } from '@/shared';
+import { useLanguage, useStoreData, EiffelLoader, EmptyState } from '@/shared';
 import { StoreCard } from '../components/StoreCard';
 import { StoreMapCanvas } from '../components/StoreMapCanvas';
 import { AppointmentModal } from '../components/AppointmentModal';
 
 export const StoreLocatorPage: React.FC = () => {
-  const { t } = useLanguage();
-  const { stores } = useStoreData();
+  const { t, isRTL } = useLanguage();
+  const { stores, isLoading } = useStoreData();
   const [selectedStore, setSelectedStore] = useState<StoreLocation>(stores[0] || {} as StoreLocation);
   const [appointmentModalStore, setAppointmentModalStore] = useState<StoreLocation | null>(null);
 
@@ -30,29 +29,43 @@ export const StoreLocatorPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Main Grid: Stores List & Simulated Interactive Map */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
-          {/* Store Cards List (5 cols) */}
-          <div className="lg:col-span-5 space-y-4 max-h-[750px] overflow-y-auto pr-2 rtl:pr-0 rtl:pl-2">
-            {stores.map((store) => (
-              <StoreCard
-                key={store.id}
-                store={store}
-                isSelected={selectedStore.id === store.id}
-                onSelect={() => setSelectedStore(store)}
-                onBookAppointment={() => setAppointmentModalStore(store)}
-              />
-            ))}
+        {/* Loading / Empty / Content */}
+        {isLoading ? (
+          <div className="py-20">
+            <EiffelLoader message={isRTL ? 'جاري تحميل مواقع فروع إيفل...' : 'Loading Eiffel boutique locations...'} />
           </div>
-
-          {/* Simulated Interactive Map Canvas (7 cols) */}
-          <StoreMapCanvas
-            stores={stores}
-            selectedStore={selectedStore}
-            onSelectStore={setSelectedStore}
-            onScheduleFitting={() => setAppointmentModalStore(selectedStore)}
+        ) : stores.length === 0 ? (
+          <EmptyState
+            title={isRTL ? 'لا توجد فروع مضافة حالياً' : 'No Stores Listed Currently'}
+            description={isRTL ? 'خدمة التوصيل السريع والدفع عند الاستلام متاحة لكافة المحافظات المصرية عبر المتجر.' : 'Express courier delivery and Cash on Delivery are available nationwide.'}
+            actionText={isRTL ? 'تصفح التشكيلة الآن' : 'Explore Collections'}
+            actionLink="/collections/men"
           />
-        </div>
+        ) : (
+          /* Main Grid: Stores List & Simulated Interactive Map */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
+            {/* Store Cards List (5 cols) */}
+            <div className="lg:col-span-5 space-y-4 max-h-[750px] overflow-y-auto pr-2 rtl:pr-0 rtl:pl-2">
+              {stores.map((store) => (
+                <StoreCard
+                  key={store.id}
+                  store={store}
+                  isSelected={selectedStore.id === store.id}
+                  onSelect={() => setSelectedStore(store)}
+                  onBookAppointment={() => setAppointmentModalStore(store)}
+                />
+              ))}
+            </div>
+
+            {/* Simulated Interactive Map Canvas (7 cols) */}
+            <StoreMapCanvas
+              stores={stores}
+              selectedStore={selectedStore.id ? selectedStore : stores[0]}
+              onSelectStore={setSelectedStore}
+              onScheduleFitting={() => setAppointmentModalStore(selectedStore.id ? selectedStore : stores[0])}
+            />
+          </div>
+        )}
       </div>
 
       {/* Book Private Fitting Appointment Modal */}

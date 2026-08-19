@@ -20,7 +20,7 @@ import {
   Image as ImageIcon,
   Check
 } from 'lucide-react';
-import { useStoreData, useLanguage } from '@/shared';
+import { useStoreData, useLanguage, EiffelLoader, EmptyState } from '@/shared';
 import { Banner, BannerPlacement } from '@/types';
 import { AdminBannerModal } from '../components/banners/AdminBannerModal';
 import { AdminShopLookForm } from '../components/home-editor/AdminShopLookForm';
@@ -34,7 +34,8 @@ export const AdminHomePageEditor: React.FC = () => {
     toggleBannerStatus,
     reorderBanners,
     homeSettings,
-    updateHomeSettings
+    updateHomeSettings,
+    isLoading
   } = useStoreData();
 
   const { isRTL } = useLanguage();

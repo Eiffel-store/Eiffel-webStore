@@ -8,13 +8,12 @@ import { PromoEditorial } from '../components/PromoEditorial';
 import { ShopTheLook } from '../components/ShopTheLook';
 import { PromoPopupModal } from '../components/PromoPopupModal';
 import { Product } from '@/types';
-import { useLanguage } from '@/shared';
-import { useStoreData } from '@/shared';
+import { useLanguage, useStoreData, EiffelLoader, EmptyState } from '@/shared';
 
 export const HomePage: React.FC = () => {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const { t, isRTL } = useLanguage();
-  const { products } = useStoreData();
+  const { products, isLoading } = useStoreData();
 
   const newArrivals = products.filter(p => p.isNew || p.category === 'men').slice(0, 4);
 
@@ -49,15 +48,24 @@ export const HomePage: React.FC = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {newArrivals.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onQuickView={(p) => setQuickViewProduct(p)}
-            />
-          ))}
-        </div>
+        {isLoading ? (
+          <EiffelLoader message={isRTL ? 'جاري تحميل أحدث الإصدارات...' : 'Loading latest releases...'} />
+        ) : newArrivals.length === 0 ? (
+          <EmptyState
+            title={isRTL ? 'لا توجد منتجات مضافة حالياً' : 'No New Arrivals'}
+            description={isRTL ? 'يتم تحضير وإضافة تشكيلات الموسم الجديد قريباً.' : 'New seasonal silhouettes are coming soon.'}
+          />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {newArrivals.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onQuickView={(p) => setQuickViewProduct(p)}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* 5. SHOP THE LOOK INTERACTIVE HOTSPOTS */}

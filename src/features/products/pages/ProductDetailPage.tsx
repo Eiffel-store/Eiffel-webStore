@@ -8,7 +8,7 @@ import { ProductAccordion } from '../components/ProductAccordion';
 import { SizeGuideModal } from '../components/SizeGuideModal';
 import { useCart } from '@/features/cart';
 import { useWishlist } from '@/features/wishlist';
-import { useCurrency, useLanguage, useStoreData, resolveColorImage } from '@/shared';
+import { useCurrency, useLanguage, useStoreData, resolveColorImage, EiffelLoader, EmptyState } from '@/shared';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,10 +16,10 @@ export const ProductDetailPage: React.FC = () => {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
-  const { t } = useLanguage();
-  const { products, getProductById } = useStoreData();
+  const { t, isRTL } = useLanguage();
+  const { products, getProductById, isLoading } = useStoreData();
 
-  const product = (id ? getProductById(id) : undefined) || products[0];
+  const product = id ? getProductById(id) : products[0];
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || 'M');
@@ -31,10 +31,33 @@ export const ProductDetailPage: React.FC = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    setSelectedImage(0);
-    setSelectedSize(product?.sizes?.[0] || 'M');
-    setSelectedColor(product?.colors?.[0]?.name || 'Noir');
+    if (product) {
+      setSelectedImage(0);
+      setSelectedSize(product.sizes?.[0] || 'M');
+      setSelectedColor(product.colors?.[0]?.name || 'Noir');
+    }
   }, [id, product]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <EiffelLoader message={isRTL ? 'جاري تجهيز تفاصيل القطعة الفاخرة...' : 'Loading bespoke garment details...'} />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="max-w-4xl mx-auto py-20 px-4">
+        <EmptyState
+          title={isRTL ? 'عذراً، القطعة المطلوبة غير متوفرة' : 'Garment Not Found'}
+          description={isRTL ? 'قد تكون هذه القطعة قد تم نقلها أو نفدت كميتها من المشغل حالياً.' : 'The requested item is no longer available or has been moved.'}
+          actionText={isRTL ? 'استكشف التشكيلة المتاحة' : 'Explore Collections'}
+          actionLink="/collections/men"
+        />
+      </div>
+    );
+  }
 
   const isSaved = isInWishlist(product.id);
 

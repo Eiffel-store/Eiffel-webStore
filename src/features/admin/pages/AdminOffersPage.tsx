@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { useStoreData, useLanguage } from '@/shared';
+import { useStoreData, useLanguage, EiffelLoader } from '@/shared';
 import { AdminOffersTable } from '../components/offers/AdminOffersTable';
 import { AdminCouponsManager } from '../components/offers/AdminCouponsManager';
 import { AdminAddOfferModal } from '../components/offers/AdminAddOfferModal';
 
 export const AdminOffersPage: React.FC = () => {
-  const { products, updateProduct } = useStoreData();
+  const { products, updateProduct, isLoading } = useStoreData();
   const { isRTL } = useLanguage();
   const [showAddOfferModal, setShowAddOfferModal] = useState(false);
 
   const offerProducts = products.filter(p => p.originalPrice && p.originalPrice > p.price);
-  const nonOfferProducts = products.filter(p => !p.originalPrice || p.originalPrice <= p.price);
 
   const handleApplyOffer = (productId: string, salePrice: number, baseOriginalPrice?: number) => {
     const product = products.find(p => p.id === productId);
@@ -52,22 +51,28 @@ export const AdminOffersPage: React.FC = () => {
 
         <button
           onClick={() => setShowAddOfferModal(true)}
-          className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 transition-colors font-label-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg self-start sm:self-auto"
+          className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 transition-colors font-label-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>{isRTL ? 'إضافة منتج لقسم العروض' : 'Add Product to Offers'}</span>
         </button>
       </div>
 
-      {/* 1. Discounted Products Table */}
-      <AdminOffersTable
-        products={offerProducts}
-        onRemoveOffer={handleRemoveOffer}
-        onOpenAddModal={() => setShowAddOfferModal(true)}
-      />
+      {isLoading ? (
+        <EiffelLoader message={isRTL ? 'جاري جلب بيانات العروض والتخفيضات...' : 'Fetching offers and discounts...'} />
+      ) : (
+        <>
+          {/* 1. Discounted Products Table */}
+          <AdminOffersTable
+            products={offerProducts}
+            onRemoveOffer={handleRemoveOffer}
+            onOpenAddModal={() => setShowAddOfferModal(true)}
+          />
 
-      {/* 2. Promo Coupons Engine */}
-      <AdminCouponsManager />
+          {/* 2. Promo Coupons Engine */}
+          <AdminCouponsManager />
+        </>
+      )}
 
       {/* Add to Offer Modal */}
       <AdminAddOfferModal

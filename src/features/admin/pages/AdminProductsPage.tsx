@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import { useStoreData, useLanguage } from '@/shared';
+import { useStoreData, useLanguage, EiffelLoader, EmptyState } from '@/shared';
 import { Product } from '@/types';
 import { AdminProductFilterBar } from '../components/products/AdminProductFilterBar';
 import { AdminProductTable } from '../components/products/AdminProductTable';
@@ -79,12 +79,35 @@ export const AdminProductsPage: React.FC = () => {
         onStockChange={setStockFilter}
       />
 
-      {/* Products Table */}
-      <AdminProductTable
-        products={filteredProducts}
-        onToggleStock={handleToggleStock}
-        onDeletePrompt={setDeleteConfirmId}
-      />
+      {/* Loading / Empty / Table */}
+      {isLoading ? (
+        <EiffelLoader message={isRTL ? 'جاري جلب كتالوج المنتجات من قاعدة البيانات...' : 'Fetching product catalog from database...'} />
+      ) : products.length === 0 ? (
+        <EmptyState
+          title={isRTL ? 'كتالوج المنتجات فارغ حالياً' : 'Product Catalog is Empty'}
+          description={isRTL ? 'لم يتم العثور على أي منتجات في قاعدة البيانات. اضغط أدناه لإضافة أول قطعة في المتجر.' : 'No products found in the database. Add your first item below.'}
+          actionText={isRTL ? '+ إضافة أول منتج' : '+ Add First Product'}
+          actionLink="/admin/products/new"
+        />
+      ) : filteredProducts.length === 0 ? (
+        <EmptyState
+          title={isRTL ? 'لا توجد نتائج مطابقة للبحث أو التصفية' : 'No matching products found'}
+          description={isRTL ? 'يرجى تجربة كلمات بحث أخرى أو إعادة ضبط عوامل التصفية.' : 'Try changing your search query or active filters.'}
+          actionText={isRTL ? 'إعادة ضبط الفلاتر' : 'Reset Filters'}
+          onAction={() => {
+            setSearchQuery('');
+            setSelectedCategory('all');
+            setStockFilter('all');
+          }}
+        />
+      ) : (
+        /* Products Table */
+        <AdminProductTable
+          products={filteredProducts}
+          onToggleStock={handleToggleStock}
+          onDeletePrompt={setDeleteConfirmId}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       <AdminProductDeleteModal

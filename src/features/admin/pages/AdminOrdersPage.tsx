@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useStoreData, useLanguage } from '@/shared';
+import { useStoreData, useLanguage, EiffelLoader, EmptyState } from '@/shared';
 import { Order } from '@/types';
 import { AdminOrderFilterBar } from '../components/orders/AdminOrderFilterBar';
 import { AdminOrdersTable } from '../components/orders/AdminOrdersTable';
 import { AdminOrderDetailsModal } from '../components/orders/AdminOrderDetailsModal';
 
 export const AdminOrdersPage: React.FC = () => {
-  const { orders, updateOrderStatus, deleteOrder } = useStoreData();
+  const { orders, updateOrderStatus, deleteOrder, isLoading } = useStoreData();
   const { isRTL } = useLanguage();
 
   const [statusFilter, setStatusFilter] = useState('all');
@@ -56,13 +56,33 @@ export const AdminOrdersPage: React.FC = () => {
         onStatusChange={setStatusFilter}
       />
 
-      {/* Orders Table */}
-      <AdminOrdersTable
-        orders={filteredOrders}
-        onSelectOrder={setSelectedOrder}
-        onUpdateStatus={handleUpdateStatus}
-        onDeleteOrder={deleteOrder}
-      />
+      {/* Loading / Empty / Table */}
+      {isLoading ? (
+        <EiffelLoader message={isRTL ? 'جاري جلب سجل الطلبات من قاعدة البيانات...' : 'Fetching orders from database...'} />
+      ) : orders.length === 0 ? (
+        <EmptyState
+          title={isRTL ? 'لا توجد طلبات مسجلة حتى الآن' : 'No Orders Recorded Yet'}
+          description={isRTL ? 'عند قيام العملاء بإجراء طلبات عبر المتجر، ستظهر تلقائياً هنا مع تفاصيل الشحن والمبلغ المطلوب كاش والتواصل واتساب.' : 'Customer orders placed on the store will automatically appear here.'}
+        />
+      ) : filteredOrders.length === 0 ? (
+        <EmptyState
+          title={isRTL ? 'لا توجد طلبات مطابقة لمعايير البحث' : 'No Matching Orders'}
+          description={isRTL ? 'يرجى مراجعة رقم الطلب أو اسم العميل أو ضبط فلتر الحالة.' : 'Please adjust your search keywords or status filter.'}
+          actionText={isRTL ? 'عرض جميع الطلبات' : 'Show All Orders'}
+          onAction={() => {
+            setSearchQuery('');
+            setStatusFilter('all');
+          }}
+        />
+      ) : (
+        /* Orders Table */
+        <AdminOrdersTable
+          orders={filteredOrders}
+          onSelectOrder={setSelectedOrder}
+          onUpdateStatus={handleUpdateStatus}
+          onDeleteOrder={deleteOrder}
+        />
+      )}
 
       {/* Order Details & Printing Modal */}
       <AdminOrderDetailsModal

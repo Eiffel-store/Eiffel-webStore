@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { useStoreData, useLanguage } from '@/shared';
+import { useStoreData, useLanguage, EiffelLoader, EmptyState } from '@/shared';
 import { StoreLocation } from '@/types';
 import { AdminBranchCard } from '../components/branches/AdminBranchCard';
 import { AdminBranchModal } from '../components/branches/AdminBranchModal';
 
 export const AdminBranchesPage: React.FC = () => {
-  const { stores, addStore, updateStore, deleteStore } = useStoreData();
+  const { stores, addStore, updateStore, deleteStore, isLoading } = useStoreData();
   const { isRTL } = useLanguage();
 
   const [editingStore, setEditingStore] = useState<StoreLocation | null>(null);
@@ -85,24 +85,36 @@ export const AdminBranchesPage: React.FC = () => {
             });
             setShowModal(true);
           }}
-          className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 transition-colors font-label-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg self-start sm:self-auto"
+          className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 transition-colors font-label-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>{isRTL ? 'إضافة فرع جديد' : 'Add New Branch'}</span>
         </button>
       </div>
 
-      {/* Branches Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {stores.map((store) => (
-          <AdminBranchCard
-            key={store.id}
-            store={store}
-            onEdit={handleOpenEdit}
-            onDelete={deleteStore}
-          />
-        ))}
-      </div>
+      {/* Loading / Empty / Content */}
+      {isLoading ? (
+        <EiffelLoader message={isRTL ? 'جاري جلب بيانات الفروع من قاعدة البيانات...' : 'Fetching boutique branches...'} />
+      ) : stores.length === 0 ? (
+        <EmptyState
+          title={isRTL ? 'لا توجد فروع مسجلة حتى الآن' : 'No Branches Found'}
+          description={isRTL ? 'يمكنك إضافة فروع إيفل وعناوينها ومواعيد العمل لتظهر للعملاء على الخريطة.' : 'Add your boutique locations, addresses, and hours.'}
+          actionText={isRTL ? '+ إضافة أول فرع' : '+ Add First Branch'}
+          onAction={() => setShowModal(true)}
+        />
+      ) : (
+        /* Branches Cards Grid */
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {stores.map((store) => (
+            <AdminBranchCard
+              key={store.id}
+              store={store}
+              onEdit={handleOpenEdit}
+              onDelete={deleteStore}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Add / Edit Branch Modal */}
       <AdminBranchModal

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { useStoreData, useLanguage } from '@/shared';
+import { useStoreData, useLanguage, EiffelLoader, EmptyState } from '@/shared';
 import { CategoryItem } from '@/types';
 import { AdminCategoryCard } from '../components/categories/AdminCategoryCard';
 import { AdminCategoryModal } from '../components/categories/AdminCategoryModal';
 
 export const AdminCategoriesPage: React.FC = () => {
-  const { categories, addCategory, updateCategory, deleteCategory, products } = useStoreData();
+  const { categories, addCategory, updateCategory, deleteCategory, products, isLoading } = useStoreData();
   const { isRTL } = useLanguage();
 
   const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null);
@@ -76,31 +76,43 @@ export const AdminCategoriesPage: React.FC = () => {
             });
             setShowAddModal(true);
           }}
-          className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 transition-colors font-label-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg self-start sm:self-auto"
+          className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 transition-colors font-label-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>{isRTL ? 'إضافة قسم جديد' : 'Add Category'}</span>
         </button>
       </div>
 
-      {/* Category Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {categories.map((cat) => {
-          const productCount = products.filter(p =>
-            cat.id === 'offers' ? (p.originalPrice && p.originalPrice > p.price) : p.category === cat.id
-          ).length;
+      {/* Loading / Empty / Content */}
+      {isLoading ? (
+        <EiffelLoader message={isRTL ? 'جاري جلب الأقسام من قاعدة البيانات...' : 'Fetching categories...'} />
+      ) : categories.length === 0 ? (
+        <EmptyState
+          title={isRTL ? 'لا توجد أقسام مسجلة حتى الآن' : 'No Categories Found'}
+          description={isRTL ? 'يمكنك إضافة أقسام جديدة مثل (الرجال، الأطفال، الإكسسوارات) لتنظيم كتالوج المتجر.' : 'Create categories to organize your product catalog.'}
+          actionText={isRTL ? '+ إضافة أول قسم' : '+ Add First Category'}
+          onAction={() => setShowAddModal(true)}
+        />
+      ) : (
+        /* Category Cards Grid */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {categories.map((cat) => {
+            const productCount = products.filter(p =>
+              cat.id === 'offers' ? (p.originalPrice && p.originalPrice > p.price) : p.category === cat.id
+            ).length;
 
-          return (
-            <AdminCategoryCard
-              key={cat.id}
-              category={cat}
-              productCount={productCount}
-              onEdit={handleOpenEdit}
-              onDelete={deleteCategory}
-            />
-          );
-        })}
-      </div>
+            return (
+              <AdminCategoryCard
+                key={cat.id}
+                category={cat}
+                productCount={productCount}
+                onEdit={handleOpenEdit}
+                onDelete={deleteCategory}
+              />
+            );
+          })}
+        </div>
+      )}
 
       {/* Add / Edit Category Modal */}
       <AdminCategoryModal
