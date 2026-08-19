@@ -25,6 +25,13 @@ export const AdminOrdersPage: React.FC = () => {
     return matchesStatus && matchesSearch;
   });
 
+  const handleUpdateStatus = (id: string, status: Order['status']) => {
+    updateOrderStatus(id, status);
+    if (selectedOrder && selectedOrder.id === id) {
+      setSelectedOrder(prev => prev ? { ...prev, status } : null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -35,7 +42,7 @@ export const AdminOrdersPage: React.FC = () => {
           </h1>
           <p className="text-xs text-zinc-400 mt-0.5">
             {isRTL
-              ? `إجمالي ${orders.length} طلب مسجل — يمكنك متابعة وتحديث حالة الشحن والدفع.`
+              ? `إجمالي ${orders.length} طلب مسجل — يمكنك متابعة وتحديث حالة الشحن والدفع وتغيير الحالة مباشرة.`
               : `Total ${orders.length} orders received from store checkout.`}
           </p>
         </div>
@@ -53,7 +60,7 @@ export const AdminOrdersPage: React.FC = () => {
       <AdminOrdersTable
         orders={filteredOrders}
         onSelectOrder={setSelectedOrder}
-        onUpdateStatus={updateOrderStatus}
+        onUpdateStatus={handleUpdateStatus}
         onDeleteOrder={deleteOrder}
       />
 
@@ -61,7 +68,7 @@ export const AdminOrdersPage: React.FC = () => {
       <AdminOrderDetailsModal
         order={selectedOrder}
         onClose={() => setSelectedOrder(null)}
-        onUpdateStatus={updateOrderStatus}
+        onUpdateStatus={handleUpdateStatus}
       />
     </div>
   );
