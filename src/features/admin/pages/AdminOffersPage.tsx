@@ -13,12 +13,14 @@ export const AdminOffersPage: React.FC = () => {
   const offerProducts = products.filter(p => p.originalPrice && p.originalPrice > p.price);
   const nonOfferProducts = products.filter(p => !p.originalPrice || p.originalPrice <= p.price);
 
-  const handleApplyOffer = (productId: string, salePrice: number) => {
+  const handleApplyOffer = (productId: string, salePrice: number, baseOriginalPrice?: number) => {
     const product = products.find(p => p.id === productId);
     if (!product) return;
 
+    const originalPrice = baseOriginalPrice || (product.originalPrice && product.originalPrice > product.price ? product.originalPrice : product.price);
+
     updateProduct(product.id, {
-      originalPrice: product.price,
+      originalPrice,
       price: salePrice
     });
   };
@@ -71,7 +73,7 @@ export const AdminOffersPage: React.FC = () => {
       <AdminAddOfferModal
         isOpen={showAddOfferModal}
         onClose={() => setShowAddOfferModal(false)}
-        products={nonOfferProducts}
+        products={products}
         onApplyOffer={handleApplyOffer}
       />
     </div>
