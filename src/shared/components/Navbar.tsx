@@ -16,10 +16,11 @@ import {
 } from 'lucide-react';
 import { useCart } from '@/features/cart';
 import { useWishlist } from '@/features/wishlist';
-import { useTheme } from '@/shared';
+import { useTheme, useStoreData } from '@/shared';
 import { useLanguage } from '@/shared';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Logo } from './Logo';
+import { Copy, Check } from 'lucide-react';
 
 interface NavbarProps {
   onOpenSearch: () => void;
@@ -31,6 +32,29 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const { user, isAuthenticated, role, logout } = useAuthStore();
+  const { activeBanners = [] } = useStoreData();
+  const [copiedCode, setCopiedCode] = useState(false);
+
+  // Find active top announcement banner
+  const announcementBanner = activeBanners.find(b => b.placement === 'TOP_ANNOUNCEMENT' && b.isActive !== false);
+
+  const announcementTitle = announcementBanner
+    ? (language === 'ar' ? (announcementBanner.titleAr || announcementBanner.titleEn) : (announcementBanner.titleEn || announcementBanner.titleAr))
+    : t.topBannerPromo;
+
+  const announcementSub = announcementBanner
+    ? (language === 'ar' ? (announcementBanner.subtitleAr || announcementBanner.subtitleEn) : (announcementBanner.subtitleEn || announcementBanner.subtitleAr))
+    : t.topBannerLocations;
+
+  const promoCode = announcementBanner?.discountCode || 'EIFFEL10';
+
+  const handleCopyCode = () => {
+    if (promoCode) {
+      navigator.clipboard.writeText(promoCode);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    }
+  };
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
@@ -61,13 +85,23 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
     <>
       {/* Top Banner */}
       <div className="bg-primary text-white dark:bg-zinc-950 dark:text-zinc-200 text-[10px] sm:text-[11px] py-1.5 px-3 sm:px-4 font-label-bold tracking-wider sm:tracking-widest text-center border-b border-black/10 flex items-center justify-between">
-        <div className="hidden md:block w-44 text-left rtl:text-right text-zinc-400 font-mono text-[10px]">
-          {t.topBannerLocations}
+        <div className="hidden md:block w-48 text-left rtl:text-right text-zinc-400 font-mono text-[10px] truncate">
+          {announcementSub}
         </div>
-        <div className="flex-1 text-center truncate">
-          {t.topBannerPromo} <strong>EIFFEL10</strong>
+        <div className="flex-1 text-center truncate flex items-center justify-center gap-1.5">
+          <span>{announcementTitle}</span>
+          {promoCode && (
+            <button
+              onClick={handleCopyCode}
+              title="Copy Coupon Code"
+              className="inline-flex items-center gap-1 bg-white/10 hover:bg-white/25 text-white px-1.5 py-0.5 rounded text-[10px] font-mono transition-colors cursor-pointer"
+            >
+              <strong>{promoCode}</strong>
+              {copiedCode ? <Check className="w-2.5 h-2.5 text-emerald-400" /> : <Copy className="w-2.5 h-2.5 text-zinc-300" />}
+            </button>
+          )}
         </div>
-        <div className="hidden md:flex w-44 justify-end items-center gap-3 text-[10px] text-zinc-300">
+        <div className="hidden md:flex w-48 justify-end items-center gap-3 text-[10px] text-zinc-300">
           {(role === 'ROLE_ADMIN' || role === 'ROLE_STAFF') && (
             <Link to="/admin" className="text-amber-400 hover:underline flex items-center gap-1 font-bold">
               <ShieldCheck className="w-3 h-3" />

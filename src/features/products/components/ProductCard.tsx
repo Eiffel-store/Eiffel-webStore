@@ -4,7 +4,7 @@ import { Heart, Eye, ShoppingBag } from 'lucide-react';
 import { Product } from '@/types';
 import { useWishlist } from '@/features/wishlist';
 import { useCart } from '@/features/cart';
-import { useCurrency, useLanguage } from '@/shared';
+import { useCurrency, useLanguage, resolveColorImage } from '@/shared';
 
 interface ProductCardProps {
   product: Product;
@@ -13,6 +13,9 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [activeColorImage, setActiveColorImage] = useState<string | null>(null);
+  const [activeColorName, setActiveColorName] = useState<string | null>(null);
+
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
@@ -22,13 +25,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
 
   const inWishlist = isInWishlist(product.id);
   const images = (product.images && product.images.length > 0) ? product.images : ['https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop'];
-  const currentImage = images[isHovered && images.length > 1 ? 1 : 0] || images[0];
+  
+  // Choose displayed image: if user selected/hovered a color that has an image, show it!
+  const currentImage = activeColorImage || (images[isHovered && images.length > 1 ? 1 : 0] || images[0]);
 
   return (
     <div
       className="group relative flex flex-col bg-surface dark:bg-zinc-950 transition-all duration-300"
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setActiveColorImage(null);
+        setActiveColorName(null);
+      }}
     >
       {/* Visual / Image Container */}
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-850 shadow-sm">
@@ -36,7 +45,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
           <img
             src={currentImage}
             alt={product.name || 'Eiffel luxury piece'}
-            className="w-full h-full object-cover luxury-image-hover"
+            className="w-full h-full object-cover luxury-image-hover transition-all duration-300"
             loading="lazy"
           />
         </Link>
@@ -58,6 +67,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
               LIMITED
             </span>
           )}
+          {(product.stock !== undefined ? product.stock : (product.inStock ? 20 : 0)) <= 0 ? (
+            <span className="bg-rose-600 text-white font-label-bold text-[9px] sm:text-[10px] tracking-widest px-2 py-0.5 uppercase shadow-sm">
+              {isRTL ? 'نفدت الكمية' : 'OUT OF STOCK'}
+            </span>
+          ) : (product.stock !== undefined ? product.stock : 20) <= 5 ? (
+            <span className="bg-amber-500 text-black font-label-bold text-[9px] sm:text-[10px] tracking-widest px-2 py-0.5 uppercase shadow-sm animate-pulse">
+              {isRTL ? `متبقي ${product.stock} فقط` : `ONLY ${product.stock} LEFT`}
+            </span>
+          ) : null}
         </div>
 
         {/* Wishlist Trigger */}
@@ -79,16 +97,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
         {/* Hover Quick Actions Bar */}
         <div className="absolute inset-x-0 bottom-0 p-2 sm:p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
           <button
-            onClick={() => addToCart(product)}
-            className="flex-1 py-2 sm:py-2.5 bg-white text-black font-label-bold text-[10px] sm:text-xs tracking-widest uppercase hover:bg-neutral-200 transition-colors flex items-center justify-center gap-1.5 shadow-md"
+            onClick={() => addToCart(product, undefined, activeColorName || undefined)}
+            disabled={(product.stock !== undefined ? product.stock : (product.inStock ? 20 : 0)) <= 0}
+            className="flex-1 py-2 sm:py-2.5 bg-white text-black font-label-bold text-[10px] sm:text-xs tracking-widest uppercase hover:bg-neutral-200 transition-colors flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             <ShoppingBag className="w-3.5 h-3.5" />
-            <span>{t.quickAdd}</span>
+            <span>{(product.stock !== undefined ? product.stock : (product.inStock ? 20 : 0)) <= 0 ? (isRTL ? 'نفدت الكمية' : 'Sold Out') : t.quickAdd}</span>
           </button>
           {onQuickView && (
             <button
               onClick={() => onQuickView(product)}
-              className="p-2 sm:p-2.5 bg-black/60 hover:bg-black/90 text-white backdrop-blur-sm transition-colors"
+              className="p-2 sm:p-2.5 bg-black/60 hover:bg-black/90 text-white backdrop-blur-sm transition-colors cursor-pointer"
               title="Quick View"
             >
               <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -99,14 +118,42 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
 
       {/* Product Details Meta */}
       <div className="pt-3 pb-2 flex flex-col flex-1">
-        <div className="flex justify-between items-baseline gap-2">
+        <div className="flex justify-between items-center gap-2">
           <span className="font-mono text-[10px] sm:text-[11px] text-secondary dark:text-zinc-400 uppercase tracking-widest">
             {product.subCategory || product.category || 'MENSWEAR'}
           </span>
+
+          {/* Interactive Color Swatches */}
           {product.colors && product.colors.length > 0 && (
-            <span className="font-mono text-[9px] text-secondary dark:text-zinc-500">
-              {product.colors.length} {isRTL ? 'ألوان' : 'COLOURS'}
-            </span>
+            <div className="flex items-center gap-1">
+              {product.colors.slice(0, 5).map((c, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onMouseEnter={() => {
+                    const img = resolveColorImage(product, c.name);
+                    setActiveColorImage(img);
+                    setActiveColorName(c.name);
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const img = resolveColorImage(product, c.name);
+                    setActiveColorImage(img);
+                    setActiveColorName(c.name);
+                  }}
+                  title={c.name}
+                  className={`w-3.5 h-3.5 rounded-full border transition-transform hover:scale-125 cursor-pointer ${
+                    activeColorName === c.name ? 'ring-2 ring-amber-400 scale-110 border-white' : 'border-zinc-700'
+                  }`}
+                  style={{ backgroundColor: c.hex }}
+                />
+              ))}
+              {product.colors.length > 5 && (
+                <span className="text-[9px] font-mono text-zinc-500">
+                  +{product.colors.length - 5}
+                </span>
+              )}
+            </div>
           )}
         </div>
 

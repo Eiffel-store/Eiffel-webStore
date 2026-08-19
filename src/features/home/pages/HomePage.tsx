@@ -6,6 +6,7 @@ import { HeroSection } from '../components/HeroSection';
 import { CategoryGrid } from '../components/CategoryGrid';
 import { PromoEditorial } from '../components/PromoEditorial';
 import { ShopTheLook } from '../components/ShopTheLook';
+import { PromoPopupModal } from '../components/PromoPopupModal';
 import { Product } from '@/types';
 import { useLanguage } from '@/shared';
 import { useStoreData } from '@/shared';
@@ -61,6 +62,9 @@ export const HomePage: React.FC = () => {
 
       {/* 5. SHOP THE LOOK INTERACTIVE HOTSPOTS */}
       <ShopTheLook />
+
+      {/* 6. PROMOTIONAL POPUP MODAL (CAMPAIGN DRIVEN) */}
+      <PromoPopupModal />
 
       {/* Quick View Modal */}
       {quickViewProduct && (

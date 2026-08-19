@@ -95,7 +95,8 @@ export const CartDrawer: React.FC = () => {
             ) : (
               cart.map((item, idx) => {
                 const prod = item?.product;
-                const prodImg = prod?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
+                const colorObj = prod?.colors?.find(c => c.name.toLowerCase() === item.selectedColor.toLowerCase());
+                const prodImg = colorObj?.image || prod?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
                 return (
                   <div key={idx} className="py-4 flex gap-3 sm:gap-4 items-center">
                     <img

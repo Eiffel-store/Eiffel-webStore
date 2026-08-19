@@ -121,20 +121,31 @@ export const AdminProductTable: React.FC<AdminProductTableProps> = ({
                   </div>
                 </td>
 
-                {/* Stock Toggle */}
+                {/* Stock Units & Toggle */}
                 <td className="py-3.5 px-4 text-center">
-                  <button
-                    onClick={() => onToggleStock(product)}
-                    className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono font-bold transition-colors cursor-pointer ${
-                      product.inStock
-                        ? 'bg-emerald-950/70 border border-emerald-800 text-emerald-300 hover:bg-emerald-900'
-                        : 'bg-red-950/70 border border-red-800 text-red-300 hover:bg-red-900'
-                    }`}
-                    title={isRTL ? 'اضغط لتغيير الحالة' : 'Click to toggle status'}
-                  >
-                    <span className={`w-1.5 h-1.5 rounded-full ${product.inStock ? 'bg-emerald-400' : 'bg-red-400'}`} />
-                    <span>{product.inStock ? (isRTL ? 'متوفر' : 'In Stock') : (isRTL ? 'نفد' : 'Out of Stock')}</span>
-                  </button>
+                  <div className="flex flex-col items-center gap-1">
+                    <span className={`text-[11px] font-mono font-bold ${
+                      (product.stock ?? 20) <= 0
+                        ? 'text-rose-400'
+                        : (product.stock ?? 20) <= 5
+                        ? 'text-amber-400'
+                        : 'text-emerald-400'
+                    }`}>
+                      {product.stock !== undefined ? `${product.stock} ${isRTL ? 'قطع' : 'units'}` : (isRTL ? '20 قطعة' : '20 units')}
+                    </span>
+                    <button
+                      onClick={() => onToggleStock(product)}
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-mono font-bold transition-colors rounded cursor-pointer ${
+                        product.inStock
+                          ? 'bg-emerald-950/70 border border-emerald-800 text-emerald-300 hover:bg-emerald-900'
+                          : 'bg-red-950/70 border border-red-800 text-red-300 hover:bg-red-900'
+                      }`}
+                      title={isRTL ? 'اضغط لتغيير الحالة' : 'Click to toggle status'}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${product.inStock ? 'bg-emerald-400' : 'bg-red-400'}`} />
+                      <span>{product.inStock ? (isRTL ? 'متوفر' : 'In Stock') : (isRTL ? 'نفد' : 'Out of Stock')}</span>
+                    </button>
+                  </div>
                 </td>
 
                 {/* Action Buttons */}

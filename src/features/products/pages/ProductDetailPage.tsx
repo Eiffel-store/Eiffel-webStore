@@ -8,9 +8,7 @@ import { ProductAccordion } from '../components/ProductAccordion';
 import { SizeGuideModal } from '../components/SizeGuideModal';
 import { useCart } from '@/features/cart';
 import { useWishlist } from '@/features/wishlist';
-import { useCurrency } from '@/shared';
-import { useLanguage } from '@/shared';
-import { useStoreData } from '@/shared';
+import { useCurrency, useLanguage, useStoreData, resolveColorImage } from '@/shared';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -81,6 +79,7 @@ export const ProductDetailPage: React.FC = () => {
           {/* Left Gallery (7 cols) */}
           <ProductGallery
             product={product}
+            activeColorImage={resolveColorImage(product, selectedColor)}
             selectedImage={selectedImage}
             setSelectedImage={setSelectedImage}
             isSaved={isSaved}

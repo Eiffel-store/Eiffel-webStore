@@ -28,7 +28,8 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
 
       <div className="max-h-72 overflow-y-auto divide-y divide-surface-container/80 dark:divide-zinc-800">
         {cart.map((item, idx) => {
-          const img = item?.product?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
+          const colorObj = item?.product?.colors?.find(c => c.name.toLowerCase() === item.selectedColor.toLowerCase());
+          const img = colorObj?.image || item?.product?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
           return (
             <div key={idx} className="py-3 flex gap-3 items-center">
               <img

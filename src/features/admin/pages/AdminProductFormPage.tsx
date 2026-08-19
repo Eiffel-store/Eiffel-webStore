@@ -4,8 +4,7 @@ import { ArrowLeft, ArrowRight, Check, AlertCircle } from 'lucide-react';
 import { useStoreData, useLanguage } from '@/shared';
 import { Product } from '@/types';
 import { ProductFormBasicInfo } from '../components/product-form/ProductFormBasicInfo';
-import { ProductFormMedia } from '../components/product-form/ProductFormMedia';
-import { ProductFormVariants } from '../components/product-form/ProductFormVariants';
+import { ProductFormColorsAndMedia } from '../components/product-form/ProductFormColorsAndMedia';
 import { ProductFormDetails } from '../components/product-form/ProductFormDetails';
 
 export const AdminProductFormPage: React.FC = () => {
@@ -156,21 +155,17 @@ export const AdminProductFormPage: React.FC = () => {
           onChange={(updates) => setFormData(prev => ({ ...prev, ...updates }))}
         />
 
-        {/* 2. Media Gallery */}
-        <ProductFormMedia
-          images={formData.images}
-          onChange={(images) => setFormData(prev => ({ ...prev, images }))}
-        />
-
-        {/* 3. Variants (Colors & Sizes) */}
-        <ProductFormVariants
+        {/* 2. Colors, Color-Specific Imagery & Sizes */}
+        <ProductFormColorsAndMedia
           colors={formData.colors}
+          images={formData.images}
           sizes={formData.sizes}
           onColorsChange={(colors) => setFormData(prev => ({ ...prev, colors }))}
+          onImagesChange={(images) => setFormData(prev => ({ ...prev, images }))}
           onSizesChange={(sizes) => setFormData(prev => ({ ...prev, sizes }))}
         />
 
-        {/* 4. Specifications & Description */}
+        {/* 3. Specifications & Description */}
         <ProductFormDetails
           description={formData.description}
           composition={formData.composition || ''}

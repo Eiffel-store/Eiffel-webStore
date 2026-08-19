@@ -3,7 +3,7 @@ import { X, ShoppingBag, Heart } from 'lucide-react';
 import { Product } from '@/types';
 import { useCart } from '@/features/cart';
 import { useWishlist } from '@/features/wishlist';
-import { useCurrency } from '@/shared';
+import { useCurrency, resolveColorImage } from '@/shared';
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -86,9 +86,17 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                 {colors.map((c, i) => (
                   <button
                     key={i}
-                    onClick={() => setSelectedColor(c.name)}
-                    className={`w-6 h-6 rounded-full border-2 ${activeColor === c.name ? 'border-primary dark:border-white ring-2 ring-primary' : 'border-zinc-700'}`}
+                    onClick={() => {
+                      setSelectedColor(c.name);
+                      const targetImg = resolveColorImage(product, c.name);
+                      const idx = images.indexOf(targetImg);
+                      if (idx !== -1) {
+                        setSelectedImage(idx);
+                      }
+                    }}
+                    className={`w-6 h-6 rounded-full border-2 cursor-pointer transition-transform hover:scale-110 ${activeColor === c.name ? 'border-primary dark:border-white ring-2 ring-primary' : 'border-zinc-700'}`}
                     style={{ backgroundColor: c.hex }}
+                    title={c.name}
                   />
                 ))}
               </div>
@@ -110,18 +118,32 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
               </div>
             </div>
 
+            {/* Stock status */}
+            <div className="text-[11px] font-mono">
+              {(product.stock !== undefined ? product.stock : (product.inStock ? 20 : 0)) <= 0 ? (
+                <span className="text-rose-400 font-bold">❌ Out of stock</span>
+              ) : (product.stock !== undefined ? product.stock : 20) <= 5 ? (
+                <span className="text-amber-400 font-bold">⚠️ Only {product.stock} left in stock!</span>
+              ) : (
+                <span className="text-emerald-400">✓ In Stock ({product.stock ?? 20} available)</span>
+              )}
+            </div>
+
             {/* Actions */}
             <div className="flex gap-2 pt-2">
               <button
                 onClick={handleAddToCart}
-                className="flex-1 py-3 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-wider uppercase hover:opacity-90 flex items-center justify-center gap-2"
+                disabled={(product.stock !== undefined ? product.stock : (product.inStock ? 20 : 0)) <= 0}
+                className="flex-1 py-3 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-wider uppercase hover:opacity-90 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               >
                 <ShoppingBag className="w-4 h-4" />
-                <span>Add to Bag</span>
+                <span>
+                  {(product.stock !== undefined ? product.stock : (product.inStock ? 20 : 0)) <= 0 ? 'Out of Stock' : 'Add to Bag'}
+                </span>
               </button>
               <button
                 onClick={() => toggleWishlist(product)}
-                className="p-3 border border-zinc-700 text-zinc-300 hover:text-white"
+                className="p-3 border border-zinc-700 text-zinc-300 hover:text-white cursor-pointer"
               >
                 <Heart className={`w-4 h-4 ${inWishlist ? 'fill-current text-red-500' : ''}`} />
               </button>

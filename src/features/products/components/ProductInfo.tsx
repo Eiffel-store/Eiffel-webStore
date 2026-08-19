@@ -1,8 +1,7 @@
 import React from 'react';
-import { Star, Ruler, ShoppingBag, Check, ArrowRight, Truck, RotateCcw } from 'lucide-react';
-import { useCurrency } from '@/shared';
-import { useLanguage } from '@/shared';
+import { ShoppingBag, Check, ArrowRight, Ruler, Truck, RotateCcw, ShieldCheck, AlertCircle, Sparkles } from 'lucide-react';
 import { Product } from '@/types';
+import { useCurrency, useLanguage } from '@/shared';
 
 interface ProductInfoProps {
   product: Product;
@@ -11,7 +10,7 @@ interface ProductInfoProps {
   selectedSize: string;
   setSelectedSize: (size: string) => void;
   quantity: number;
-  setQuantity: (qty: number) => void;
+  setQuantity: (q: number) => void;
   addedAnimation: boolean;
   onAddToCart: () => void;
   onBuyNow: () => void;
@@ -29,79 +28,95 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
   addedAnimation,
   onAddToCart,
   onBuyNow,
-  onOpenSizeGuide,
+  onOpenSizeGuide
 }) => {
   const { formatPrice } = useCurrency();
   const { t, isRTL } = useLanguage();
 
+  const currentStock = product.stock !== undefined ? product.stock : (product.inStock ? 20 : 0);
+  const isOutOfStock = currentStock <= 0;
+  const isLowStock = currentStock > 0 && currentStock <= 5;
+
   return (
-    <div>
-      {/* Reference ID & Category */}
-      <div className="flex items-center justify-between text-[11px] sm:text-xs font-mono text-secondary dark:text-zinc-400 uppercase">
-        <span>{t.refNumber} {product.id.toUpperCase()}</span>
-        <span>{t.madeInItaly}</span>
-      </div>
-
-      {/* Title & Subtitle */}
-      <h1 className="font-editorial text-3xl sm:text-5xl text-primary dark:text-white mt-1 sm:mt-2 leading-[1.0] sm:leading-[0.95]">
-        {product.name}
-      </h1>
-      <p className="text-xs sm:text-sm text-secondary dark:text-zinc-300 mt-1.5 sm:mt-2 font-light">
-        {product.subtitle}
-      </p>
-
-      {/* Price & Rating */}
-      <div className="flex items-center justify-between mt-4 sm:mt-6 pb-4 sm:pb-6 border-b border-surface-container dark:border-zinc-800">
-        <div className="flex items-baseline gap-2.5 sm:gap-3">
-          <span className="font-mono text-2xl sm:text-3xl font-bold text-primary dark:text-white">
-            {formatPrice(product.price)}
+    <div className="flex flex-col justify-start">
+      {/* Editorial Category & Name */}
+      <div>
+        <div className="flex items-center gap-2 mb-2 flex-wrap">
+          <span className="text-[10px] sm:text-xs font-label-bold tracking-widest text-secondary dark:text-zinc-400 uppercase">
+            {product.category}
           </span>
-          {product.originalPrice && (
-            <span className="text-xs sm:text-sm font-mono text-secondary line-through">
-              {formatPrice(product.originalPrice)}
+          {product.isNew && (
+            <span className="bg-primary text-white dark:bg-white dark:text-black text-[9px] font-label-bold px-2 py-0.5 uppercase tracking-widest">
+              {t.newArrivalBadge}
+            </span>
+          )}
+          {product.isBestSeller && (
+            <span className="bg-amber-500/20 text-amber-500 border border-amber-500/30 text-[9px] font-label-bold px-2 py-0.5 uppercase tracking-widest">
+              {t.bestSellerBadge}
             </span>
           )}
         </div>
-        <div className="flex items-center gap-1 sm:gap-1.5 text-xs text-secondary dark:text-zinc-400">
-          <div className="flex text-amber-500">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-3.5 h-3.5 fill-current" />
-            ))}
-          </div>
-          <span className="font-mono text-[11px] sm:text-xs">({product.reviewCount})</span>
-        </div>
+
+        <h1 className="font-editorial text-2xl sm:text-4xl text-primary dark:text-white uppercase leading-tight">
+          {product.name}
+        </h1>
+        {product.subtitle && (
+          <p className="text-xs sm:text-sm text-secondary dark:text-zinc-400 font-mono mt-1">
+            {product.subtitle}
+          </p>
+        )}
       </div>
 
-      {/* Color Swatches */}
-      <div className="mt-5 sm:mt-6">
+      {/* Pricing Strip */}
+      <div className="mt-4 flex items-baseline gap-3">
+        <span className="font-mono text-2xl sm:text-3xl font-bold text-primary dark:text-white">
+          {formatPrice(product.price)}
+        </span>
+        {product.originalPrice && product.originalPrice > product.price && (
+          <span className="text-sm font-mono text-secondary dark:text-zinc-500 line-through">
+            {formatPrice(product.originalPrice)}
+          </span>
+        )}
+      </div>
+
+      {/* Color Selection */}
+      <div className="mt-6">
         <div className="flex justify-between items-center text-xs font-label-bold text-secondary dark:text-zinc-400 uppercase mb-2">
-          <span>{t.colorway} <strong className="text-primary dark:text-white">{selectedColor}</strong></span>
+          <span>{t.selectColor}</span>
+          <span className="text-primary dark:text-white font-mono">{selectedColor}</span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           {product.colors.map((c) => (
             <button
               key={c.name}
               onClick={() => setSelectedColor(c.name)}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border text-xs font-label-bold uppercase transition-all ${
+              className={`flex items-center gap-2 px-3 py-1.5 border transition-all text-xs ${
                 selectedColor === c.name
-                  ? 'border-primary dark:border-white bg-surface-container-high dark:bg-zinc-800 text-primary dark:text-white shadow-sm'
-                  : 'border-surface-container dark:border-zinc-800 text-secondary hover:border-secondary'
+                  ? 'border-primary dark:border-white bg-surface-container-low dark:bg-zinc-800 text-primary dark:text-white shadow-sm'
+                  : 'border-surface-container dark:border-zinc-800 text-secondary dark:text-zinc-400 hover:border-primary'
               }`}
             >
-              <span className="w-3 h-3 rounded-full border border-black/30" style={{ backgroundColor: c.hex }} />
-              <span>{c.name}</span>
+              {c.image ? (
+                <img src={c.image} alt={c.name} className="w-4 h-4 rounded-full object-cover border border-black/20 shadow-sm" />
+              ) : (
+                <span
+                  className="w-3.5 h-3.5 rounded-full border border-black/20"
+                  style={{ backgroundColor: c.hex }}
+                />
+              )}
+              <span className="capitalize">{c.name}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Size Selector */}
-      <div className="mt-5 sm:mt-6">
+      {/* Size Selection */}
+      <div className="mt-6">
         <div className="flex justify-between items-center text-xs font-label-bold text-secondary dark:text-zinc-400 uppercase mb-2">
           <span>{t.selectSize}</span>
           <button
             onClick={onOpenSizeGuide}
-            className="flex items-center gap-1 text-primary dark:text-white hover:underline text-[11px]"
+            className="flex items-center gap-1 text-primary dark:text-white hover:underline text-[11px] cursor-pointer"
           >
             <Ruler className="w-3.5 h-3.5" />
             <span>{t.sizeGuide}</span>
@@ -112,7 +127,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
             <button
               key={sz}
               onClick={() => setSelectedSize(sz)}
-              className={`py-2.5 sm:py-3 text-xs font-label-bold border transition-all text-center uppercase ${
+              className={`py-2.5 sm:py-3 text-xs font-label-bold border transition-all text-center uppercase cursor-pointer ${
                 selectedSize === sz
                   ? 'bg-primary text-white dark:bg-white dark:text-black border-primary dark:border-white shadow-sm'
                   : 'border-surface-container dark:border-zinc-800 hover:border-primary text-primary dark:text-white'
@@ -122,18 +137,36 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
             </button>
           ))}
         </div>
-        <p className="text-[11px] text-zinc-500 font-mono mt-2">
-          {t.inStockNotice}
-        </p>
+
+        {/* Dynamic Real-time Stock Notice */}
+        <div className="mt-3">
+          {isOutOfStock ? (
+            <div className="flex items-center gap-1.5 text-xs text-rose-500 font-bold bg-rose-500/10 p-2 rounded border border-rose-500/20">
+              <AlertCircle className="w-4 h-4" />
+              <span>{isRTL ? '❌ نفدت الكمية من المخزون حالياً' : '❌ Currently Out of Stock'}</span>
+            </div>
+          ) : isLowStock ? (
+            <div className="flex items-center gap-1.5 text-xs text-amber-500 font-bold bg-amber-500/10 p-2 rounded border border-amber-500/30 animate-pulse">
+              <Sparkles className="w-4 h-4" />
+              <span>{isRTL ? `⚠️ متبقي ${currentStock} قطع فقط في المخزون! اطلب قبل نفادها.` : `⚠️ Only ${currentStock} pieces left in stock! Order soon.`}</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">
+              <Check className="w-3.5 h-3.5" />
+              <span>{isRTL ? `✓ متوفر في المخزون (متبقي ${currentStock} قطعة جاهزة للشحن)` : `✓ In Stock (${currentStock} units ready to ship)`}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Quantity & Purchasing CTA Buttons */}
       <div className="mt-6 sm:mt-8 space-y-2.5 sm:space-y-3">
         <div className="flex gap-2.5 sm:gap-3">
-          <div className="flex items-center border border-surface-container dark:border-zinc-700 bg-surface-container-low dark:bg-zinc-900 px-2 sm:px-3">
+          <div className={`flex items-center border border-surface-container dark:border-zinc-700 bg-surface-container-low dark:bg-zinc-900 px-2 sm:px-3 ${isOutOfStock ? 'opacity-50 pointer-events-none' : ''}`}>
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="text-primary dark:text-white px-2 py-2 sm:py-3 hover:opacity-60 text-base font-bold"
+              disabled={isOutOfStock || quantity <= 1}
+              className="text-primary dark:text-white px-2 py-2 sm:py-3 hover:opacity-60 text-base font-bold disabled:opacity-30 cursor-pointer"
             >
               -
             </button>
@@ -141,8 +174,9 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               {quantity}
             </span>
             <button
-              onClick={() => setQuantity(quantity + 1)}
-              className="text-primary dark:text-white px-2 py-2 sm:py-3 hover:opacity-60 text-base font-bold"
+              onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
+              disabled={isOutOfStock || quantity >= currentStock}
+              className="text-primary dark:text-white px-2 py-2 sm:py-3 hover:opacity-60 text-base font-bold disabled:opacity-30 cursor-pointer"
             >
               +
             </button>
@@ -150,13 +184,16 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
 
           <button
             onClick={onAddToCart}
-            className="flex-1 py-3.5 sm:py-4 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-widest uppercase flex items-center justify-center gap-2 hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all shadow-md"
+            disabled={isOutOfStock}
+            className="flex-1 py-3.5 sm:py-4 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-widest uppercase flex items-center justify-center gap-2 hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all shadow-md disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {addedAnimation ? (
               <>
                 <Check className="w-4 h-4 text-green-400" />
                 <span>{t.addedToBag}</span>
               </>
+            ) : isOutOfStock ? (
+              <span>{isRTL ? 'نفدت الكمية' : 'OUT OF STOCK'}</span>
             ) : (
               <>
                 <ShoppingBag className="w-4 h-4" />
@@ -166,13 +203,15 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           </button>
         </div>
 
-        <button
-          onClick={onBuyNow}
-          className="w-full py-3.5 sm:py-4 bg-secondary text-white dark:bg-zinc-800 dark:text-zinc-200 font-label-bold text-xs tracking-widest uppercase hover:bg-primary dark:hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2"
-        >
-          <span>{t.expressCheckout}</span>
-          <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
-        </button>
+        {!isOutOfStock && (
+          <button
+            onClick={onBuyNow}
+            className="w-full py-3.5 sm:py-4 bg-secondary text-white dark:bg-zinc-800 dark:text-zinc-200 font-label-bold text-xs tracking-widest uppercase hover:bg-primary dark:hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>{t.expressCheckout}</span>
+            <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+          </button>
+        )}
       </div>
 
       {/* Guarantees Bar */}

@@ -27,6 +27,7 @@ export interface Product {
   badge?: string;
   rating: number;
   reviewCount: number;
+  stock?: number;
   inStock: boolean;
   createdAt?: string;
 }
@@ -229,3 +230,44 @@ export interface HomePageSettings {
   promoEditorial: PromoBannerSettings;
   shopTheLook: ShopTheLookSettings;
 }
+
+export type BannerPlacement = 
+  | 'HERO_SLIDER'
+  | 'PROMO_EDITORIAL'
+  | 'TOP_ANNOUNCEMENT'
+  | 'POPUP_MODAL'
+  | 'COLLECTION_HEADER';
+
+export type BannerType = 'IMAGE' | 'VIDEO' | 'COUNTDOWN';
+
+export interface Banner {
+  id: string;
+  titleEn?: string;
+  titleAr?: string;
+  subtitleEn?: string;
+  subtitleAr?: string;
+  tagEn?: string;
+  tagAr?: string;
+  placement: BannerPlacement;
+  type?: BannerType;
+  desktopImageUrl?: string;
+  mobileImageUrl?: string;
+  videoUrl?: string;
+  buttonTextEn?: string;
+  buttonTextAr?: string;
+  buttonLink?: string;
+  secondaryButtonTextEn?: string;
+  secondaryButtonTextAr?: string;
+  secondaryButtonLink?: string;
+  discountCode?: string;
+  isActive?: boolean;
+  displayOrder?: number;
+  startDate?: string;
+  endDate?: string;
+  targetAudience?: string;
+  impressions?: number;
+  clicks?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+

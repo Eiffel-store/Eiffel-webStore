@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Product, StoreLocation, CategoryItem, Coupon, Order, StoreSettings, HomePageSettings } from '@/types';
+import { Product, StoreLocation, CategoryItem, Coupon, Order, StoreSettings, HomePageSettings, Banner, BannerPlacement } from '@/types';
 import { PRODUCTS as INITIAL_PRODUCTS, CATEGORIES as INITIAL_CATEGORIES } from '@/data/products';
 import { STORES as INITIAL_STORES } from '@/data/stores';
 import { productService } from '@/services/productService';
@@ -8,6 +8,8 @@ import { categoryService } from '@/services/categoryService';
 import { storeService } from '@/services/storeService';
 import { orderService } from '@/services/orderService';
 import { settingsService } from '@/services/settingsService';
+import { homeSettingsService } from '@/services/homeSettingsService';
+import { bannerService } from '@/services/bannerService';
 
 const INITIAL_CATEGORIES_DATA: CategoryItem[] = INITIAL_CATEGORIES.map(c => ({
   id: c.id,
@@ -125,7 +127,22 @@ interface StoreDataContextType {
   updateSettings: (updates: Partial<StoreSettings>) => void;
   updateHomeSettings: (updates: Partial<HomePageSettings>) => void;
 
-  // Backup / Restore
+  // Banners & Campaigns CMS
+  banners: Banner[];
+  activeBanners: Banner[];
+  addBanner: (banner: Partial<Banner>) => Promise<Banner>;
+  updateBanner: (id: string, updates: Partial<Banner>) => Promise<Banner>;
+  deleteBanner: (id: string) => Promise<void>;
+  toggleBannerStatus: (id: string) => Promise<Banner>;
+  reorderBanners: (ids: string[]) => Promise<void>;
+  trackBannerImpression: (id: string) => void;
+  trackBannerClick: (id: string) => void;
+
+  // Stock Inventory Management
+  decrementStock: (id: string, quantity?: number) => void;
+  incrementStock: (id: string, quantity?: number) => void;
+
+  // Import / Export
   exportData: () => string;
   importData: (jsonData: string) => boolean;
   resetAllToDefault: () => void;
@@ -164,14 +181,32 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     placeholderData: INITIAL_STORES,
   });
 
-  // 5. Local & Server States with smart offline fallback
+  // 5. React Query: Fetch Home Page & Banners Settings
+  const { data: serverHomeSettings } = useQuery({
+    queryKey: ['homeSettings'],
+    queryFn: () => homeSettingsService.getHomeSettings().catch(() => DEFAULT_HOME_SETTINGS),
+    placeholderData: DEFAULT_HOME_SETTINGS,
+  });
+
+  // 6. React Query: Fetch All Banners & Active Banners for Storefront
+  const { data: serverAllBanners = [] } = useQuery({
+    queryKey: ['banners', 'all'],
+    queryFn: () => bannerService.getAllBanners().catch(() => []),
+  });
+
+  const { data: serverActiveBanners = [] } = useQuery({
+    queryKey: ['banners', 'active'],
+    queryFn: () => bannerService.getActiveBanners().catch(() => []),
+  });
+
+  // 7. Local & Server States with smart offline fallback
   const [localProducts, setLocalProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [localCategories, setLocalCategories] = useState<CategoryItem[]>(INITIAL_CATEGORIES_DATA);
   const [localStores, setLocalStores] = useState<StoreLocation[]>(INITIAL_STORES);
   const [coupons, setCoupons] = useState<Coupon[]>(DEFAULT_COUPONS);
   const [orders, setOrders] = useState<Order[]>([]);
   const [localSettings, setLocalSettings] = useState<StoreSettings>(DEFAULT_SETTINGS);
-  const [homeSettings, setHomeSettings] = useState<HomePageSettings>(() => {
+  const [localHomeSettings, setLocalHomeSettings] = useState<HomePageSettings>(() => {
     try {
       const saved = localStorage.getItem('eiffel_home_settings');
       return saved ? { ...DEFAULT_HOME_SETTINGS, ...JSON.parse(saved) } : DEFAULT_HOME_SETTINGS;
@@ -184,24 +219,148 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const categories = (serverCategories && serverCategories.length > 0) ? serverCategories : localCategories;
   const stores = (serverStores && serverStores.length > 0) ? serverStores : localStores;
   const settings = serverSettings || localSettings;
+  const homeSettings = serverHomeSettings || localHomeSettings;
+  const banners = serverAllBanners;
+  const activeBanners = serverActiveBanners;
 
-  // Home Page Settings
-  const updateHomeSettings = (updates: Partial<HomePageSettings>) => {
-    setHomeSettings(prev => {
-      const updated = {
-        ...prev,
-        ...updates,
-        hero: updates.hero ? { ...prev.hero, ...updates.hero } : prev.hero,
-        promoEditorial: updates.promoEditorial ? { ...prev.promoEditorial, ...updates.promoEditorial } : prev.promoEditorial,
-        shopTheLook: updates.shopTheLook ? { ...prev.shopTheLook, ...updates.shopTheLook } : prev.shopTheLook,
-      };
-      try {
-        localStorage.setItem('eiffel_home_settings', JSON.stringify(updated));
-      } catch (err) {
-        console.error('Failed to save home settings', err);
-      }
-      return updated;
+  // Mutations
+  const updateHomeSettingsMutation = useMutation({
+    mutationFn: (newHomeSettings: HomePageSettings) => homeSettingsService.updateHomeSettings(newHomeSettings),
+    onSuccess: (data) => {
+      setLocalHomeSettings(data);
+      queryClient.setQueryData(['homeSettings'], data);
+      queryClient.invalidateQueries({ queryKey: ['homeSettings'] });
+    },
+    onError: (err) => {
+      console.warn('Backend update failed, kept local copy:', err);
+    }
+  });
+
+  const addBannerMutation = useMutation({
+    mutationFn: (banner: Partial<Banner>) => bannerService.create(banner),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['banners'] }),
+  });
+
+  const updateBannerMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Banner> }) => bannerService.update(id, updates),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['banners'] }),
+  });
+
+  const toggleBannerStatusMutation = useMutation({
+    mutationFn: (id: string) => bannerService.toggleStatus(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['banners'] }),
+  });
+
+  const reorderBannersMutation = useMutation({
+    mutationFn: (ids: string[]) => bannerService.reorder(ids),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['banners'] }),
+  });
+
+  const deleteBannerMutation = useMutation({
+    mutationFn: (id: string) => bannerService.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['banners'] }),
+  });
+
+  const addBanner = async (banner: Partial<Banner>) => {
+    return await addBannerMutation.mutateAsync(banner);
+  };
+
+  const updateBanner = async (id: string, updates: Partial<Banner>) => {
+    return await updateBannerMutation.mutateAsync({ id, updates });
+  };
+
+  const deleteBanner = async (id: string) => {
+    await deleteBannerMutation.mutateAsync(id);
+  };
+
+  const toggleBannerStatus = async (id: string) => {
+    return await toggleBannerStatusMutation.mutateAsync(id);
+  };
+
+  const reorderBanners = async (ids: string[]) => {
+    await reorderBannersMutation.mutateAsync(ids);
+  };
+
+  const trackBannerImpression = (id: string) => {
+    bannerService.trackImpression(id);
+  };
+
+  const trackBannerClick = (id: string) => {
+    bannerService.trackClick(id);
+  };
+
+  // Stock Inventory Management Handlers
+  const decrementStock = (id: string, quantity: number = 1) => {
+    queryClient.setQueryData<Product[]>(['products', 'all'], (old) => {
+      if (!old) return old;
+      return old.map(p => {
+        if (p.id === id) {
+          const current = p.stock !== undefined ? p.stock : 20;
+          const updated = Math.max(0, current - quantity);
+          return { ...p, stock: updated, inStock: updated > 0 };
+        }
+        return p;
+      });
     });
+
+    setLocalProducts(prev => prev.map(p => {
+      if (p.id === id) {
+        const current = p.stock !== undefined ? p.stock : 20;
+        const updated = Math.max(0, current - quantity);
+        return { ...p, stock: updated, inStock: updated > 0 };
+      }
+      return p;
+    }));
+
+    productService.adjustStock(id, -quantity).catch((err) => {
+      console.warn('Backend stock decrement failed, fallback to local', err);
+    });
+  };
+
+  const incrementStock = (id: string, quantity: number = 1) => {
+    queryClient.setQueryData<Product[]>(['products', 'all'], (old) => {
+      if (!old) return old;
+      return old.map(p => {
+        if (p.id === id) {
+          const current = p.stock !== undefined ? p.stock : 20;
+          const updated = current + quantity;
+          return { ...p, stock: updated, inStock: updated > 0 };
+        }
+        return p;
+      });
+    });
+
+    setLocalProducts(prev => prev.map(p => {
+      if (p.id === id) {
+        const current = p.stock !== undefined ? p.stock : 20;
+        const updated = current + quantity;
+        return { ...p, stock: updated, inStock: updated > 0 };
+      }
+      return p;
+    }));
+
+    productService.adjustStock(id, quantity).catch((err) => {
+      console.warn('Backend stock increment failed, fallback to local', err);
+    });
+  };
+
+  // Home Page Settings Update
+  const updateHomeSettings = (updates: Partial<HomePageSettings>) => {
+    const current = serverHomeSettings || localHomeSettings || DEFAULT_HOME_SETTINGS;
+    const updated: HomePageSettings = {
+      ...current,
+      ...updates,
+      hero: updates.hero ? { ...current.hero, ...updates.hero } : current.hero,
+      promoEditorial: updates.promoEditorial ? { ...current.promoEditorial, ...updates.promoEditorial } : current.promoEditorial,
+      shopTheLook: updates.shopTheLook ? { ...current.shopTheLook, ...updates.shopTheLook } : current.shopTheLook,
+    };
+    setLocalHomeSettings(updated);
+    try {
+      localStorage.setItem('eiffel_home_settings', JSON.stringify(updated));
+    } catch (err) {
+      console.error('Failed to save home settings', err);
+    }
+    updateHomeSettingsMutation.mutate(updated);
   };
 
   // Mutations
@@ -407,6 +566,8 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         orders,
         settings,
         homeSettings,
+        banners,
+        activeBanners,
         isLoading: isProductsLoading,
         addProduct,
         updateProduct,
@@ -427,6 +588,15 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         deleteOrder,
         updateSettings,
         updateHomeSettings,
+        addBanner,
+        updateBanner,
+        deleteBanner,
+        toggleBannerStatus,
+        reorderBanners,
+        trackBannerImpression,
+        trackBannerClick,
+        decrementStock,
+        incrementStock,
         exportData,
         importData,
         resetAllToDefault

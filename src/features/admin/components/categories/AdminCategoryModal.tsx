@@ -1,6 +1,6 @@
 import React from 'react';
 import { CategoryItem } from '@/types';
-import { useLanguage } from '@/shared';
+import { useLanguage, ImageUploadInput } from '@/shared';
 
 interface AdminCategoryModalProps {
   isOpen: boolean;
@@ -25,8 +25,8 @@ export const AdminCategoryModal: React.FC<AdminCategoryModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-zinc-950 border border-zinc-800 max-w-md w-full p-6 space-y-5 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto">
-        <h3 className="font-bold text-sm text-white pb-3 border-b border-zinc-800">
+      <div className="bg-zinc-950 border border-zinc-800 max-w-md w-full p-6 space-y-5 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto rounded-lg">
+        <h3 className="font-bold text-sm text-white pb-3 border-b border-zinc-800 font-editorial">
           {isEditing ? (isRTL ? 'تعديل بيانات القسم' : 'Edit Category') : (isRTL ? 'إضافة قسم جديد' : 'Add New Category')}
         </h3>
 
@@ -41,7 +41,7 @@ export const AdminCategoryModal: React.FC<AdminCategoryModalProps> = ({
               value={formCategory.name}
               onChange={(e) => setFormCategory({ ...formCategory, name: e.target.value })}
               placeholder="e.g. MEN COLLECTION, SUITS"
-              className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white focus:outline-none focus:border-white"
+              className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white rounded focus:outline-none focus:border-amber-400"
             />
           </div>
 
@@ -54,44 +54,31 @@ export const AdminCategoryModal: React.FC<AdminCategoryModalProps> = ({
               value={formCategory.subtitle}
               onChange={(e) => setFormCategory({ ...formCategory, subtitle: e.target.value })}
               placeholder="e.g. Brutalist Silhouettes & Precision Engineering"
-              className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white focus:outline-none focus:border-white"
+              className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white rounded focus:outline-none focus:border-amber-400"
             />
           </div>
 
-          <div>
-            <label className="block text-xs text-zinc-300 font-bold mb-1">
-              {isRTL ? 'رابط صورة الغلاف (Banner Image URL) *' : 'Cover Image URL *'}
-            </label>
-            <input
-              type="url"
-              required
-              value={formCategory.image}
-              onChange={(e) => setFormCategory({ ...formCategory, image: e.target.value })}
-              className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white focus:outline-none focus:border-white"
-            />
-          </div>
-
-          {formCategory.image && (
-            <div className="aspect-[16/9] bg-zinc-900 border border-zinc-800 overflow-hidden">
-              <img
-                src={formCategory.image}
-                alt="Preview"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
+          {/* Cover Image Upload (Device file upload + Direct URL) */}
+          <ImageUploadInput
+            label={isRTL ? 'صورة الغلاف للقسم (Cover Banner)' : 'Category Cover Banner'}
+            value={formCategory.image}
+            onChange={(url) => setFormCategory({ ...formCategory, image: url })}
+            aspectRatio="16/9"
+            required={true}
+            helpText={isRTL ? 'يمكنك رفع صورة من جهازك أو وضع رابط صورة خارجي' : 'Upload from your device or paste a direct image URL'}
+          />
 
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-800">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-700 transition-colors"
+              className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-700 rounded transition-colors cursor-pointer"
             >
               {isRTL ? 'إلغاء' : 'Cancel'}
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-white text-black hover:bg-zinc-200 text-xs font-bold transition-colors"
+              className="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded transition-colors cursor-pointer"
             >
               {isEditing ? (isRTL ? 'حفظ التعديل' : 'Save Changes') : (isRTL ? 'إضافة القسم' : 'Add Category')}
             </button>

@@ -52,7 +52,8 @@ export const AdminOrderDetailsModal: React.FC<AdminOrderDetailsModalProps> = ({
         {/* Ordered Items */}
         <div className="space-y-3 max-h-48 overflow-y-auto">
           {order.items?.map((it, idx) => {
-            const img = it?.product?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
+            const colorObj = it?.product?.colors?.find(c => c.name.toLowerCase() === it.selectedColor.toLowerCase());
+            const img = colorObj?.image || it?.product?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
             return (
               <div key={idx} className="flex items-center gap-3 p-2 bg-zinc-900 border border-zinc-800">
                 <img src={img} alt="" className="w-12 h-14 object-cover" />

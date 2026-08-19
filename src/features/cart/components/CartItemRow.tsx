@@ -13,7 +13,8 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item, onUpdateQuantity
   const { formatPrice } = useCurrency();
   const { product, quantity, selectedColor, selectedSize } = item;
 
-  const img = product?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
+  const colorObj = product?.colors?.find(c => c.name.toLowerCase() === selectedColor.toLowerCase());
+  const img = colorObj?.image || product?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
 
   return (
     <div className="flex gap-3 sm:gap-4 py-4 border-b border-surface-container dark:border-zinc-800">

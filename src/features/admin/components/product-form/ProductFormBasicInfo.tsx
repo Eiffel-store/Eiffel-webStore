@@ -118,6 +118,22 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
 
       {/* Stock & Badges */}
       <div className="pt-3 border-t border-zinc-800/80 flex flex-wrap items-center gap-6">
+        <div className="flex items-center gap-2">
+          <label className="text-xs text-zinc-300 font-bold">
+            {isRTL ? 'الكمية المتوفرة في المخزون (Stock Units):' : 'Stock Quantity:'}
+          </label>
+          <input
+            type="number"
+            min={0}
+            value={formData.stock !== undefined ? formData.stock : 20}
+            onChange={(e) => {
+              const val = parseInt(e.target.value, 10) || 0;
+              onChange({ stock: val, inStock: val > 0 });
+            }}
+            className="w-20 bg-zinc-900 border border-zinc-700 px-2 py-1 text-xs text-white font-mono rounded focus:outline-none focus:border-amber-400"
+          />
+        </div>
+
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"

@@ -52,4 +52,11 @@ export const productService = {
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/products/${id}`);
   },
+
+  adjustStock: async (id: string, delta: number): Promise<Product> => {
+    const response = await apiClient.patch<ApiResponse<Product>>(`/products/${id}/stock`, null, {
+      params: { delta }
+    });
+    return response.data.data;
+  },
 };

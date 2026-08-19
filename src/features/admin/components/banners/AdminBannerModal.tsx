@@ -1,0 +1,797 @@
+import React, { useState } from 'react';
+import {
+  X,
+  Upload,
+  Sparkles,
+  Loader2,
+  Calendar,
+  Smartphone,
+  Monitor,
+  Check,
+  Zap,
+  Tag,
+  Link2,
+  ShoppingBag
+} from 'lucide-react';
+import { Banner, BannerPlacement } from '@/types';
+import { useLanguage, useStoreData } from '@/shared';
+import { uploadService } from '@/services/uploadService';
+
+interface AdminBannerModalProps {
+  banner: Partial<Banner> | null;
+  defaultPlacement?: BannerPlacement;
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (banner: Partial<Banner>) => Promise<void>;
+}
+
+// Pre-defined ready-to-use marketing presets
+const CAMPAIGN_PRESETS = [
+  {
+    id: 'preset-winter',
+    labelAr: '❄️ تشكيلة خريف وشتاء (Winter Campaign)',
+    labelEn: '❄️ Autumn / Winter Campaign',
+    tagAr: 'تشكيلة خريف / شتاء 2026 الحصرية',
+    tagEn: 'AUTUMN / WINTER 2026 CAMPAIGN',
+    titleAr: 'الهيبة المعمارية الفاخرة',
+    titleEn: 'ARCHITECTURAL FORM',
+    subtitleAr: 'قطن مصري فاخر ثقيل محاك بانضباط معماري وقصات حصرية فائقة الدقة.',
+    subtitleEn: 'Heavyweight Egyptian Giza Cotton engineered with brutalist discipline and precision tailoring.',
+    buttonTextAr: 'استكشف التشكيلة',
+    buttonTextEn: 'EXPLORE COLLECTION',
+    buttonLink: '/collections/men',
+    discountCode: ''
+  },
+  {
+    id: 'preset-sale',
+    labelAr: '🔥 عروض وخصومات خاصة (Seasonal Sale)',
+    labelEn: '🔥 Seasonal Private Sale',
+    tagAr: 'خصومات حصرية لفترة محدودة',
+    tagEn: 'EXCLUSIVE PRIVATE SALE',
+    titleAr: 'تخفيضات الموسم الاستثنائية',
+    titleEn: 'MID-SEASON EXCLUSIVE SALE',
+    subtitleAr: 'استمتع بخصم يصل إلى 30% على مختارات من الأزياء الرجالية الفاخرة.',
+    subtitleEn: 'Enjoy up to 30% off on curated architectural menswear collections.',
+    buttonTextAr: 'تسوق العروض الآن',
+    buttonTextEn: 'SHOP OFFERS NOW',
+    buttonLink: '/collections/offers',
+    discountCode: 'EIFFEL10'
+  },
+  {
+    id: 'preset-cashmere',
+    labelAr: '👑 إصدار الكشمير الملكي (Royal Cashmere)',
+    labelEn: '👑 Noir Cashmere Edition',
+    tagAr: 'البساطة الباريسية الراقية',
+    tagEn: 'PARISIAN MINIMALISM',
+    titleAr: 'إصدار الكشمير الأسود الملكي',
+    titleEn: 'NOIR CASHMERE EDITION',
+    subtitleAr: 'معاطف شتوية فاخرة مزدوجة الأزرار ومصنوعة يدوياً بأزرار مطلية بالبلاتين.',
+    subtitleEn: 'Handcrafted double-breasted outerwear meticulously finished with platinum buttons.',
+    buttonTextAr: 'تسوق المعاطف',
+    buttonTextEn: 'SHOP CASHMERE',
+    buttonLink: '/collections/men',
+    discountCode: ''
+  },
+  {
+    id: 'preset-shipping',
+    labelAr: '🚚 شحن سريع مجاني (Free Express Shipping)',
+    labelEn: '🚚 Free Express Delivery',
+    tagAr: 'شحن سريع مجاني',
+    tagEn: 'FREE EXPRESS SHIPPING',
+    titleAr: 'شحن مجاني لجميع محافظات مصر للطلبات فوق 1,500 ج.م',
+    titleEn: 'COMPLIMENTARY EXPRESS DELIVERY ACROSS EGYPT ON ORDERS OVER 1,500 EGP',
+    subtitleAr: 'محافظة الغربية • زفتى • نهطاي • وكافة المحافظات',
+    subtitleEn: 'GHARBIA • ZEFTA • NAHTAY • NATIONWIDE',
+    buttonTextAr: 'تسوق الآن',
+    buttonTextEn: 'SHOP NOW',
+    buttonLink: '/collections/men',
+    discountCode: 'EIFFEL10'
+  },
+  {
+    id: 'preset-vip',
+    labelAr: '💎 نافذة ترحيبية بالعملاء الجدد (VIP Welcome Popup)',
+    labelEn: '💎 VIP Welcome Popup',
+    tagAr: 'عرض حصري لعملاء المتجر',
+    tagEn: 'EXCLUSIVE VIP PRIVILEGE',
+    titleAr: 'مرحباً بك في عالم إيفل',
+    titleEn: 'WELCOME TO THE ATELIER',
+    subtitleAr: 'احصل على خصم 10% إضافي على طلبك الأول عند استخدام كود الخصم EIFFEL10.',
+    subtitleEn: 'Enjoy 10% off your entire first purchase with exclusive code EIFFEL10.',
+    buttonTextAr: 'تفعيل الخصم والتسوق',
+    buttonTextEn: 'CLAIM VOUCHER & SHOP',
+    buttonLink: '/collections/men',
+    discountCode: 'EIFFEL10'
+  }
+];
+
+// Pre-defined quick link destinations
+const STORE_DESTINATIONS = [
+  { labelAr: '👔 تشكيلة الرجال (Men Collection)', labelEn: "👔 Men's Collection", path: '/collections/men' },
+  { labelAr: '✨ أحدث الوصول (New Arrivals)', labelEn: '✨ New Arrivals', path: '/collections/new-arrivals' },
+  { labelAr: '🏷️ العروض والتخفيضات (Offers & Sale)', labelEn: '🏷️ Offers & Sale', path: '/collections/offers' },
+  { labelAr: '👶 تشكيلة الأطفال (Kids Collection)', labelEn: "👶 Kids' Collection", path: '/collections/kids' },
+  { labelAr: '💼 الإكسسوارات (Accessories)', labelEn: '💼 Accessories', path: '/collections/accessories' },
+  { labelAr: '🏛️ فروعنا وصالات العرض (Stores & Ateliers)', labelEn: '🏛️ Stores & Ateliers', path: '/stores' }
+];
+
+// Pre-defined CTA button text options
+const BUTTON_PRESETS = [
+  { ar: 'استكشف التشكيلة', en: 'EXPLORE COLLECTION' },
+  { ar: 'تسوق الآن', en: 'SHOP NOW' },
+  { ar: 'اطلب القطعة الآن', en: 'ACQUIRE PIECE' },
+  { ar: 'عرض الكتالوج', en: 'VIEW LOOKBOOK' },
+  { ar: 'تفعيل الخصم والتسوق', en: 'CLAIM & SHOP' },
+  { ar: 'استكشف البدلات', en: 'DISCOVER SUITS' }
+];
+
+export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
+  banner,
+  defaultPlacement = 'HERO_SLIDER',
+  isOpen,
+  onClose,
+  onSave
+}) => {
+  const { isRTL } = useLanguage();
+  const { products = [], coupons = [] } = useStoreData();
+
+  const [formData, setFormData] = useState<Partial<Banner>>(() => ({
+    placement: defaultPlacement,
+    type: 'IMAGE',
+    isActive: true,
+    displayOrder: 1,
+    titleEn: '',
+    titleAr: '',
+    subtitleEn: '',
+    subtitleAr: '',
+    tagEn: '',
+    tagAr: '',
+    buttonTextEn: 'EXPLORE COLLECTION',
+    buttonTextAr: 'استكشف التشكيلة',
+    buttonLink: '/collections/men',
+    secondaryButtonTextEn: '',
+    secondaryButtonTextAr: '',
+    secondaryButtonLink: '',
+    discountCode: '',
+    desktopImageUrl: '',
+    mobileImageUrl: '',
+    startDate: '',
+    endDate: '',
+    targetAudience: 'ALL',
+    ...banner
+  }));
+
+  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
+  const [isUploadingDesktop, setIsUploadingDesktop] = useState(false);
+  const [isUploadingMobile, setIsUploadingMobile] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [desktopUrlInput, setDesktopUrlInput] = useState('');
+  const [mobileUrlInput, setMobileUrlInput] = useState('');
+  const [linkMode, setLinkMode] = useState<'preset' | 'product' | 'custom'>('preset');
+
+  if (!isOpen) return null;
+
+  // Apply a full campaign preset into the form with 1 click
+  const handleApplyPreset = (presetId: string) => {
+    const p = CAMPAIGN_PRESETS.find(x => x.id === presetId);
+    if (!p) return;
+
+    setFormData(prev => ({
+      ...prev,
+      tagAr: p.tagAr,
+      tagEn: p.tagEn,
+      titleAr: p.titleAr,
+      titleEn: p.titleEn,
+      subtitleAr: p.subtitleAr,
+      subtitleEn: p.subtitleEn,
+      buttonTextAr: p.buttonTextAr,
+      buttonTextEn: p.buttonTextEn,
+      buttonLink: p.buttonLink,
+      discountCode: p.discountCode || prev.discountCode
+    }));
+  };
+
+  const handleApplyButtonPreset = (ar: string, en: string) => {
+    setFormData(prev => ({
+      ...prev,
+      buttonTextAr: ar,
+      buttonTextEn: en
+    }));
+  };
+
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: 'desktopImageUrl' | 'mobileImageUrl',
+    setUploading: (val: boolean) => void
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const res = await uploadService.uploadImage(file);
+      if (res?.fileUrl) {
+        setFormData(prev => ({ ...prev, [field]: res.fileUrl }));
+        return;
+      }
+      throw new Error('No URL returned');
+    } catch {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setFormData(prev => ({ ...prev, [field]: reader.result }));
+        }
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      await onSave(formData);
+      onClose();
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const currentImg = previewDevice === 'desktop'
+    ? (formData.desktopImageUrl || formData.mobileImageUrl)
+    : (formData.mobileImageUrl || formData.desktopImageUrl);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto animate-fade-in">
+      <div className="relative w-full max-w-5xl bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/80 sticky top-0 z-20">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-400" />
+            <div>
+              <h2 className="text-base sm:text-lg font-editorial font-bold text-white tracking-wide">
+                {formData.id
+                  ? (isRTL ? 'تعديل البانر والحملة الإعلانية' : 'Edit Campaign Banner')
+                  : (isRTL ? 'إنشاء وتخصيص بانر جديد' : 'Create Campaign Banner')}
+              </h2>
+              <span className="text-[11px] text-zinc-400">
+                {isRTL ? 'اختر قالباً جاهزاً لتعبئة البيانات تلقائياً أو عدل حسب رغبتك' : 'Choose a ready preset to auto-fill or customize fields'}
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Body Form & Live Preview */}
+        <div className="p-6 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Left Form: 7 cols */}
+          <form id="bannerForm" onSubmit={handleSubmit} className="lg:col-span-7 space-y-5">
+            
+            {/* Quick Presets Dropdown */}
+            <div className="p-3.5 bg-amber-950/20 border border-amber-500/30 rounded-lg space-y-2">
+              <label className="block text-xs font-mono text-amber-300 font-bold flex items-center gap-1.5">
+                <Zap className="w-4 h-4 text-amber-400" />
+                <span>{isRTL ? '⚡ قوالب وحملات تسويقية جاهزة (تعبئة بضغطة زر):' : '⚡ Quick Marketing Presets (Auto-fill with 1 Click):'}</span>
+              </label>
+              <select
+                defaultValue=""
+                onChange={(e) => {
+                  if (e.target.value) handleApplyPreset(e.target.value);
+                }}
+                className="w-full bg-zinc-900 border border-amber-500/40 text-amber-200 rounded p-2 text-xs font-mono focus:border-amber-400 focus:outline-none cursor-pointer"
+              >
+                <option value="" disabled>{isRTL ? '-- اختر قالباً جاهزاً للتعبئة الفورية --' : '-- Choose a preset to auto-fill --'}</option>
+                {CAMPAIGN_PRESETS.map(preset => (
+                  <option key={preset.id} value={preset.id}>
+                    {isRTL ? preset.labelAr : preset.labelEn}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Placement & Status */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-mono text-zinc-400 mb-1.5">
+                  {isRTL ? 'موضع الظهور (Placement) *' : 'Placement *'}
+                </label>
+                <select
+                  value={formData.placement}
+                  onChange={(e) => setFormData(prev => ({ ...prev, placement: e.target.value as BannerPlacement }))}
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2.5 text-xs font-mono focus:border-amber-500 focus:outline-none cursor-pointer"
+                >
+                  <option value="HERO_SLIDER">{isRTL ? 'سلايدر الهيرو الرئيسي (Hero Slider)' : 'Hero Main Slider'}</option>
+                  <option value="PROMO_EDITORIAL">{isRTL ? 'بانر العروض الترويجي (Promo Editorial)' : 'Promo Editorial'}</option>
+                  <option value="TOP_ANNOUNCEMENT">{isRTL ? 'الشريط العلوي (Top Announcement)' : 'Top Announcement'}</option>
+                  <option value="POPUP_MODAL">{isRTL ? 'نافذة منبثقة (Popup Modal)' : 'Popup Modal'}</option>
+                  <option value="COLLECTION_HEADER">{isRTL ? 'رأس صفحة التصنيف (Collection Header)' : 'Collection Header'}</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-zinc-400 mb-1.5">
+                  {isRTL ? 'حالة التفعيل (Status)' : 'Status'}
+                </label>
+                <div className="flex items-center gap-3 pt-1">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(formData.isActive)}
+                      onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                  </label>
+                  <span className="text-xs font-bold text-zinc-300">
+                    {formData.isActive ? (isRTL ? 'نشط ومتاح' : 'Active (Live)') : (isRTL ? 'معطل' : 'Inactive')}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bilingual Titles */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-mono text-zinc-400 mb-1.5">
+                  {isRTL ? 'العنوان بالعربية *' : 'Arabic Title *'}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.titleAr || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, titleAr: e.target.value }))}
+                  placeholder="مثال: الهيبة المعمارية الفاخرة"
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2.5 text-xs text-right focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-mono text-zinc-400 mb-1.5">
+                  {isRTL ? 'العنوان بالإنجليزية *' : 'English Title *'}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.titleEn || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, titleEn: e.target.value }))}
+                  placeholder="e.g. ARCHITECTURAL FORM"
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2.5 text-xs focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Bilingual Subtitles */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-mono text-zinc-400 mb-1.5">
+                  {isRTL ? 'الوصف بالعربية' : 'Arabic Description'}
+                </label>
+                <textarea
+                  rows={2}
+                  value={formData.subtitleAr || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, subtitleAr: e.target.value }))}
+                  placeholder="الوصف أو التفاصيل بالعربية..."
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2 text-xs text-right focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-mono text-zinc-400 mb-1.5">
+                  {isRTL ? 'الوصف بالإنجليزية' : 'English Description'}
+                </label>
+                <textarea
+                  rows={2}
+                  value={formData.subtitleEn || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, subtitleEn: e.target.value }))}
+                  placeholder="Subtitle or brief details in English..."
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2 text-xs focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Tag / Badge & Coupon Dropdown */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-xs font-mono text-zinc-400 mb-1.5">
+                  {isRTL ? 'شارة التميز (عربي)' : 'Tag / Badge (Ar)'}
+                </label>
+                <input
+                  type="text"
+                  value={formData.tagAr || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, tagAr: e.target.value }))}
+                  placeholder="تشكيلة الشتاء"
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2.5 text-xs text-right focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-mono text-zinc-400 mb-1.5">
+                  {isRTL ? 'شارة التميز (إنجليزي)' : 'Tag / Badge (En)'}
+                </label>
+                <input
+                  type="text"
+                  value={formData.tagEn || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, tagEn: e.target.value }))}
+                  placeholder="WINTER 2026"
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2.5 text-xs focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+
+              {/* Coupon Dropdown Selector */}
+              <div>
+                <label className="block text-xs font-mono text-zinc-400 mb-1.5 flex items-center gap-1">
+                  <Tag className="w-3 h-3 text-amber-400" />
+                  <span>{isRTL ? 'كوبون الخصم المربوط' : 'Coupon Code'}</span>
+                </label>
+                <select
+                  value={formData.discountCode || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, discountCode: e.target.value }))}
+                  className="w-full bg-zinc-900 border border-zinc-700 text-amber-300 font-mono rounded p-2.5 text-xs focus:border-amber-500 focus:outline-none cursor-pointer"
+                >
+                  <option value="">{isRTL ? '-- بدون كود خصم --' : '-- No Discount Code --'}</option>
+                  {coupons.map(c => (
+                    <option key={c.id} value={c.code}>
+                      {c.code} ({c.discountPercentage}% OFF)
+                    </option>
+                  ))}
+                  <option value="EIFFEL10">EIFFEL10 (10% OFF)</option>
+                  <option value="CAIRO20">CAIRO20 (20% OFF)</option>
+                  <option value="VIP30">VIP30 (30% OFF)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* CTA Destination Link Selector */}
+            <div className="space-y-2 pt-2 border-t border-zinc-800">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-mono text-zinc-400 flex items-center gap-1.5">
+                  <Link2 className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{isRTL ? 'رابط التوجيه عند النقر (Destination Link):' : 'Destination Link:'}</span>
+                </label>
+                <div className="flex items-center gap-1 text-[11px] font-mono">
+                  <button
+                    type="button"
+                    onClick={() => setLinkMode('preset')}
+                    className={`px-2 py-0.5 rounded cursor-pointer ${linkMode === 'preset' ? 'bg-amber-500 text-black font-bold' : 'text-zinc-400'}`}
+                  >
+                    {isRTL ? 'أقسام المتجر' : 'Collections'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLinkMode('product')}
+                    className={`px-2 py-0.5 rounded cursor-pointer ${linkMode === 'product' ? 'bg-amber-500 text-black font-bold' : 'text-zinc-400'}`}
+                  >
+                    {isRTL ? 'منتج محدد' : 'Product'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLinkMode('custom')}
+                    className={`px-2 py-0.5 rounded cursor-pointer ${linkMode === 'custom' ? 'bg-amber-500 text-black font-bold' : 'text-zinc-400'}`}
+                  >
+                    {isRTL ? 'مخصص' : 'Custom'}
+                  </button>
+                </div>
+              </div>
+
+              {linkMode === 'preset' && (
+                <select
+                  value={formData.buttonLink}
+                  onChange={(e) => setFormData(prev => ({ ...prev, buttonLink: e.target.value }))}
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2.5 text-xs font-mono focus:border-amber-500 focus:outline-none cursor-pointer"
+                >
+                  {STORE_DESTINATIONS.map(d => (
+                    <option key={d.path} value={d.path}>
+                      {isRTL ? d.labelAr : d.labelEn} ({d.path})
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              {linkMode === 'product' && (
+                <select
+                  value={formData.buttonLink}
+                  onChange={(e) => setFormData(prev => ({ ...prev, buttonLink: e.target.value }))}
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2.5 text-xs font-mono focus:border-amber-500 focus:outline-none cursor-pointer"
+                >
+                  <option value="" disabled>{isRTL ? '-- اختر منتجاً من المتجر --' : '-- Choose a product --'}</option>
+                  {products.map(p => (
+                    <option key={p.id} value={`/product/${p.id}`}>
+                      {p.name} ({p.price} EGP)
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              {linkMode === 'custom' && (
+                <input
+                  type="text"
+                  value={formData.buttonLink || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, buttonLink: e.target.value }))}
+                  placeholder="/collections/... أو https://..."
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2.5 text-xs font-mono focus:border-amber-500 focus:outline-none"
+                />
+              )}
+            </div>
+
+            {/* Quick Button Texts Dropdown & Inputs */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-mono text-zinc-400">
+                  {isRTL ? 'نص زر التوجيه (CTA Text):' : 'CTA Button Text:'}
+                </label>
+                <select
+                  defaultValue=""
+                  onChange={(e) => {
+                    const found = BUTTON_PRESETS.find(x => x.en === e.target.value);
+                    if (found) handleApplyButtonPreset(found.ar, found.en);
+                  }}
+                  className="bg-zinc-900 border border-zinc-700 text-zinc-300 rounded px-2 py-0.5 text-[11px] font-mono focus:outline-none cursor-pointer"
+                >
+                  <option value="" disabled>{isRTL ? 'اختر نصاً جاهزاً' : 'Choose button preset'}</option>
+                  {BUTTON_PRESETS.map((bp, i) => (
+                    <option key={i} value={bp.en}>
+                      {isRTL ? bp.ar : bp.en}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input
+                  type="text"
+                  value={formData.buttonTextAr || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, buttonTextAr: e.target.value }))}
+                  placeholder="نص الزر بالعربية (استكشف التشكيلة)"
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2 text-xs text-right focus:border-amber-500 focus:outline-none"
+                />
+                <input
+                  type="text"
+                  value={formData.buttonTextEn || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, buttonTextEn: e.target.value }))}
+                  placeholder="Button text in English (EXPLORE COLLECTION)"
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2 text-xs focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Responsive Media: Desktop & Mobile Images */}
+            <div className="space-y-4 pt-2 border-t border-zinc-800">
+              <h3 className="text-xs font-label-bold uppercase text-zinc-300 tracking-wider">
+                {isRTL ? 'صور الوسائط المتجاوبة (Desktop & Mobile Media)' : 'Responsive Images (Desktop & Mobile)'}
+              </h3>
+
+              {/* Desktop Image */}
+              <div className="space-y-2 p-3 bg-zinc-900/60 border border-zinc-800 rounded">
+                <div className="flex items-center justify-between text-xs text-zinc-300">
+                  <span className="flex items-center gap-1.5 font-mono">
+                    <Monitor className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{isRTL ? 'صورة الكمبيوتر (Desktop 16:9 / 21:9)' : 'Desktop Image (16:9)'}</span>
+                  </span>
+                  {formData.desktopImageUrl && <span className="text-emerald-400 text-[10px]">✓ {isRTL ? 'مرفوعة' : 'Set'}</span>}
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={desktopUrlInput}
+                    onChange={(e) => setDesktopUrlInput(e.target.value)}
+                    placeholder="https://... أو ارفع صورة"
+                    className="flex-1 bg-zinc-900 border border-zinc-700 text-white rounded px-2.5 py-1.5 text-xs font-mono focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (desktopUrlInput.trim()) {
+                        setFormData(prev => ({ ...prev, desktopImageUrl: desktopUrlInput.trim() }));
+                        setDesktopUrlInput('');
+                      }
+                    }}
+                    className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded text-xs cursor-pointer"
+                  >
+                    {isRTL ? 'تطبيق' : 'Apply'}
+                  </button>
+                  <label className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded text-xs flex items-center gap-1 cursor-pointer">
+                    {isUploadingDesktop ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                    <span>{isRTL ? 'رفع سحابي' : 'Upload'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(e, 'desktopImageUrl', setIsUploadingDesktop)}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Mobile Image */}
+              <div className="space-y-2 p-3 bg-zinc-900/60 border border-zinc-800 rounded">
+                <div className="flex items-center justify-between text-xs text-zinc-300">
+                  <span className="flex items-center gap-1.5 font-mono">
+                    <Smartphone className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{isRTL ? 'صورة الموبايل (Mobile 9:16 / 4:5 - اختياري)' : 'Mobile Image (Portrait - Optional)'}</span>
+                  </span>
+                  {formData.mobileImageUrl && <span className="text-emerald-400 text-[10px]">✓ {isRTL ? 'مرفوعة' : 'Set'}</span>}
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={mobileUrlInput}
+                    onChange={(e) => setMobileUrlInput(e.target.value)}
+                    placeholder="https://... أو ارفع صورة موبايل"
+                    className="flex-1 bg-zinc-900 border border-zinc-700 text-white rounded px-2.5 py-1.5 text-xs font-mono focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (mobileUrlInput.trim()) {
+                        setFormData(prev => ({ ...prev, mobileImageUrl: mobileUrlInput.trim() }));
+                        setMobileUrlInput('');
+                      }
+                    }}
+                    className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded text-xs cursor-pointer"
+                  >
+                    {isRTL ? 'تطبيق' : 'Apply'}
+                  </button>
+                  <label className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded text-xs flex items-center gap-1 border border-zinc-700 cursor-pointer">
+                    {isUploadingMobile ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                    <span>{isRTL ? 'رفع للموبايل' : 'Upload Mobile'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(e, 'mobileImageUrl', setIsUploadingMobile)}
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Campaign Scheduling (Dates) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-zinc-800">
+              <div>
+                <label className="block text-xs font-mono text-zinc-400 mb-1.5 flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{isRTL ? 'تاريخ بدء الحملة (Start Date)' : 'Start Date (Optional)'}</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  value={formData.startDate ? formData.startDate.substring(0, 16) : ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2 text-xs font-mono focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-mono text-zinc-400 mb-1.5 flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-red-400" />
+                  <span>{isRTL ? 'تاريخ انتهاء الحملة (End Date)' : 'End Date (Optional)'}</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  value={formData.endDate ? formData.endDate.substring(0, 16) : ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                  className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2 text-xs font-mono focus:outline-none"
+                />
+              </div>
+            </div>
+          </form>
+
+          {/* Right: Live Device Mockup Preview (5 cols) */}
+          <div className="lg:col-span-5 space-y-3 flex flex-col items-center">
+            <div className="w-full flex items-center justify-between pb-2 border-b border-zinc-800">
+              <span className="text-xs font-label-bold text-zinc-300 uppercase">
+                {isRTL ? 'المعاينة التفاعلية الحية' : 'Live Mockup Preview'}
+              </span>
+              <div className="flex items-center gap-1 bg-zinc-900 p-1 rounded border border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice('desktop')}
+                  className={`p-1.5 rounded transition-colors cursor-pointer ${
+                    previewDevice === 'desktop' ? 'bg-amber-500 text-black font-bold' : 'text-zinc-400 hover:text-white'
+                  }`}
+                  title="Desktop Preview"
+                >
+                  <Monitor className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice('mobile')}
+                  className={`p-1.5 rounded transition-colors cursor-pointer ${
+                    previewDevice === 'mobile' ? 'bg-amber-500 text-black font-bold' : 'text-zinc-400 hover:text-white'
+                  }`}
+                  title="Mobile Preview"
+                >
+                  <Smartphone className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Mockup Frame */}
+            {previewDevice === 'desktop' ? (
+              <div className="w-full aspect-[16/10] bg-zinc-900 rounded-lg border border-zinc-700 overflow-hidden relative shadow-2xl flex flex-col justify-end p-4 text-white">
+                {currentImg ? (
+                  <img src={currentImg} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-zinc-600 text-xs font-mono">
+                    {isRTL ? 'لا توجد صورة محددة بعد' : 'No image specified'}
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="relative z-10 space-y-1">
+                  {formData.tagAr && (
+                    <span className="inline-block bg-white text-black text-[8px] font-bold px-1.5 py-0.5 uppercase">
+                      {isRTL ? formData.tagAr : formData.tagEn}
+                    </span>
+                  )}
+                  <h4 className="font-editorial text-lg font-bold uppercase truncate">
+                    {isRTL ? (formData.titleAr || 'العنوان الرئيسي') : (formData.titleEn || 'Main Title')}
+                  </h4>
+                  <p className="text-[10px] text-zinc-300 line-clamp-2">
+                    {isRTL ? formData.subtitleAr : formData.subtitleEn}
+                  </p>
+                  {formData.buttonTextAr && (
+                    <div className="pt-1">
+                      <span className="inline-block bg-white text-black text-[9px] font-bold px-3 py-1 uppercase">
+                        {isRTL ? formData.buttonTextAr : formData.buttonTextEn}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="w-56 aspect-[9/16] bg-zinc-900 rounded-2xl border-4 border-zinc-700 overflow-hidden relative shadow-2xl flex flex-col justify-end p-3 text-white">
+                {currentImg ? (
+                  <img src={currentImg} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-zinc-600 text-xs font-mono">
+                    {isRTL ? 'شاشة الهاتف' : 'Phone Frame'}
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
+                <div className="relative z-10 space-y-1">
+                  <h4 className="font-editorial text-sm font-bold uppercase truncate">
+                    {isRTL ? (formData.titleAr || 'العنوان الرئيسي') : (formData.titleEn || 'Main Title')}
+                  </h4>
+                  <p className="text-[9px] text-zinc-300 line-clamp-2">
+                    {isRTL ? formData.subtitleAr : formData.subtitleEn}
+                  </p>
+                  {formData.buttonTextAr && (
+                    <div className="pt-1">
+                      <span className="inline-block bg-white text-black text-[8px] font-bold px-2 py-0.5 uppercase">
+                        {isRTL ? formData.buttonTextAr : formData.buttonTextEn}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="px-6 py-4 border-t border-zinc-800 flex items-center justify-end gap-3 bg-zinc-900/80 sticky bottom-0 z-20">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold rounded cursor-pointer"
+          >
+            {isRTL ? 'إلغاء' : 'Cancel'}
+          </button>
+          <button
+            type="submit"
+            form="bannerForm"
+            disabled={isSaving}
+            className="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-label-bold uppercase tracking-wider rounded flex items-center gap-2 shadow-lg disabled:opacity-50 cursor-pointer"
+          >
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+            <span>{isRTL ? 'حفظ ونشر البانر' : 'Save & Publish Banner'}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
