@@ -15,7 +15,8 @@ import {
   Plus,
   ShieldCheck,
   LayoutTemplate,
-  BarChart3
+  BarChart3,
+  Users
 } from 'lucide-react';
 import { useAdminAuth } from '@/features/admin';
 import { useStoreData } from '@/shared';
@@ -40,6 +41,7 @@ export const AdminLayout: React.FC = () => {
     { label: isRTL ? 'إدارة الفروع' : 'Branches & Stores', href: '/admin/branches', icon: MapPin },
     { label: isRTL ? 'الطلبات والمبيعات' : 'Orders', href: '/admin/orders', icon: Package, badge: pendingOrdersCount ? `${pendingOrdersCount}` : undefined, badgeColor: 'bg-amber-500' },
     { label: isRTL ? 'التقارير والإحصائيات' : 'Reports & Analytics', href: '/admin/reports', icon: BarChart3 },
+    { label: isRTL ? 'العملاء وبرنامج VIP' : 'Customers & VIP', href: '/admin/customers', icon: Users },
     { label: isRTL ? 'إعدادات المتجر' : 'Store Settings', href: '/admin/settings', icon: Settings }
   ];
 
@@ -217,6 +219,7 @@ export const AdminLayout: React.FC = () => {
               {location.pathname === '/admin/branches' && (isRTL ? 'إدارة مواقع الفروع' : 'Branch Locations')}
               {location.pathname === '/admin/orders' && (isRTL ? 'سجل وإدارة طلبات العملاء' : 'Orders Management')}
               {location.pathname === '/admin/reports' && (isRTL ? 'مركز التقارير والتحليلات المالية' : 'Reports & Financial Analytics')}
+              {location.pathname === '/admin/customers' && (isRTL ? 'إدارة العملاء ونقاط الولاء وعضوية VIP' : 'Customers, Loyalty Points & VIP')}
               {location.pathname === '/admin/settings' && (isRTL ? 'إعدادات المتجر والنسخ الاحتياطي' : 'Store Settings & Backup')}
             </h1>
           </div>

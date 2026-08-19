@@ -14,6 +14,7 @@ export * from './pages/AdminCategoriesPage';
 export * from './pages/AdminBranchesPage';
 export * from './pages/AdminOrdersPage';
 export * from './pages/AdminReportsPage';
+export * from './pages/AdminCustomersPage';
 export * from './pages/AdminSettingsPage';
 
 // Modular Subcomponents

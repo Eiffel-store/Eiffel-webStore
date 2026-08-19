@@ -29,6 +29,7 @@ import {
   AdminBranchesPage,
   AdminOrdersPage,
   AdminReportsPage,
+  AdminCustomersPage,
   AdminSettingsPage
 } from './features/admin';
 
@@ -102,6 +103,7 @@ export const App: React.FC = () => {
                             <Route path="branches" element={<AdminBranchesPage />} />
                             <Route path="orders" element={<AdminOrdersPage />} />
                             <Route path="reports" element={<AdminReportsPage />} />
+                            <Route path="customers" element={<AdminCustomersPage />} />
                             <Route path="settings" element={<AdminSettingsPage />} />
                           </Route>
 

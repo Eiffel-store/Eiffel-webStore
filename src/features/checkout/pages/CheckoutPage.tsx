@@ -40,9 +40,17 @@ export const CheckoutPage: React.FC = () => {
   const [cardCvc, setCardCvc] = useState('');
   const [cardName, setCardName] = useState('');
 
+  // Points & VIP
+  const availablePoints = user?.tierPoints || 0;
+  const [redeemPoints, setRedeemPoints] = useState(false);
+  const isVip = user?.tier === 'VIP' || user?.isVip || false;
+
   const discountValue = discountAmount;
+  const maxPointsDiscount = Math.min(availablePoints, Math.max(0, subtotal - discountValue));
+  const pointsDiscountValue = redeemPoints ? maxPointsDiscount : 0;
   const shippingFee = shippingMethod === 'white-glove' ? 10 : 0;
-  const totalAmount = Math.max(0, subtotal - discountValue + shippingFee);
+  const totalAmount = Math.max(0, subtotal - discountValue - pointsDiscountValue + shippingFee);
+  const pointsToEarn = isVip ? Math.round(totalAmount * 0.10) : Math.round(totalAmount * 0.05);
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,11 +77,14 @@ export const CheckoutPage: React.FC = () => {
         items: cart,
         subtotal,
         shipping: shippingFee,
-        discount: discountValue,
+        discount: discountValue + pointsDiscountValue,
         tax: 0,
         total: totalAmount,
         shippingAddress,
         paymentMethod: paymentMethodString,
+        pointsEarned: pointsToEarn,
+        pointsRedeemed: redeemPoints ? pointsDiscountValue : 0,
+        pointsDiscount: pointsDiscountValue
       });
       addOrder(order);
       clearCart();
@@ -177,6 +188,12 @@ export const CheckoutPage: React.FC = () => {
               discountValue={discountValue}
               shippingFee={shippingFee}
               totalAmount={totalAmount}
+              availablePoints={availablePoints}
+              redeemPoints={redeemPoints}
+              onToggleRedeemPoints={setRedeemPoints}
+              pointsDiscountValue={pointsDiscountValue}
+              pointsToEarn={pointsToEarn}
+              isVip={isVip}
             />
           </div>
         </div>

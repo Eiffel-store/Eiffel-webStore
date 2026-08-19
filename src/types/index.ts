@@ -117,6 +117,9 @@ export interface Order {
   customerName?: string;
   customerPhone?: string;
   customerEmail?: string;
+  pointsEarned?: number;
+  pointsRedeemed?: number;
+  pointsDiscount?: number;
 }
 
 export interface StoreSettings {
@@ -138,8 +141,11 @@ export interface User {
   name: string;
   email: string;
   role?: 'ROLE_ADMIN' | 'ROLE_STAFF' | 'ROLE_CUSTOMER';
-  tier: 'EIFFEL PRIVÉ' | 'EIFFEL NOIR' | 'MEMBER' | string;
+  tier: 'EIFFEL PRIVÉ' | 'EIFFEL NOIR' | 'VIP' | 'MEMBER' | string;
   tierPoints: number;
+  completedOrdersCount?: number;
+  totalSpend?: number;
+  isVip?: boolean;
   phone: string;
   memberSince: string;
   addresses: Address[];

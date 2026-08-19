@@ -2,10 +2,14 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Address, Order, PaymentMethod } from '@/types';
 
 export interface UserProfile {
+  id?: string | number;
   name: string;
   email: string;
-  tier: 'EIFFEL PRIVÉ' | 'EIFFEL NOIR' | 'MEMBER';
+  tier: 'EIFFEL PRIVÉ' | 'EIFFEL NOIR' | 'VIP' | 'MEMBER' | string;
   tierPoints: number;
+  completedOrdersCount?: number;
+  totalSpend?: number;
+  isVip?: boolean;
   phone: string;
   memberSince: string;
   addresses: Address[];
