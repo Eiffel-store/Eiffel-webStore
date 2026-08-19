@@ -28,6 +28,7 @@ import {
   AdminCategoriesPage,
   AdminBranchesPage,
   AdminOrdersPage,
+  AdminReportsPage,
   AdminSettingsPage
 } from './features/admin';
 
@@ -100,6 +101,7 @@ export const App: React.FC = () => {
                             <Route path="categories" element={<AdminCategoriesPage />} />
                             <Route path="branches" element={<AdminBranchesPage />} />
                             <Route path="orders" element={<AdminOrdersPage />} />
+                            <Route path="reports" element={<AdminReportsPage />} />
                             <Route path="settings" element={<AdminSettingsPage />} />
                           </Route>
 
