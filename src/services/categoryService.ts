@@ -12,6 +12,11 @@ export const categoryService = {
     return response.data.data;
   },
 
+  update: async (id: string, updates: Partial<CategoryItem>): Promise<CategoryItem> => {
+    const response = await apiClient.post<ApiResponse<CategoryItem>>('/categories', { ...updates, id });
+    return response.data.data;
+  },
+
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/categories/${id}`);
   },

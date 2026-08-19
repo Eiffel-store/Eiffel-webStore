@@ -30,6 +30,13 @@ const sampleProduct: Product = {
   inStock: true,
 };
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { StoreDataProvider } from '../shared';
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false } },
+});
+
 describe('UI Components Unit Tests', () => {
   it('renders Logo with Eiffel branding emblem correctly', () => {
     render(
@@ -72,15 +79,19 @@ describe('UI Components Unit Tests', () => {
   it('renders QuickViewModal with product info and add to bag action', () => {
     let closed = false;
     render(
-      <LanguageProvider>
-        <CurrencyProvider>
-          <WishlistProvider>
-            <CartProvider>
-              <QuickViewModal product={sampleProduct} onClose={() => { closed = true; }} />
-            </CartProvider>
-          </WishlistProvider>
-        </CurrencyProvider>
-      </LanguageProvider>
+      <QueryClientProvider client={queryClient}>
+        <StoreDataProvider>
+          <LanguageProvider>
+            <CurrencyProvider>
+              <WishlistProvider>
+                <CartProvider>
+                  <QuickViewModal product={sampleProduct} onClose={() => { closed = true; }} />
+                </CartProvider>
+              </WishlistProvider>
+            </CurrencyProvider>
+          </LanguageProvider>
+        </StoreDataProvider>
+      </QueryClientProvider>
     );
 
     expect(screen.getByText('Eiffel Longline Cardigan')).toBeInTheDocument();

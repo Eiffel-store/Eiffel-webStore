@@ -1,31 +1,14 @@
 import React, { createContext, useContext, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Product, StoreLocation, CategoryItem, Coupon, Order, StoreSettings, HomePageSettings, Banner, BannerPlacement } from '@/types';
-import { PRODUCTS as INITIAL_PRODUCTS, CATEGORIES as INITIAL_CATEGORIES } from '@/data/products';
-import { STORES as INITIAL_STORES } from '@/data/stores';
+import { Product, StoreLocation, CategoryItem, Coupon, Order, StoreSettings, HomePageSettings, Banner } from '@/types';
 import { productService } from '@/services/productService';
 import { categoryService } from '@/services/categoryService';
 import { storeService } from '@/services/storeService';
 import { orderService } from '@/services/orderService';
+import { couponService } from '@/services/couponService';
 import { settingsService } from '@/services/settingsService';
 import { homeSettingsService } from '@/services/homeSettingsService';
 import { bannerService } from '@/services/bannerService';
-
-const INITIAL_CATEGORIES_DATA: CategoryItem[] = INITIAL_CATEGORIES.map(c => ({
-  id: c.id,
-  name: c.title,
-  nameEn: c.id,
-  subtitle: c.subtitle,
-  image: c.image,
-  itemCount: '12 PIECES',
-  subCategories: []
-}));
-
-const DEFAULT_COUPONS: Coupon[] = [
-  { id: 'c-1', code: 'EIFFEL10', discountPercentage: 10, minOrderAmount: 500, isActive: true },
-  { id: 'c-2', code: 'CAIRO20', discountPercentage: 20, minOrderAmount: 1000, isActive: true },
-  { id: 'c-3', code: 'VIP30', discountPercentage: 30, minOrderAmount: 2500, isActive: true }
-];
 
 const DEFAULT_SETTINGS: StoreSettings = {
   storeName: 'EIFFEL Egypt',
@@ -34,7 +17,7 @@ const DEFAULT_SETTINGS: StoreSettings = {
   whatsappNumber: '+20 10 2345 6789',
   facebookUrl: 'https://facebook.com/eiffel.eg',
   instagramUrl: 'https://instagram.com/eiffel.eg',
-  announcementTextAr: 'شحن مجاني لكافة محافظات مصر للطلبات فوق 1500 ج.م | تشكيلة خريف وشتاء 2026',
+  announcementTextAr: 'شحن مجاني لكافة محافظات مصر للطلبات فوق 1500 ج.م',
   announcementTextEn: 'Complimentary express shipping across Egypt on orders over 1,500 EGP',
   currency: 'EGP',
   freeShippingThreshold: 1500,
@@ -43,12 +26,12 @@ const DEFAULT_SETTINGS: StoreSettings = {
 
 export const DEFAULT_HOME_SETTINGS: HomePageSettings = {
   hero: {
-    tagEn: 'AUTUMN / WINTER 2026 CAMPAIGN',
-    tagAr: 'تشكيلة خريف / شتاء 2026 الحصرية',
+    tagEn: 'NEW COLLECTION',
+    tagAr: 'التشكيلة الجديدة',
     titleEn: 'ARCHITECTURAL FORM',
     titleAr: 'الهيبة المعمارية الفاخرة',
-    subtitleEn: 'Heavyweight Egyptian Giza Cotton engineered with brutalist discipline and precision tailoring.',
-    subtitleAr: 'قطن مصري فاخر ثقيل محاك بانضباط معماري وقصات حصرية فائقة الدقة.',
+    subtitleEn: 'Heavyweight Egyptian Cotton tailored with precision.',
+    subtitleAr: 'قطن مصري فاخر ثقيل محاك بقصات دقيقة وفاخرة.',
     buttonTextEn: 'EXPLORE COLLECTION',
     buttonTextAr: 'استكشف التشكيلة',
     buttonLink: '/collections/men',
@@ -58,17 +41,17 @@ export const DEFAULT_HOME_SETTINGS: HomePageSettings = {
     imageUrl: `${import.meta.env.BASE_URL}images/products/eiffel-outfit-flatlay.jpg`
   },
   promoEditorial: {
-    badgeEn: 'LIMITED EDITION CAPSULE',
-    badgeAr: 'إصدار محدود خاص',
+    badgeEn: 'LIMITED EDITION',
+    badgeAr: 'إصدار خاص',
     titleEn: 'EIFFEL HEAVY OVERSHIRT',
     titleAr: 'قميص إيفل المعماري الثقيل',
-    descriptionEn: 'Double-faced heavyweight textile structure designed for effortless elegance and enduring comfort.',
-    descriptionAr: 'نسيج فاخر مزدوج الوجه مصمم ليمنحك حضوراً واثقاً وراحة فائقة طوال اليوم.',
+    descriptionEn: 'Double-faced heavyweight textile structure designed for effortless elegance.',
+    descriptionAr: 'نسيج فاخر مزدوج الوجه مصمم ليمنحك حضوراً واثقاً وراحة فائقة.',
     buttonTextEn: 'ACQUIRE PIECE',
     buttonTextAr: 'اطلب القطعة الآن',
     buttonLink: '/collections/offers',
-    discountBadgeEn: 'UP TO 30% OFF',
-    discountBadgeAr: 'خصم يصل إلى 30%',
+    discountBadgeEn: 'OFFERS',
+    discountBadgeAr: 'عروض خاصة',
     imageUrl: 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop'
   },
   shopTheLook: {
@@ -78,11 +61,7 @@ export const DEFAULT_HOME_SETTINGS: HomePageSettings = {
     subtitleAr: 'تنسيق متناسق متكامل للرجل العصري',
     imageUrl: `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`,
     collectionLink: '/collections/men',
-    hotspots: [
-      { id: 'h-1', x: 50, y: 30, titleEn: 'Heavyweight Cardigan', titleAr: 'كارديجان ثقيل', price: 650 },
-      { id: 'h-2', x: 48, y: 55, titleEn: 'Relaxed Tailored Pant', titleAr: 'بنطال تيلورد مريح', price: 480 },
-      { id: 'h-3', x: 52, y: 80, titleEn: 'Leather Minimal Chelsea', titleAr: 'حذاء تشيلسي كلاسيك', price: 890 }
-    ]
+    hotspots: []
   }
 };
 
@@ -99,6 +78,7 @@ interface StoreDataContextType {
   isCategoriesLoading: boolean;
   isStoresLoading: boolean;
   isOrdersLoading: boolean;
+  isCouponsLoading: boolean;
   isBannersLoading: boolean;
   isHomeSettingsLoading: boolean;
 
@@ -159,47 +139,55 @@ const StoreDataContext = createContext<StoreDataContextType | undefined>(undefin
 export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const queryClient = useQueryClient();
 
-  // 1. React Query: Fetch Products
-  const { data: serverProducts, isLoading: isProductsLoading, isSuccess: isProductsSuccess } = useQuery({
+  // 1. React Query: Fetch Products from Backend
+  const { data: serverProducts = [], isLoading: isProductsLoading } = useQuery({
     queryKey: ['products'],
-    queryFn: () => productService.getAll(),
+    queryFn: () => productService.getAll().catch(() => []),
     staleTime: 1000 * 30,
     retry: 1
   });
 
-  // 2. React Query: Fetch Categories
-  const { data: serverCategories, isLoading: isCategoriesLoading, isSuccess: isCategoriesSuccess } = useQuery({
+  // 2. React Query: Fetch Categories from Backend
+  const { data: serverCategories = [], isLoading: isCategoriesLoading } = useQuery({
     queryKey: ['categories'],
-    queryFn: () => categoryService.getAll(),
+    queryFn: () => categoryService.getAll().catch(() => []),
     staleTime: 1000 * 30,
     retry: 1
   });
 
-  // 3. React Query: Fetch Settings
-  const { data: serverSettings, isLoading: isSettingsLoading, isSuccess: isSettingsSuccess } = useQuery({
+  // 3. React Query: Fetch Settings from Backend
+  const { data: serverSettings, isLoading: isSettingsLoading } = useQuery({
     queryKey: ['settings'],
-    queryFn: () => settingsService.getSettings(),
+    queryFn: () => settingsService.getSettings().catch(() => DEFAULT_SETTINGS),
     staleTime: 1000 * 60,
     retry: 1
   });
 
-  // 4. React Query: Fetch Stores
-  const { data: serverStores, isLoading: isStoresLoading, isSuccess: isStoresSuccess } = useQuery({
+  // 4. React Query: Fetch Stores from Backend
+  const { data: serverStores = [], isLoading: isStoresLoading } = useQuery({
     queryKey: ['stores'],
-    queryFn: () => storeService.getAll(),
+    queryFn: () => storeService.getAll().catch(() => []),
     staleTime: 1000 * 60,
     retry: 1
   });
 
-  // 5. React Query: Fetch Home Page & Banners Settings
+  // 5. React Query: Fetch Coupons from Backend
+  const { data: serverCoupons = [], isLoading: isCouponsLoading } = useQuery({
+    queryKey: ['coupons'],
+    queryFn: () => couponService.getAll().catch(() => []),
+    staleTime: 1000 * 30,
+    retry: 1
+  });
+
+  // 6. React Query: Fetch Home Page & Banners Settings
   const { data: serverHomeSettings, isLoading: isHomeSettingsLoading } = useQuery({
     queryKey: ['homeSettings'],
-    queryFn: () => homeSettingsService.getHomeSettings(),
+    queryFn: () => homeSettingsService.getHomeSettings().catch(() => DEFAULT_HOME_SETTINGS),
     staleTime: 1000 * 60,
     retry: 1
   });
 
-  // 6. React Query: Fetch All Banners & Active Banners for Storefront
+  // 7. React Query: Fetch All Banners & Active Banners for Storefront
   const { data: serverAllBanners = [], isLoading: isAllBannersLoading } = useQuery({
     queryKey: ['banners', 'all'],
     queryFn: () => bannerService.getAllBanners().catch(() => []),
@@ -216,28 +204,15 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const isBannersLoading = isAllBannersLoading || isActiveBannersLoading;
 
-  // 7. React Query: Fetch Orders from Backend
-  const { data: serverOrders = [], isLoading: isOrdersLoading, isSuccess: isOrdersSuccess } = useQuery({
+  // 8. React Query: Fetch Orders from Backend
+  const { data: serverOrders = [], isLoading: isOrdersLoading } = useQuery({
     queryKey: ['orders'],
-    queryFn: async () => {
-      try {
-        return await orderService.getAll();
-      } catch (err) {
-        console.warn('Orders query failed (using local state fallback):', err);
-        return [];
-      }
-    },
+    queryFn: () => orderService.getAll().catch(() => []),
     staleTime: 1000 * 15,
     retry: 1
   });
 
-  // 8. Local & Server States with smart offline fallback
-  const [localProducts, setLocalProducts] = useState<Product[]>(INITIAL_PRODUCTS);
-  const [localCategories, setLocalCategories] = useState<CategoryItem[]>(INITIAL_CATEGORIES_DATA);
-  const [localStores, setLocalStores] = useState<StoreLocation[]>(INITIAL_STORES);
-  const [coupons, setCoupons] = useState<Coupon[]>(DEFAULT_COUPONS);
-  const [localOrders, setLocalOrders] = useState<Order[]>([]);
-  const [localSettings, setLocalSettings] = useState<StoreSettings>(DEFAULT_SETTINGS);
+  // State
   const [localHomeSettings, setLocalHomeSettings] = useState<HomePageSettings>(() => {
     try {
       const saved = localStorage.getItem('eiffel_home_settings');
@@ -247,18 +222,19 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   });
 
-  const products = isProductsSuccess && Array.isArray(serverProducts) ? serverProducts : (serverProducts || localProducts);
-  const categories = isCategoriesSuccess && Array.isArray(serverCategories) ? serverCategories : (serverCategories || localCategories);
-  const stores = isStoresSuccess && Array.isArray(serverStores) ? serverStores : (serverStores || localStores);
-  const orders = isOrdersSuccess && Array.isArray(serverOrders) ? serverOrders : (serverOrders || localOrders);
-  const settings = isSettingsSuccess && serverSettings ? serverSettings : (serverSettings || localSettings);
+  const products = Array.isArray(serverProducts) ? serverProducts : [];
+  const categories = Array.isArray(serverCategories) ? serverCategories : [];
+  const stores = Array.isArray(serverStores) ? serverStores : [];
+  const coupons = Array.isArray(serverCoupons) ? serverCoupons : [];
+  const orders = Array.isArray(serverOrders) ? serverOrders : [];
+  const settings = serverSettings || DEFAULT_SETTINGS;
   const homeSettings = serverHomeSettings || localHomeSettings;
   const banners = serverAllBanners;
   const activeBanners = serverActiveBanners;
 
-  const isLoading = isProductsLoading || isCategoriesLoading || isStoresLoading || isOrdersLoading || isBannersLoading;
+  const isLoading = isProductsLoading || isCategoriesLoading || isStoresLoading || isOrdersLoading || isBannersLoading || isCouponsLoading || isSettingsLoading;
 
-  // Mutations
+  // Mutations: Home Settings
   const updateHomeSettingsMutation = useMutation({
     mutationFn: (newHomeSettings: HomePageSettings) => homeSettingsService.updateHomeSettings(newHomeSettings),
     onSuccess: (data) => {
@@ -267,10 +243,11 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       queryClient.invalidateQueries({ queryKey: ['homeSettings'] });
     },
     onError: (err) => {
-      console.warn('Backend update failed, kept local copy:', err);
+      console.warn('Backend update failed:', err);
     }
   });
 
+  // Mutations: Banners
   const addBannerMutation = useMutation({
     mutationFn: (banner: Partial<Banner>) => bannerService.create(banner),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['banners'] }),
@@ -326,11 +303,11 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Stock Inventory Management Handlers
   const decrementStock = (id: string, quantity: number = 1) => {
-    queryClient.setQueryData<Product[]>(['products', 'all'], (old) => {
-      if (!old) return old;
-      return old.map(p => {
+    queryClient.setQueryData<Product[]>(['products'], (old: Product[] | undefined) => {
+      if (!old) return [];
+      return old.map((p: Product) => {
         if (p.id === id) {
-          const current = p.stock !== undefined ? p.stock : 20;
+          const current = p.stock !== undefined ? p.stock : 0;
           const updated = Math.max(0, current - quantity);
           return { ...p, stock: updated, inStock: updated > 0 };
         }
@@ -338,26 +315,17 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       });
     });
 
-    setLocalProducts(prev => prev.map(p => {
-      if (p.id === id) {
-        const current = p.stock !== undefined ? p.stock : 20;
-        const updated = Math.max(0, current - quantity);
-        return { ...p, stock: updated, inStock: updated > 0 };
-      }
-      return p;
-    }));
-
     productService.adjustStock(id, -quantity).catch((err) => {
-      console.warn('Backend stock decrement failed, fallback to local', err);
+      console.warn('Backend stock decrement failed', err);
     });
   };
 
   const incrementStock = (id: string, quantity: number = 1) => {
-    queryClient.setQueryData<Product[]>(['products', 'all'], (old) => {
-      if (!old) return old;
-      return old.map(p => {
+    queryClient.setQueryData<Product[]>(['products'], (old: Product[] | undefined) => {
+      if (!old) return [];
+      return old.map((p: Product) => {
         if (p.id === id) {
-          const current = p.stock !== undefined ? p.stock : 20;
+          const current = p.stock !== undefined ? p.stock : 0;
           const updated = current + quantity;
           return { ...p, stock: updated, inStock: updated > 0 };
         }
@@ -365,17 +333,8 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       });
     });
 
-    setLocalProducts(prev => prev.map(p => {
-      if (p.id === id) {
-        const current = p.stock !== undefined ? p.stock : 20;
-        const updated = current + quantity;
-        return { ...p, stock: updated, inStock: updated > 0 };
-      }
-      return p;
-    }));
-
     productService.adjustStock(id, quantity).catch((err) => {
-      console.warn('Backend stock increment failed, fallback to local', err);
+      console.warn('Backend stock increment failed', err);
     });
   };
 
@@ -398,7 +357,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     updateHomeSettingsMutation.mutate(updated);
   };
 
-  // Mutations
+  // Mutations: Products
   const createProductMutation = useMutation({
     mutationFn: (p: Partial<Product>) => productService.create(p),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
@@ -415,16 +374,16 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
   });
 
+  // Mutations: Settings
   const updateSettingsMutation = useMutation({
     mutationFn: (newSettings: Partial<StoreSettings>) => settingsService.updateSettings(newSettings),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['settings'] }),
   });
 
+  // Mutations: Orders
   const createOrderMutation = useMutation({
     mutationFn: (order: Partial<Order>) => orderService.create(order),
-    onSuccess: (newOrder) => {
-      setLocalOrders(prev => [newOrder, ...prev.filter(o => o.id !== newOrder.id)]);
-      queryClient.setQueryData(['orders'], (old: Order[] = []) => [newOrder, ...old.filter(o => o.id !== newOrder.id)]);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
   });
@@ -432,13 +391,12 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const updateOrderStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: Order['status'] }) =>
       orderService.updateStatus(id, status),
-    onSuccess: (updated) => {
-      setLocalOrders(prev => prev.map(o => o.id === updated.id ? updated : o));
-      queryClient.setQueryData(['orders'], (old: Order[] = []) => old.map(o => o.id === updated.id ? updated : o));
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
   });
 
+  // Mutations: Stores
   const createStoreMutation = useMutation({
     mutationFn: (s: Partial<StoreLocation>) => storeService.create(s),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['stores'] }),
@@ -455,22 +413,47 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['stores'] }),
   });
 
+  // Mutations: Categories
+  const createCategoryMutation = useMutation({
+    mutationFn: (cat: Partial<CategoryItem>) => categoryService.create(cat),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
+  });
+
+  const updateCategoryMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<CategoryItem> }) =>
+      categoryService.update(id, updates),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
+  });
+
+  const deleteCategoryMutation = useMutation({
+    mutationFn: (id: string) => categoryService.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
+  });
+
+  // Mutations: Coupons
+  const createCouponMutation = useMutation({
+    mutationFn: (coupon: Partial<Coupon>) => couponService.create(coupon),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['coupons'] }),
+  });
+
+  const deleteCouponMutation = useMutation({
+    mutationFn: (id: string) => couponService.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['coupons'] }),
+  });
+
   // Product Methods
   const addProduct = (newProdData: Omit<Product, 'id'>): Product => {
     const id = `prod-${Date.now()}`;
     const newProduct: Product = { ...newProdData, id, createdAt: new Date().toISOString() };
-    setLocalProducts(prev => [newProduct, ...prev]);
     createProductMutation.mutate(newProduct);
     return newProduct;
   };
 
   const updateProduct = (id: string, updates: Partial<Product>) => {
-    setLocalProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
     updateProductMutation.mutate({ id, updates });
   };
 
   const deleteProduct = (id: string) => {
-    setLocalProducts(prev => prev.filter(p => p.id !== id));
     deleteProductMutation.mutate(id);
   };
 
@@ -482,57 +465,43 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const addCategory = (catData: Omit<CategoryItem, 'id'>) => {
     const id = catData.nameEn ? catData.nameEn.toLowerCase().replace(/\s+/g, '-') : `cat-${Date.now()}`;
     const newCat: CategoryItem = { ...catData, id };
-    setLocalCategories(prev => [...prev, newCat]);
-    categoryService.create(newCat).then(() => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
-    }).catch(() => {
-      // offline fallback
-    });
+    createCategoryMutation.mutate(newCat);
   };
 
   const updateCategory = (id: string, updates: Partial<CategoryItem>) => {
-    setLocalCategories(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
+    updateCategoryMutation.mutate({ id, updates });
   };
 
   const deleteCategory = (id: string) => {
-    setLocalCategories(prev => prev.filter(c => c.id !== id));
-    categoryService.delete(id).then(() => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
-    }).catch(() => {
-      // offline fallback
-    });
+    deleteCategoryMutation.mutate(id);
   };
 
   // Store Methods
   const addStore = (s: Omit<StoreLocation, 'id'>) => {
     const id = `store-${Date.now()}`;
     const newStore: StoreLocation = { ...s, id };
-    setLocalStores(prev => [...prev, newStore]);
     createStoreMutation.mutate(newStore);
   };
 
   const updateStore = (id: string, updates: Partial<StoreLocation>) => {
-    setLocalStores(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
     updateStoreMutation.mutate({ id, updates });
   };
 
   const deleteStore = (id: string) => {
-    setLocalStores(prev => prev.filter(s => s.id !== id));
     deleteStoreMutation.mutate(id);
   };
 
   // Coupon Methods
   const addCoupon = (c: Omit<Coupon, 'id'>) => {
-    const newCoupon = { ...c, id: `c-${Date.now()}` };
-    setCoupons(prev => [...prev, newCoupon]);
+    createCouponMutation.mutate(c);
   };
 
   const updateCoupon = (id: string, updates: Partial<Coupon>) => {
-    setCoupons(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
+    createCouponMutation.mutate({ ...updates, id } as any);
   };
 
   const deleteCoupon = (id: string) => {
-    setCoupons(prev => prev.filter(c => c.id !== id));
+    deleteCouponMutation.mutate(id);
   };
 
   const validateCoupon = (code: string, subtotal: number): Coupon | null => {
@@ -545,23 +514,20 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Order Methods
   const addOrder = (order: Order) => {
-    setLocalOrders(prev => [order, ...prev]);
     createOrderMutation.mutate(order);
   };
 
   const updateOrderStatus = (orderId: string, status: Order['status']) => {
-    setLocalOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
     updateOrderStatusMutation.mutate({ id: orderId, status });
   };
 
   const deleteOrder = (orderId: string) => {
-    setLocalOrders(prev => prev.filter(o => o.id !== orderId));
-    queryClient.setQueryData(['orders'], (old: Order[] = []) => old.filter(o => o.id !== orderId));
+    updateOrderStatusMutation.mutate({ id: orderId, status: 'Cancelled' });
+    queryClient.setQueryData<Order[]>(['orders'], (old: Order[] | undefined) => (old || []).filter((o: Order) => o.id !== orderId));
   };
 
   // Settings
   const updateSettings = (updates: Partial<StoreSettings>) => {
-    setLocalSettings(prev => ({ ...prev, ...updates }));
     updateSettingsMutation.mutate(updates);
   };
 
@@ -572,14 +538,13 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const importData = (jsonData: string): boolean => {
     try {
       const data = JSON.parse(jsonData);
-      if (data.stores) setLocalStores(data.stores);
-      if (data.coupons) setCoupons(data.coupons);
-      if (data.products) setLocalProducts(data.products);
-      if (data.categories) setLocalCategories(data.categories);
       if (data.homeSettings) {
-        setLocalHomeSettings(data.homeSettings);
-        localStorage.setItem('eiffel_home_settings', JSON.stringify(data.homeSettings));
+        updateHomeSettings(data.homeSettings);
       }
+      if (data.settings) {
+        updateSettings(data.settings);
+      }
+      queryClient.invalidateQueries();
       return true;
     } catch {
       return false;
@@ -587,12 +552,6 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const resetAllToDefault = () => {
-    setLocalProducts(INITIAL_PRODUCTS);
-    setLocalCategories(INITIAL_CATEGORIES_DATA);
-    setLocalStores(INITIAL_STORES);
-    setCoupons(DEFAULT_COUPONS);
-    setLocalSettings(DEFAULT_SETTINGS);
-    setLocalHomeSettings(DEFAULT_HOME_SETTINGS);
     localStorage.removeItem('eiffel_home_settings');
     queryClient.invalidateQueries();
   };
@@ -614,6 +573,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         isCategoriesLoading,
         isStoresLoading,
         isOrdersLoading,
+        isCouponsLoading,
         isBannersLoading,
         isHomeSettingsLoading,
         addProduct,

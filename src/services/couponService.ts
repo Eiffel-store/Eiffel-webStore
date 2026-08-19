@@ -11,4 +11,13 @@ export const couponService = {
     const response = await apiClient.get<ApiResponse<Coupon[]>>('/coupons');
     return response.data.data;
   },
+
+  create: async (coupon: Partial<Coupon>): Promise<Coupon> => {
+    const response = await apiClient.post<ApiResponse<Coupon>>('/coupons', coupon);
+    return response.data.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete<ApiResponse<void>>(`/coupons/${id}`);
+  },
 };

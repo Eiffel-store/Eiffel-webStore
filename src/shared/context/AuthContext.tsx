@@ -30,117 +30,18 @@ interface AuthContextType {
   placeOrder: (order: Omit<Order, 'id' | 'date' | 'status' | 'trackingNumber' | 'estimatedDelivery'>) => Order;
 }
 
-const INITIAL_USER: UserProfile = {
-  name: 'طارق منصور (Tarek Mansour)',
-  email: 'tarek.mansour@eiffel-client.eg',
-  phone: '+20 100 123 4567',
+const DEFAULT_EMPTY_USER: UserProfile = {
+  name: '',
+  email: '',
+  phone: '',
   tier: 'MEMBER',
   tierPoints: 0,
   completedOrdersCount: 0,
   isVip: false,
-  memberSince: '2026',
-  addresses: [
-    {
-      id: 'addr-1',
-      isDefault: true,
-      type: 'Home',
-      firstName: 'Tarek',
-      lastName: 'Mansour',
-      street: '18 Gezira Street, Apt 7A',
-      city: 'Zamalek, Cairo',
-      state: 'Cairo',
-      postalCode: '11211',
-      country: 'Egypt',
-      phone: '+20 100 123 4567'
-    },
-    {
-      id: 'addr-2',
-      isDefault: false,
-      type: 'Work',
-      firstName: 'Tarek',
-      lastName: 'Mansour',
-      street: 'Complex 5A by The Waterway',
-      city: 'New Cairo (5th Settlement)',
-      state: 'Cairo',
-      postalCode: '11835',
-      country: 'Egypt',
-      phone: '+20 100 123 4567'
-    }
-  ],
-  paymentMethods: [
-    {
-      id: 'card-1',
-      isDefault: true,
-      type: 'visa',
-      cardNumber: '•••• •••• •••• 4242',
-      expiry: '09/28',
-      cardholderName: 'TAREK MANSOUR'
-    },
-    {
-      id: 'card-2',
-      isDefault: false,
-      type: 'mastercard',
-      cardNumber: '•••• •••• •••• 8891',
-      expiry: '12/27',
-      cardholderName: 'TAREK MANSOUR'
-    }
-  ],
-  orders: [
-    {
-      id: 'EFL-EG-89241',
-      date: 'AUG 12, 2026',
-      status: 'Delivered',
-      trackingNumber: 'BOUSTA-EFL-992014881',
-      estimatedDelivery: 'AUG 13, 2026',
-      subtotal: 940,
-      shipping: 0,
-      discount: 0,
-      tax: 0,
-      total: 940,
-      paymentMethod: 'InstaPay (@eiffel.egypt)',
-      shippingAddress: {
-        id: 'addr-1',
-        isDefault: true,
-        type: 'Home',
-        firstName: 'Tarek',
-        lastName: 'Mansour',
-        street: '18 Gezira Street, Apt 7A',
-        city: 'Zamalek, Cairo',
-        state: 'Cairo',
-        postalCode: '11211',
-        country: 'Egypt',
-        phone: '+20 100 123 4567'
-      },
-      items: [
-        {
-          product: {
-            id: 'eiffel-monolith-overcoat',
-            name: 'Monolith Double-Breasted Trench',
-            subtitle: 'Bonded Heavy Wool & Technical Gabardine',
-            price: 940,
-            category: 'men',
-            subCategory: 'Outerwear',
-            images: [
-              'https://lh3.googleusercontent.com/aida-public/AB6AXuCseUeu5hdr7LWtZska9tdU1nipaGbIV9oDB4qQIfpmf9TGBKI3WMIeHE7Dhi3cpBD1BLkDSNssElp43QgvSsbNFoyCtrgDtaWeFakgnquiUwsZGJutEtBBG2VrOwNvDhRXK2l4kEiDc6woEqKHLmR-wjLYVi085GjBUjBr9WGc_WUmlNMKBme8o3SAnoAIsLDlCOY_WmzxZ_2Siru3KoWJD9zwJNdMDng5OdcgPqc2VO_kGELw2iBIhg'
-            ],
-            colors: [{ name: 'Carbon Black', hex: '#0a0a0a' }],
-            sizes: ['48 (M)'],
-            description: '',
-            details: [],
-            composition: '',
-            fit: '',
-            care: [],
-            rating: 5,
-            reviewCount: 38,
-            inStock: true
-          },
-          quantity: 1,
-          selectedSize: '48 (M)',
-          selectedColor: 'Carbon Black'
-        }
-      ]
-    }
-  ]
+  memberSince: new Date().getFullYear().toString(),
+  addresses: [],
+  paymentMethods: [],
+  orders: []
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -149,14 +50,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProfile>(() => {
     try {
       const saved = localStorage.getItem('eiffel_user');
-      return saved ? JSON.parse(saved) : INITIAL_USER;
+      return saved ? JSON.parse(saved) : DEFAULT_EMPTY_USER;
     } catch {
-      return INITIAL_USER;
+      return DEFAULT_EMPTY_USER;
     }
   });
 
   useEffect(() => {
-    localStorage.setItem('eiffel_user', JSON.stringify(user));
+    if (user.email || user.phone || user.name) {
+      localStorage.setItem('eiffel_user', JSON.stringify(user));
+    }
   }, [user]);
 
   const updateProfile = (data: Partial<UserProfile>) => {
@@ -245,7 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase(),
       status: 'Processing',
       trackingNumber: `BOSTA-EGY-${Math.floor(100000000 + Math.random() * 900000000)}`,
-      estimatedDelivery: '24–48 HOURS (CAIRO & GIZA)'
+      estimatedDelivery: '24–48 HOURS'
     };
 
     setUser(prev => ({

@@ -87,6 +87,10 @@ export interface Address {
   postalCode: string;
   country: string;
   phone: string;
+  latitude?: number;
+  longitude?: number;
+  mapUrl?: string;
+  formattedAddress?: string;
 }
 
 export interface PaymentMethod {
@@ -120,6 +124,7 @@ export interface Order {
   pointsEarned?: number;
   pointsRedeemed?: number;
   pointsDiscount?: number;
+  couponCode?: string;
 }
 
 export interface StoreSettings {
