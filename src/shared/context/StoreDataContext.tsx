@@ -95,6 +95,12 @@ interface StoreDataContextType {
   settings: StoreSettings;
   homeSettings: HomePageSettings;
   isLoading: boolean;
+  isProductsLoading: boolean;
+  isCategoriesLoading: boolean;
+  isStoresLoading: boolean;
+  isOrdersLoading: boolean;
+  isBannersLoading: boolean;
+  isHomeSettingsLoading: boolean;
 
   // Products CRUD
   addProduct: (product: Omit<Product, 'id'>) => Product;
@@ -153,54 +159,65 @@ const StoreDataContext = createContext<StoreDataContextType | undefined>(undefin
 export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const queryClient = useQueryClient();
 
-  // 1. React Query: Fetch Products with initial fallback
-  const { data: serverProducts, isLoading: isProductsLoading } = useQuery({
+  // 1. React Query: Fetch Products
+  const { data: serverProducts, isLoading: isProductsLoading, isSuccess: isProductsSuccess } = useQuery({
     queryKey: ['products'],
-    queryFn: () => productService.getAll().catch(() => INITIAL_PRODUCTS),
-    placeholderData: INITIAL_PRODUCTS,
+    queryFn: () => productService.getAll(),
+    staleTime: 1000 * 30,
+    retry: 1
   });
 
   // 2. React Query: Fetch Categories
-  const { data: serverCategories } = useQuery({
+  const { data: serverCategories, isLoading: isCategoriesLoading, isSuccess: isCategoriesSuccess } = useQuery({
     queryKey: ['categories'],
-    queryFn: () => categoryService.getAll().catch(() => INITIAL_CATEGORIES_DATA),
-    placeholderData: INITIAL_CATEGORIES_DATA,
+    queryFn: () => categoryService.getAll(),
+    staleTime: 1000 * 30,
+    retry: 1
   });
 
   // 3. React Query: Fetch Settings
-  const { data: serverSettings } = useQuery({
+  const { data: serverSettings, isLoading: isSettingsLoading, isSuccess: isSettingsSuccess } = useQuery({
     queryKey: ['settings'],
-    queryFn: () => settingsService.getSettings().catch(() => DEFAULT_SETTINGS),
-    placeholderData: DEFAULT_SETTINGS,
+    queryFn: () => settingsService.getSettings(),
+    staleTime: 1000 * 60,
+    retry: 1
   });
 
   // 4. React Query: Fetch Stores
-  const { data: serverStores } = useQuery({
+  const { data: serverStores, isLoading: isStoresLoading, isSuccess: isStoresSuccess } = useQuery({
     queryKey: ['stores'],
-    queryFn: () => storeService.getAll().catch(() => INITIAL_STORES),
-    placeholderData: INITIAL_STORES,
+    queryFn: () => storeService.getAll(),
+    staleTime: 1000 * 60,
+    retry: 1
   });
 
   // 5. React Query: Fetch Home Page & Banners Settings
-  const { data: serverHomeSettings } = useQuery({
+  const { data: serverHomeSettings, isLoading: isHomeSettingsLoading } = useQuery({
     queryKey: ['homeSettings'],
-    queryFn: () => homeSettingsService.getHomeSettings().catch(() => DEFAULT_HOME_SETTINGS),
-    placeholderData: DEFAULT_HOME_SETTINGS,
+    queryFn: () => homeSettingsService.getHomeSettings(),
+    staleTime: 1000 * 60,
+    retry: 1
   });
 
   // 6. React Query: Fetch All Banners & Active Banners for Storefront
-  const { data: serverAllBanners = [] } = useQuery({
+  const { data: serverAllBanners = [], isLoading: isAllBannersLoading } = useQuery({
     queryKey: ['banners', 'all'],
     queryFn: () => bannerService.getAllBanners().catch(() => []),
+    staleTime: 1000 * 30,
+    retry: 1
   });
 
-  const { data: serverActiveBanners = [] } = useQuery({
+  const { data: serverActiveBanners = [], isLoading: isActiveBannersLoading } = useQuery({
     queryKey: ['banners', 'active'],
     queryFn: () => bannerService.getActiveBanners().catch(() => []),
+    staleTime: 1000 * 30,
+    retry: 1
   });
 
+  const isBannersLoading = isAllBannersLoading || isActiveBannersLoading;
+
   // 7. React Query: Fetch Orders from Backend
-  const { data: serverOrders = [] } = useQuery({
+  const { data: serverOrders = [], isLoading: isOrdersLoading, isSuccess: isOrdersSuccess } = useQuery({
     queryKey: ['orders'],
     queryFn: async () => {
       try {
@@ -211,6 +228,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     },
     staleTime: 1000 * 15,
+    retry: 1
   });
 
   // 8. Local & Server States with smart offline fallback
@@ -229,14 +247,16 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   });
 
-  const products = (serverProducts && serverProducts.length > 0) ? serverProducts : localProducts;
-  const categories = (serverCategories && serverCategories.length > 0) ? serverCategories : localCategories;
-  const stores = (serverStores && serverStores.length > 0) ? serverStores : localStores;
-  const orders = (serverOrders && serverOrders.length > 0) ? serverOrders : localOrders;
-  const settings = serverSettings || localSettings;
+  const products = isProductsSuccess && Array.isArray(serverProducts) ? serverProducts : (serverProducts || localProducts);
+  const categories = isCategoriesSuccess && Array.isArray(serverCategories) ? serverCategories : (serverCategories || localCategories);
+  const stores = isStoresSuccess && Array.isArray(serverStores) ? serverStores : (serverStores || localStores);
+  const orders = isOrdersSuccess && Array.isArray(serverOrders) ? serverOrders : (serverOrders || localOrders);
+  const settings = isSettingsSuccess && serverSettings ? serverSettings : (serverSettings || localSettings);
   const homeSettings = serverHomeSettings || localHomeSettings;
   const banners = serverAllBanners;
   const activeBanners = serverActiveBanners;
+
+  const isLoading = isProductsLoading || isCategoriesLoading || isStoresLoading || isOrdersLoading || isBannersLoading;
 
   // Mutations
   const updateHomeSettingsMutation = useMutation({
@@ -589,7 +609,13 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         homeSettings,
         banners,
         activeBanners,
-        isLoading: isProductsLoading,
+        isLoading,
+        isProductsLoading,
+        isCategoriesLoading,
+        isStoresLoading,
+        isOrdersLoading,
+        isBannersLoading,
+        isHomeSettingsLoading,
         addProduct,
         updateProduct,
         deleteProduct,

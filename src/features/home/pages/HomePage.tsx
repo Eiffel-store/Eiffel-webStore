@@ -13,7 +13,7 @@ import { useLanguage, useStoreData, EiffelLoader, EmptyState } from '@/shared';
 export const HomePage: React.FC = () => {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const { t, isRTL } = useLanguage();
-  const { products, isLoading } = useStoreData();
+  const { products, isProductsLoading } = useStoreData();
 
   const newArrivals = products.filter(p => p.isNew || p.category === 'men').slice(0, 4);
 
@@ -48,7 +48,7 @@ export const HomePage: React.FC = () => {
           </Link>
         </div>
 
-        {isLoading ? (
+        {isProductsLoading ? (
           <EiffelLoader message={isRTL ? 'جاري تحميل أحدث الإصدارات...' : 'Loading latest releases...'} />
         ) : newArrivals.length === 0 ? (
           <EmptyState

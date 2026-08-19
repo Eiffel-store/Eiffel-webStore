@@ -6,7 +6,7 @@ import { AdminCouponsManager } from '../components/offers/AdminCouponsManager';
 import { AdminAddOfferModal } from '../components/offers/AdminAddOfferModal';
 
 export const AdminOffersPage: React.FC = () => {
-  const { products, updateProduct, isLoading } = useStoreData();
+  const { products, updateProduct, isProductsLoading } = useStoreData();
   const { isRTL } = useLanguage();
   const [showAddOfferModal, setShowAddOfferModal] = useState(false);
 
@@ -58,7 +58,7 @@ export const AdminOffersPage: React.FC = () => {
         </button>
       </div>
 
-      {isLoading ? (
+      {isProductsLoading ? (
         <EiffelLoader message={isRTL ? 'جاري جلب بيانات العروض والتخفيضات...' : 'Fetching offers and discounts...'} />
       ) : (
         <>

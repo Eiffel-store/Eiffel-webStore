@@ -6,7 +6,7 @@ import { AdminCategoryCard } from '../components/categories/AdminCategoryCard';
 import { AdminCategoryModal } from '../components/categories/AdminCategoryModal';
 
 export const AdminCategoriesPage: React.FC = () => {
-  const { categories, addCategory, updateCategory, deleteCategory, products, isLoading } = useStoreData();
+  const { categories, addCategory, updateCategory, deleteCategory, products, isCategoriesLoading } = useStoreData();
   const { isRTL } = useLanguage();
 
   const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null);
@@ -84,7 +84,7 @@ export const AdminCategoriesPage: React.FC = () => {
       </div>
 
       {/* Loading / Empty / Content */}
-      {isLoading ? (
+      {isCategoriesLoading ? (
         <EiffelLoader message={isRTL ? 'جاري جلب الأقسام من قاعدة البيانات...' : 'Fetching categories...'} />
       ) : categories.length === 0 ? (
         <EmptyState

@@ -6,7 +6,7 @@ import { AdminBranchCard } from '../components/branches/AdminBranchCard';
 import { AdminBranchModal } from '../components/branches/AdminBranchModal';
 
 export const AdminBranchesPage: React.FC = () => {
-  const { stores, addStore, updateStore, deleteStore, isLoading } = useStoreData();
+  const { stores, addStore, updateStore, deleteStore, isStoresLoading } = useStoreData();
   const { isRTL } = useLanguage();
 
   const [editingStore, setEditingStore] = useState<StoreLocation | null>(null);
@@ -93,7 +93,7 @@ export const AdminBranchesPage: React.FC = () => {
       </div>
 
       {/* Loading / Empty / Content */}
-      {isLoading ? (
+      {isStoresLoading ? (
         <EiffelLoader message={isRTL ? 'جاري جلب بيانات الفروع من قاعدة البيانات...' : 'Fetching boutique branches...'} />
       ) : stores.length === 0 ? (
         <EmptyState

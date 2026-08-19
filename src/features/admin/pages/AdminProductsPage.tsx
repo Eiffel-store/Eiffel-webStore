@@ -8,7 +8,7 @@ import { AdminProductTable } from '../components/products/AdminProductTable';
 import { AdminProductDeleteModal } from '../components/products/AdminProductDeleteModal';
 
 export const AdminProductsPage: React.FC = () => {
-  const { products, deleteProduct, updateProduct } = useStoreData();
+  const { products, deleteProduct, updateProduct, isProductsLoading } = useStoreData();
   const { isRTL } = useLanguage();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -80,7 +80,7 @@ export const AdminProductsPage: React.FC = () => {
       />
 
       {/* Loading / Empty / Table */}
-      {isLoading ? (
+      {isProductsLoading ? (
         <EiffelLoader message={isRTL ? 'جاري جلب كتالوج المنتجات من قاعدة البيانات...' : 'Fetching product catalog from database...'} />
       ) : products.length === 0 ? (
         <EmptyState

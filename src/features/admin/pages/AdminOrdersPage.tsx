@@ -6,7 +6,7 @@ import { AdminOrdersTable } from '../components/orders/AdminOrdersTable';
 import { AdminOrderDetailsModal } from '../components/orders/AdminOrderDetailsModal';
 
 export const AdminOrdersPage: React.FC = () => {
-  const { orders, updateOrderStatus, deleteOrder, isLoading } = useStoreData();
+  const { orders, updateOrderStatus, deleteOrder, isOrdersLoading } = useStoreData();
   const { isRTL } = useLanguage();
 
   const [statusFilter, setStatusFilter] = useState('all');
@@ -57,7 +57,7 @@ export const AdminOrdersPage: React.FC = () => {
       />
 
       {/* Loading / Empty / Table */}
-      {isLoading ? (
+      {isOrdersLoading ? (
         <EiffelLoader message={isRTL ? 'جاري جلب سجل الطلبات من قاعدة البيانات...' : 'Fetching orders from database...'} />
       ) : orders.length === 0 ? (
         <EmptyState

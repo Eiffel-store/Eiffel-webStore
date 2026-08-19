@@ -35,7 +35,7 @@ export const AdminHomePageEditor: React.FC = () => {
     reorderBanners,
     homeSettings,
     updateHomeSettings,
-    isLoading
+    isBannersLoading
   } = useStoreData();
 
   const { isRTL } = useLanguage();

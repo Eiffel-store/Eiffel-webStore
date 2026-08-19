@@ -17,7 +17,7 @@ export const ProductDetailPage: React.FC = () => {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
   const { t, isRTL } = useLanguage();
-  const { products, getProductById, isLoading } = useStoreData();
+  const { products, getProductById, isProductsLoading } = useStoreData();
 
   const product = id ? getProductById(id) : products[0];
 
@@ -38,7 +38,7 @@ export const ProductDetailPage: React.FC = () => {
     }
   }, [id, product]);
 
-  if (isLoading) {
+  if (isProductsLoading) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
         <EiffelLoader message={isRTL ? 'جاري تجهيز تفاصيل القطعة الفاخرة...' : 'Loading bespoke garment details...'} />

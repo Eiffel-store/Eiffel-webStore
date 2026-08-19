@@ -14,7 +14,7 @@ export const CollectionsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const searchKeyword = searchParams.get('search') || '';
   const { t, isRTL } = useLanguage();
-  const { products, categories } = useStoreData();
+  const { products, categories, isProductsLoading } = useStoreData();
 
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('All');
   const [selectedSize, setSelectedSize] = useState<string>('All');
@@ -192,7 +192,7 @@ export const CollectionsPage: React.FC = () => {
         )}
 
         {/* Results Counter */}
-        {!isLoading && (
+        {!isProductsLoading && (
           <div className="flex justify-between items-center text-[11px] sm:text-xs font-mono text-secondary dark:text-zinc-400 mb-4 sm:mb-6 px-1">
             <span>{t.showingSilhouettes} ({filteredProducts.length})</span>
             <span>{t.curatedCollection}</span>
@@ -200,7 +200,7 @@ export const CollectionsPage: React.FC = () => {
         )}
 
         {/* Loading State vs Empty State vs Product Cards Grid */}
-        {isLoading ? (
+        {isProductsLoading ? (
           <EiffelLoader message={isRTL ? `جاري تحميل ${getCategoryTitle()}...` : `Loading ${getCategoryTitle()}...`} />
         ) : filteredProducts.length === 0 ? (
           <EmptyState

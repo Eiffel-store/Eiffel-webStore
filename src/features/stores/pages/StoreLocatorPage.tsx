@@ -7,7 +7,7 @@ import { AppointmentModal } from '../components/AppointmentModal';
 
 export const StoreLocatorPage: React.FC = () => {
   const { t, isRTL } = useLanguage();
-  const { stores, isLoading } = useStoreData();
+  const { stores, isStoresLoading } = useStoreData();
   const [selectedStore, setSelectedStore] = useState<StoreLocation>(stores[0] || {} as StoreLocation);
   const [appointmentModalStore, setAppointmentModalStore] = useState<StoreLocation | null>(null);
 
@@ -30,7 +30,7 @@ export const StoreLocatorPage: React.FC = () => {
         </div>
 
         {/* Loading / Empty / Content */}
-        {isLoading ? (
+        {isStoresLoading ? (
           <div className="py-20">
             <EiffelLoader message={isRTL ? 'جاري تحميل مواقع فروع إيفل...' : 'Loading Eiffel boutique locations...'} />
           </div>
