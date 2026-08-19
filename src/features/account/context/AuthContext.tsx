@@ -31,12 +31,14 @@ interface AuthContextType {
 }
 
 const INITIAL_USER: UserProfile = {
-  name: 'Tarek Mansour',
+  name: 'طارق منصور (Tarek Mansour)',
   email: 'tarek.mansour@eiffel-client.eg',
   phone: '+20 100 123 4567',
-  tier: 'EIFFEL PRIVÉ',
-  tierPoints: 47500,
-  memberSince: 'JANUARY 2025',
+  tier: 'MEMBER',
+  tierPoints: 120,
+  completedOrdersCount: 2,
+  isVip: false,
+  memberSince: 'JANUARY 2026',
   addresses: [
     {
       id: 'addr-1',
