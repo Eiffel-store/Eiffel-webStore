@@ -34,11 +34,11 @@ export const CheckoutPage: React.FC = () => {
 
   // Shipping & Payment
   const [shippingMethod, setShippingMethod] = useState<'express' | 'white-glove'>('express');
-  const [paymentMethod, setPaymentMethod] = useState<'instapay' | 'card' | 'cod'>('instapay');
-  const [cardNumber, setCardNumber] = useState('•••• •••• •••• 4242');
-  const [cardExpiry, setCardExpiry] = useState('11/28');
-  const [cardCvc, setCardCvc] = useState('842');
-  const [cardName, setCardName] = useState('TAREK MANSOUR');
+  const [paymentMethod, setPaymentMethod] = useState<'cod'>('cod');
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvc, setCardCvc] = useState('');
+  const [cardName, setCardName] = useState('');
 
   const discountValue = discountAmount;
   const shippingFee = shippingMethod === 'white-glove' ? 10 : 0;
@@ -62,12 +62,7 @@ export const CheckoutPage: React.FC = () => {
       isDefault: true,
     };
 
-    let paymentMethodString = 'InstaPay (@eiffel.egypt)';
-    if (paymentMethod === 'card') {
-      paymentMethodString = 'Credit Card / Meeza (ending in 4242)';
-    } else if (paymentMethod === 'cod') {
-      paymentMethodString = 'Cash on Delivery (الدفع عند الاستلام)';
-    }
+    const paymentMethodString = 'Cash on Delivery (الدفع عند الاستلام)';
 
     setTimeout(() => {
       const order = placeOrder({

@@ -79,7 +79,7 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
 
       <div className="p-3 bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-800 text-[11px] text-secondary dark:text-zinc-400 space-y-1">
         <p className="font-bold text-primary dark:text-white">🇪🇬 خدمة التوصيل المباشر داخل مصر</p>
-        <p>شحن سريع إلى كافة المحافظات مع إمكانية المعاينة قبل الاستلام والدفع كاش أو عبر إنستاباي.</p>
+        <p>شحن سريع إلى كافة المحافظات مع إمكانية المعاينة قبل الاستلام والدفع كاش عند الاستلام.</p>
       </div>
     </div>
   );

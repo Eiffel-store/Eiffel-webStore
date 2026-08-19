@@ -72,15 +72,11 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           </div>
         </div>
 
-        {paymentMethod === 'instapay' && (
-          <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-mono text-left rtl:text-right space-y-1">
-            <p className="font-bold flex items-center gap-1.5">
-              <Smartphone className="w-4 h-4" />
-              <span>تعليمات التحويل عبر إنستاباي (InstaPay):</span>
-            </p>
-            <p>يرجى إرسال المبلغ الإجمالي ({formatPrice(order.total)}) إلى الحساب الموثق: <strong>eiffel.egypt@instapay</strong> واذكر رقم الطلب <strong>{order.id}</strong> في الملاحظات.</p>
-          </div>
-        )}
+        <div className="p-4 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono text-center space-y-1 rounded">
+          <p className="font-bold">
+            ✓ يرجى تجهيز المبلغ المطلوب نقداً لمندوب الشحن عند استلام وتجربة شحنتك.
+          </p>
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-4 pt-2">
           <Link

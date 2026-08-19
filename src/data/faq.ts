@@ -19,8 +19,8 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
         a: 'We provide complimentary Express Courier delivery for all orders over 3,000 EGP. Orders in Greater Cairo (Zamalek, New Cairo, Sheikh Zayed, Maadi, Heliopolis) and Giza are delivered within 24–48 hours. Orders to Alexandria, the Delta, and coastal destinations (El Gouna, Hurghada, North Coast) arrive within 2–3 business days.'
       },
       {
-        q: 'Can I pay via InstaPay or Cash on Delivery (COD)?',
-        a: 'Yes. We accept Cash on Delivery (COD) across all Egyptian governorates, instant transfers via InstaPay (@eiffel.egypt), Mobile Wallets (Vodafone Cash, Orange Money), and all major Credit/Debit Cards including Meeza, Visa, and Mastercard.'
+        q: 'What payment methods are supported for my order?',
+        a: 'We accept Cash on Delivery (COD) across all Egyptian governorates. You pay directly in cash to the courier upon delivery and inspecting your order.'
       },
       {
         q: 'Can I inspect and try on the pieces before accepting the courier delivery?',
