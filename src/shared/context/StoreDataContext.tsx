@@ -199,12 +199,26 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     queryFn: () => bannerService.getActiveBanners().catch(() => []),
   });
 
-  // 7. Local & Server States with smart offline fallback
+  // 7. React Query: Fetch Orders from Backend
+  const { data: serverOrders = [] } = useQuery({
+    queryKey: ['orders'],
+    queryFn: async () => {
+      try {
+        return await orderService.getAll();
+      } catch (err) {
+        console.warn('Orders query failed (using local state fallback):', err);
+        return [];
+      }
+    },
+    staleTime: 1000 * 15,
+  });
+
+  // 8. Local & Server States with smart offline fallback
   const [localProducts, setLocalProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [localCategories, setLocalCategories] = useState<CategoryItem[]>(INITIAL_CATEGORIES_DATA);
   const [localStores, setLocalStores] = useState<StoreLocation[]>(INITIAL_STORES);
   const [coupons, setCoupons] = useState<Coupon[]>(DEFAULT_COUPONS);
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [localOrders, setLocalOrders] = useState<Order[]>([]);
   const [localSettings, setLocalSettings] = useState<StoreSettings>(DEFAULT_SETTINGS);
   const [localHomeSettings, setLocalHomeSettings] = useState<HomePageSettings>(() => {
     try {
@@ -218,6 +232,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const products = (serverProducts && serverProducts.length > 0) ? serverProducts : localProducts;
   const categories = (serverCategories && serverCategories.length > 0) ? serverCategories : localCategories;
   const stores = (serverStores && serverStores.length > 0) ? serverStores : localStores;
+  const orders = (serverOrders && serverOrders.length > 0) ? serverOrders : localOrders;
   const settings = serverSettings || localSettings;
   const homeSettings = serverHomeSettings || localHomeSettings;
   const banners = serverAllBanners;
@@ -388,7 +403,8 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const createOrderMutation = useMutation({
     mutationFn: (order: Partial<Order>) => orderService.create(order),
     onSuccess: (newOrder) => {
-      setOrders(prev => [newOrder, ...prev]);
+      setLocalOrders(prev => [newOrder, ...prev.filter(o => o.id !== newOrder.id)]);
+      queryClient.setQueryData(['orders'], (old: Order[] = []) => [newOrder, ...old.filter(o => o.id !== newOrder.id)]);
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
   });
@@ -396,7 +412,11 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const updateOrderStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: Order['status'] }) =>
       orderService.updateStatus(id, status),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['orders'] }),
+    onSuccess: (updated) => {
+      setLocalOrders(prev => prev.map(o => o.id === updated.id ? updated : o));
+      queryClient.setQueryData(['orders'], (old: Order[] = []) => old.map(o => o.id === updated.id ? updated : o));
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
   });
 
   const createStoreMutation = useMutation({
@@ -505,17 +525,18 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Order Methods
   const addOrder = (order: Order) => {
-    setOrders(prev => [order, ...prev]);
+    setLocalOrders(prev => [order, ...prev]);
     createOrderMutation.mutate(order);
   };
 
   const updateOrderStatus = (orderId: string, status: Order['status']) => {
-    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+    setLocalOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
     updateOrderStatusMutation.mutate({ id: orderId, status });
   };
 
   const deleteOrder = (orderId: string) => {
-    setOrders(prev => prev.filter(o => o.id !== orderId));
+    setLocalOrders(prev => prev.filter(o => o.id !== orderId));
+    queryClient.setQueryData(['orders'], (old: Order[] = []) => old.filter(o => o.id !== orderId));
   };
 
   // Settings

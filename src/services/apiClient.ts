@@ -13,17 +13,22 @@ export const apiClient = axios.create({
 // Request Interceptor: Automatically attach JWT Bearer token
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const storedAuth = localStorage.getItem('eiffel-auth-storage');
-    if (storedAuth) {
-      try {
-        const parsed = JSON.parse(storedAuth);
-        const token = parsed?.state?.token;
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+    let token = localStorage.getItem('token') || localStorage.getItem('eiffel_auth_token') || sessionStorage.getItem('token');
+    
+    if (!token) {
+      const storedAuth = localStorage.getItem('eiffel-auth-storage');
+      if (storedAuth) {
+        try {
+          const parsed = JSON.parse(storedAuth);
+          token = parsed?.state?.token;
+        } catch (e) {
+          console.error('Failed to parse auth storage token', e);
         }
-      } catch (e) {
-        console.error('Failed to parse auth storage token', e);
       }
+    }
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
