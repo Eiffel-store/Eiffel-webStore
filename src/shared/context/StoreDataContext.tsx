@@ -577,7 +577,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (data.products) setLocalProducts(data.products);
       if (data.categories) setLocalCategories(data.categories);
       if (data.homeSettings) {
-        setHomeSettings(data.homeSettings);
+        setLocalHomeSettings(data.homeSettings);
         localStorage.setItem('eiffel_home_settings', JSON.stringify(data.homeSettings));
       }
       return true;
@@ -592,7 +592,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setLocalStores(INITIAL_STORES);
     setCoupons(DEFAULT_COUPONS);
     setLocalSettings(DEFAULT_SETTINGS);
-    setHomeSettings(DEFAULT_HOME_SETTINGS);
+    setLocalHomeSettings(DEFAULT_HOME_SETTINGS);
     localStorage.removeItem('eiffel_home_settings');
     queryClient.invalidateQueries();
   };
