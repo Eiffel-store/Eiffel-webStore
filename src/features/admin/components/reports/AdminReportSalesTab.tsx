@@ -42,12 +42,15 @@ export const AdminReportSalesTab: React.FC<AdminReportSalesTabProps> = ({
 
     nonCancelledOrders.forEach((o) => {
       o.items?.forEach((item) => {
-        const catKey = 'men'; // default
+        const prod = item.product || (item as any);
+        const catKey = prod?.category || 'men';
         if (!catMap[catKey]) {
           catMap[catKey] = { name: 'تشكيلة الرجال', nameEn: "Men's Collection", count: 0, revenue: 0 };
         }
-        catMap[catKey].count += item.quantity || 1;
-        catMap[catKey].revenue += (item.price || 0) * (item.quantity || 1);
+        const qty = item.quantity || 1;
+        const price = prod?.price || (item as any)?.price || 0;
+        catMap[catKey].count += qty;
+        catMap[catKey].revenue += price * qty;
       });
     });
 

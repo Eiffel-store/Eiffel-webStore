@@ -40,18 +40,22 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
     orders.forEach((o) => {
       if (o.status === 'Cancelled') return;
       o.items?.forEach((item) => {
-        const pId = item.productId || item.name;
+        const prod = item.product || (item as any);
+        const pId = prod?.id || prod?.name || 'item';
         if (!map[pId]) {
           map[pId] = {
-            name: item.name,
+            product: prod,
+            name: prod?.name || 'Item',
             qty: 0,
             revenue: 0,
-            image: item.image,
-            stock: 0
+            image: prod?.images?.[0] || (prod as any)?.image,
+            stock: prod?.stock !== undefined ? prod.stock : 0
           };
         }
-        map[pId].qty += item.quantity || 1;
-        map[pId].revenue += (item.price || 0) * (item.quantity || 1);
+        const qty = item.quantity || 1;
+        const price = prod?.price || (item as any)?.price || 0;
+        map[pId].qty += qty;
+        map[pId].revenue += price * qty;
       });
     });
 

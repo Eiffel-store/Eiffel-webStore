@@ -1,5 +1,5 @@
 import { apiClient } from './apiClient';
-import { Order, ApiResponse, CartItem, Address } from '../types';
+import { Order, ApiResponse, CartItem, Address, Product } from '../types';
 
 export interface ServerOrderItem {
   productId: string;
@@ -83,13 +83,22 @@ export const mapServerOrderToClient = (s: ServerOrder): Order => {
       id: item.productId,
       name: item.productName || 'قطعة أزياء إيفل',
       subtitle: '',
+      description: 'قطعة حصرية فاخرة من دار أزياء إيفل',
+      details: [],
+      composition: '100% قطن مصري فاخر',
+      care: [],
       price: item.price || 0,
       category: 'men',
+      subCategory: 'T-Shirts',
       images: item.productImage ? [item.productImage] : ['https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop'],
       colors: item.selectedColor ? [{ name: item.selectedColor, hex: '#000000', image: item.productImage }] : [],
-      sizes: item.selectedSize ? [item.selectedSize] : [],
-      inStock: true
-    },
+      sizes: item.selectedSize ? [item.selectedSize] : ['M'],
+      inStock: true,
+      isNew: false,
+      isBestSeller: false,
+      rating: 5,
+      reviewsCount: 1
+    } as unknown as Product,
     quantity: item.quantity || 1,
     selectedColor: item.selectedColor || 'Standard',
     selectedSize: item.selectedSize || 'M'

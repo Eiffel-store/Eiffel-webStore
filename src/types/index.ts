@@ -62,6 +62,7 @@ export interface StoreLocation {
   id: string;
   city: string;
   name: string;
+  nameEn?: string;
   address: string;
   hours: string;
   phone: string;
@@ -79,6 +80,7 @@ export interface Address {
   firstName: string;
   lastName: string;
   street: string;
+  streetAddress?: string;
   apartment?: string;
   city: string;
   state: string;
@@ -99,6 +101,7 @@ export interface PaymentMethod {
 export interface Order {
   id: string;
   date: string;
+  createdAt?: string;
   items: CartItem[];
   subtotal: number;
   shipping: number;
@@ -111,6 +114,9 @@ export interface Order {
   shippingAddress: Address;
   paymentMethod: string;
   customerNotes?: string;
+  customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
 }
 
 export interface StoreSettings {

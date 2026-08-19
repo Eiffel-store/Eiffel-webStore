@@ -47,12 +47,12 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           </span>
           {product.isNew && (
             <span className="bg-primary text-white dark:bg-white dark:text-black text-[9px] font-label-bold px-2 py-0.5 uppercase tracking-widest">
-              {t.newArrivalBadge}
+              {isRTL ? 'إصدار جديد' : 'NEW'}
             </span>
           )}
           {product.isBestSeller && (
             <span className="bg-amber-500/20 text-amber-500 border border-amber-500/30 text-[9px] font-label-bold px-2 py-0.5 uppercase tracking-widest">
-              {t.bestSellerBadge}
+              {isRTL ? 'الأكثر طلباً' : 'BEST SELLER'}
             </span>
           )}
         </div>
