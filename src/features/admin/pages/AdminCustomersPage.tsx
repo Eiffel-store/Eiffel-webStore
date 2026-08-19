@@ -1,24 +1,21 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Users,
   Crown,
   Sparkles,
   Coins,
   Search,
-  Filter,
   Plus,
   Minus,
   MessageCircle,
   Phone,
   CheckCircle2,
-  XCircle,
-  ShieldCheck,
   Award,
-  ArrowUpDown,
-  ShoppingBag,
-  ExternalLink
+  RefreshCw,
+  ShoppingBag
 } from 'lucide-react';
 import { useStoreData, useLanguage, useCurrency, EiffelLoader, EmptyState } from '@/shared';
+import { customerService } from '@/services/customerService';
 import { User, Order } from '@/types';
 
 export const AdminCustomersPage: React.FC = () => {
@@ -26,89 +23,9 @@ export const AdminCustomersPage: React.FC = () => {
   const { isRTL } = useLanguage();
   const { formatPrice } = useCurrency();
 
-  // Local customers state initialized from orders and mock users
-  const [customers, setCustomers] = useState<User[]>([
-    {
-      id: 'cust-1',
-      name: 'طارق منصور (Tarek Mansour)',
-      email: 'tarek.mansour@eiffel-client.eg',
-      phone: '01001234567',
-      role: 'ROLE_CUSTOMER',
-      tier: 'VIP',
-      tierPoints: 480,
-      completedOrdersCount: 5,
-      totalSpend: 34500,
-      isVip: true,
-      memberSince: '2026-01-15',
-      addresses: [],
-      paymentMethods: [],
-      orders: []
-    },
-    {
-      id: 'cust-2',
-      name: 'كريم الشناوي (Karim El-Shennawy)',
-      email: 'karim.shennawy@gmail.com',
-      phone: '01223456789',
-      role: 'ROLE_CUSTOMER',
-      tier: 'VIP',
-      tierPoints: 260,
-      completedOrdersCount: 3,
-      totalSpend: 19800,
-      isVip: true,
-      memberSince: '2026-02-10',
-      addresses: [],
-      paymentMethods: [],
-      orders: []
-    },
-    {
-      id: 'cust-3',
-      name: 'مروان الألفي (Marwan El-Alfy)',
-      email: 'marwan.alfy@outlook.com',
-      phone: '01112223344',
-      role: 'ROLE_CUSTOMER',
-      tier: 'MEMBER',
-      tierPoints: 120,
-      completedOrdersCount: 2,
-      totalSpend: 8400,
-      isVip: false,
-      memberSince: '2026-03-01',
-      addresses: [],
-      paymentMethods: [],
-      orders: []
-    },
-    {
-      id: 'cust-4',
-      name: 'أحمد زهران (Ahmed Zahran)',
-      email: 'ahmed.zahran@eiffel.eg',
-      phone: '01099887766',
-      role: 'ROLE_CUSTOMER',
-      tier: 'MEMBER',
-      tierPoints: 50,
-      completedOrdersCount: 1,
-      totalSpend: 3900,
-      isVip: false,
-      memberSince: '2026-04-12',
-      addresses: [],
-      paymentMethods: [],
-      orders: []
-    },
-    {
-      id: 'cust-5',
-      name: 'عمر الصاوي (Omar El-Sawy)',
-      email: 'omar.sawy@yahoo.com',
-      phone: '01555544332',
-      role: 'ROLE_CUSTOMER',
-      tier: 'MEMBER',
-      tierPoints: 0,
-      completedOrdersCount: 0,
-      totalSpend: 0,
-      isVip: false,
-      memberSince: '2026-05-02',
-      addresses: [],
-      paymentMethods: [],
-      orders: []
-    }
-  ]);
+  const [backendCustomers, setBackendCustomers] = useState<User[]>([]);
+  const [isLoadingCustomers, setIsLoadingCustomers] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [tierFilter, setTierFilter] = useState<'all' | 'vip' | 'member'>('all');
@@ -116,54 +33,133 @@ export const AdminCustomersPage: React.FC = () => {
   const [pointsInput, setPointsInput] = useState<number>(50);
   const [pointsAction, setPointsAction] = useState<'add' | 'deduct'>('add');
 
-  // Toggle VIP Status
-  const handleToggleVip = (customerId: string | number | undefined) => {
-    if (!customerId) return;
-    setCustomers((prev) =>
-      prev.map((c) => {
-        if (c.id === customerId) {
-          const isCurrentlyVip = c.tier === 'VIP' || c.isVip;
-          const nextTier = isCurrentlyVip ? 'MEMBER' : 'VIP';
-          return {
-            ...c,
-            tier: nextTier,
-            isVip: !isCurrentlyVip
-          };
-        }
-        return c;
-      })
-    );
+  // 1. Fetch real customer accounts from backend MongoDB API
+  const fetchCustomers = async () => {
+    setIsLoadingCustomers(true);
+    try {
+      const data = await customerService.getAllCustomers();
+      setBackendCustomers(data);
+    } catch (err) {
+      console.error('Failed to load customers from backend API:', err);
+    } finally {
+      setIsLoadingCustomers(false);
+    }
   };
 
-  // Adjust Points
-  const handleSavePoints = () => {
-    if (!selectedCustomerForPoints) return;
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  // 2. Synthesize Real Registered Users + Real Order Customers (No fake mockups)
+  const allMergedCustomers = useMemo(() => {
+    const custMap: Record<string, User> = {};
+
+    // First add real registered MongoDB users
+    backendCustomers.forEach((u) => {
+      const key = u.email || u.phone || String(u.id);
+      custMap[key] = {
+        ...u,
+        tier: u.tier || 'MEMBER',
+        tierPoints: u.tierPoints || 0,
+        completedOrdersCount: u.completedOrdersCount || 0,
+        totalSpend: u.totalSpend || 0,
+        isVip: u.tier === 'VIP' || u.isVip || false,
+        memberSince: u.memberSince ? new Date(u.memberSince).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US') : '2026',
+        orders: u.orders || []
+      };
+    });
+
+    // Then cross-reference with real actual orders from the database
+    orders.forEach((o) => {
+      const email = o.customerEmail || '';
+      const phone = o.customerPhone || o.shippingAddress?.phone || 'N/A';
+      const name = o.customerName || `${o.shippingAddress?.firstName || ''} ${o.shippingAddress?.lastName || ''}`.trim() || 'عميل إيفل';
+      const key = email || phone || o.id;
+
+      if (!custMap[key]) {
+        custMap[key] = {
+          id: `order-cust-${key}`,
+          name,
+          email: email || `${phone}@eiffel-guest.eg`,
+          phone,
+          role: 'ROLE_CUSTOMER',
+          tier: 'MEMBER',
+          tierPoints: 0,
+          completedOrdersCount: 0,
+          totalSpend: 0,
+          isVip: false,
+          memberSince: o.createdAt || o.date || new Date().toISOString(),
+          addresses: o.shippingAddress ? [o.shippingAddress] : [],
+          paymentMethods: [],
+          orders: []
+        };
+      }
+
+      // Aggregate order counts & spend
+      if (o.status !== 'Cancelled') {
+        custMap[key].totalSpend = (custMap[key].totalSpend || 0) + (o.total || o.subtotal || 0);
+      }
+      if (o.status === 'Delivered') {
+        custMap[key].completedOrdersCount = (custMap[key].completedOrdersCount || 0) + 1;
+      }
+
+      // Check auto VIP condition: 3+ delivered orders
+      if ((custMap[key].completedOrdersCount || 0) >= 3 && custMap[key].tier !== 'VIP') {
+        custMap[key].tier = 'VIP';
+        custMap[key].isVip = true;
+      }
+    });
+
+    return Object.values(custMap);
+  }, [backendCustomers, orders, isRTL]);
+
+  // 3. Toggle VIP Status (Calls backend API & updates state)
+  const handleToggleVip = async (customer: User) => {
+    if (!customer.id) return;
+    setIsUpdating(true);
+    const nextVip = !(customer.tier === 'VIP' || customer.isVip);
+
+    try {
+      await customerService.toggleVip(customer.id, nextVip);
+      setBackendCustomers((prev) =>
+        prev.map((c) => (c.id === customer.id ? { ...c, tier: nextVip ? 'VIP' : 'MEMBER', isVip: nextVip } : c))
+      );
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // 4. Adjust Points (Calls backend API & updates state)
+  const handleSavePoints = async () => {
+    if (!selectedCustomerForPoints || !selectedCustomerForPoints.id) return;
+    setIsUpdating(true);
     const delta = pointsAction === 'add' ? pointsInput : -pointsInput;
 
-    setCustomers((prev) =>
-      prev.map((c) => {
-        if (c.id === selectedCustomerForPoints.id) {
-          const currentPts = c.tierPoints || 0;
-          const newPts = Math.max(0, currentPts + delta);
-          return {
-            ...c,
-            tierPoints: newPts
-          };
-        }
-        return c;
-      })
-    );
-
-    setSelectedCustomerForPoints(null);
+    try {
+      await customerService.adjustPoints(selectedCustomerForPoints.id, delta);
+      setBackendCustomers((prev) =>
+        prev.map((c) => {
+          if (c.id === selectedCustomerForPoints.id) {
+            const current = c.tierPoints || 0;
+            return { ...c, tierPoints: Math.max(0, current + delta) };
+          }
+          return c;
+        })
+      );
+    } finally {
+      setIsUpdating(false);
+      setSelectedCustomerForPoints(null);
+    }
   };
 
-  // Filtered list
+  // 5. Filtered & Searched Customers
   const filteredCustomers = useMemo(() => {
-    return customers.filter((c) => {
+    return allMergedCustomers.filter((c) => {
+      const q = searchQuery.toLowerCase();
       const matchesQuery =
-        c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.phone.includes(searchQuery);
+        c.name.toLowerCase().includes(q) ||
+        (c.email && c.email.toLowerCase().includes(q)) ||
+        (c.phone && c.phone.includes(q));
 
       const isVip = c.tier === 'VIP' || c.isVip;
       if (tierFilter === 'vip' && !isVip) return false;
@@ -171,273 +167,311 @@ export const AdminCustomersPage: React.FC = () => {
 
       return matchesQuery;
     });
-  }, [customers, searchQuery, tierFilter]);
+  }, [allMergedCustomers, searchQuery, tierFilter]);
 
-  // Overall KPIs
-  const totalCustomers = customers.length;
-  const totalVipCount = customers.filter((c) => c.tier === 'VIP' || c.isVip).length;
-  const totalPointsInCirculation = customers.reduce((sum, c) => sum + (c.tierPoints || 0), 0);
-  const totalCustomerSpend = customers.reduce((sum, c) => sum + (c.totalSpend || 0), 0);
+  // KPIs
+  const totalCustomers = allMergedCustomers.length;
+  const totalVipCount = allMergedCustomers.filter((c) => c.tier === 'VIP' || c.isVip).length;
+  const totalPointsInCirculation = allMergedCustomers.reduce((sum, c) => sum + (c.tierPoints || 0), 0);
+  const totalCustomerSpend = allMergedCustomers.reduce((sum, c) => sum + (c.totalSpend || 0), 0);
+
+  const isLoading = isLoadingCustomers || isOrdersLoading;
 
   return (
     <div className="space-y-8">
-      {/* 1. Header & Quick Summary */}
+      {/* 1. Header & Summary */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-editorial font-bold text-white tracking-wide">
-              {isRTL ? 'إدارة العملاء ونظام نقاط الولاء والـ VIP' : 'Customer CRM & Loyalty Points Manager'}
+              {isRTL ? 'إدارة العملاء ونظام نقاط الولاء وعضوية VIP' : 'Customer CRM & VIP Loyalty Manager'}
             </h1>
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-amber-400/10 text-amber-400 border border-amber-400/20 font-bold flex items-center gap-1">
               <Crown className="w-3 h-3" />
-              <span>VIP SYSTEM</span>
+              <span>LIVE SYNC</span>
             </span>
           </div>
           <p className="text-xs text-zinc-400 mt-1">
             {isRTL
-              ? 'متابعة رصيد نقاط العملاء، ترقية الحسابات إلى عضوية VIP المميزة، وتعديل النقاط والمكافآت يدوياً.'
-              : 'Manage customer loyalty points, promote accounts to VIP tiers, and adjust reward balances.'}
+              ? 'البيانات الحقيقية المباشرة للعملاء المسجلين والطلبات الواردة من قاعدة البيانات (MongoDB).'
+              : 'Live customer profiles synchronized with MongoDB and active store orders.'}
           </p>
         </div>
 
-        {/* Action Preset Banner */}
-        <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-lg text-xs font-mono text-zinc-300">
-          <Award className="w-4 h-4 text-amber-400" />
-          <span>{isRTL ? 'الترقية التلقائية: بعد 3 طلبات مستلمة' : 'Auto VIP Threshold: 3 Delivered Orders'}</span>
+        {/* Refresh & Preset Info */}
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={fetchCustomers}
+            disabled={isLoading}
+            className="p-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-white rounded-lg text-xs font-mono transition-colors"
+            title={isRTL ? 'تحديث البيانات' : 'Refresh'}
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-amber-400' : ''}`} />
+          </button>
+
+          <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-lg text-xs font-mono text-zinc-300">
+            <Award className="w-4 h-4 text-amber-400" />
+            <span>{isRTL ? 'الترقية لـ VIP: 3 طلبات مستلمة' : 'Auto VIP: 3 Delivered Orders'}</span>
+          </div>
         </div>
       </div>
 
-      {/* 2. Executive Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Customers */}
-        <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-zinc-400">{isRTL ? 'إجمالي العملاء المسجلين' : 'Total Customers'}</span>
-            <Users className="w-4 h-4 text-blue-400" />
+      {isLoading ? (
+        <EiffelLoader message={isRTL ? 'جاري جلب حسابات العملاء وسجل الطلبات من السيرفر...' : 'Loading customer profiles from backend...'} />
+      ) : allMergedCustomers.length === 0 ? (
+        <EmptyState
+          title={isRTL ? 'لا يوجد عملاء مسجلين حالياً' : 'No Registered Customers Found'}
+          description={
+            isRTL
+              ? 'عند قيام العملاء بإنشاء حسابات أو تسجيل طلبات شراء في المتجر، ستظهر بياناتهم الحقيقية ورصيد نقاطهم هنا فوراً.'
+              : 'As customers register accounts or submit checkout orders, their verified profiles will populate here automatically.'
+          }
+        />
+      ) : (
+        <>
+          {/* 2. Executive Metric Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Total Customers */}
+            <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono text-zinc-400">{isRTL ? 'إجمالي العملاء' : 'Total Customers'}</span>
+                <Users className="w-4 h-4 text-blue-400" />
+              </div>
+              <p className="text-2xl font-mono font-bold text-white mt-2">{totalCustomers}</p>
+              <p className="text-[11px] text-zinc-500 font-mono mt-1">{isRTL ? 'حسابات وبيانات فعلية' : 'Verified profiles'}</p>
+            </div>
+
+            {/* VIP Members Count */}
+            <div className="p-5 rounded-xl bg-gradient-to-br from-amber-400/10 to-zinc-950 border border-amber-400/30 shadow-md">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono text-amber-400 font-bold">{isRTL ? 'أعضاء إيفل المميزين VIP' : 'VIP Members'}</span>
+                <Crown className="w-4 h-4 text-amber-400" />
+              </div>
+              <p className="text-2xl font-mono font-bold text-amber-300 mt-2">{totalVipCount}</p>
+              <p className="text-[11px] text-zinc-400 font-mono mt-1">{isRTL ? 'مكافأة نقاط مضاعفة 2x' : '2x Points Multiplier'}</p>
+            </div>
+
+            {/* Points in Circulation */}
+            <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono text-zinc-400">{isRTL ? 'إجمالي النقاط المتداولة' : 'Loyalty Points Balance'}</span>
+                <Coins className="w-4 h-4 text-emerald-400" />
+              </div>
+              <p className="text-2xl font-mono font-bold text-emerald-400 mt-2">
+                {totalPointsInCirculation} <span className="text-xs text-zinc-500 font-sans">PTS</span>
+              </p>
+              <p className="text-[11px] text-zinc-500 font-mono mt-1">
+                {isRTL ? `تعادل: ${formatPrice(totalPointsInCirculation)} رصيد شرائي` : `Value: ${formatPrice(totalPointsInCirculation)}`}
+              </p>
+            </div>
+
+            {/* Total Spend */}
+            <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono text-zinc-400">{isRTL ? 'إجمالي المبيعات المحققة' : 'Customer Lifetime Value'}</span>
+                <ShoppingBag className="w-4 h-4 text-purple-400" />
+              </div>
+              <p className="text-2xl font-mono font-bold text-white mt-2">{formatPrice(totalCustomerSpend)}</p>
+              <p className="text-[11px] text-zinc-500 font-mono mt-1">{isRTL ? 'صافي المشتريات' : 'Delivered sales'}</p>
+            </div>
           </div>
-          <p className="text-2xl font-mono font-bold text-white mt-2">{totalCustomers}</p>
-          <p className="text-[11px] text-zinc-500 font-mono mt-1">{isRTL ? 'قاعدة بيانات المشترين' : 'Registered client base'}</p>
-        </div>
 
-        {/* VIP Members Count */}
-        <div className="p-5 rounded-xl bg-gradient-to-br from-amber-400/10 to-zinc-950 border border-amber-400/30 shadow-md">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-amber-400 font-bold">{isRTL ? 'أعضاء إيفل المميزين VIP' : 'VIP Members'}</span>
-            <Crown className="w-4 h-4 text-amber-400" />
+          {/* 3. Search & Filter Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-zinc-950 border border-zinc-800 rounded-xl">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="w-4 h-4 text-zinc-500 absolute top-1/2 -translate-y-1/2 left-3 rtl:left-auto rtl:right-3" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={isRTL ? 'بحث بالاسم، رقم الهاتف، أو البريد الإلكتروني...' : 'Search by name, phone, or email...'}
+                className="w-full pl-9 pr-3 rtl:pl-3 rtl:pr-9 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400"
+              />
+            </div>
+
+            {/* Tier Filter Pills */}
+            <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg p-1">
+              <button
+                type="button"
+                onClick={() => setTierFilter('all')}
+                className={`px-3 py-1.5 rounded text-xs font-mono transition-all ${
+                  tierFilter === 'all' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                {isRTL ? 'الكل' : 'All'} ({allMergedCustomers.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setTierFilter('vip')}
+                className={`px-3 py-1.5 rounded text-xs font-mono flex items-center gap-1.5 transition-all ${
+                  tierFilter === 'vip' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <Crown className="w-3.5 h-3.5" />
+                <span>VIP ({totalVipCount})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setTierFilter('member')}
+                className={`px-3 py-1.5 rounded text-xs font-mono transition-all ${
+                  tierFilter === 'member' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                {isRTL ? 'الأعضاء العاديين' : 'Members'} ({allMergedCustomers.length - totalVipCount})
+              </button>
+            </div>
           </div>
-          <p className="text-2xl font-mono font-bold text-amber-300 mt-2">{totalVipCount}</p>
-          <p className="text-[11px] text-zinc-400 font-mono mt-1">{isRTL ? 'مكافأة نقاط مضاعفة 2x' : '2x Points Multiplier'}</p>
-        </div>
 
-        {/* Points in Circulation */}
-        <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-zinc-400">{isRTL ? 'إجمالي النقاط المتداولة' : 'Loyalty Points Balance'}</span>
-            <Coins className="w-4 h-4 text-emerald-400" />
-          </div>
-          <p className="text-2xl font-mono font-bold text-emerald-400 mt-2">{totalPointsInCirculation} <span className="text-xs text-zinc-500 font-sans">PTS</span></p>
-          <p className="text-[11px] text-zinc-500 font-mono mt-1">
-            {isRTL ? `تعادل: ${formatPrice(totalPointsInCirculation)} رصيد شرائي` : `Equivalent to: ${formatPrice(totalPointsInCirculation)}`}
-          </p>
-        </div>
-
-        {/* Total Spend */}
-        <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-zinc-400">{isRTL ? 'إجمالي إنفاق العملاء' : 'Total Lifetime Value'}</span>
-            <ShoppingBag className="w-4 h-4 text-purple-400" />
-          </div>
-          <p className="text-2xl font-mono font-bold text-white mt-2">{formatPrice(totalCustomerSpend)}</p>
-          <p className="text-[11px] text-zinc-500 font-mono mt-1">{isRTL ? 'مبيعات محققة' : 'Cumulative revenue'}</p>
-        </div>
-      </div>
-
-      {/* 3. Search & Filter Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-zinc-950 border border-zinc-800 rounded-xl">
-        {/* Search */}
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-zinc-500 absolute top-1/2 -translate-y-1/2 left-3 rtl:left-auto rtl:right-3" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={isRTL ? 'بحث بالاسم، رقم الهاتف، أو البريد الإلكتروني...' : 'Search by name, phone, or email...'}
-            className="w-full pl-9 pr-3 rtl:pl-3 rtl:pr-9 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400"
-          />
-        </div>
-
-        {/* Tier Filter Pills */}
-        <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg p-1">
-          <button
-            type="button"
-            onClick={() => setTierFilter('all')}
-            className={`px-3 py-1.5 rounded text-xs font-mono transition-all ${
-              tierFilter === 'all' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
-            }`}
-          >
-            {isRTL ? 'الكل' : 'All'} ({customers.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setTierFilter('vip')}
-            className={`px-3 py-1.5 rounded text-xs font-mono flex items-center gap-1.5 transition-all ${
-              tierFilter === 'vip' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
-            }`}
-          >
-            <Crown className="w-3.5 h-3.5" />
-            <span>VIP ({totalVipCount})</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setTierFilter('member')}
-            className={`px-3 py-1.5 rounded text-xs font-mono transition-all ${
-              tierFilter === 'member' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
-            }`}
-          >
-            {isRTL ? 'الأعضاء العاديين' : 'Members'} ({customers.length - totalVipCount})
-          </button>
-        </div>
-      </div>
-
-      {/* 4. Customer & Points Management Table */}
-      <div className="p-6 rounded-xl bg-zinc-950 border border-zinc-800 shadow-lg">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs font-mono">
-            <thead className="bg-zinc-900/60 border-b border-zinc-800 text-zinc-400">
-              <tr>
-                <th className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>{isRTL ? 'العميل' : 'Customer'}</th>
-                <th className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>{isRTL ? 'نوع العضوية' : 'Membership Tier'}</th>
-                <th className="p-3.5 text-center">{isRTL ? 'الطلبات المكتملة' : 'Completed Orders'}</th>
-                <th className="p-3.5 text-center">{isRTL ? 'رصيد النقاط (PTS)' : 'Points Balance'}</th>
-                <th className={`p-3.5 ${isRTL ? 'text-left' : 'text-right'}`}>{isRTL ? 'إجمالي الإنفاق' : 'Total Spend'}</th>
-                <th className="p-3.5 text-center">{isRTL ? 'إجراءات التحكم' : 'Admin Actions'}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
-              {filteredCustomers.map((cust) => {
-                const isVip = cust.tier === 'VIP' || cust.isVip;
-                const cleanPhone = cust.phone.replace(/\D/g, '');
-                const waNumber = cleanPhone.startsWith('0') ? `2${cleanPhone}` : cleanPhone;
-
-                return (
-                  <tr key={cust.id} className="hover:bg-zinc-900/40 transition-colors">
-                    {/* Customer Info */}
-                    <td className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs ${
-                            isVip
-                              ? 'bg-gradient-to-tr from-amber-500 to-amber-300 text-black shadow-lg shadow-amber-500/20'
-                              : 'bg-zinc-800 text-zinc-300 border border-zinc-700'
-                          }`}
-                        >
-                          {cust.name.slice(0, 1).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-sans font-bold text-white text-sm">{cust.name}</p>
-                          <div className="flex items-center gap-2 text-[11px] text-zinc-400 mt-0.5">
-                            <span>{cust.phone}</span>
-                            <span>•</span>
-                            <span className="text-zinc-500">{cust.email}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Tier Badge */}
-                    <td className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>
-                      {isVip ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/30 text-[11px] font-bold shadow-sm">
-                          <Crown className="w-3.5 h-3.5 text-amber-400" />
-                          <span>EIFFEL VIP</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 text-[11px]">
-                          <span>STANDARD MEMBER</span>
-                        </span>
-                      )}
-                    </td>
-
-                    {/* Completed Orders */}
-                    <td className="p-3.5 text-center font-bold text-white">
-                      <span className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800">
-                        {cust.completedOrdersCount || 0} {isRTL ? 'طلب' : 'orders'}
-                      </span>
-                    </td>
-
-                    {/* Points Balance */}
-                    <td className="p-3.5 text-center">
-                      <div className="inline-flex flex-col items-center">
-                        <span className="font-bold text-emerald-400 text-sm">
-                          {cust.tierPoints || 0} PTS
-                        </span>
-                        <span className="text-[10px] text-zinc-500">
-                          ({formatPrice(cust.tierPoints || 0)})
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Total Spend */}
-                    <td className={`p-3.5 font-bold text-white ${isRTL ? 'text-left' : 'text-right'}`}>
-                      {formatPrice(cust.totalSpend || 0)}
-                    </td>
-
-                    {/* Actions */}
-                    <td className="p-3.5 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        {/* Toggle VIP */}
-                        <button
-                          type="button"
-                          onClick={() => handleToggleVip(cust.id)}
-                          className={`px-2.5 py-1.5 rounded text-xs font-mono flex items-center gap-1.5 transition-colors ${
-                            isVip
-                              ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                              : 'bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 border border-amber-400/30'
-                          }`}
-                          title={isVip ? (isRTL ? 'إلغاء عضوية VIP' : 'Revoke VIP') : (isRTL ? 'ترقية إلى VIP' : 'Promote to VIP')}
-                        >
-                          <Crown className="w-3.5 h-3.5" />
-                          <span>{isVip ? (isRTL ? 'إلغاء VIP' : 'Remove VIP') : (isRTL ? 'ترقية VIP' : 'Make VIP')}</span>
-                        </button>
-
-                        {/* Adjust Points Modal Trigger */}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedCustomerForPoints(cust);
-                            setPointsInput(50);
-                            setPointsAction('add');
-                          }}
-                          className="px-2.5 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-emerald-400 border border-zinc-700 text-xs font-mono flex items-center gap-1 transition-colors"
-                          title={isRTL ? 'تعديل النقاط' : 'Adjust Points'}
-                        >
-                          <Coins className="w-3.5 h-3.5" />
-                          <span>{isRTL ? 'النقاط' : 'Points'}</span>
-                        </button>
-
-                        {/* WhatsApp Contact */}
-                        <a
-                          href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
-                            isRTL
-                              ? `مرحباً بك ${cust.name}، يسعدنا تواصلك مع دار أزياء إيفل.`
-                              : `Hello ${cust.name}, welcome to Eiffel.`
-                          )}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 transition-colors"
-                          title={isRTL ? 'محادثة واتساب' : 'WhatsApp'}
-                        >
-                          <MessageCircle className="w-3.5 h-3.5" />
-                        </a>
-                      </div>
-                    </td>
+          {/* 4. Customer Table */}
+          <div className="p-6 rounded-xl bg-zinc-950 border border-zinc-800 shadow-lg">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs font-mono">
+                <thead className="bg-zinc-900/60 border-b border-zinc-800 text-zinc-400">
+                  <tr>
+                    <th className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>{isRTL ? 'العميل' : 'Customer'}</th>
+                    <th className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>{isRTL ? 'نوع العضوية' : 'Membership Tier'}</th>
+                    <th className="p-3.5 text-center">{isRTL ? 'الطلبات المسلمة' : 'Delivered Orders'}</th>
+                    <th className="p-3.5 text-center">{isRTL ? 'رصيد النقاط (PTS)' : 'Points Balance'}</th>
+                    <th className={`p-3.5 ${isRTL ? 'text-left' : 'text-right'}`}>{isRTL ? 'إجمالي المشتريات' : 'Total Spend'}</th>
+                    <th className="p-3.5 text-center">{isRTL ? 'إجراءات التحكم' : 'Admin Actions'}</th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
+                  {filteredCustomers.map((cust) => {
+                    const isVip = cust.tier === 'VIP' || cust.isVip;
+                    const cleanPhone = cust.phone ? cust.phone.replace(/\D/g, '') : '';
+                    const waNumber = cleanPhone.startsWith('0') ? `2${cleanPhone}` : cleanPhone;
+
+                    return (
+                      <tr key={cust.id} className="hover:bg-zinc-900/40 transition-colors">
+                        {/* Customer Info */}
+                        <td className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs ${
+                                isVip
+                                  ? 'bg-gradient-to-tr from-amber-500 to-amber-300 text-black shadow-lg shadow-amber-500/20'
+                                  : 'bg-zinc-800 text-zinc-300 border border-zinc-700'
+                              }`}
+                            >
+                              {cust.name.slice(0, 1).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className="font-sans font-bold text-white text-sm">{cust.name}</p>
+                              <div className="flex items-center gap-2 text-[11px] text-zinc-400 mt-0.5">
+                                <span>{cust.phone}</span>
+                                {cust.email && (
+                                  <>
+                                    <span>•</span>
+                                    <span className="text-zinc-500">{cust.email}</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Tier Badge */}
+                        <td className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>
+                          {isVip ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/30 text-[11px] font-bold shadow-sm">
+                              <Crown className="w-3.5 h-3.5 text-amber-400" />
+                              <span>EIFFEL VIP</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 text-[11px]">
+                              <span>STANDARD MEMBER</span>
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Delivered Orders */}
+                        <td className="p-3.5 text-center font-bold text-white">
+                          <span className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800">
+                            {cust.completedOrdersCount || 0} {isRTL ? 'طلب' : 'orders'}
+                          </span>
+                        </td>
+
+                        {/* Points Balance */}
+                        <td className="p-3.5 text-center">
+                          <div className="inline-flex flex-col items-center">
+                            <span className="font-bold text-emerald-400 text-sm">
+                              {cust.tierPoints || 0} PTS
+                            </span>
+                            <span className="text-[10px] text-zinc-500">
+                              ({formatPrice(cust.tierPoints || 0)})
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Total Spend */}
+                        <td className={`p-3.5 font-bold text-white ${isRTL ? 'text-left' : 'text-right'}`}>
+                          {formatPrice(cust.totalSpend || 0)}
+                        </td>
+
+                        {/* Actions */}
+                        <td className="p-3.5 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            {/* Toggle VIP */}
+                            <button
+                              type="button"
+                              onClick={() => handleToggleVip(cust)}
+                              disabled={isUpdating}
+                              className={`px-2.5 py-1.5 rounded text-xs font-mono flex items-center gap-1.5 transition-colors disabled:opacity-50 ${
+                                isVip
+                                  ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                  : 'bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                              }`}
+                              title={isVip ? (isRTL ? 'إلغاء عضوية VIP' : 'Revoke VIP') : (isRTL ? 'ترقية إلى VIP' : 'Promote to VIP')}
+                            >
+                              <Crown className="w-3.5 h-3.5" />
+                              <span>{isVip ? (isRTL ? 'إلغاء VIP' : 'Remove VIP') : (isRTL ? 'ترقية VIP' : 'Make VIP')}</span>
+                            </button>
+
+                            {/* Adjust Points Modal Trigger */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedCustomerForPoints(cust);
+                                setPointsInput(50);
+                                setPointsAction('add');
+                              }}
+                              className="px-2.5 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-emerald-400 border border-zinc-700 text-xs font-mono flex items-center gap-1 transition-colors"
+                              title={isRTL ? 'تعديل النقاط' : 'Adjust Points'}
+                            >
+                              <Coins className="w-3.5 h-3.5" />
+                              <span>{isRTL ? 'النقاط' : 'Points'}</span>
+                            </button>
+
+                            {/* WhatsApp Direct Contact */}
+                            {cleanPhone && (
+                              <a
+                                href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
+                                  isRTL
+                                    ? `مرحباً بك ${cust.name}، يسعدنا تواصلك مع دار أزياء إيفل.`
+                                    : `Hello ${cust.name}, welcome to Eiffel.`
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 transition-colors"
+                                title={isRTL ? 'محادثة واتساب' : 'WhatsApp'}
+                              >
+                                <MessageCircle className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* 5. Points Adjustment Modal */}
       {selectedCustomerForPoints && (
@@ -532,7 +566,8 @@ export const AdminCustomersPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleSavePoints}
-                className="px-5 py-2 rounded bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs shadow-lg shadow-amber-400/20 transition-colors"
+                disabled={isUpdating}
+                className="px-5 py-2 rounded bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs shadow-lg shadow-amber-400/20 transition-colors disabled:opacity-50"
               >
                 {isRTL ? 'حفظ وتحديث الرصيد' : 'Save & Update'}
               </button>
