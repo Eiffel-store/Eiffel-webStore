@@ -35,10 +35,10 @@ const INITIAL_USER: UserProfile = {
   email: 'tarek.mansour@eiffel-client.eg',
   phone: '+20 100 123 4567',
   tier: 'MEMBER',
-  tierPoints: 120,
-  completedOrdersCount: 2,
+  tierPoints: 0,
+  completedOrdersCount: 0,
   isVip: false,
-  memberSince: 'JANUARY 2026',
+  memberSince: '2026',
   addresses: [
     {
       id: 'addr-1',
