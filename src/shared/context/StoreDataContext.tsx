@@ -381,13 +381,6 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   });
 
   // Mutations: Orders
-  const createOrderMutation = useMutation({
-    mutationFn: (order: Partial<Order>) => orderService.create(order),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-    },
-  });
-
   const updateOrderStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: Order['status'] }) =>
       orderService.updateStatus(id, status),
