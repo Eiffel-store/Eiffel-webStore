@@ -17,6 +17,7 @@ interface AuthState {
   logout: () => void;
   setUser: (user: User, token: string) => void;
   fetchProfile: () => Promise<void>;
+  updateUserPoints: (delta: number) => void;
   clearError: () => void;
 }
 
@@ -134,6 +135,15 @@ export const useAuthStore = create<AuthState>()(
         } catch {
           // ignore if unauthenticated or offline
         }
+      },
+
+      updateUserPoints: (delta: number) => {
+        set((state) => ({
+          user: state.user ? {
+            ...state.user,
+            tierPoints: Math.max(0, (state.user.tierPoints || 0) + delta)
+          } : null
+        }));
       },
 
       clearError: () => set({ error: null }),

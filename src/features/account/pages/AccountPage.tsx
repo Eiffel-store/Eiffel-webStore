@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useMyOrders } from '@/hooks/useOrders';
-import { useLanguage } from '@/shared';
+import { useLanguage, useStoreData } from '@/shared';
 import { CustomerAuthView } from '../components/CustomerAuthView';
 import { AccountHeader } from '../components/AccountHeader';
 import { AccountTabsNav, AccountTabKey } from '../components/AccountTabsNav';
@@ -13,12 +13,13 @@ import { AddressModal } from '../components/AddressModal';
 import { CardModal } from '../components/CardModal';
 import { LogOut, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Address, PaymentMethod, User } from '@/types';
+import { Address, PaymentMethod, User, Order } from '@/types';
 
 export const AccountPage: React.FC = () => {
   const { user, isAuthenticated, role, logout, fetchProfile } = useAuthStore();
   const { t } = useLanguage();
-  const { data: serverOrders = [] } = useMyOrders();
+  const { orders: localStoreOrders } = useStoreData();
+  const { data: serverOrders = [] } = useMyOrders(user?.email);
 
   const [activeTab, setActiveTab] = useState<AccountTabKey>('overview');
   const [showAddressModal, setShowAddressModal] = useState(false);
@@ -41,6 +42,46 @@ export const AccountPage: React.FC = () => {
     }
   }, [user]);
 
+  // Merge and deduplicate server orders and local store orders
+  const userOrders = useMemo(() => {
+    const userEmail = (user?.email || '').trim().toLowerCase();
+    const map = new Map<string, Order>();
+
+    // 1. Add server orders (from /orders/my-orders)
+    (serverOrders || []).forEach(o => map.set(o.id, o));
+
+    // 2. Add local store orders matching user email
+    if (localStoreOrders && userEmail) {
+      localStoreOrders.forEach(o => {
+        const orderEmail = (o.customerEmail || (o as any).email || o.shippingAddress?.phone || '').trim().toLowerCase();
+        const shipEmail = (o.shippingAddress?.streetAddress || o.shippingAddress?.apartment || '').toLowerCase();
+        if (
+          (o.customerEmail && o.customerEmail.toLowerCase().trim() === userEmail) ||
+          ((o as any).email && (o as any).email.toLowerCase().trim() === userEmail)
+        ) {
+          if (!map.has(o.id)) {
+            map.set(o.id, o);
+          }
+        }
+      });
+    }
+
+    // 3. Add user.orders if present
+    if (user?.orders && Array.isArray(user.orders)) {
+      user.orders.forEach(o => {
+        if (!map.has(o.id)) {
+          map.set(o.id, o);
+        }
+      });
+    }
+
+    return Array.from(map.values()).sort((a, b) => {
+      const dateA = new Date(a.date || (a as any).createdAt || 0).getTime();
+      const dateB = new Date(b.date || (b as any).createdAt || 0).getTime();
+      return dateB - dateA;
+    });
+  }, [serverOrders, localStoreOrders, user]);
+
   // If user is not authenticated, render the luxury login/register form!
   if (!isAuthenticated || !user) {
     return <CustomerAuthView />;
@@ -48,7 +89,7 @@ export const AccountPage: React.FC = () => {
 
   const fullUser: User = {
     ...user,
-    orders: serverOrders.length > 0 ? serverOrders : (user.orders || []),
+    orders: userOrders,
     addresses: userState?.addresses || user.addresses || [],
     paymentMethods: userState?.paymentMethods || user.paymentMethods || [],
   };

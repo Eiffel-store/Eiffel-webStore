@@ -53,8 +53,19 @@ export const AccountOrdersTab: React.FC<AccountOrdersTabProps> = ({ orders = [] 
                     <img src={img} alt={it?.product?.name || 'Item'} className="w-14 h-16 object-cover" />
                     <div className="flex-1">
                       <h4 className="font-editorial text-base text-primary dark:text-white line-clamp-1">{it?.product?.name || 'Product'}</h4>
-                      <p className="text-[11px] text-secondary font-mono">{it?.selectedSize || 'M'} • {it?.selectedColor || 'Standard'}</p>
-                      <span className="font-mono text-xs font-bold text-primary dark:text-white">{formatPrice(it?.product?.price || 0)}</span>
+                      <p className="text-[11px] text-secondary font-mono">
+                        {it?.selectedSize || 'M'} • {it?.selectedColor || 'Standard'} {it.quantity > 1 ? `• ${isRTL ? `العدد: ${it.quantity}` : `Qty: ${it.quantity}`}` : ''}
+                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="font-mono text-xs font-bold text-primary dark:text-white">
+                          {formatPrice((it?.product?.price || 0) * (it.quantity || 1))}
+                        </span>
+                        {it.quantity > 1 && (
+                          <span className="font-mono text-[10px] text-zinc-400">
+                            ({it.quantity} × {formatPrice(it?.product?.price || 0)})
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );

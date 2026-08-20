@@ -9,10 +9,10 @@ export const useOrders = () => {
   });
 };
 
-export const useMyOrders = () => {
+export const useMyOrders = (email?: string) => {
   return useQuery({
-    queryKey: ['orders', 'my-orders'],
-    queryFn: () => orderService.getMyOrders(),
+    queryKey: ['orders', 'my-orders', email || 'current'],
+    queryFn: () => orderService.getMyOrders(email),
   });
 };
 

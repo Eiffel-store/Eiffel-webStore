@@ -520,7 +520,8 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Order Methods
   const addOrder = (order: Order) => {
-    createOrderMutation.mutate(order);
+    queryClient.setQueryData<Order[]>(['orders'], (old = []) => [order, ...(old || []).filter(o => o.id !== order.id)]);
+    queryClient.invalidateQueries({ queryKey: ['orders'] });
   };
 
   const updateOrderStatus = (orderId: string, status: Order['status']) => {

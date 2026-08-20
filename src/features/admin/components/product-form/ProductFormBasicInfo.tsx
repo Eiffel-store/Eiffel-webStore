@@ -22,23 +22,36 @@ const POPULAR_SUBCATEGORIES: Record<string, Array<{ value: string; labelEn: stri
     { value: 'Joggers & Sweatpants', labelEn: 'Joggers & Sweatpants (سويت بانتس وجوجرز)', labelAr: 'سويت بانتس وجوجرز (Sweatpants)' },
     { value: 'Shorts', labelEn: 'Shorts (شورتات)', labelAr: 'شورتات (Shorts)' },
     { value: 'Co-ords & Sets', labelEn: 'Co-ords & Sets (أطقم متكاملة)', labelAr: 'أطقم متكاملة (Sets)' },
-    { value: 'Suits & Blazers', labelEn: 'Suits & Blazers (بدل وبليزر)', labelAr: 'بدل وبليزر (Blazers)' }
+    { value: 'Suits & Blazers', labelEn: 'Suits & Blazers (بدل وبليزر)', labelAr: 'بدل وبليزر (Blazers)' },
+    { value: 'Accessories', labelEn: 'Accessories (إكسسوارات)', labelAr: 'إكسسوارات (Accessories)' },
+    { value: 'Caps & Hats', labelEn: 'Caps & Hats (كابات وقبعات)', labelAr: 'كابات وقبعات (Caps)' },
+    { value: 'Bags & Backpacks', labelEn: 'Bags & Backpacks (شنط وحقائب)', labelAr: 'شنط وحقائب (Bags)' },
+    { value: 'Belts & Leather Goods', labelEn: 'Belts & Leather Goods (أحزمة ومصنوعات جلدية)', labelAr: 'أحزمة وجلديات (Belts)' },
+    { value: 'Sunglasses', labelEn: 'Sunglasses (نظارات شمسية)', labelAr: 'نظارات شمسية (Sunglasses)' },
+    { value: 'Wallets & Cardholders', labelEn: 'Wallets & Cardholders (محافظ وحوامل كروت)', labelAr: 'محافظ وحوامل كروت (Wallets)' },
+    { value: 'Perfumes & Fragrances', labelEn: 'Perfumes & Fragrances (عطور وبيرفيوم)', labelAr: 'عطور وبيرفيوم (Fragrances)' },
+    { value: 'Socks', labelEn: 'Socks (شرابات فاخرة)', labelAr: 'شرابات فاخرة (Socks)' },
   ],
   kids: [
     { value: 'Kids T-Shirts', labelEn: 'Kids T-Shirts (تيشيرتات أطفال)', labelAr: 'تيشيرتات أطفال (T-Shirts)' },
     { value: 'Kids Hoodies', labelEn: 'Kids Hoodies (هوديز وسويت شيرت أطفال)', labelAr: 'هوديز أطفال (Hoodies)' },
     { value: 'Kids Pants', labelEn: 'Kids Pants (بناطيل أطفال)', labelAr: 'بناطيل أطفال (Pants)' },
     { value: 'Kids Sets', labelEn: 'Kids Sets (أطقم أطفال)', labelAr: 'أطقم أطفال (Sets)' },
-    { value: 'Kids Jackets', labelEn: 'Kids Jackets (جواكت أطفال)', labelAr: 'جواكت أطفال (Jackets)' }
+    { value: 'Kids Jackets', labelEn: 'Kids Jackets (جواكت أطفال)', labelAr: 'جواكت أطفال (Jackets)' },
+    { value: 'Kids Accessories', labelEn: 'Kids Accessories (إكسسوارات أطفال)', labelAr: 'إكسسوارات أطفال (Kids Accessories)' },
+    { value: 'Accessories', labelEn: 'Accessories (إكسسوارات عامة)', labelAr: 'إكسسوارات عامة (Accessories)' }
   ],
   accessories: [
+    { value: 'Accessories', labelEn: 'Accessories (إكسسوارات عامة)', labelAr: 'إكسسوارات عامة (General Accessories)' },
     { value: 'Caps & Hats', labelEn: 'Caps & Hats (كابات وقبعات)', labelAr: 'كابات وقبعات (Caps)' },
     { value: 'Bags & Backpacks', labelEn: 'Bags & Backpacks (شنط وحقائب)', labelAr: 'شنط وحقائب (Bags)' },
     { value: 'Belts & Leather Goods', labelEn: 'Belts & Leather Goods (أحزمة ومصنوعات جلدية)', labelAr: 'أحزمة وجلديات (Belts)' },
-    { value: 'Socks', labelEn: 'Socks (شرابات فاخرة)', labelAr: 'شرابات فاخرة (Socks)' },
+    { value: 'Wallets & Cardholders', labelEn: 'Wallets (محافظ وحوامل بطاقات)', labelAr: 'محافظ وحوامل بطاقات (Wallets)' },
     { value: 'Sunglasses', labelEn: 'Sunglasses (نظارات شمسية)', labelAr: 'نظارات شمسية (Eyewear)' },
-    { value: 'Fragrances', labelEn: 'Fragrances (عطور وبيرفيوم)', labelAr: 'عطور وبيرفيوم (Fragrances)' },
-    { value: 'Wallets & Cardholders', labelEn: 'Wallets (محافظ وحوامل بطاقات)', labelAr: 'محافظ وحوامل بطاقات (Wallets)' }
+    { value: 'Perfumes & Fragrances', labelEn: 'Fragrances (عطور وبيرفيوم)', labelAr: 'عطور وبيرفيوم (Fragrances)' },
+    { value: 'Jewelry & Watches', labelEn: 'Jewelry & Watches (ساعات ومجوهرات/سلاسل)', labelAr: 'ساعات ومجوهرات (Jewelry & Watches)' },
+    { value: 'Socks', labelEn: 'Socks (شرابات فاخرة)', labelAr: 'شرابات فاخرة (Socks)' },
+    { value: 'Scarves & Ties', labelEn: 'Scarves & Ties (سكارفات وكرافتات)', labelAr: 'سكارفات وكرافتات (Scarves & Ties)' }
   ]
 };
 

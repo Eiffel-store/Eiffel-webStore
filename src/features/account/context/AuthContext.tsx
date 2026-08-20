@@ -153,7 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setUser(prev => ({
       ...prev,
-      tierPoints: prev.tierPoints + Math.round(newOrder.total),
+      tierPoints: prev.tierPoints + Math.max(1, Math.round(newOrder.total * 0.01)),
       orders: [newOrder, ...prev.orders]
     }));
 

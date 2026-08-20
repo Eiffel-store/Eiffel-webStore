@@ -121,12 +121,19 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
 
                 {/* Order Items */}
                 <td className="py-3.5 px-4">
-                  <div className="font-mono text-zinc-300 font-bold">
-                    {order.items?.length || 0} {isRTL ? 'قطعة' : 'items'}
-                  </div>
-                  <div className="text-[10px] text-zinc-400 truncate max-w-[180px] mt-0.5">
-                    {order.items?.map(i => `${i.product?.name || 'قطعة'} (${i.selectedColor || ''})`).join(' • ')}
-                  </div>
+                  {(() => {
+                    const totalUnits = order.items?.reduce((sum, i) => sum + (i.quantity || 1), 0) || 0;
+                    return (
+                      <>
+                        <div className="font-mono text-zinc-300 font-bold">
+                          {totalUnits} {isRTL ? (totalUnits === 1 ? 'قطعة' : totalUnits === 2 ? 'قطعتين' : totalUnits <= 10 ? 'قطع' : 'قطعة') : (totalUnits === 1 ? 'item' : 'items')}
+                        </div>
+                        <div className="text-[10px] text-zinc-400 truncate max-w-[200px] mt-0.5" title={order.items?.map(i => `${i.product?.name || 'قطعة'} (${i.selectedColor || ''})${i.quantity > 1 ? ` ×${i.quantity}` : ''}`).join(' • ')}>
+                          {order.items?.map(i => `${i.product?.name || 'قطعة'} (${i.selectedColor || ''})${i.quantity > 1 ? ` ×${i.quantity}` : ''}`).join(' • ')}
+                        </div>
+                      </>
+                    );
+                  })()}
                 </td>
 
                 {/* Total & Payment */}

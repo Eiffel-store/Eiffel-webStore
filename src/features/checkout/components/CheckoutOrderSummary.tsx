@@ -145,15 +145,10 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
       <div className="p-3 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-between text-xs font-mono">
         <div className="flex items-center gap-2 text-amber-300">
           <Sparkles className="w-4 h-4 text-amber-400" />
-          <span>{isRTL ? 'النقاط المكتسبة من هذا الطلب:' : 'Points to earn on delivery:'}</span>
+          <span>{isRTL ? 'النقاط المكتسبة (1% من قيمة الطلب):' : 'Points to earn (1% of order):'}</span>
         </div>
         <div className="flex items-center gap-1.5 font-bold text-amber-400">
           <span>+{pointsToEarn} PTS</span>
-          {isVip && (
-            <span className="text-[10px] bg-amber-400 text-black px-1.5 py-0.2 rounded font-sans font-bold">
-              2x VIP
-            </span>
-          )}
         </div>
       </div>
 

@@ -125,7 +125,9 @@ export const mapServerOrderToClient = (s: ServerOrder): Order => {
 // Convert Frontend Order to ServerOrderRequest
 export const mapClientOrderToServerRequest = (order: Partial<Order>): ServerOrderRequest => {
   const address = order.shippingAddress;
-  const fullName = address ? `${address.firstName || ''} ${address.lastName || ''}`.trim() : 'عميل إيفل';
+  const fullName = order.customerName || (address ? `${address.firstName || ''} ${address.lastName || ''}`.trim() : 'عميل إيفل');
+  const email = order.customerEmail || (order as any).email || (address as any)?.email;
+  const phone = order.customerPhone || address?.phone || '';
 
   const items: ServerOrderItem[] = (order.items || []).map(it => ({
     productId: it.product?.id || `prod-${Date.now()}`,
@@ -145,7 +147,8 @@ export const mapClientOrderToServerRequest = (order: Partial<Order>): ServerOrde
     tax: order.tax || 0,
     total: order.total || (order.subtotal || 0),
     customerName: fullName,
-    customerPhone: address?.phone || '',
+    customerEmail: email || undefined,
+    customerPhone: phone || undefined,
     shippingStreet: address?.street || '',
     shippingApartment: address?.apartment || '',
     shippingCity: address?.city || 'القاهرة',
@@ -153,7 +156,8 @@ export const mapClientOrderToServerRequest = (order: Partial<Order>): ServerOrde
     shippingPostalCode: address?.postalCode || '',
     shippingCountry: address?.country || 'Egypt',
     paymentMethod: order.paymentMethod || 'Cash on Delivery (الدفع عند الاستلام)',
-    customerNotes: order.customerNotes
+    customerNotes: order.customerNotes,
+    couponCode: order.couponCode
   };
 };
 
@@ -171,8 +175,9 @@ export const orderService = {
     return rawOrders.map(mapServerOrderToClient);
   },
 
-  getMyOrders: async (): Promise<Order[]> => {
-    const response = await apiClient.get<ApiResponse<ServerOrder[]>>('/orders/my-orders');
+  getMyOrders: async (email?: string): Promise<Order[]> => {
+    const params = email ? { email } : undefined;
+    const response = await apiClient.get<ApiResponse<ServerOrder[]>>('/orders/my-orders', { params });
     const rawOrders = response.data.data || [];
     return rawOrders.map(mapServerOrderToClient);
   },

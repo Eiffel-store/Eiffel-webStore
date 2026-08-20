@@ -47,7 +47,7 @@ describe('Authentication & Access Control', () => {
     expect(useAuthStore.getState().role).toBe('ROLE_CUSTOMER');
   });
 
-  it('registers new user correctly with fallback', async () => {
+  it('registers new user correctly with 50 initial loyalty points', async () => {
     const store = useAuthStore.getState();
     const result = await store.register({
       name: 'Youssef Mansour',
@@ -59,6 +59,34 @@ describe('Authentication & Access Control', () => {
     expect(result.email).toBe('youssef@example.com');
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
     expect(useAuthStore.getState().user?.name).toBe('Youssef Mansour');
+    expect(useAuthStore.getState().user?.tierPoints).toBe(50);
+  });
+
+  it('updates loyalty points balance properly', () => {
+    const store = useAuthStore.getState();
+    store.setUser({
+      id: 'test-user-1',
+      name: 'Test Customer',
+      email: 'cust@eiffel.com',
+      role: 'ROLE_CUSTOMER',
+      tier: 'MEMBER',
+      tierPoints: 50,
+      phone: '',
+      memberSince: '2026',
+      addresses: [],
+      paymentMethods: [],
+      orders: [],
+    }, 'token-123');
+
+    expect(useAuthStore.getState().user?.tierPoints).toBe(50);
+
+    // Deduct 20 points (e.g. on checkout redemption)
+    useAuthStore.getState().updateUserPoints(-20);
+    expect(useAuthStore.getState().user?.tierPoints).toBe(30);
+
+    // Add 10 points (e.g. 1% purchase reward)
+    useAuthStore.getState().updateUserPoints(10);
+    expect(useAuthStore.getState().user?.tierPoints).toBe(40);
   });
 
   it('resets state on logout', async () => {

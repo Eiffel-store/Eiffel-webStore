@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Lock, Truck, AlertCircle, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/features/cart';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCurrency, useLanguage, useStoreData } from '@/shared';
 import { Address, Order } from '@/types';
 import { orderService } from '@/services/orderService';
+import { customerService } from '@/services/customerService';
 import { OrderConfirmation } from '../components/OrderConfirmation';
 import { CheckoutContactForm, CheckoutFormErrors } from '../components/CheckoutContactForm';
 import { CheckoutShippingSelector } from '../components/CheckoutShippingSelector';
@@ -12,8 +14,9 @@ import { CheckoutPaymentSelector } from '../components/CheckoutPaymentSelector';
 import { CheckoutOrderSummary } from '../components/CheckoutOrderSummary';
 
 export const CheckoutPage: React.FC = () => {
+  const queryClient = useQueryClient();
   const { cart, subtotal, discountAmount, discountCode, clearCart } = useCart();
-  const { user } = useAuthStore();
+  const { user, updateUserPoints } = useAuthStore();
   const { addOrder } = useStoreData();
   const { formatPrice } = useCurrency();
   const { t, isRTL } = useLanguage();
@@ -127,26 +130,33 @@ export const CheckoutPage: React.FC = () => {
 
   // Shipping & Payment
   const [shippingMethod, setShippingMethod] = useState<'express' | 'white-glove'>('express');
-  const [paymentMethod, setPaymentMethod] = useState<'cod'>('cod');
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'points'>('cod');
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCvc, setCardCvc] = useState('');
   const [cardName, setCardName] = useState('');
 
-  // Points & VIP
+  // Points & Loyalty Calculations
   const availablePoints = user?.tierPoints || 0;
   const [redeemPoints, setRedeemPoints] = useState(false);
   const isVip = user?.tier === 'VIP' || user?.isVip || false;
 
   const discountValue = discountAmount;
-  const maxPointsDiscount = Math.min(availablePoints, Math.max(0, subtotal - discountValue));
-  const pointsDiscountValue = redeemPoints ? maxPointsDiscount : 0;
   const shippingFee = shippingMethod === 'white-glove' ? 10 : 0;
-  const totalAmount = Math.max(0, subtotal - discountValue - pointsDiscountValue + shippingFee);
-  const pointsToEarn = isVip ? Math.round(totalAmount * 0.10) : Math.round(totalAmount * 0.05);
+  const totalBeforePoints = Math.max(0, subtotal - discountValue + shippingFee);
+
+  // Apply points if explicitly chosen as payment method OR checked in summary
+  const isUsingPoints = paymentMethod === 'points' || redeemPoints;
+  const maxPointsDiscount = Math.min(availablePoints, totalBeforePoints);
+  const pointsDiscountValue = isUsingPoints ? maxPointsDiscount : 0;
+  const totalAmount = Math.max(0, totalBeforePoints - pointsDiscountValue);
+
+  // Rule: Earn exactly 1% points of the purchase value
+  const pointsToEarn = Math.max(1, Math.round(totalAmount * 0.01));
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setFormAlert(null);
 
     // 1. Check Cart
@@ -206,7 +216,20 @@ export const CheckoutPage: React.FC = () => {
       isDefault: true,
     };
 
-    const paymentMethodString = 'Cash on Delivery (الدفع عند الاستلام)';
+    let paymentMethodString = 'Cash on Delivery (الدفع عند الاستلام)';
+    if (paymentMethod === 'points') {
+      if (totalAmount === 0) {
+        paymentMethodString = isRTL ? 'الدفع بالنقاط بالكامل (Loyalty Points)' : 'Loyalty Points (Paid in Full)';
+      } else {
+        paymentMethodString = isRTL
+          ? `خصم بالنقاط (${pointsDiscountValue} ج.م) + دفع عند الاستلام (${totalAmount} ج.م)`
+          : `Points Discount (${pointsDiscountValue} PTS) + COD (${totalAmount} EGP)`;
+      }
+    } else if (pointsDiscountValue > 0) {
+      paymentMethodString = isRTL
+        ? `دفع عند الاستلام مع خصم بالنقاط (${pointsDiscountValue} ج.م)`
+        : `Cash on Delivery + Points Discount (${pointsDiscountValue} PTS)`;
+    }
 
     try {
       const orderPayload: Partial<Order> = {
@@ -216,16 +239,33 @@ export const CheckoutPage: React.FC = () => {
         discount: discountValue + pointsDiscountValue,
         tax: 0,
         total: totalAmount,
-        shippingAddress,
+        customerName: `${firstName.trim()} ${lastName.trim()}`.trim(),
+        customerEmail: email.trim() || user?.email || '',
+        customerPhone: phone.trim(),
+        shippingAddress: {
+          ...shippingAddress,
+          email: email.trim() || user?.email || '',
+        } as any,
         paymentMethod: paymentMethodString,
         pointsEarned: pointsToEarn,
-        pointsRedeemed: redeemPoints ? pointsDiscountValue : 0,
+        pointsRedeemed: pointsDiscountValue,
         pointsDiscount: pointsDiscountValue,
         couponCode: discountCode || undefined
       };
 
       const createdOrder = await orderService.create(orderPayload);
       addOrder(createdOrder);
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['orders', 'my-orders'] });
+
+      // Deduct points from user balance if points were redeemed
+      if (pointsDiscountValue > 0 && user) {
+        updateUserPoints(-pointsDiscountValue);
+        if (user.id) {
+          customerService.adjustPoints(user.id, -pointsDiscountValue).catch(() => {});
+        }
+      }
+
       clearCart();
       setOrderComplete(createdOrder);
     } catch (err) {
@@ -243,10 +283,28 @@ export const CheckoutPage: React.FC = () => {
         discount: discountValue + pointsDiscountValue,
         tax: 0,
         total: totalAmount,
-        shippingAddress,
-        paymentMethod: paymentMethodString
+        customerName: `${firstName.trim()} ${lastName.trim()}`.trim(),
+        customerEmail: email.trim() || user?.email || '',
+        customerPhone: phone.trim(),
+        shippingAddress: {
+          ...shippingAddress,
+          email: email.trim() || user?.email || '',
+        } as any,
+        paymentMethod: paymentMethodString,
+        pointsEarned: pointsToEarn,
+        pointsRedeemed: pointsDiscountValue,
+        pointsDiscount: pointsDiscountValue,
+        couponCode: discountCode || undefined
       };
+
       addOrder(fallbackOrder);
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+
+      // Deduct points from user balance in local fallback
+      if (pointsDiscountValue > 0 && user) {
+        updateUserPoints(-pointsDiscountValue);
+      }
+
       clearCart();
       setOrderComplete(fallbackOrder);
     } finally {
@@ -350,15 +408,15 @@ export const CheckoutPage: React.FC = () => {
 
               <CheckoutPaymentSelector
                 paymentMethod={paymentMethod}
-                setPaymentMethod={setPaymentMethod}
-                cardNumber={cardNumber}
-                setCardNumber={setCardNumber}
-                cardExpiry={cardExpiry}
-                setCardExpiry={setCardExpiry}
-                cardCvc={cardCvc}
-                setCardCvc={setCardCvc}
-                cardName={cardName}
-                setCardName={setCardName}
+                setPaymentMethod={(method) => {
+                  setPaymentMethod(method);
+                  if (method === 'points') {
+                    setRedeemPoints(true);
+                  }
+                }}
+                availablePoints={availablePoints}
+                totalBeforePoints={totalBeforePoints}
+                pointsDiscountValue={pointsDiscountValue}
               />
 
               {/* Authorize CTA Button */}

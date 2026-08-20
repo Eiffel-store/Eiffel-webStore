@@ -8,7 +8,7 @@ import { Order } from '@/types';
 
 interface OrderConfirmationProps {
   order: Order;
-  paymentMethod: 'instapay' | 'card' | 'cod';
+  paymentMethod?: string;
   street: string;
   city: string;
 }

@@ -38,8 +38,7 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const setCurrencyCode = (_code: string) => {};
 
   const convertPrice = (amount: number): number => {
-    // If amounts are entered in standard figures e.g. 180 -> 1,800 EGP or direct amount
-    return amount >= 1000 ? amount : amount * 10;
+    return Number(amount) || 0;
   };
 
   const formatPrice = (amount: number): string => {

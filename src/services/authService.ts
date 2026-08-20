@@ -38,7 +38,7 @@ export const authService = {
           email: email,
           role: 'ROLE_CUSTOMER',
           tier: 'MEMBER',
-          tierPoints: 100,
+          tierPoints: 50,
           token: `demo-customer-jwt-token-${Date.now()}`,
         };
       }

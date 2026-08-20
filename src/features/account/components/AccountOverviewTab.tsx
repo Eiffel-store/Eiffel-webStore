@@ -62,9 +62,9 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
             </div>
 
             <p className="text-xs text-zinc-400 font-light max-w-xl">
-              {isVip
-                ? (isRTL ? 'بصفتك عميل VIP، تكسب 10% نقاط مضاعفة (2x) على كل طلب تطلبه من المتجر ويمكنك استبدالها بخصومات فورية.' : 'As a VIP, you earn 10% (2x) bonus loyalty points on all purchases, redeemable at checkout.')
-                : (isRTL ? 'تكسب 5% نقاط ولاء على كل طلب مستلم، وتتم ترقيتك تلقائياً لعضوية VIP بعد 3 طلبات مستلمة!' : 'Earn 5% points on all delivered orders. Auto-upgrade to VIP upon completing 3 orders!')}
+              {isRTL
+                ? 'تكسب 1% نقاط ولاء على قيمة كل عملية شراء من المتجر، ويمكنك استخدام رصيد نقاطك للدفع المباشر عند إتمام أي طلب!'
+                : 'Earn 1% loyalty points on every purchase, and redeem your points balance directly at checkout to pay for orders!'}
             </p>
           </div>
 
@@ -146,7 +146,14 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
                       );
                     })}
                     <div className="flex-1 text-xs">
-                      <p className="text-secondary dark:text-zinc-400 font-light">{items.length} {t.itemsReserved}</p>
+                      {(() => {
+                        const totalUnits = items.reduce((sum: number, it: CartItem) => sum + (it.quantity || 1), 0);
+                        return (
+                          <p className="text-secondary dark:text-zinc-400 font-light">
+                            {totalUnits} {totalUnits === 1 ? (isRTL ? 'قطعة' : 'item') : totalUnits === 2 ? (isRTL ? 'قطعتين' : 'items') : (isRTL ? 'قطع' : 'items')}
+                          </p>
+                        );
+                      })()}
                       <span className="font-mono font-bold text-primary dark:text-white">{formatPrice(order.total || 0)}</span>
                     </div>
                   </div>
