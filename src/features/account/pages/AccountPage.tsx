@@ -16,7 +16,7 @@ import { Link } from 'react-router-dom';
 import { Address, PaymentMethod, User } from '@/types';
 
 export const AccountPage: React.FC = () => {
-  const { user, isAuthenticated, role, logout } = useAuthStore();
+  const { user, isAuthenticated, role, logout, fetchProfile } = useAuthStore();
   const { t } = useLanguage();
   const { data: serverOrders = [] } = useMyOrders();
 
@@ -26,6 +26,13 @@ export const AccountPage: React.FC = () => {
 
   // Local user state for addresses/payment methods
   const [userState, setUserState] = useState<User | null>(user);
+
+  // Fetch fresh profile from server on mount
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      fetchProfile();
+    }
+  }, [isAuthenticated, fetchProfile]);
 
   // Keep state in sync with auth store
   React.useEffect(() => {

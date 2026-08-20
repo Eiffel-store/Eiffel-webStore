@@ -41,7 +41,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             email: 'admin@eiffel.com',
             role: 'ROLE_ADMIN',
             tier: 'EIFFEL PRIVÉ',
-            tierPoints: 9999,
+            tierPoints: 0,
             phone: '+201000000001',
             memberSince: '2026',
             addresses: [],

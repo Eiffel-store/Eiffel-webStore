@@ -436,6 +436,12 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['coupons'] }),
   });
 
+  const updateCouponMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Coupon> }) =>
+      couponService.update(id, updates),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['coupons'] }),
+  });
+
   const deleteCouponMutation = useMutation({
     mutationFn: (id: string) => couponService.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['coupons'] }),
@@ -497,7 +503,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const updateCoupon = (id: string, updates: Partial<Coupon>) => {
-    createCouponMutation.mutate({ ...updates, id } as any);
+    updateCouponMutation.mutate({ id, updates });
   };
 
   const deleteCoupon = (id: string) => {

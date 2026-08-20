@@ -18,23 +18,10 @@ export const StoreCard: React.FC<StoreCardProps> = ({
 }) => {
   const { t, isRTL } = useLanguage();
 
-  const isNahtay = store.id?.includes('nahtay') || store.name?.includes('Nahtay') || store.name?.includes('نهطاي');
-
-  const displayName = isRTL
-    ? (isNahtay ? 'إيفل بوتيك — نهطاي' : 'إيفل الرئيسي — زفتى')
-    : (isNahtay ? 'Eiffel Boutique — Nahtay' : 'Eiffel Flagship — Zifta');
-
-  const displayCity = isRTL
-    ? (isNahtay ? 'نهطاي (الغربية)' : 'زفتى (الغربية)')
-    : (isNahtay ? 'NAHTAY (GHARBIA)' : 'ZIFTA (GHARBIA)');
-
-  const displayAddress = isRTL
-    ? (isNahtay ? 'نهطاي، على الطريق بجوار كشري الإمبراطور، محافظة الغربية، مصر' : 'زفتى، المحطة أمام قاعة هوليوود، محافظة الغربية، مصر')
-    : (isNahtay ? 'Nahtay, Main Highway, Beside El-Emperator, Gharbia, Egypt' : 'Zifta, Station St., In front of Hollywood Hall, Gharbia, Egypt');
-
-  const displayHours = isRTL
-    ? 'يومياً: 11:00 صباحاً – 12:00 منتصف الليل'
-    : 'Daily: 11:00 AM – 12:00 AM';
+  const displayName = isRTL ? store.name : (store.nameEn || store.name);
+  const displayCity = isRTL ? store.city : (store.cityEn || store.city);
+  const displayAddress = isRTL ? store.address : (store.addressEn || store.address);
+  const displayHours = isRTL ? store.hours : (store.hoursEn || store.hours);
 
   return (
     <div
@@ -67,10 +54,26 @@ export const StoreCard: React.FC<StoreCardProps> = ({
           <Clock className="w-3.5 h-3.5 shrink-0 text-primary dark:text-white" />
           <span>{displayHours}</span>
         </p>
-        <p className="flex items-center gap-2">
-          <Phone className="w-3.5 h-3.5 shrink-0 text-primary dark:text-white" />
-          <span>{store.phone || '+20 100 932 6801'}</span>
-        </p>
+        {store.phone && (
+          <p className="flex items-center gap-2">
+            <Phone className="w-3.5 h-3.5 shrink-0 text-primary dark:text-white" />
+            <span>{store.phone}</span>
+          </p>
+        )}
+        {store.mapLink && (
+          <p className="pt-1">
+            <a
+              href={store.mapLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-[11px] text-amber-500 hover:underline inline-flex items-center gap-1 font-mono"
+            >
+              <MapPin className="w-3 h-3" />
+              <span>{isRTL ? 'عرض الموقع على الخريطة' : 'View on Google Maps'} &rarr;</span>
+            </a>
+          </p>
+        )}
       </div>
 
       <div className="mt-6 pt-4 border-t border-surface-container/60 dark:border-zinc-800 flex items-center justify-between gap-3">

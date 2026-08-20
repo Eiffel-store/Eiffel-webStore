@@ -61,16 +61,22 @@ export interface Coupon {
 export interface StoreLocation {
   id: string;
   city: string;
+  cityEn?: string;
   name: string;
   nameEn?: string;
   address: string;
+  addressEn?: string;
   hours: string;
+  hoursEn?: string;
   phone: string;
   email: string;
-  type: 'Flagship' | 'Atelier' | 'Boutique';
+  type: 'Flagship' | 'Atelier' | 'Boutique' | 'Studio';
   coordinates: { x: number; y: number };
+  latitude?: number;
+  longitude?: number;
   image: string;
   mapLink?: string;
+  active?: boolean;
 }
 
 export interface Address {

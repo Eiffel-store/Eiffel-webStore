@@ -16,6 +16,7 @@ interface AuthState {
   register: (data: RegisterData) => Promise<AuthResult>;
   logout: () => void;
   setUser: (user: User, token: string) => void;
+  fetchProfile: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -114,6 +115,25 @@ export const useAuthStore = create<AuthState>()(
           role: user.role as any,
           isAuthenticated: true,
         });
+      },
+
+      fetchProfile: async () => {
+        try {
+          const data = await authService.getProfile();
+          if (data) {
+            set((state) => ({
+              user: state.user ? {
+                ...state.user,
+                name: data.name || state.user.name,
+                tier: (data.tier as any) || state.user.tier,
+                tierPoints: data.tierPoints ?? 0,
+                phone: data.phone || state.user.phone,
+              } : null
+            }));
+          }
+        } catch {
+          // ignore if unauthenticated or offline
+        }
       },
 
       clearError: () => set({ error: null }),

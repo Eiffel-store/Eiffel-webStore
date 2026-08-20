@@ -14,28 +14,44 @@ export const AdminBranchesPage: React.FC = () => {
 
   const [formStore, setFormStore] = useState<Omit<StoreLocation, 'id'>>({
     city: '',
+    cityEn: '',
     name: '',
+    nameEn: '',
     address: '',
+    addressEn: '',
     hours: '',
+    hoursEn: '',
     phone: '',
     email: '',
     type: 'Boutique',
     coordinates: { x: 50, y: 50 },
-    image: ''
+    latitude: undefined,
+    longitude: undefined,
+    image: '',
+    mapLink: '',
+    active: true
   });
 
   const handleOpenEdit = (store: StoreLocation) => {
     setEditingStore(store);
     setFormStore({
       city: store.city || '',
+      cityEn: store.cityEn || '',
       name: store.name || '',
+      nameEn: store.nameEn || '',
       address: store.address || '',
+      addressEn: store.addressEn || '',
       hours: store.hours || '',
+      hoursEn: store.hoursEn || '',
       phone: store.phone || '',
       email: store.email || '',
       type: store.type || 'Boutique',
       coordinates: store.coordinates || { x: 50, y: 50 },
-      image: store.image || ''
+      latitude: store.latitude,
+      longitude: store.longitude,
+      image: store.image || '',
+      mapLink: store.mapLink || '',
+      active: store.active !== false
     });
     setShowModal(true);
   };
@@ -74,14 +90,22 @@ export const AdminBranchesPage: React.FC = () => {
             setEditingStore(null);
             setFormStore({
               city: '',
+              cityEn: '',
               name: '',
+              nameEn: '',
               address: '',
+              addressEn: '',
               hours: '',
+              hoursEn: '',
               phone: '',
               email: '',
               type: 'Boutique',
               coordinates: { x: 50, y: 50 },
-              image: ''
+              latitude: undefined,
+              longitude: undefined,
+              image: '',
+              mapLink: '',
+              active: true
             });
             setShowModal(true);
           }}

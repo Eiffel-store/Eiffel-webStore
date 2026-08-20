@@ -66,4 +66,9 @@ export const authService = {
       throw err;
     }
   },
+
+  getProfile: async (): Promise<AuthResult> => {
+    const response = await apiClient.get<ApiResponse<AuthResult>>('/auth/me');
+    return response.data.data;
+  },
 };

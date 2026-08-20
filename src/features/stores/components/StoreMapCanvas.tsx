@@ -16,7 +16,11 @@ export const StoreMapCanvas: React.FC<StoreMapCanvasProps> = ({
   onSelectStore,
   onScheduleFitting,
 }) => {
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
+  const activeStores = stores.filter((s) => s.active !== false);
+
+  const activeName = isRTL ? selectedStore.name : (selectedStore.nameEn || selectedStore.name);
+  const activeAddress = isRTL ? selectedStore.address : (selectedStore.addressEn || selectedStore.address);
 
   return (
     <div className="lg:col-span-7 flex flex-col gap-4">
@@ -33,13 +37,17 @@ export const StoreMapCanvas: React.FC<StoreMapCanvasProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
 
         {/* Map Interactive Pins for all stores */}
-        {stores.map((st) => {
+        {activeStores.map((st) => {
           const isSelected = selectedStore.id === st.id;
+          const pinCity = isRTL ? st.city : (st.cityEn || st.city);
+          const pinX = st.coordinates?.x ?? 50;
+          const pinY = st.coordinates?.y ?? 50;
+
           return (
             <button
               key={st.id}
               onClick={() => onSelectStore(st)}
-              style={{ top: `${st.coordinates.y}%`, left: `${st.coordinates.x}%` }}
+              style={{ top: `${pinY}%`, left: `${pinX}%` }}
               className="absolute -translate-x-1/2 -translate-y-1/2 z-20 group"
             >
               <div className="relative">
@@ -59,7 +67,7 @@ export const StoreMapCanvas: React.FC<StoreMapCanvasProps> = ({
 
               {/* City Marker Label */}
               <span className="absolute top-full mt-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-black/90 text-white font-mono text-[10px] tracking-wider uppercase whitespace-nowrap border border-zinc-800">
-                {st.city}
+                {pinCity}
               </span>
             </button>
           );
@@ -72,10 +80,10 @@ export const StoreMapCanvas: React.FC<StoreMapCanvasProps> = ({
               {t.activeSelection} {selectedStore.type}
             </span>
             <h3 className="font-editorial text-2xl sm:text-3xl text-white">
-              {selectedStore.name}
+              {activeName}
             </h3>
             <p className="text-xs text-zinc-300 font-light mt-0.5">
-              {selectedStore.address}
+              {activeAddress}
             </p>
           </div>
 
