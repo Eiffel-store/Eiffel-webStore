@@ -150,16 +150,16 @@ export const CustomerAuthView: React.FC = () => {
 
           <div>
             <label className="block text-[11px] font-label-bold uppercase tracking-wider text-secondary dark:text-zinc-400 mb-1.5">
-              {t.emailLabel}
+              {mode === 'login' ? (isRTL ? 'البريد الإلكتروني أو رقم الهاتف' : 'Email or Mobile Phone') : t.emailLabel}
             </label>
             <div className="relative">
               <Mail className="absolute left-3 rtl:left-auto rtl:right-3 top-3 w-4 h-4 text-zinc-400" />
               <input
-                type="email"
+                type={mode === 'login' ? 'text' : 'email'}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="client@eiffel.com"
+                placeholder={mode === 'login' ? (isRTL ? 'client@eiffel.com أو 010...' : 'client@eiffel.com or 010...') : 'client@eiffel.com'}
                 className="w-full pl-9 rtl:pl-3 rtl:pr-9 pr-3 py-2.5 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 text-xs text-primary dark:text-white placeholder:text-zinc-500 focus:outline-none focus:border-primary dark:focus:border-white transition-colors font-mono"
               />
             </div>
