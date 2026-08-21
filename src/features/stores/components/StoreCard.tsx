@@ -7,14 +7,13 @@ interface StoreCardProps {
   store: StoreLocation;
   isSelected: boolean;
   onSelect: () => void;
-  onBookAppointment: () => void;
+  onBookAppointment?: () => void;
 }
 
 export const StoreCard: React.FC<StoreCardProps> = ({
   store,
   isSelected,
   onSelect,
-  onBookAppointment,
 }) => {
   const { t, isRTL } = useLanguage();
 
@@ -74,18 +73,6 @@ export const StoreCard: React.FC<StoreCardProps> = ({
             </a>
           </p>
         )}
-      </div>
-
-      <div className="mt-6 pt-4 border-t border-surface-container/60 dark:border-zinc-800 flex items-center justify-between gap-3">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onBookAppointment();
-          }}
-          className="w-full py-2.5 bg-primary text-white dark:bg-white dark:text-black text-xs font-label-bold tracking-widest uppercase hover:opacity-90 transition-opacity text-center"
-        >
-          {t.scheduleFitting}
-        </button>
       </div>
     </div>
   );
