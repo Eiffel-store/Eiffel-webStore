@@ -23,10 +23,15 @@ export const AdminProductsPage: React.FC = () => {
   // Filter products
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
+      const q = (searchQuery || '').toLowerCase();
+      const pName = (p.name || (p as any).nameEn || (p as any).nameAr || '').toLowerCase();
+      const pSubtitle = (p.subtitle || '').toLowerCase();
+      const pId = (p.id || '').toLowerCase();
+
       const matchesSearch =
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.id.toLowerCase().includes(searchQuery.toLowerCase());
+        pName.includes(q) ||
+        pSubtitle.includes(q) ||
+        pId.includes(q);
 
       const matchesCategory =
         selectedCategory === 'all' ||

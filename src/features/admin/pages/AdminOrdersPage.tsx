@@ -20,12 +20,16 @@ export const AdminOrdersPage: React.FC = () => {
   const filteredOrders = useMemo(() => {
     return orders.filter((o) => {
       const matchesStatus = statusFilter === 'all' || o.status === statusFilter;
+      const q = (searchQuery || '').toLowerCase();
       const matchesSearch =
-        o.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (o.shippingAddress?.firstName && o.shippingAddress.firstName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (o.shippingAddress?.lastName && o.shippingAddress.lastName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (o.id || '').toLowerCase().includes(q) ||
+        (o.customerName && o.customerName.toLowerCase().includes(q)) ||
+        (o.customerEmail && o.customerEmail.toLowerCase().includes(q)) ||
+        (o.customerPhone && o.customerPhone.includes(searchQuery)) ||
+        (o.shippingAddress?.firstName && o.shippingAddress.firstName.toLowerCase().includes(q)) ||
+        (o.shippingAddress?.lastName && o.shippingAddress.lastName.toLowerCase().includes(q)) ||
         (o.shippingAddress?.phone && o.shippingAddress.phone.includes(searchQuery)) ||
-        (o.shippingAddress?.city && o.shippingAddress.city.toLowerCase().includes(searchQuery.toLowerCase()));
+        (o.shippingAddress?.city && o.shippingAddress.city.toLowerCase().includes(q));
 
       return matchesStatus && matchesSearch;
     });

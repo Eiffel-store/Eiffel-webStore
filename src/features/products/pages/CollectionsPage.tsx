@@ -127,7 +127,7 @@ export const CollectionsPage: React.FC = () => {
       }
 
       // Color
-      if (selectedColor !== 'All' && (!p.colors || !p.colors.some(c => c.name.toLowerCase().includes(selectedColor.toLowerCase())))) {
+      if (selectedColor !== 'All' && (!p.colors || !p.colors.some(c => c && c.name && c.name.toLowerCase().includes(selectedColor.toLowerCase())))) {
         return false;
       }
 
