@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useMyOrders } from '@/hooks/useOrders';
-import { useLanguage, useStoreData } from '@/shared';
+import { useLanguage, useStoreData, EiffelLoader } from '@/shared';
 import { CustomerAuthView } from '../components/CustomerAuthView';
 import { AccountHeader } from '../components/AccountHeader';
 import { AccountTabsNav, AccountTabKey } from '../components/AccountTabsNav';
@@ -14,10 +14,10 @@ import { Link } from 'react-router-dom';
 import { Address, User, Order } from '@/types';
 
 export const AccountPage: React.FC = () => {
-  const { user, isAuthenticated, role, logout, fetchProfile } = useAuthStore();
-  const { t } = useLanguage();
+  const { user, isAuthenticated, role, logout, fetchProfile, isLoading: isAuthLoading } = useAuthStore();
+  const { t, isRTL } = useLanguage();
   const { orders: localStoreOrders } = useStoreData();
-  const { data: serverOrders = [] } = useMyOrders(user?.email);
+  const { data: serverOrders = [], isLoading: isOrdersLoading } = useMyOrders(user?.email);
   const [activeTab, setActiveTab] = useState<AccountTabKey>('overview');
   const [showAddressModal, setShowAddressModal] = useState(false);
 
@@ -75,6 +75,14 @@ export const AccountPage: React.FC = () => {
       return dateB - dateA;
     });
   }, [serverOrders, localStoreOrders, user]);
+
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <EiffelLoader size="lg" message={isRTL ? 'جاري التحقق من بيانات الحساب...' : 'Loading bespoke client profile...'} />
+      </div>
+    );
+  }
 
   if (!isAuthenticated || !user) {
     return <CustomerAuthView />;

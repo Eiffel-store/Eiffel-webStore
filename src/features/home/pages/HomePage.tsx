@@ -15,6 +15,14 @@ export const HomePage: React.FC = () => {
   const { t, isRTL } = useLanguage();
   const { products, isProductsLoading } = useStoreData();
 
+  if (isProductsLoading && products.length === 0) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <EiffelLoader size="lg" message={isRTL ? 'جاري تحميل المتجر وتشكيلات الموسم الجديد...' : 'Loading bespoke collections...'} />
+      </div>
+    );
+  }
+
   const newArrivals = products.filter(p => p.isNew || p.category === 'men').slice(0, 4);
 
   return (

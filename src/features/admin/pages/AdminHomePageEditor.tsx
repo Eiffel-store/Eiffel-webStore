@@ -104,6 +104,14 @@ export const AdminHomePageEditor: React.FC = () => {
     showSuccess(isRTL ? 'تم تحديث ترتيب البانرات' : 'Banners reordered');
   };
 
+  if (isBannersLoading && banners.length === 0) {
+    return (
+      <div className="py-24">
+        <EiffelLoader message={isRTL ? 'جاري جلب إعدادات وبانرات الواجهة الرئيسية...' : 'Loading home page CMS editor...'} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
       {/* Page Header */}

@@ -4,8 +4,20 @@ import { AdminStatCards } from '../components/dashboard/AdminStatCards';
 import { AdminQuickNav } from '../components/dashboard/AdminQuickNav';
 import { AdminRecentOrders } from '../components/dashboard/AdminRecentOrders';
 import { AdminCatalogPreview } from '../components/dashboard/AdminCatalogPreview';
+import { useStoreData, useLanguage, EiffelLoader } from '@/shared';
 
 export const AdminDashboardPage: React.FC = () => {
+  const { isProductsLoading, isOrdersLoading } = useStoreData();
+  const { isRTL } = useLanguage();
+
+  if (isProductsLoading && isOrdersLoading) {
+    return (
+      <div className="py-24">
+        <EiffelLoader message={isRTL ? 'جاري تحميل لوحة المؤشرات والبيانات الحية...' : 'Loading live dashboard analytics...'} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* 1. Welcome & Quick CTA Banner */}

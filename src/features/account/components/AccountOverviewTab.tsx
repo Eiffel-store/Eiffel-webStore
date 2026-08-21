@@ -16,8 +16,8 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
   const { t, isRTL } = useLanguage();
   const { settings } = useStoreData();
 
-  const requiredOrders = settings?.vipRequiredOrders ;
-  const requiredPoints = settings?.vipRequiredPoints ;
+  const requiredOrders = settings?.vipRequiredOrders ?? 3;
+  const requiredPoints = settings?.vipRequiredPoints ?? 500;
   const cashbackPercent = Math.round((settings?.loyaltyCashbackRate ?? 0.05) * 100);
 
   const orders = user?.orders || [];
