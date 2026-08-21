@@ -11,7 +11,6 @@ interface AuthState {
   isLoading: boolean;
   error: string | null;
 
-  // Actions
   login: (credentials: LoginCredentials) => Promise<AuthResult>;
   register: (data: RegisterData) => Promise<AuthResult>;
   logout: () => void;
@@ -35,16 +34,19 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         try {
           const data = await authService.login(credentials);
+          const rawUser = (data as any).user || (data as any);
+          const rawPoints = rawUser.points ?? rawUser.tierPoints ?? data.tierPoints ?? 50;
+          const isVip = rawUser.isVip ?? (rawPoints >= 200);
           const user: User = {
-            id: String(data.id),
-            name: data.name,
-            email: data.email,
-            role: data.role,
-            tier: (data.tier as any) || 'MEMBER',
-            tierPoints: data.tierPoints || 0,
-            phone: data.phone || '',
+            id: String(rawUser.id || data.id || Date.now()),
+            name: rawUser.name || data.name || credentials.email.split('@')[0],
+            email: rawUser.email || data.email || credentials.email,
+            role: rawUser.role || data.role || 'ROLE_CUSTOMER',
+            tier: isVip ? 'VIP_PLATINUM' : ((data.tier as any) || 'MEMBER'),
+            tierPoints: rawPoints,
+            phone: rawUser.phone || data.phone || '',
             memberSince: '2026',
-            addresses: [],
+            addresses: rawUser.addresses || [],
             paymentMethods: [],
             orders: [],
           };
@@ -52,7 +54,7 @@ export const useAuthStore = create<AuthState>()(
           set({
             user,
             token: data.token,
-            role: data.role,
+            role: (rawUser.role || data.role) as any,
             isAuthenticated: true,
             isLoading: false,
           });
@@ -69,14 +71,17 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         try {
           const data = await authService.register(registerData);
+          const rawUser = (data as any).user || (data as any);
+          const rawPoints = rawUser.points ?? rawUser.tierPoints ?? data.tierPoints ?? 50;
+          const isVip = rawUser.isVip ?? (rawPoints >= 200);
           const user: User = {
-            id: String(data.id),
-            name: data.name,
-            email: data.email,
-            role: data.role,
-            tier: (data.tier as any) || 'MEMBER',
-            tierPoints: data.tierPoints || 0,
-            phone: data.phone || '',
+            id: String(rawUser.id || data.id || Date.now()),
+            name: rawUser.name || data.name || registerData.name,
+            email: rawUser.email || data.email || registerData.email,
+            role: rawUser.role || data.role || 'ROLE_CUSTOMER',
+            tier: isVip ? 'VIP_PLATINUM' : ((data.tier as any) || 'MEMBER'),
+            tierPoints: rawPoints,
+            phone: rawUser.phone || data.phone || registerData.phone || '',
             memberSince: '2026',
             addresses: [],
             paymentMethods: [],
@@ -86,7 +91,7 @@ export const useAuthStore = create<AuthState>()(
           set({
             user,
             token: data.token,
-            role: data.role,
+            role: (rawUser.role || data.role) as any,
             isAuthenticated: true,
             isLoading: false,
           });
@@ -122,13 +127,17 @@ export const useAuthStore = create<AuthState>()(
         try {
           const data = await authService.getProfile();
           if (data) {
+            const rawUser = (data as any).user || (data as any);
+            const rawPoints = rawUser.points ?? rawUser.tierPoints ?? (data as any).tierPoints ?? 0;
+            const isVip = rawUser.isVip ?? (rawPoints >= 200);
             set((state) => ({
               user: state.user ? {
                 ...state.user,
-                name: data.name || state.user.name,
-                tier: (data.tier as any) || state.user.tier,
-                tierPoints: data.tierPoints ?? 0,
-                phone: data.phone || state.user.phone,
+                name: rawUser.name || data.name || state.user.name,
+                tier: isVip ? 'VIP_PLATINUM' : ((data.tier as any) || state.user.tier),
+                tierPoints: rawPoints,
+                phone: rawUser.phone || data.phone || state.user.phone,
+                addresses: rawUser.addresses || state.user.addresses || [],
               } : null
             }));
           }
