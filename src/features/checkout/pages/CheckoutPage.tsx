@@ -17,7 +17,7 @@ export const CheckoutPage: React.FC = () => {
   const queryClient = useQueryClient();
   const { cart, subtotal, discountAmount, discountCode, clearCart } = useCart();
   const { user, updateUserPoints } = useAuthStore();
-  const { addOrder } = useStoreData();
+  const { addOrder, settings } = useStoreData();
   const { formatPrice } = useCurrency();
   const { t, isRTL } = useLanguage();
 
@@ -139,10 +139,13 @@ export const CheckoutPage: React.FC = () => {
   // Points & Loyalty Calculations
   const availablePoints = user?.tierPoints || 0;
   const [redeemPoints, setRedeemPoints] = useState(false);
-  const isVip = user?.tier === 'VIP' || user?.isVip || false;
+  const isVip = user?.tier === 'VIP' || user?.tier === 'VIP_PLATINUM' || user?.isVip || (Boolean(user?.tierPoints) && (user?.tierPoints || 0) >= (settings?.vipRequiredPoints || 500)) || false;
 
-  const discountValue = discountAmount;
-  const shippingFee = shippingMethod === 'white-glove' ? 10 : 0;
+  const vipDiscountRate = isVip && settings?.vipDiscountPercentage ? (settings.vipDiscountPercentage / 100) : 0;
+  const vipDiscountAmount = subtotal * vipDiscountRate;
+  const discountValue = discountAmount + vipDiscountAmount;
+  const isFreeShipping = (settings?.vipFreeShipping && isVip) || subtotal >= (settings?.freeShippingThreshold || 1500);
+  const shippingFee = isFreeShipping ? 0 : (shippingMethod === 'white-glove' ? 10 : 0);
   const totalBeforePoints = Math.max(0, subtotal - discountValue + shippingFee);
 
   // Apply points if explicitly chosen as payment method OR checked in summary
@@ -151,8 +154,9 @@ export const CheckoutPage: React.FC = () => {
   const pointsDiscountValue = isUsingPoints ? maxPointsDiscount : 0;
   const totalAmount = Math.max(0, totalBeforePoints - pointsDiscountValue);
 
-  // Rule: Earn exactly 1% points of the purchase value
-  const pointsToEarn = Math.max(1, Math.round(totalAmount * 0.01));
+  // Dynamic Points to earn based on settings cashback rate (e.g. 5%)
+  const cashbackRate = settings?.loyaltyCashbackRate || 0.05;
+  const pointsToEarn = Math.max(1, Math.round(totalAmount * cashbackRate));
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -118,7 +118,7 @@ export interface Order {
   discount: number;
   tax: number;
   total: number;
-  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+  status: 'Pending' | 'Awaiting_Confirmation' | 'Confirmed' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
   trackingNumber: string;
   estimatedDelivery: string;
   shippingAddress: Address;
@@ -145,6 +145,11 @@ export interface StoreSettings {
   currency: string;
   freeShippingThreshold: number;
   adminPin: string;
+  vipRequiredOrders?: number;
+  vipRequiredPoints?: number;
+  vipDiscountPercentage?: number;
+  loyaltyCashbackRate?: number;
+  vipFreeShipping?: boolean;
 }
 
 export interface User {

@@ -22,7 +22,12 @@ const DEFAULT_SETTINGS: StoreSettings = {
   announcementTextEn: 'Complimentary express shipping across Egypt on orders over 1,500 EGP',
   currency: 'EGP',
   freeShippingThreshold: 1500,
-  adminPin: '8899'
+  adminPin: '8899',
+  vipRequiredOrders: 3,
+  vipRequiredPoints: 500,
+  vipDiscountPercentage: 10,
+  loyaltyCashbackRate: 0.05,
+  vipFreeShipping: true
 };
 
 export const DEFAULT_HOME_SETTINGS: HomePageSettings = {

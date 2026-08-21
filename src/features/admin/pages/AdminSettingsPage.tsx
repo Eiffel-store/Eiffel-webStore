@@ -3,6 +3,7 @@ import { Check, AlertCircle } from 'lucide-react';
 import { useStoreData, useLanguage } from '@/shared';
 import { AdminContactSettingsForm } from '../components/settings/AdminContactSettingsForm';
 import { AdminAnnouncementSettingsForm } from '../components/settings/AdminAnnouncementSettingsForm';
+import { AdminLoyaltyVIPSettingsForm } from '../components/settings/AdminLoyaltyVIPSettingsForm';
 import { AdminSecuritySettingsForm } from '../components/settings/AdminSecuritySettingsForm';
 import { AdminDataBackupCard } from '../components/settings/AdminDataBackupCard';
 
@@ -64,6 +65,11 @@ export const AdminSettingsPage: React.FC = () => {
         />
 
         <AdminAnnouncementSettingsForm
+          settings={formSettings}
+          onChange={(updates) => setFormSettings(prev => ({ ...prev, ...updates }))}
+        />
+
+        <AdminLoyaltyVIPSettingsForm
           settings={formSettings}
           onChange={(updates) => setFormSettings(prev => ({ ...prev, ...updates }))}
         />
