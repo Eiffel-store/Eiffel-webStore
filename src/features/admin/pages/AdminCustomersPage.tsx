@@ -248,7 +248,7 @@ export const AdminCustomersPage: React.FC = () => {
 
           <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-lg text-xs font-mono text-zinc-300">
             <Award className="w-4 h-4 text-amber-400" />
-            <span>{isRTL ? 'الترقية لـ VIP: 3 طلبات مستلمة' : 'Auto VIP: 3 Delivered Orders'}</span>
+            <span>{isRTL ? `الترقية لـ VIP: ${settings?.vipRequiredOrders ?? 3} طلبات مستلمة` : `Auto VIP: ${settings?.vipRequiredOrders ?? 3} Delivered Orders`}</span>
           </div>
         </div>
       </div>

@@ -159,6 +159,7 @@ export interface User {
   role?: 'ROLE_ADMIN' | 'ROLE_STAFF' | 'ROLE_CUSTOMER';
   tier: 'EIFFEL PRIVÉ' | 'EIFFEL NOIR' | 'VIP' | 'MEMBER' | string;
   tierPoints: number;
+  points?: number;
   completedOrdersCount?: number;
   totalSpend?: number;
   isVip?: boolean;

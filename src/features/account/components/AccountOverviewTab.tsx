@@ -1,6 +1,6 @@
 import React from 'react';
 import { Crown, Coins, Sparkles, Gift, Truck, CheckCircle2 } from 'lucide-react';
-import { useCurrency, useLanguage } from '@/shared';
+import { useCurrency, useLanguage, useStoreData } from '@/shared';
 import { User, Order, CartItem } from '@/types';
 
 interface AccountOverviewTabProps {
@@ -14,12 +14,18 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
 }) => {
   const { formatPrice } = useCurrency();
   const { t, isRTL } = useLanguage();
+  const { settings } = useStoreData();
+
+  const requiredOrders = settings?.vipRequiredOrders ?? 3;
+  const requiredPoints = settings?.vipRequiredPoints ?? 500;
+  const cashbackPercent = Math.round((settings?.loyaltyCashbackRate ?? 0.05) * 100);
 
   const orders = user?.orders || [];
   const completedOrders = orders.filter(o => o.status === 'Delivered').length || user.completedOrdersCount || 0;
-  const isVip = user.tier === 'VIP' || user.isVip;
-  const points = user.tierPoints || 0;
+  const points = user.tierPoints || user.points || 0;
   const pointsValue = points; // 1 point = 1 EGP
+
+  const isVip = user.tier === 'VIP' || user.isVip || (points >= requiredPoints) || (completedOrders >= requiredOrders);
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -63,8 +69,8 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
 
             <p className="text-xs text-zinc-400 font-light max-w-xl">
               {isRTL
-                ? 'تكسب 1% نقاط ولاء على قيمة كل عملية شراء من المتجر، ويمكنك استخدام رصيد نقاطك للدفع المباشر عند إتمام أي طلب!'
-                : 'Earn 1% loyalty points on every purchase, and redeem your points balance directly at checkout to pay for orders!'}
+                ? `تكسب ${cashbackPercent}% نقاط ولاء على قيمة كل عملية شراء من المتجر، ويمكنك استخدام رصيد نقاطك للدفع المباشر عند إتمام أي طلب!`
+                : `Earn ${cashbackPercent}% loyalty points on every purchase, and redeem your points balance directly at checkout to pay for orders!`}
             </p>
           </div>
 
@@ -72,14 +78,16 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
           <div className="p-4 rounded-lg bg-zinc-950/80 border border-zinc-800 min-w-[280px] space-y-3">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="text-zinc-300 font-bold">{isRTL ? 'مستوى التقدم نحو VIP:' : 'VIP Qualification:'}</span>
-              <span className="text-amber-400 font-bold">{Math.min(3, completedOrders)} / 3 {isRTL ? 'طلبات' : 'orders'}</span>
+              <span className="text-amber-400 font-bold">
+                {Math.min(requiredOrders, completedOrders)} / {requiredOrders} {isRTL ? 'طلبات' : 'orders'}
+              </span>
             </div>
 
             {/* Progress Bar */}
             <div className="w-full h-2 rounded-full bg-zinc-900 overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all duration-500"
-                style={{ width: `${isVip ? 100 : Math.min(100, (completedOrders / 3) * 100)}%` }}
+                style={{ width: `${isVip ? 100 : Math.min(100, (completedOrders / requiredOrders) * 100)}%` }}
               />
             </div>
 
