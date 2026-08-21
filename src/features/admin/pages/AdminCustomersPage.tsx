@@ -19,7 +19,7 @@ import { customerService } from '@/services/customerService';
 import { User, Order } from '@/types';
 
 export const AdminCustomersPage: React.FC = () => {
-  const { orders, isOrdersLoading } = useStoreData();
+  const { orders, isOrdersLoading, settings } = useStoreData();
   const { isRTL } = useLanguage();
   const { formatPrice } = useCurrency();
 
@@ -56,62 +56,98 @@ export const AdminCustomersPage: React.FC = () => {
 
     // First add real registered MongoDB users
     backendCustomers.forEach((u) => {
-      const key = u.email || u.phone || String(u.id);
-      custMap[key] = {
+      const emailKey = u.email ? u.email.trim().toLowerCase() : '';
+      const phoneKey = u.phone ? u.phone.trim() : '';
+      const primaryKey = emailKey || phoneKey || String(u.id);
+
+      const userPoints = (u as any).points ?? u.tierPoints ?? 0;
+      const isVip = Boolean(u.isVip) || u.tier === 'VIP' || u.tier === 'VIP_PLATINUM' || userPoints >= (settings?.vipRequiredPoints || 500);
+
+      const entry: User = {
         ...u,
-        tier: u.tier || 'MEMBER',
-        tierPoints: u.tierPoints || 0,
+        email: u.email || '',
+        phone: u.phone || '',
+        tier: isVip ? 'VIP' : 'MEMBER',
+        tierPoints: userPoints,
+        points: userPoints,
         completedOrdersCount: u.completedOrdersCount || 0,
         totalSpend: u.totalSpend || 0,
-        isVip: u.tier === 'VIP' || u.isVip || false,
+        isVip,
         memberSince: u.memberSince ? new Date(u.memberSince).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US') : '2026',
         orders: u.orders || []
       };
+
+      if (emailKey) custMap[emailKey] = entry;
+      if (phoneKey) custMap[phoneKey] = entry;
+      custMap[primaryKey] = entry;
     });
 
     // Then cross-reference with real actual orders from the database
     orders.forEach((o) => {
-      const email = o.customerEmail || '';
-      const phone = o.customerPhone || o.shippingAddress?.phone || 'N/A';
+      const email = o.customerEmail ? o.customerEmail.trim().toLowerCase() : '';
+      const phone = o.customerPhone ? o.customerPhone.trim() : (o.shippingAddress?.phone ? o.shippingAddress.phone.trim() : '');
       const name = o.customerName || `${o.shippingAddress?.firstName || ''} ${o.shippingAddress?.lastName || ''}`.trim() || 'عميل إيفل';
-      const key = email || phone || o.id;
 
-      if (!custMap[key]) {
-        custMap[key] = {
-          id: `order-cust-${key}`,
+      // Find existing registered user by email or phone
+      const target = (email && custMap[email]) || (phone && custMap[phone]);
+
+      if (target) {
+        if (o.status !== 'Cancelled') {
+          target.totalSpend = (target.totalSpend || 0) + (o.total || o.subtotal || 0);
+        }
+        if (o.status === 'Delivered') {
+          target.completedOrdersCount = (target.completedOrdersCount || 0) + 1;
+        }
+        if (
+          (target.completedOrdersCount || 0) >= (settings?.vipRequiredOrders || 3) ||
+          (target.tierPoints || 0) >= (settings?.vipRequiredPoints || 500)
+        ) {
+          target.tier = 'VIP';
+          target.isVip = true;
+        }
+      } else {
+        const fallbackKey = email || phone || o.id;
+        const newCust: User = {
+          id: `order-cust-${fallbackKey}`,
           name,
-          email: email || `${phone}@eiffel-guest.eg`,
-          phone,
+          email: email || (phone ? `${phone}@eiffel-guest.eg` : 'guest@eiffel.eg'),
+          phone: phone || 'N/A',
           role: 'ROLE_CUSTOMER',
           tier: 'MEMBER',
-          tierPoints: 0,
-          completedOrdersCount: 0,
-          totalSpend: 0,
+          tierPoints: o.pointsEarned || 0,
+          points: o.pointsEarned || 0,
+          completedOrdersCount: o.status === 'Delivered' ? 1 : 0,
+          totalSpend: o.status !== 'Cancelled' ? (o.total || o.subtotal || 0) : 0,
           isVip: false,
           memberSince: o.createdAt || o.date || new Date().toISOString(),
           addresses: o.shippingAddress ? [o.shippingAddress] : [],
           paymentMethods: [],
-          orders: []
+          orders: [o]
         };
-      }
-
-      // Aggregate order counts & spend
-      if (o.status !== 'Cancelled') {
-        custMap[key].totalSpend = (custMap[key].totalSpend || 0) + (o.total || o.subtotal || 0);
-      }
-      if (o.status === 'Delivered') {
-        custMap[key].completedOrdersCount = (custMap[key].completedOrdersCount || 0) + 1;
-      }
-
-      // Check auto VIP condition: 3+ delivered orders
-      if ((custMap[key].completedOrdersCount || 0) >= 3 && custMap[key].tier !== 'VIP') {
-        custMap[key].tier = 'VIP';
-        custMap[key].isVip = true;
+        if (
+          (newCust.completedOrdersCount || 0) >= (settings?.vipRequiredOrders || 3) ||
+          (newCust.tierPoints || 0) >= (settings?.vipRequiredPoints || 500)
+        ) {
+          newCust.tier = 'VIP';
+          newCust.isVip = true;
+        }
+        if (email) custMap[email] = newCust;
+        if (phone) custMap[phone] = newCust;
+        custMap[fallbackKey] = newCust;
       }
     });
 
-    return Object.values(custMap);
-  }, [backendCustomers, orders, isRTL]);
+    // Deduplicate by ID / unique customer identity
+    const uniqueMap = new Map<string, User>();
+    Object.values(custMap).forEach((c) => {
+      const uid = String(c.id || c.email || c.phone);
+      if (!uniqueMap.has(uid)) {
+        uniqueMap.set(uid, c);
+      }
+    });
+
+    return Array.from(uniqueMap.values());
+  }, [backendCustomers, orders, settings, isRTL]);
 
   // 3. Toggle VIP Status (Calls backend API & updates state)
   const handleToggleVip = async (customer: User) => {
