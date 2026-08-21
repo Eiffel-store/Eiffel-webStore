@@ -16,8 +16,8 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
   const { t, isRTL } = useLanguage();
   const { settings } = useStoreData();
 
-  const requiredOrders = settings?.vipRequiredOrders ?? 3;
-  const requiredPoints = settings?.vipRequiredPoints ?? 500;
+  const requiredOrders = settings?.vipRequiredOrders ;
+  const requiredPoints = settings?.vipRequiredPoints ;
   const cashbackPercent = Math.round((settings?.loyaltyCashbackRate ?? 0.05) * 100);
 
   const orders = user?.orders || [];
@@ -25,7 +25,7 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
   const points = user.tierPoints || user.points || 0;
   const pointsValue = points; // 1 point = 1 EGP
 
-  const isVip = user.tier === 'VIP' || user.isVip || (points >= requiredPoints) || (completedOrders >= requiredOrders);
+  const isVip = Boolean(user.isVip) || user.tier === 'VIP' || user.tier === 'VIP_PLATINUM';
 
   return (
     <div className="space-y-8 animate-fade-in">

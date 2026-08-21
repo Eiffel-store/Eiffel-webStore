@@ -36,13 +36,13 @@ export const useAuthStore = create<AuthState>()(
           const data = await authService.login(credentials);
           const rawUser = (data as any).user || (data as any);
           const rawPoints = rawUser.points ?? rawUser.tierPoints ?? data.tierPoints ?? 50;
-          const isVip = Boolean(rawUser.isVip) || Boolean((data as any).isVip) || rawUser.tier === 'VIP' || rawUser.tier === 'VIP_PLATINUM' || (rawPoints >= 200);
+          const isVip = Boolean(rawUser.isVip ?? (data as any).isVip ?? (rawUser.tier === 'VIP' || rawUser.tier === 'VIP_PLATINUM'));
           const user: User = {
             id: String(rawUser.id || data.id || Date.now()),
             name: rawUser.name || data.name || credentials.email.split('@')[0],
             email: rawUser.email || data.email || credentials.email,
             role: rawUser.role || data.role || 'ROLE_CUSTOMER',
-            tier: isVip ? 'VIP' : ((data.tier as any) || 'MEMBER'),
+            tier: isVip ? 'VIP' : ((data.tier as any) || rawUser.tier || 'MEMBER'),
             isVip: isVip,
             points: rawPoints,
             tierPoints: rawPoints,
@@ -75,13 +75,13 @@ export const useAuthStore = create<AuthState>()(
           const data = await authService.register(registerData);
           const rawUser = (data as any).user || (data as any);
           const rawPoints = rawUser.points ?? rawUser.tierPoints ?? data.tierPoints ?? 50;
-          const isVip = Boolean(rawUser.isVip) || Boolean((data as any).isVip) || rawUser.tier === 'VIP' || rawUser.tier === 'VIP_PLATINUM' || (rawPoints >= 200);
+          const isVip = Boolean(rawUser.isVip ?? (data as any).isVip ?? (rawUser.tier === 'VIP' || rawUser.tier === 'VIP_PLATINUM'));
           const user: User = {
             id: String(rawUser.id || data.id || Date.now()),
             name: rawUser.name || data.name || registerData.name,
             email: rawUser.email || data.email || registerData.email,
             role: rawUser.role || data.role || 'ROLE_CUSTOMER',
-            tier: isVip ? 'VIP' : ((data.tier as any) || 'MEMBER'),
+            tier: isVip ? 'VIP' : ((data.tier as any) || rawUser.tier || 'MEMBER'),
             isVip: isVip,
             points: rawPoints,
             tierPoints: rawPoints,
@@ -133,12 +133,12 @@ export const useAuthStore = create<AuthState>()(
           if (data) {
             const rawUser = (data as any).user || (data as any);
             const rawPoints = rawUser.points ?? rawUser.tierPoints ?? (data as any).tierPoints ?? 0;
-            const isVip = Boolean(rawUser.isVip) || Boolean((data as any).isVip) || rawUser.tier === 'VIP' || rawUser.tier === 'VIP_PLATINUM' || (rawPoints >= 200);
+            const isVip = Boolean(rawUser.isVip ?? (data as any).isVip ?? (rawUser.tier === 'VIP' || rawUser.tier === 'VIP_PLATINUM'));
             set((state) => ({
               user: state.user ? {
                 ...state.user,
                 name: rawUser.name || data.name || state.user.name,
-                tier: isVip ? 'VIP' : ((data.tier as any) || state.user.tier || 'MEMBER'),
+                tier: isVip ? 'VIP' : ((data.tier as any) || rawUser.tier || 'MEMBER'),
                 isVip: isVip,
                 points: rawPoints,
                 tierPoints: rawPoints,

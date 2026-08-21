@@ -80,11 +80,11 @@ export const AccountPage: React.FC = () => {
     return <CustomerAuthView />;
   }
 
-  const isVip = Boolean(user.isVip) || user.tier === 'VIP' || user.tier === 'VIP_PLATINUM' || ((user.points ?? user.tierPoints ?? 0) >= 200);
+  const isVip = Boolean(user.isVip) || user.tier === 'VIP' || user.tier === 'VIP_PLATINUM';
   const fullUser: User = {
     ...user,
     isVip,
-    tier: isVip ? 'VIP' : (user.tier || 'MEMBER'),
+    tier: isVip ? 'VIP' : (user.tier === 'VIP' ? 'MEMBER' : (user.tier || 'MEMBER')),
     points: user.points ?? user.tierPoints ?? 0,
     tierPoints: user.points ?? user.tierPoints ?? 0,
     orders: userOrders,
