@@ -10,8 +10,8 @@ interface AccountHeaderProps {
 export const AccountHeader: React.FC<AccountHeaderProps> = ({ user }) => {
   const { t, isRTL } = useLanguage();
 
-  const isVip = user.tier === 'VIP' || user.isVip;
-  const points = user.tierPoints || 0;
+  const isVip = Boolean(user.isVip) || user.tier === 'VIP' || user.tier === 'VIP_PLATINUM' || ((user.points ?? user.tierPoints ?? 0) >= 200);
+  const points = user.points ?? user.tierPoints ?? 0;
 
   return (
     <div className="flex flex-col md:flex-row md:items-end justify-between pb-6 sm:pb-8 border-b border-surface-container dark:border-zinc-800 gap-4 sm:gap-6">

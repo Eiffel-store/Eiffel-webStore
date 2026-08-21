@@ -18,7 +18,6 @@ export const AccountPage: React.FC = () => {
   const { t } = useLanguage();
   const { orders: localStoreOrders } = useStoreData();
   const { data: serverOrders = [] } = useMyOrders(user?.email);
-console.log("user :", user)
   const [activeTab, setActiveTab] = useState<AccountTabKey>('overview');
   const [showAddressModal, setShowAddressModal] = useState(false);
 
@@ -77,13 +76,17 @@ console.log("user :", user)
     });
   }, [serverOrders, localStoreOrders, user]);
 
-  // If user is not authenticated, render the login/register form
   if (!isAuthenticated || !user) {
     return <CustomerAuthView />;
   }
 
+  const isVip = Boolean(user.isVip) || user.tier === 'VIP' || user.tier === 'VIP_PLATINUM' || ((user.points ?? user.tierPoints ?? 0) >= 200);
   const fullUser: User = {
     ...user,
+    isVip,
+    tier: isVip ? 'VIP' : (user.tier || 'MEMBER'),
+    points: user.points ?? user.tierPoints ?? 0,
+    tierPoints: user.points ?? user.tierPoints ?? 0,
     orders: userOrders,
     addresses: userState?.addresses || user.addresses || [],
   };
