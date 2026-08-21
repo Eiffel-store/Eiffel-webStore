@@ -18,7 +18,7 @@ export const AccountPage: React.FC = () => {
   const { t } = useLanguage();
   const { orders: localStoreOrders } = useStoreData();
   const { data: serverOrders = [] } = useMyOrders(user?.email);
-
+console.log("user :", user)
   const [activeTab, setActiveTab] = useState<AccountTabKey>('overview');
   const [showAddressModal, setShowAddressModal] = useState(false);
 
@@ -45,7 +45,7 @@ export const AccountPage: React.FC = () => {
     const map = new Map<string, Order>();
 
     // 1. Add server orders (from /orders/my-orders)
-    (serverOrders || []).forEach(o => map.set(o.id, o));
+    (serverOrders || []).forEach((o: Order) => map.set(o.id, o));
 
     // 2. Add local store orders matching user email
     if (localStoreOrders && userEmail) {

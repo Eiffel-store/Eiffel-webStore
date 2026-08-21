@@ -63,8 +63,13 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
                 <h4 className="font-editorial text-base text-primary dark:text-white line-clamp-1">
                   {item?.product?.name || 'Product'}
                 </h4>
-                <p className="text-[11px] text-secondary dark:text-zinc-400 font-mono">
-                  {item.selectedSize} • {item.selectedColor} (x{item.quantity})
+                <p className="text-[11px] text-secondary dark:text-zinc-400 font-mono flex items-center gap-2 flex-wrap">
+                  <span>{item.selectedSize} • {item.selectedColor} (x{item.quantity})</span>
+                  {item?.product?.stock !== undefined && item?.product?.stock <= 2 && (
+                    <span className="text-[10px] text-amber-400 font-bold px-1.5 py-0.5 bg-amber-400/10 border border-amber-400/20 rounded font-mono">
+                      {item.product.stock === 1 ? (isRTL ? '🔥 آخر قطعة' : '🔥 Last 1 left') : (isRTL ? `متبقي ${item.product.stock} فقط` : `Only ${item.product.stock} left`)}
+                    </span>
+                  )}
                 </p>
               </div>
               <span className="font-mono text-xs font-bold text-primary dark:text-white">

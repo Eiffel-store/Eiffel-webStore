@@ -272,45 +272,24 @@ export const CheckoutPage: React.FC = () => {
 
       clearCart();
       setOrderComplete(createdOrder);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to create order on backend:', err);
-      // Create local order if network error
-      const fallbackOrder: Order = {
-        id: `EFL-EG-${Math.floor(10000 + Math.random() * 90000)}`,
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase(),
-        status: 'Pending',
-        trackingNumber: `BOSTA-${Math.floor(100000000 + Math.random() * 900000000)}`,
-        estimatedDelivery: '24–48 HOURS',
-        items: cart,
-        subtotal,
-        shipping: shippingFee,
-        discount: discountValue + pointsDiscountValue,
-        tax: 0,
-        total: totalAmount,
-        customerName: `${firstName.trim()} ${lastName.trim()}`.trim(),
-        customerEmail: email.trim() || user?.email || '',
-        customerPhone: phone.trim(),
-        shippingAddress: {
-          ...shippingAddress,
-          email: email.trim() || user?.email || '',
-        } as any,
-        paymentMethod: paymentMethodString,
-        pointsEarned: pointsToEarn,
-        pointsRedeemed: pointsDiscountValue,
-        pointsDiscount: pointsDiscountValue,
-        couponCode: discountCode || undefined
-      };
+      const serverMessage = err?.response?.data?.message || err?.message;
 
-      addOrder(fallbackOrder);
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      // Invalidate products query to refresh real-time stock
+      queryClient.invalidateQueries({ queryKey: ['products'] });
 
-      // Deduct points from user balance in local fallback
-      if (pointsDiscountValue > 0 && user) {
-        updateUserPoints(-pointsDiscountValue);
+      // If backend returned a clear validation error (e.g. stock out, validation limit)
+      if (serverMessage && typeof serverMessage === 'string' && (err?.response?.status === 400 || err?.response?.status === 409 || err?.response?.status === 422)) {
+        setFormAlert(serverMessage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
       }
 
-      clearCart();
-      setOrderComplete(fallbackOrder);
+      setFormAlert(
+        serverMessage || (isRTL ? 'حدث خطأ أثناء معالجة الطلب، يرجى المحاولة مرة أخرى أو مراجعة المخزون المتاح.' : 'An error occurred while processing your order.')
+      );
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setIsSubmitting(false);
     }
