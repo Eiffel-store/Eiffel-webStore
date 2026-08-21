@@ -389,8 +389,12 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const updateOrderStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: Order['status'] }) =>
       orderService.updateStatus(id, status),
-    onSuccess: () => {
+    onSuccess: (updatedOrder) => {
+      queryClient.setQueryData<Order[]>(['orders'], (old = []) =>
+        (old || []).map(o => o.id === updatedOrder.id ? updatedOrder : o)
+      );
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['orders', 'my-orders'] });
     },
   });
 

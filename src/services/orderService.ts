@@ -188,7 +188,7 @@ export const orderService = {
   },
 
   updateStatus: async (id: string, status: Order['status']): Promise<Order> => {
-    const response = await apiClient.patch<ApiResponse<ServerOrder>>(`/orders/${id}/status`, null, {
+    const response = await apiClient.patch<ApiResponse<ServerOrder>>(`/orders/${id}/status`, { status }, {
       params: { status }
     });
     return mapServerOrderToClient(response.data.data);
