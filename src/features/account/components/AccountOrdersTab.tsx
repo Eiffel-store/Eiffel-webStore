@@ -9,7 +9,7 @@ interface AccountOrdersTabProps {
 
 export const AccountOrdersTab: React.FC<AccountOrdersTabProps> = ({ orders = [] }) => {
   const { formatPrice } = useCurrency();
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
 
   if (!orders || orders.length === 0) {
     return (

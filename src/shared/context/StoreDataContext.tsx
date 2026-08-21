@@ -9,6 +9,7 @@ import { couponService } from '@/services/couponService';
 import { settingsService } from '@/services/settingsService';
 import { homeSettingsService } from '@/services/homeSettingsService';
 import { bannerService } from '@/services/bannerService';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const DEFAULT_SETTINGS: StoreSettings = {
   storeName: 'EIFFEL Egypt',
@@ -138,6 +139,8 @@ const StoreDataContext = createContext<StoreDataContextType | undefined>(undefin
 
 export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+  const isAdminOrStaff = user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_STAFF';
 
   // 1. React Query: Fetch Products from Backend
   const { data: serverProducts = [], isLoading: isProductsLoading } = useQuery({
@@ -192,6 +195,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     queryKey: ['banners', 'all'],
     queryFn: () => bannerService.getAllBanners().catch(() => []),
     staleTime: 1000 * 30,
+    enabled: isAdminOrStaff,
     retry: 1
   });
 
@@ -202,13 +206,14 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     retry: 1
   });
 
-  const isBannersLoading = isAllBannersLoading || isActiveBannersLoading;
+  const isBannersLoading = isActiveBannersLoading || (isAdminOrStaff && isAllBannersLoading);
 
-  // 8. React Query: Fetch Orders from Backend
+  // 8. React Query: Fetch Orders from Backend (Admin & Staff only)
   const { data: serverOrders = [], isLoading: isOrdersLoading } = useQuery({
     queryKey: ['orders'],
     queryFn: () => orderService.getAll().catch(() => []),
     staleTime: 1000 * 15,
+    enabled: isAdminOrStaff,
     retry: 1
   });
 
@@ -229,8 +234,8 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const orders = Array.isArray(serverOrders) ? serverOrders : [];
   const settings = serverSettings || DEFAULT_SETTINGS;
   const homeSettings = serverHomeSettings || localHomeSettings;
-  const banners = serverAllBanners;
-  const activeBanners = serverActiveBanners;
+  const banners = Array.isArray(serverAllBanners) && serverAllBanners.length > 0 ? serverAllBanners : (Array.isArray(serverActiveBanners) ? serverActiveBanners : []);
+  const activeBanners = Array.isArray(serverActiveBanners) ? serverActiveBanners : [];
 
   const isLoading = isProductsLoading || isCategoriesLoading || isStoresLoading || isOrdersLoading || isBannersLoading || isCouponsLoading || isSettingsLoading;
 

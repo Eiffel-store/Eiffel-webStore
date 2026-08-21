@@ -8,12 +8,10 @@ import { AccountTabsNav, AccountTabKey } from '../components/AccountTabsNav';
 import { AccountOverviewTab } from '../components/AccountOverviewTab';
 import { AccountOrdersTab } from '../components/AccountOrdersTab';
 import { AccountAddressesTab } from '../components/AccountAddressesTab';
-import { AccountPaymentsTab } from '../components/AccountPaymentsTab';
 import { AddressModal } from '../components/AddressModal';
-import { CardModal } from '../components/CardModal';
 import { LogOut, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Address, PaymentMethod, User, Order } from '@/types';
+import { Address, User, Order } from '@/types';
 
 export const AccountPage: React.FC = () => {
   const { user, isAuthenticated, role, logout, fetchProfile } = useAuthStore();
@@ -23,9 +21,8 @@ export const AccountPage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<AccountTabKey>('overview');
   const [showAddressModal, setShowAddressModal] = useState(false);
-  const [showCardModal, setShowCardModal] = useState(false);
 
-  // Local user state for addresses/payment methods
+  // Local user state for addresses
   const [userState, setUserState] = useState<User | null>(user);
 
   // Fetch fresh profile from server on mount
@@ -38,7 +35,7 @@ export const AccountPage: React.FC = () => {
   // Keep state in sync with auth store
   React.useEffect(() => {
     if (user) {
-      setUserState(prev => prev ? { ...user, addresses: prev.addresses || user.addresses || [], paymentMethods: prev.paymentMethods || user.paymentMethods || [] } : user);
+      setUserState(prev => prev ? { ...user, addresses: prev.addresses || user.addresses || [] } : user);
     }
   }, [user]);
 
@@ -53,8 +50,6 @@ export const AccountPage: React.FC = () => {
     // 2. Add local store orders matching user email
     if (localStoreOrders && userEmail) {
       localStoreOrders.forEach(o => {
-        const orderEmail = (o.customerEmail || (o as any).email || o.shippingAddress?.phone || '').trim().toLowerCase();
-        const shipEmail = (o.shippingAddress?.streetAddress || o.shippingAddress?.apartment || '').toLowerCase();
         if (
           (o.customerEmail && o.customerEmail.toLowerCase().trim() === userEmail) ||
           ((o as any).email && (o as any).email.toLowerCase().trim() === userEmail)
@@ -82,7 +77,7 @@ export const AccountPage: React.FC = () => {
     });
   }, [serverOrders, localStoreOrders, user]);
 
-  // If user is not authenticated, render the luxury login/register form!
+  // If user is not authenticated, render the login/register form
   if (!isAuthenticated || !user) {
     return <CustomerAuthView />;
   }
@@ -91,7 +86,6 @@ export const AccountPage: React.FC = () => {
     ...user,
     orders: userOrders,
     addresses: userState?.addresses || user.addresses || [],
-    paymentMethods: userState?.paymentMethods || user.paymentMethods || [],
   };
 
   const handleAddAddress = (addr: Omit<Address, 'id'>) => {
@@ -100,18 +94,8 @@ export const AccountPage: React.FC = () => {
     setShowAddressModal(false);
   };
 
-  const handleAddCard = (card: Omit<PaymentMethod, 'id'>) => {
-    const newCard: PaymentMethod = { ...card, id: `card-${Date.now()}` };
-    setUserState(prev => prev ? { ...prev, paymentMethods: [...(prev.paymentMethods || []), newCard] } : null);
-    setShowCardModal(false);
-  };
-
   const handleDeleteAddress = (id: string) => {
     setUserState(prev => prev ? { ...prev, addresses: (prev.addresses || []).filter(a => a.id !== id) } : null);
-  };
-
-  const handleDeleteCard = (id: string) => {
-    setUserState(prev => prev ? { ...prev, paymentMethods: (prev.paymentMethods || []).filter(c => c.id !== id) } : null);
   };
 
   const handleSetDefaultAddress = (id: string) => {
@@ -145,7 +129,7 @@ export const AccountPage: React.FC = () => {
           <AccountHeader user={fullUser} />
           <button
             onClick={logout}
-            className="self-start sm:self-auto px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 text-xs font-label-bold tracking-wider uppercase flex items-center gap-1.5 transition-colors"
+            className="self-start sm:self-auto px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 text-xs font-label-bold tracking-wider uppercase flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>{t.signOut}</span>
@@ -158,7 +142,6 @@ export const AccountPage: React.FC = () => {
           setActiveTab={setActiveTab}
           ordersCount={fullUser.orders.length}
           addressesCount={fullUser.addresses.length}
-          paymentsCount={fullUser.paymentMethods.length}
         />
 
         {/* Tab Content */}
@@ -182,27 +165,12 @@ export const AccountPage: React.FC = () => {
           />
         )}
 
-        {activeTab === 'payments' && (
-          <AccountPaymentsTab
-            paymentMethods={fullUser.paymentMethods}
-            onOpenAddModal={() => setShowCardModal(true)}
-            onDelete={handleDeleteCard}
-          />
-        )}
-
-        {/* Modals */}
+        {/* Address Modal */}
         {showAddressModal && (
           <AddressModal
             user={fullUser}
             onClose={() => setShowAddressModal(false)}
             onAddAddress={handleAddAddress}
-          />
-        )}
-        {showCardModal && (
-          <CardModal
-            user={fullUser}
-            onClose={() => setShowCardModal(false)}
-            onAddCard={handleAddCard}
           />
         )}
       </div>

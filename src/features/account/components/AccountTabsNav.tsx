@@ -1,15 +1,14 @@
 import React from 'react';
-import { User as UserIcon, Package, MapPin, CreditCard } from 'lucide-react';
+import { User as UserIcon, Package, MapPin } from 'lucide-react';
 import { useLanguage } from '@/shared';
 
-export type AccountTabKey = 'overview' | 'orders' | 'addresses' | 'payments';
+export type AccountTabKey = 'overview' | 'orders' | 'addresses';
 
 interface AccountTabsNavProps {
   activeTab: AccountTabKey;
   setActiveTab: (tab: AccountTabKey) => void;
   ordersCount: number;
   addressesCount: number;
-  paymentsCount: number;
 }
 
 export const AccountTabsNav: React.FC<AccountTabsNavProps> = ({
@@ -17,7 +16,6 @@ export const AccountTabsNav: React.FC<AccountTabsNavProps> = ({
   setActiveTab,
   ordersCount,
   addressesCount,
-  paymentsCount,
 }) => {
   const { t } = useLanguage();
 
@@ -25,7 +23,6 @@ export const AccountTabsNav: React.FC<AccountTabsNavProps> = ({
     { key: 'overview' as AccountTabKey, label: t.tabOverview, icon: UserIcon },
     { key: 'orders' as AccountTabKey, label: `${t.tabOrders} (${ordersCount})`, icon: Package },
     { key: 'addresses' as AccountTabKey, label: `${t.tabAddresses} (${addressesCount})`, icon: MapPin },
-    { key: 'payments' as AccountTabKey, label: `${t.tabPayments} (${paymentsCount})`, icon: CreditCard },
   ];
 
   return (
@@ -37,7 +34,7 @@ export const AccountTabsNav: React.FC<AccountTabsNavProps> = ({
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`py-2.5 sm:py-3 px-3 sm:px-4 text-[11px] sm:text-xs font-label-bold tracking-wider uppercase flex items-center gap-1.5 sm:gap-2 border-b-2 whitespace-nowrap transition-all shrink-0 ${
+            className={`py-2.5 sm:py-3 px-3 sm:px-4 text-[11px] sm:text-xs font-label-bold tracking-wider uppercase flex items-center gap-1.5 sm:gap-2 border-b-2 whitespace-nowrap transition-all shrink-0 cursor-pointer ${
               isActive
                 ? 'border-primary dark:border-white text-primary dark:text-white'
                 : 'border-transparent text-secondary dark:text-zinc-400 hover:text-primary'

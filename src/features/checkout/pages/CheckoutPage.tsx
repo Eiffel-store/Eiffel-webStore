@@ -358,6 +358,7 @@ export const CheckoutPage: React.FC = () => {
           <div className="lg:col-span-7 space-y-8">
             <form onSubmit={handlePlaceOrder} noValidate className="space-y-8">
               <CheckoutContactForm
+                addresses={user?.addresses}
                 email={email}
                 setEmail={(v) => {
                   setEmail(v);
