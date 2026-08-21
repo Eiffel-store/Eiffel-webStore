@@ -37,6 +37,8 @@ export const AdminOrderFilterBar: React.FC<AdminOrderFilterBarProps> = ({
           className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white focus:outline-none focus:border-white transition-colors"
         >
           <option value="all">{isRTL ? 'جميع الحالات (الكل)' : 'All Order Statuses'}</option>
+          <option value="Awaiting_Confirmation">{isRTL ? '📞 في انتظار التأكيد (Awaiting Confirmation)' : 'Awaiting Confirmation'}</option>
+          <option value="Confirmed">{isRTL ? '✅ تم التأكيد (Confirmed)' : 'Confirmed'}</option>
           <option value="Pending">Pending (جديد)</option>
           <option value="Processing">Processing (قيد التجهيز)</option>
           <option value="Shipped">Shipped (خرج للتوصيل)</option>

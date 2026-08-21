@@ -10,7 +10,19 @@ interface AdminOrdersTableProps {
   onDeleteOrder: (id: string) => void;
 }
 
-const STATUS_CONFIG: Record<Order['status'], { labelAr: string; labelEn: string; color: string; icon: any }> = {
+const STATUS_CONFIG: Record<string, { labelAr: string; labelEn: string; color: string; icon: any }> = {
+  Awaiting_Confirmation: {
+    labelAr: 'في انتظار التأكيد',
+    labelEn: 'Awaiting Confirmation',
+    color: 'bg-amber-950/90 text-amber-300 border-amber-600',
+    icon: Phone
+  },
+  Confirmed: {
+    labelAr: 'تم التأكيد',
+    labelEn: 'Confirmed',
+    color: 'bg-emerald-950/90 text-emerald-300 border-emerald-600',
+    icon: CheckCircle2
+  },
   Pending: {
     labelAr: 'قيد الانتظار',
     labelEn: 'Pending',
@@ -154,6 +166,12 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                           isUpdating ? 'opacity-50 animate-pulse' : ''
                         }`}
                       >
+                        <option value="Awaiting_Confirmation" className="bg-zinc-900 text-amber-300">
+                          📞 {isRTL ? 'في انتظار التأكيد (Awaiting Confirmation)' : 'Awaiting Confirmation'}
+                        </option>
+                        <option value="Confirmed" className="bg-zinc-900 text-emerald-300">
+                          ✅ {isRTL ? 'تم التأكيد (Confirmed)' : 'Confirmed'}
+                        </option>
                         <option value="Pending" className="bg-zinc-900 text-amber-300">
                           ⏳ {isRTL ? 'قيد الانتظار (Pending)' : 'Pending'}
                         </option>

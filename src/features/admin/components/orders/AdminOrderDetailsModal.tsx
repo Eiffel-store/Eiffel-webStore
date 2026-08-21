@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Phone, MessageSquare, MapPin, CreditCard, User, ExternalLink } from 'lucide-react';
+import { X, Phone, MessageSquare, MapPin, CreditCard, User, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { Order } from '@/types';
 import { useCurrency, useLanguage } from '@/shared';
 
@@ -19,9 +19,17 @@ export const AdminOrderDetailsModal: React.FC<AdminOrderDetailsModalProps> = ({
 
   if (!order) return null;
 
-  const phone = order.shippingAddress?.phone || '';
+  const phone = order.customerPhone || order.shippingAddress?.phone || '';
   const cleanPhone = phone.replace(/[^0-9]/g, '');
   const waPhone = cleanPhone.startsWith('0') ? `2${cleanPhone}` : (cleanPhone.startsWith('20') ? cleanPhone : `20${cleanPhone}`);
+
+  const customerName = order.customerName || `${order.shippingAddress?.firstName || ''} ${order.shippingAddress?.lastName || ''}`.trim() || 'عميلنا العزيز';
+  const waMessage = encodeURIComponent(
+    `أهلاً بك يا ${customerName}، معك دار أزياء إيفل (EIFFEL Haute Couture).\n` +
+    `نود تأكيد شحن طلبكم رقم (#${order.id}) بقيمة ${order.total || 0} ج.م.\n` +
+    `العنوان: ${order.shippingAddress?.city || ''} - ${order.shippingAddress?.street || ''}.\n\n` +
+    `يرجى الرد بتأكيد الشحن لتسليم الطلب لمندوب التوصيل فوراً.`
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
@@ -37,34 +45,34 @@ export const AdminOrderDetailsModal: React.FC<AdminOrderDetailsModalProps> = ({
           </button>
         </div>
 
-        {/* Customer & Shipping Info Card */}
+        {/* Customer & Direct Confirmation Actions */}
         <div className="p-4 bg-zinc-900/80 border border-zinc-800 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <div className="flex items-center gap-2 text-white font-bold">
               <User className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>{order.shippingAddress?.firstName} {order.shippingAddress?.lastName}</span>
+              <span className="text-sm">{customerName}</span>
             </div>
             {phone && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 pt-1">
                 <a
                   href={`tel:${phone}`}
-                  className="flex items-center gap-1 text-zinc-300 hover:text-white font-mono"
+                  className="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 rounded text-xs flex items-center gap-1.5 font-mono font-bold transition-colors"
                 >
                   <Phone className="w-3.5 h-3.5 text-emerald-400" />
                   <span>{phone}</span>
                 </a>
                 <a
-                  href={`https://wa.me/${waPhone}`}
+                  href={`https://wa.me/${waPhone}?text=${waMessage}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-2 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-800 rounded text-[10px] flex items-center gap-1 font-bold hover:bg-emerald-900 transition-colors"
+                  className="px-3 py-1 bg-emerald-950 text-emerald-400 border border-emerald-800 rounded text-xs flex items-center gap-1.5 font-bold hover:bg-emerald-900 transition-colors"
                 >
-                  <MessageSquare className="w-3 h-3" />
-                  <span>واتساب</span>
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>تأكيد عبر واتساب</span>
                 </a>
               </div>
             )}
-            <div className="flex items-center gap-1.5 text-zinc-400">
+            <div className="flex items-center gap-1.5 text-zinc-400 pt-1">
               <CreditCard className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span>{order.paymentMethod || 'الدفع عند الاستلام (كاش)'}</span>
             </div>
@@ -96,27 +104,42 @@ export const AdminOrderDetailsModal: React.FC<AdminOrderDetailsModalProps> = ({
           </div>
         </div>
 
-        {/* Status Selector */}
-        <div className="flex items-center justify-between p-3 bg-zinc-900/50 border border-zinc-800 rounded">
-          <span className="text-xs text-zinc-300 font-bold">{isRTL ? 'تحديث حالة الشحن والطلب:' : 'Order Status:'}</span>
-          <select
-            value={order.status}
-            onChange={(e) => onUpdateStatus(order.id, e.target.value as any)}
-            className="bg-zinc-900 border border-zinc-700 text-white text-xs px-3 py-1.5 rounded focus:outline-none focus:border-amber-400 font-bold"
-          >
-            <option value="Pending">⏳ قيد الانتظار (Pending)</option>
-            <option value="Processing">📦 جاري التجهيز (Processing)</option>
-            <option value="Shipped">🚚 خرج للتوصيل (Shipped)</option>
-            <option value="Delivered">✓ تم التسليم (Delivered)</option>
-            <option value="Cancelled">✕ ملغي (Cancelled)</option>
-          </select>
+        {/* Status Selector & 1-Click Confirm Button */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 bg-zinc-900/50 border border-zinc-800 rounded-lg">
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-zinc-300 font-bold">{isRTL ? 'حالة الطلب الحالية:' : 'Status:'}</span>
+            <select
+              value={order.status}
+              onChange={(e) => onUpdateStatus(order.id, e.target.value as any)}
+              className="bg-zinc-900 border border-zinc-700 text-white text-xs px-3 py-1.5 rounded focus:outline-none focus:border-amber-400 font-bold"
+            >
+              <option value="Awaiting_Confirmation">📞 في انتظار التأكيد (Awaiting Confirmation)</option>
+              <option value="Confirmed">✅ تم التأكيد من العميل (Confirmed)</option>
+              <option value="Pending">⏳ قيد الانتظار (Pending)</option>
+              <option value="Processing">📦 جاري التجهيز (Processing)</option>
+              <option value="Shipped">🚚 خرج للتوصيل (Shipped)</option>
+              <option value="Delivered">✓ تم التسليم بنجاح (Delivered)</option>
+              <option value="Cancelled">✕ ملغي / لم يرد (Cancelled)</option>
+              <option value="Returned">↩ مرتجع (Returned)</option>
+            </select>
+          </div>
+
+          {order.status !== 'Confirmed' && order.status !== 'Shipped' && order.status !== 'Delivered' && (
+            <button
+              onClick={() => onUpdateStatus(order.id, 'Confirmed' as any)}
+              className="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded text-xs flex items-center justify-center gap-1.5 transition-colors shadow-lg cursor-pointer"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              <span>تأكيد الطلب وشحنه للعميل</span>
+            </button>
+          )}
         </div>
 
         {/* Ordered Items */}
         <div className="space-y-2 max-h-48 overflow-y-auto">
           <span className="text-xs text-zinc-400 font-bold block mb-1">{isRTL ? 'المنتجات المطلوبة:' : 'Ordered Items:'}</span>
           {order.items?.map((it, idx) => {
-            const colorObj = it?.product?.colors?.find(c => c.name.toLowerCase() === it.selectedColor.toLowerCase());
+            const colorObj = it?.product?.colors?.find(c => c && c.name && c.name.toLowerCase() === (it.selectedColor || '').toLowerCase());
             const img = colorObj?.image || it?.product?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
             return (
               <div key={idx} className="flex items-center gap-3 p-2.5 bg-zinc-900/80 border border-zinc-800 rounded">
