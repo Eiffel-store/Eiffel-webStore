@@ -254,7 +254,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
               </div>
               {isAuthenticated && user && (
                 <span className="text-xs font-label-bold tracking-wider max-w-[80px] truncate">
-                  {user.name.split(' ')[0]}
+                  {(user.name || user.email || 'User').split(' ')[0]}
                 </span>
               )}
             </Link>
@@ -297,7 +297,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
                 {isAuthenticated && user ? (
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-bold text-primary dark:text-white">{user.name}</p>
+                      <p className="text-xs font-bold text-primary dark:text-white">{user.name || user.email || 'User'}</p>
                       <p className="text-[10px] text-zinc-400 font-mono">{user.email}</p>
                     </div>
                     <button

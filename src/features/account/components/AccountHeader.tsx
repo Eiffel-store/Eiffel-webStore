@@ -20,7 +20,7 @@ export const AccountHeader: React.FC<AccountHeaderProps> = ({ user }) => {
           {t.clientDashboard}
         </span>
         <h1 className="font-editorial text-3xl sm:text-5xl text-primary dark:text-white mt-1">
-          {t.welcomeClient} {user.name.toUpperCase()}
+          {t.welcomeClient} {(user.name || user.email || 'CLIENT').toUpperCase()}
         </h1>
       </div>
 
