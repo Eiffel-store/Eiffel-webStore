@@ -1,4 +1,5 @@
 import React, { createContext, useContext } from 'react';
+import toast from 'react-hot-toast';
 import { CartItem, Product } from '@/types';
 import { useCartStore } from '@/stores/useCartStore';
 import { useStoreData } from '@/shared';
@@ -49,7 +50,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 2. Check if product is out of stock
     if (availableStock <= 0) {
-      alert('عذراً، هذا المنتج نفد من المخزون حالياً.');
+      toast.error('عذراً، هذا المنتج نفد من المخزون حالياً.', { id: `out-of-stock-${product.id}` });
       return false;
     }
 
@@ -63,6 +64,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 5. Decrement inventory stock across app & backend
     decrementStock(currentProd.id, validQuantity);
+
+    const prodTitle = currentProd.nameAr || currentProd.nameEn || currentProd.name || 'القطعة';
+    toast.success(`تمت إضافة ${prodTitle} إلى حقيبة التسوق`, {
+      icon: '🛍️',
+      id: `cart-add-${currentProd.id}`
+    });
+
     return true;
   };
 

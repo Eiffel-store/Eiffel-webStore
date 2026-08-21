@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useStoreData, useLanguage } from '@/shared';
 import { Product } from '@/types';
 import { ProductFormBasicInfo } from '../components/product-form/ProductFormBasicInfo';
@@ -95,10 +96,14 @@ export const AdminProductFormPage: React.FC = () => {
 
     if (isEditing && id) {
       updateProduct(id, payload);
-      setSuccessMessage(isRTL ? 'تم تحديث المنتج بنجاح!' : 'Product updated successfully!');
+      const msg = isRTL ? 'تم تحديث المنتج بنجاح!' : 'Product updated successfully!';
+      setSuccessMessage(msg);
+      toast.success(msg, { id: 'admin-prod-save' });
     } else {
       addProduct(payload);
-      setSuccessMessage(isRTL ? 'تمت إضافة المنتج للكتالوج بنجاح!' : 'New product created successfully!');
+      const msg = isRTL ? 'تمت إضافة المنتج للكتالوج بنجاح!' : 'New product created successfully!';
+      setSuccessMessage(msg);
+      toast.success(msg, { id: 'admin-prod-save' });
     }
 
     setTimeout(() => {

@@ -7,6 +7,8 @@ export interface ProductColor {
 export interface Product {
   id: string;
   name: string;
+  nameAr?: string;
+  nameEn?: string;
   subtitle: string;
   price: number;
   originalPrice?: number;
@@ -16,6 +18,8 @@ export interface Product {
   colors: ProductColor[];
   sizes: string[];
   description: string;
+  descriptionAr?: string;
+  descriptionEn?: string;
   details: string[];
   composition: string;
   fit: string;

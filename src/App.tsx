@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'react-hot-toast';
 
 // Shared App Core Providers & Components
 import {
@@ -124,6 +125,38 @@ export const App: React.FC = () => {
 
                         {/* Global Search Modal */}
                         <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+
+                        {/* Luxury Hot Toast Notifications */}
+                        <Toaster
+                          position="top-center"
+                          reverseOrder={false}
+                          gutter={8}
+                          toastOptions={{
+                            duration: 3500,
+                            style: {
+                              background: '#09090b',
+                              color: '#f4f4f5',
+                              border: '1px solid rgba(251, 191, 36, 0.25)',
+                              borderRadius: '0.75rem',
+                              padding: '12px 18px',
+                              fontSize: '0.8125rem',
+                              fontFamily: 'inherit',
+                              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6)',
+                            },
+                            success: {
+                              iconTheme: {
+                                primary: '#fbbf24',
+                                secondary: '#000000',
+                              },
+                            },
+                            error: {
+                              iconTheme: {
+                                primary: '#ef4444',
+                                secondary: '#ffffff',
+                              },
+                            },
+                          }}
+                        />
                       </Router>
                     </AdminAuthProvider>
                   </CartProvider>

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { Product } from '@/types';
 
 interface WishlistContextType {
@@ -27,11 +28,14 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [wishlist]);
 
   const toggleWishlist = (product: Product) => {
+    const prodName = product.nameAr || product.nameEn || product.name || 'القطعة';
     setWishlist(prev => {
       const exists = prev.some(item => item.id === product.id);
       if (exists) {
+        toast(`تمت إزالة ${prodName} من قائمة الرغبات`, { icon: '🤍', id: `wishlist-${product.id}` });
         return prev.filter(item => item.id !== product.id);
       } else {
+        toast.success(`تم حفظ ${prodName} في قائمة الرغبات`, { icon: '❤️', id: `wishlist-${product.id}` });
         return [...prev, product];
       }
     });

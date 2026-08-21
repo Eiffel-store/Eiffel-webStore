@@ -21,6 +21,7 @@ import { useLanguage } from '@/shared';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Logo } from './Logo';
 import { Copy, Check } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface NavbarProps {
   onOpenSearch: () => void;
@@ -30,7 +31,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   const { totalItems, openCart } = useCart();
   const { totalWishlist } = useWishlist();
   const { theme, toggleTheme } = useTheme();
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, isRTL, t } = useLanguage();
   const { user, isAuthenticated, role, logout } = useAuthStore();
   const { activeBanners = [] } = useStoreData();
   const [copiedCode, setCopiedCode] = useState(false);
@@ -52,6 +53,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
     if (promoCode) {
       navigator.clipboard.writeText(promoCode);
       setCopiedCode(true);
+      toast.success(isRTL ? `تم نسخ كود الخصم (${promoCode})! 🎉` : `Coupon code (${promoCode}) copied! 🎉`, {
+        id: 'promo-code-copy'
+      });
       setTimeout(() => setCopiedCode(false), 2000);
     }
   };

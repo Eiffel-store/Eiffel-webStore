@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { Check, AlertCircle } from 'lucide-react';
 import { useStoreData, useLanguage } from '@/shared';
 import { AdminContactSettingsForm } from '../components/settings/AdminContactSettingsForm';
@@ -24,7 +25,9 @@ export const AdminSettingsPage: React.FC = () => {
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
     updateSettings(formSettings);
-    setSuccessMessage(isRTL ? 'تم حفظ إعدادات المتجر بنجاح!' : 'Store settings updated successfully!');
+    const msg = isRTL ? 'تم حفظ إعدادات المتجر بنجاح!' : 'Store settings updated successfully!';
+    setSuccessMessage(msg);
+    toast.success(msg, { id: 'store-settings-save' });
     setTimeout(() => setSuccessMessage(''), 3000);
   };
 

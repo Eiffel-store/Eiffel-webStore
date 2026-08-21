@@ -15,6 +15,7 @@ import {
   ShoppingBag
 } from 'lucide-react';
 import { useStoreData, useLanguage, useCurrency, EiffelLoader, EmptyState } from '@/shared';
+import toast from 'react-hot-toast';
 import { customerService } from '@/services/customerService';
 import { User, Order } from '@/types';
 
@@ -160,6 +161,14 @@ export const AdminCustomersPage: React.FC = () => {
       setBackendCustomers((prev) =>
         prev.map((c) => (c.id === customer.id ? { ...c, tier: nextVip ? 'VIP' : 'MEMBER', isVip: nextVip } : c))
       );
+      toast.success(
+        isRTL
+          ? (nextVip ? `تمت ترقية ${customer.name || 'العميل'} إلى VIP 👑` : `تم إلغاء عضوية VIP عن ${customer.name || 'العميل'}`)
+          : (nextVip ? `Customer upgraded to VIP 👑` : `VIP revoked`),
+        { id: `vip-toggle-${customer.id}` }
+      );
+    } catch (err) {
+      toast.error(isRTL ? 'فشل تعديل حالة VIP' : 'Failed to update VIP status');
     } finally {
       setIsUpdating(false);
     }
@@ -182,6 +191,13 @@ export const AdminCustomersPage: React.FC = () => {
           return c;
         })
       );
+      toast.success(
+        isRTL
+          ? `تم تحديث رصيد النقاط بنجاح (${delta > 0 ? '+' : ''}${delta} PTS)`
+          : `Points updated successfully (${delta > 0 ? '+' : ''}${delta} PTS)`
+      );
+    } catch (err) {
+      toast.error(isRTL ? 'فشل تعديل النقاط' : 'Failed to adjust points');
     } finally {
       setIsUpdating(false);
       setSelectedCustomerForPoints(null);
