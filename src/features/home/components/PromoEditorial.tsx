@@ -28,6 +28,11 @@ export const PromoEditorial: React.FC = () => {
     ? (products.find(p => p && p.originalPrice && p.originalPrice > p.price) || products[0])
     : null;
 
+  // If no dynamic promo, no custom promo in DB, and no products, don't render empty dummy container
+  if (!dynamicPromo && !staticPromo?.titleAr && !staticPromo?.titleEn && !featuredProduct) {
+    return null;
+  }
+
   const badge = isRTL
     ? (dynamicPromo?.tagAr || staticPromo?.badgeAr || t.promoCapsule)
     : (dynamicPromo?.tagEn || staticPromo?.badgeEn || t.promoCapsule);

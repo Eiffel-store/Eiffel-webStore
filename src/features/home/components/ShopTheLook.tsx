@@ -10,6 +10,12 @@ export const ShopTheLook: React.FC = () => {
   const { isRTL } = useLanguage();
 
   const look = homeSettings?.shopTheLook;
+
+  // Don't render empty dummy look if nothing is configured and no products exist
+  if (!look?.imageUrl && (!products || products.length === 0)) {
+    return null;
+  }
+
   const title = isRTL ? (look?.titleAr || 'تسوق الإطلالة') : (look?.titleEn || 'Shop The Look');
   const subtitle = isRTL ? (look?.subtitleAr || 'تنسيق الإطلالة الكاملة') : (look?.subtitleEn || 'Curated Ensemble');
   const mainImage = look?.imageUrl || products?.[0]?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';

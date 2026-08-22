@@ -7,6 +7,10 @@ export const CategoryGrid: React.FC = () => {
   const { categories } = useStoreData();
   const { t, isRTL } = useLanguage();
 
+  if (!categories || categories.length === 0) {
+    return null;
+  }
+
   const getCategoryInfo = (cat: any) => {
     const id = (cat.id || '').toLowerCase();
     if (isRTL) {
