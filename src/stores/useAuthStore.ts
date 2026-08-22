@@ -9,6 +9,7 @@ interface AuthState {
   role: 'ROLE_ADMIN' | 'ROLE_STAFF' | 'ROLE_CUSTOMER' | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isProfileLoading: boolean;
   error: string | null;
 
   login: (credentials: LoginCredentials) => Promise<AuthResult>;
@@ -28,6 +29,7 @@ export const useAuthStore = create<AuthState>()(
       role: null,
       isAuthenticated: false,
       isLoading: false,
+      isProfileLoading: false,
       error: null,
 
       login: async (credentials) => {
@@ -128,6 +130,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       fetchProfile: async () => {
+        set({ isProfileLoading: true });
         try {
           const data = await authService.getProfile();
           if (data) {
@@ -149,6 +152,8 @@ export const useAuthStore = create<AuthState>()(
           }
         } catch {
           // ignore if unauthenticated or offline
+        } finally {
+          set({ isProfileLoading: false });
         }
       },
 

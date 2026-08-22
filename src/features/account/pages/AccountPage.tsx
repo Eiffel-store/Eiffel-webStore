@@ -14,21 +14,33 @@ import { Link } from 'react-router-dom';
 import { Address, User, Order } from '@/types';
 
 export const AccountPage: React.FC = () => {
-  const { user, isAuthenticated, role, logout, fetchProfile, isLoading: isAuthLoading } = useAuthStore();
+  const { user, isAuthenticated, role, logout, fetchProfile, isLoading: isAuthLoading, isProfileLoading } = useAuthStore();
   const { t, isRTL } = useLanguage();
   const { orders: localStoreOrders } = useStoreData();
   const { data: serverOrders = [], isLoading: isOrdersLoading } = useMyOrders(user?.email);
   const [activeTab, setActiveTab] = useState<AccountTabKey>('overview');
   const [showAddressModal, setShowAddressModal] = useState(false);
+  const [isInitialSyncing, setIsInitialSyncing] = useState(true);
 
   // Local user state for addresses
   const [userState, setUserState] = useState<User | null>(user);
 
   // Fetch fresh profile from server on mount
   React.useEffect(() => {
+    let isMounted = true;
     if (isAuthenticated) {
-      fetchProfile();
+      setIsInitialSyncing(true);
+      fetchProfile().finally(() => {
+        if (isMounted) {
+          setIsInitialSyncing(false);
+        }
+      });
+    } else {
+      setIsInitialSyncing(false);
     }
+    return () => {
+      isMounted = false;
+    };
   }, [isAuthenticated, fetchProfile]);
 
   // Keep state in sync with auth store
@@ -76,10 +88,12 @@ export const AccountPage: React.FC = () => {
     });
   }, [serverOrders, localStoreOrders, user]);
 
-  if (isAuthLoading) {
+  const isDataLoading = isAuthLoading || (isAuthenticated && (isInitialSyncing || isProfileLoading || isOrdersLoading));
+
+  if (isDataLoading) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center">
-        <EiffelLoader size="lg" message={isRTL ? 'جاري التحقق من بيانات الحساب...' : 'Loading bespoke client profile...'} />
+      <div className="min-h-[75vh] flex items-center justify-center">
+        <EiffelLoader size="lg" message={isRTL ? 'جاري تحميل وتحديث بيانات الحساب...' : 'Loading bespoke client profile...'} />
       </div>
     );
   }
