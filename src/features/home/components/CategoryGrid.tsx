@@ -12,19 +12,14 @@ export const CategoryGrid: React.FC = () => {
   }
 
   const getCategoryInfo = (cat: any) => {
-    const id = (cat.id || '').toLowerCase();
     if (isRTL) {
-      if (id === 'men') return { title: 'تشكيلة الرجال', subtitle: 'قصات معمارية انسيابية وخامات قطن الجيزة' };
-      if (id === 'kids') return { title: 'أزياء الأطفال', subtitle: 'أزياء راقية ومريحة للأولاد والبنات' };
-      if (id === 'accessories') return { title: 'القطع الجلدية والإكسسوارات', subtitle: 'ساعات يد ستيل، محافظ وحقائب كروس' };
-      if (id === 'offers') return { title: 'العروض والتخفيضات', subtitle: 'تخفيضات موسمية وباقات أطقم متكاملة' };
-      return { title: cat.name, subtitle: cat.subtitle };
+      const title = cat.name || cat.nameAr || cat.nameEn || '';
+      const subtitle = cat.subtitle || cat.subtitleAr || cat.subtitleEn || '';
+      return { title, subtitle };
     } else {
-      if (id === 'men') return { title: "MEN'S COLLECTION", subtitle: 'Architectural silhouettes & premium Egyptian cotton' };
-      if (id === 'kids') return { title: "KIDS COLLECTION", subtitle: 'Contemporary junior tailoring & varsity knits' };
-      if (id === 'accessories') return { title: "TIMEPIECES & ACCESSORIES", subtitle: 'Steel chronographs & fine leather goods' };
-      if (id === 'offers') return { title: "SPECIAL OFFERS", subtitle: 'Seasonal markdowns & complete bundled looks' };
-      return { title: cat.nameEn || cat.name || id.toUpperCase(), subtitle: cat.subtitleEn || 'Curated architectural collection' };
+      const title = cat.nameEn || cat.name || '';
+      const subtitle = cat.subtitleEn || cat.subtitle || '';
+      return { title, subtitle };
     }
   };
 

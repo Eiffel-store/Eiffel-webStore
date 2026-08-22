@@ -13,7 +13,7 @@ export const categoryService = {
   },
 
   update: async (id: string, updates: Partial<CategoryItem>): Promise<CategoryItem> => {
-    const response = await apiClient.post<ApiResponse<CategoryItem>>('/categories', { ...updates, id });
+    const response = await apiClient.put<ApiResponse<CategoryItem>>(`/categories/${id}`, updates);
     return response.data.data;
   },
 

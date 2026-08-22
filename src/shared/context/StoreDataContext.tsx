@@ -10,6 +10,7 @@ import { settingsService } from '@/services/settingsService';
 import { homeSettingsService } from '@/services/homeSettingsService';
 import { bannerService } from '@/services/bannerService';
 import { useAuthStore } from '@/stores/useAuthStore';
+import toast from 'react-hot-toast';
 
 const DEFAULT_SETTINGS: StoreSettings = {
   storeName: 'EIFFEL',
@@ -423,18 +424,47 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Mutations: Categories
   const createCategoryMutation = useMutation({
     mutationFn: (cat: Partial<CategoryItem>) => categoryService.create(cat),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast.success('تمت إضافة القسم بنجاح');
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'فشل إضافة القسم');
+    }
   });
 
   const updateCategoryMutation = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<CategoryItem> }) =>
       categoryService.update(id, updates),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast.success('تم تحديث القسم بنجاح');
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'فشل تحديث القسم');
+    }
   });
 
   const deleteCategoryMutation = useMutation({
     mutationFn: (id: string) => categoryService.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
+    onMutate: async (id: string) => {
+      await queryClient.cancelQueries({ queryKey: ['categories'] });
+      const prevCategories = queryClient.getQueryData<CategoryItem[]>(['categories']);
+      if (prevCategories) {
+        queryClient.setQueryData<CategoryItem[]>(['categories'], prevCategories.filter(c => c.id !== id));
+      }
+      return { prevCategories };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast.success('تم حذف القسم نهائياً من قاعدة البيانات');
+    },
+    onError: (err: any, _id, context) => {
+      if (context?.prevCategories) {
+        queryClient.setQueryData(['categories'], context.prevCategories);
+      }
+      toast.error(err?.message || 'فشل حذف القسم');
+    }
   });
 
   // Mutations: Coupons
