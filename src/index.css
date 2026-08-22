@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -42,35 +44,53 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Arabic typography (Cairo) */
-  [dir="rtl"],
-  [dir="rtl"] body {
-    font-family: 'Cairo', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
-
   h1, h2, h3, h4, .font-editorial {
     font-family: 'Bebas Neue', sans-serif;
     letter-spacing: 0.02em;
     text-transform: uppercase;
   }
+}
 
-  [dir="rtl"] h1,
-  [dir="rtl"] h2,
-  [dir="rtl"] h3,
-  [dir="rtl"] h4,
-  [dir="rtl"] .font-editorial {
-    font-family: 'Cairo', 'Bebas Neue', sans-serif;
-    letter-spacing: normal;
-    text-transform: none;
-    font-weight: 700;
-  }
+/* ==========================================================================
+   GLOBAL ARABIC (RTL) TYPOGRAPHY ENFORCEMENT -> CAIRO FONT
+   ========================================================================== */
+[dir="rtl"],
+[dir="rtl"] body,
+[dir="rtl"] p,
+[dir="rtl"] span,
+[dir="rtl"] a,
+[dir="rtl"] button,
+[dir="rtl"] input,
+[dir="rtl"] select,
+[dir="rtl"] textarea,
+[dir="rtl"] label,
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6,
+[dir="rtl"] div,
+[dir="rtl"] .font-editorial,
+[dir="rtl"] .font-label-bold,
+[dir="rtl"] .font-label-sm,
+[dir="rtl"] .font-body-md,
+[dir="rtl"] .font-body-lg,
+[dir="rtl"] .font-inter,
+[dir="rtl"] .font-headline-md,
+[dir="rtl"] .font-headline-lg,
+[dir="rtl"] .font-display-xl,
+[dir="rtl"] .font-display-lg,
+[dir="rtl"] .font-bebas,
+[dir="rtl"] .font-sans {
+  font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
 
-  [dir="rtl"] input,
-  [dir="rtl"] select,
-  [dir="rtl"] textarea,
-  [dir="rtl"] button {
-    font-family: 'Cairo', sans-serif;
-  }
+/* Preserve monospaced numbers & tracking IDs */
+[dir="rtl"] .font-mono,
+[dir="rtl"] code,
+[dir="rtl"] pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
 }
 
 /* Custom luxury scrollbar */
