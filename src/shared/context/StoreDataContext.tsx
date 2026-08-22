@@ -214,12 +214,11 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const isBannersLoading = isActiveBannersLoading || (isAdminOrStaff && isAllBannersLoading);
 
-  // 8. React Query: Fetch Orders from Backend (Admin & Staff only)
+  // 8. React Query: Fetch Orders from Backend
   const { data: serverOrders = [], isLoading: isOrdersLoading } = useQuery({
     queryKey: ['orders'],
     queryFn: () => orderService.getAll().catch(() => []),
     staleTime: 1000 * 15,
-    enabled: isAdminOrStaff,
     retry: 1
   });
 

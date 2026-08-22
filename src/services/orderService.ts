@@ -118,7 +118,12 @@ export const mapServerOrderToClient = (s: ServerOrder): Order => {
     estimatedDelivery: s.estimatedDelivery || 'خلال 48 ساعة',
     shippingAddress,
     paymentMethod: s.paymentMethod || 'الدفع عند الاستلام (كاش)',
-    customerNotes: s.customerNotes
+    customerNotes: s.customerNotes,
+    customerName: s.customerName || `${firstName} ${lastName}`.trim(),
+    customerEmail: s.customerEmail,
+    customerPhone: s.customerPhone || (s as any).shippingAddress?.phone,
+    pointsEarned: (s as any).pointsEarned || 0,
+    pointsRedeemed: (s as any).pointsRedeemed || 0
   };
 };
 

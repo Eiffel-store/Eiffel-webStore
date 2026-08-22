@@ -56,11 +56,17 @@ export const AdminCustomersPage: React.FC = () => {
   const allMergedCustomers = useMemo(() => {
     const custMap: Record<string, User> = {};
 
+    const normalizePhone = (p?: string) => {
+      if (!p) return '';
+      const digits = p.replace(/\D/g, '');
+      return digits.startsWith('20') && digits.length === 12 ? digits.slice(2) : digits;
+    };
+
     // First add real registered MongoDB users
     backendCustomers.forEach((u) => {
       const emailKey = u.email ? u.email.trim().toLowerCase() : '';
-      const phoneKey = u.phone ? u.phone.trim() : '';
-      const primaryKey = emailKey || phoneKey || String(u.id);
+      const cleanPhone = normalizePhone(u.phone);
+      const primaryKey = emailKey || cleanPhone || String(u.id);
 
       const userPoints = (u as any).points ?? u.tierPoints ?? 0;
       const isVip = Boolean(u.isVip) || u.tier === 'VIP' || u.tier === 'VIP_PLATINUM' || userPoints >= (settings?.vipRequiredPoints || 500);
@@ -80,25 +86,37 @@ export const AdminCustomersPage: React.FC = () => {
       };
 
       if (emailKey) custMap[emailKey] = entry;
-      if (phoneKey) custMap[phoneKey] = entry;
+      if (cleanPhone) custMap[cleanPhone] = entry;
       custMap[primaryKey] = entry;
     });
 
     // Then cross-reference with real actual orders from the database
     orders.forEach((o) => {
       const email = o.customerEmail ? o.customerEmail.trim().toLowerCase() : '';
-      const phone = o.customerPhone ? o.customerPhone.trim() : (o.shippingAddress?.phone ? o.shippingAddress.phone.trim() : '');
+      const rawPhone = o.customerPhone || o.shippingAddress?.phone || '';
+      const cleanPhone = normalizePhone(rawPhone);
       const name = o.customerName || `${o.shippingAddress?.firstName || ''} ${o.shippingAddress?.lastName || ''}`.trim() || 'عميل إيفل';
 
-      // Find existing registered user by email or phone
-      const target = (email && custMap[email]) || (phone && custMap[phone]);
+      // Find existing registered user by email or normalized phone
+      const target = (email && custMap[email]) || (cleanPhone && custMap[cleanPhone]);
+
+      const isDelivered = String(o.status || '').toLowerCase() === 'delivered';
+      const isNotCancelled = String(o.status || '').toLowerCase() !== 'cancelled';
+      const orderAmount = Number(o.total || o.subtotal || 0);
 
       if (target) {
-        if (o.status !== 'Cancelled') {
-          target.totalSpend = (target.totalSpend || 0) + (o.total || o.subtotal || 0);
-        }
-        if (o.status === 'Delivered') {
-          target.completedOrdersCount = (target.completedOrdersCount || 0) + 1;
+        // If target already has this order in its orders array, avoid double counting
+        const orderExists = target.orders && target.orders.some(existing => existing.id === o.id);
+        if (!orderExists) {
+          if (!target.orders) target.orders = [];
+          target.orders.push(o);
+
+          if (isNotCancelled && (!target.totalSpend || target.totalSpend === 0)) {
+            target.totalSpend = (target.totalSpend || 0) + orderAmount;
+          }
+          if (isDelivered && (!target.completedOrdersCount || target.completedOrdersCount === 0)) {
+            target.completedOrdersCount = (target.completedOrdersCount || 0) + 1;
+          }
         }
         if (
           (target.completedOrdersCount || 0) >= (settings?.vipRequiredOrders || 3) ||
@@ -108,18 +126,18 @@ export const AdminCustomersPage: React.FC = () => {
           target.isVip = true;
         }
       } else {
-        const fallbackKey = email || phone || o.id;
+        const fallbackKey = email || cleanPhone || o.id;
         const newCust: User = {
           id: `order-cust-${fallbackKey}`,
           name,
-          email: email || (phone ? `${phone}@eiffel-guest.eg` : 'guest@eiffel.eg'),
-          phone: phone || 'N/A',
+          email: email || (cleanPhone ? `${cleanPhone}@eiffel-guest.eg` : 'guest@eiffel.eg'),
+          phone: rawPhone || cleanPhone || 'N/A',
           role: 'ROLE_CUSTOMER',
           tier: 'MEMBER',
           tierPoints: o.pointsEarned || 0,
           points: o.pointsEarned || 0,
-          completedOrdersCount: o.status === 'Delivered' ? 1 : 0,
-          totalSpend: o.status !== 'Cancelled' ? (o.total || o.subtotal || 0) : 0,
+          completedOrdersCount: isDelivered ? 1 : 0,
+          totalSpend: isNotCancelled ? orderAmount : 0,
           isVip: false,
           memberSince: o.createdAt || o.date || new Date().toISOString(),
           addresses: o.shippingAddress ? [o.shippingAddress] : [],
@@ -134,7 +152,7 @@ export const AdminCustomersPage: React.FC = () => {
           newCust.isVip = true;
         }
         if (email) custMap[email] = newCust;
-        if (phone) custMap[phone] = newCust;
+        if (cleanPhone) custMap[cleanPhone] = newCust;
         custMap[fallbackKey] = newCust;
       }
     });
