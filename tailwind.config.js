@@ -68,7 +68,8 @@ export default {
         "display-lg": ["Bebas Neue", "sans-serif"],
         "body-lg": ["Inter", "sans-serif"],
         "bebas": ["Bebas Neue", "sans-serif"],
-        "inter": ["Inter", "sans-serif"]
+        "inter": ["Inter", "sans-serif"],
+        "cairo": ["Cairo", "sans-serif"]
       },
     },
   },

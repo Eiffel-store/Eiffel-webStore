@@ -42,9 +42,10 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Arabic body typography */
+  /* Arabic typography (Cairo) */
+  [dir="rtl"],
   [dir="rtl"] body {
-    font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
+    font-family: 'Cairo', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   h1, h2, h3, h4, .font-editorial {
@@ -58,10 +59,17 @@
   [dir="rtl"] h3,
   [dir="rtl"] h4,
   [dir="rtl"] .font-editorial {
-    font-family: 'IBM Plex Sans Arabic', 'Bebas Neue', sans-serif;
+    font-family: 'Cairo', 'Bebas Neue', sans-serif;
     letter-spacing: normal;
     text-transform: none;
     font-weight: 700;
+  }
+
+  [dir="rtl"] input,
+  [dir="rtl"] select,
+  [dir="rtl"] textarea,
+  [dir="rtl"] button {
+    font-family: 'Cairo', sans-serif;
   }
 }
 
@@ -94,7 +102,7 @@
 
 /* Watermark Text */
 .watermark-text {
-  font-family: 'Bebas Neue', 'IBM Plex Sans Arabic', sans-serif;
+  font-family: 'Bebas Neue', 'Cairo', sans-serif;
   font-size: clamp(80px, 18vw, 240px);
   line-height: 0.85;
   color: rgba(0, 0, 0, 0.025);
