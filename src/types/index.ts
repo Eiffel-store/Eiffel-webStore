@@ -10,6 +10,8 @@ export interface Product {
   nameAr?: string;
   nameEn?: string;
   subtitle: string;
+  subtitleAr?: string;
+  subtitleEn?: string;
   price: number;
   originalPrice?: number;
   category: string;
