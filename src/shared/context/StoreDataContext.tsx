@@ -371,54 +371,130 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Mutations: Products
   const createProductMutation = useMutation({
     mutationFn: (p: Partial<Product>) => productService.create(p),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
+    onSuccess: (newProd: Product) => {
+      queryClient.setQueryData<Product[]>(['products'], (old: Product[] | undefined) => [newProd, ...(old || []).filter(p => p.id !== newProd.id)]);
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('تمت إضافة المنتج بنجاح');
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'فشل إضافة المنتج');
+    }
   });
 
   const updateProductMutation = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<Product> }) =>
       productService.update(id, updates),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
+    onSuccess: (updatedProd: Product) => {
+      queryClient.setQueryData<Product[]>(['products'], (old: Product[] | undefined) =>
+        (old || []).map((p: Product) => (p.id === updatedProd.id ? updatedProd : p))
+      );
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('تم تحديث المنتج بنجاح');
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'فشل تحديث المنتج');
+    }
   });
 
   const deleteProductMutation = useMutation({
     mutationFn: (id: string) => productService.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] }),
+    onMutate: async (id: string) => {
+      await queryClient.cancelQueries({ queryKey: ['products'] });
+      const prevProducts = queryClient.getQueryData<Product[]>(['products']);
+      if (prevProducts) {
+        queryClient.setQueryData<Product[]>(['products'], prevProducts.filter(p => p.id !== id));
+      }
+      return { prevProducts };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('تم حذف المنتج نهائياً من قاعدة البيانات');
+    },
+    onError: (err: any, _id, context) => {
+      if (context?.prevProducts) {
+        queryClient.setQueryData(['products'], context.prevProducts);
+      }
+      toast.error(err?.message || 'فشل حذف المنتج');
+    }
   });
 
   // Mutations: Settings
   const updateSettingsMutation = useMutation({
     mutationFn: (newSettings: Partial<StoreSettings>) => settingsService.updateSettings(newSettings),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['settings'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings'] });
+      toast.success('تم حفظ الإعدادات بنجاح');
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'فشل حفظ الإعدادات');
+    }
   });
 
   // Mutations: Orders
   const updateOrderStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: Order['status'] }) =>
       orderService.updateStatus(id, status),
-    onSuccess: (updatedOrder) => {
-      queryClient.setQueryData<Order[]>(['orders'], (old = []) =>
-        (old || []).map(o => o.id === updatedOrder.id ? updatedOrder : o)
+    onSuccess: (updatedOrder: Order) => {
+      queryClient.setQueryData<Order[]>(['orders'], (old: Order[] | undefined) =>
+        (old || []).map((o: Order) => (o.id === updatedOrder.id ? updatedOrder : o))
       );
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['orders', 'my-orders'] });
+      toast.success('تم تحديث حالة الطلب');
     },
+    onError: (err: any) => {
+      toast.error(err?.message || 'فشل تحديث حالة الطلب');
+    }
   });
 
   // Mutations: Stores
   const createStoreMutation = useMutation({
     mutationFn: (s: Partial<StoreLocation>) => storeService.create(s),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['stores'] }),
+    onSuccess: (newStore: StoreLocation) => {
+      queryClient.setQueryData<StoreLocation[]>(['stores'], (old: StoreLocation[] | undefined) => [newStore, ...(old || []).filter(st => st.id !== newStore.id)]);
+      queryClient.invalidateQueries({ queryKey: ['stores'] });
+      toast.success('تمت إضافة الفرع بنجاح');
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'فشل إضافة الفرع');
+    }
   });
 
   const updateStoreMutation = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<StoreLocation> }) =>
       storeService.update(id, updates),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['stores'] }),
+    onSuccess: (updatedStore: StoreLocation) => {
+      queryClient.setQueryData<StoreLocation[]>(['stores'], (old: StoreLocation[] | undefined) =>
+        (old || []).map((st: StoreLocation) => (st.id === updatedStore.id ? updatedStore : st))
+      );
+      queryClient.invalidateQueries({ queryKey: ['stores'] });
+      toast.success('تم تحديث بيانات الفرع');
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'فشل تحديث بيانات الفرع');
+    }
   });
 
   const deleteStoreMutation = useMutation({
     mutationFn: (id: string) => storeService.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['stores'] }),
+    onMutate: async (id: string) => {
+      await queryClient.cancelQueries({ queryKey: ['stores'] });
+      const prevStores = queryClient.getQueryData<StoreLocation[]>(['stores']);
+      if (prevStores) {
+        queryClient.setQueryData<StoreLocation[]>(['stores'], prevStores.filter(st => st.id !== id));
+      }
+      return { prevStores };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['stores'] });
+      toast.success('تم حذف الفرع بنجاح');
+    },
+    onError: (err: any, _id, context) => {
+      if (context?.prevStores) {
+        queryClient.setQueryData(['stores'], context.prevStores);
+      }
+      toast.error(err?.message || 'فشل حذف الفرع');
+    }
   });
 
   // Mutations: Categories
@@ -470,18 +546,51 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Mutations: Coupons
   const createCouponMutation = useMutation({
     mutationFn: (coupon: Partial<Coupon>) => couponService.create(coupon),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['coupons'] }),
+    onSuccess: (newCoupon: Coupon) => {
+      queryClient.setQueryData<Coupon[]>(['coupons'], (old: Coupon[] | undefined) => [newCoupon, ...(old || []).filter(c => c.id !== newCoupon.id)]);
+      queryClient.invalidateQueries({ queryKey: ['coupons'] });
+      toast.success('تم إنشاء كوبون الخصم بنجاح');
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'فشل إنشاء الكوبون');
+    }
   });
 
   const updateCouponMutation = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<Coupon> }) =>
       couponService.update(id, updates),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['coupons'] }),
+    onSuccess: (updatedCoupon: Coupon) => {
+      queryClient.setQueryData<Coupon[]>(['coupons'], (old: Coupon[] | undefined) =>
+        (old || []).map((c: Coupon) => (c.id === updatedCoupon.id ? updatedCoupon : c))
+      );
+      queryClient.invalidateQueries({ queryKey: ['coupons'] });
+      toast.success('تم تحديث كوبون الخصم');
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'فشل تحديث الكوبون');
+    }
   });
 
   const deleteCouponMutation = useMutation({
     mutationFn: (id: string) => couponService.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['coupons'] }),
+    onMutate: async (id: string) => {
+      await queryClient.cancelQueries({ queryKey: ['coupons'] });
+      const prevCoupons = queryClient.getQueryData<Coupon[]>(['coupons']);
+      if (prevCoupons) {
+        queryClient.setQueryData<Coupon[]>(['coupons'], prevCoupons.filter(c => c.id !== id));
+      }
+      return { prevCoupons };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['coupons'] });
+      toast.success('تم حذف الكوبون');
+    },
+    onError: (err: any, _id, context) => {
+      if (context?.prevCoupons) {
+        queryClient.setQueryData(['coupons'], context.prevCoupons);
+      }
+      toast.error(err?.message || 'فشل حذف الكوبون');
+    }
   });
 
   // Product Methods
@@ -557,7 +666,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Order Methods
   const addOrder = (order: Order) => {
-    queryClient.setQueryData<Order[]>(['orders'], (old = []) => [order, ...(old || []).filter(o => o.id !== order.id)]);
+    queryClient.setQueryData<Order[]>(['orders'], (old: Order[] | undefined) => [order, ...(old || []).filter((o: Order) => o.id !== order.id)]);
     queryClient.invalidateQueries({ queryKey: ['orders'] });
   };
 
