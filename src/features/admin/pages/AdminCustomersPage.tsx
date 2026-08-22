@@ -12,7 +12,8 @@ import {
   CheckCircle2,
   Award,
   RefreshCw,
-  ShoppingBag
+  ShoppingBag,
+  User as UserIcon
 } from 'lucide-react';
 import { useStoreData, useLanguage, useCurrency, EiffelLoader, EmptyState } from '@/shared';
 import toast from 'react-hot-toast';
@@ -428,13 +429,14 @@ export const AdminCustomersPage: React.FC = () => {
                         {/* Tier Badge */}
                         <td className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>
                           {isVip ? (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/30 text-[11px] font-bold shadow-sm">
-                              <Crown className="w-3.5 h-3.5 text-amber-400" />
-                              <span>EIFFEL VIP</span>
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-amber-400/10 text-amber-300 border border-amber-400/40 text-[11px] font-bold shadow-sm whitespace-nowrap">
+                              <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                              <span>{isRTL ? 'عضوية VIP' : 'EIFFEL VIP'}</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 text-[11px]">
-                              <span>STANDARD MEMBER</span>
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 text-zinc-300 border border-zinc-700/80 text-[11px] font-medium whitespace-nowrap">
+                              <UserIcon className="w-3 h-3 text-zinc-400 shrink-0" />
+                              <span>{isRTL ? 'عضو قياسي' : 'Standard Member'}</span>
                             </span>
                           )}
                         </td>
