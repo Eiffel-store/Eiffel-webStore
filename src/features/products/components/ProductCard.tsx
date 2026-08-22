@@ -159,12 +159,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
 
         <Link to={`/product/${product.id}`} className="mt-1 block">
           <h3 className="font-editorial text-sm sm:text-base font-bold text-primary dark:text-white group-hover:underline line-clamp-1">
-            {isRTL ? (product.nameAr || product.name || product.nameEn) : (product.nameEn || product.name || product.nameAr)}
+            {product.name}
           </h3>
         </Link>
-        {(product.subtitle || product.subtitleAr || product.subtitleEn) && (
+        {product.subtitle && (
           <p className="text-[11px] sm:text-xs text-secondary dark:text-zinc-400 line-clamp-1 mt-0.5 font-light">
-            {isRTL ? (product.subtitleAr || product.subtitle || product.subtitleEn) : (product.subtitleEn || product.subtitle || product.subtitleAr)}
+            {product.subtitle}
           </p>
         )}
 

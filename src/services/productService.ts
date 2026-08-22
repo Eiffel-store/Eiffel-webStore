@@ -13,63 +13,30 @@ export interface ProductQueryParams {
   direction?: 'asc' | 'desc';
 }
 
-export const normalizeProduct = (p: any): Product => {
-  if (!p) return p;
-  const name =
-    p.name ||
-    p.nameAr ||
-    p.nameEn ||
-    (p.id === 'prod-1787247537255' || p.category === 'accessories'
-      ? 'ساعة سكمي العسكرية الفاخرة'
-      : 'جاكيت إيفل من الصوف والجلد الفاخر');
-  const subtitle =
-    p.subtitle ||
-    p.subtitleAr ||
-    p.subtitleEn ||
-    p.descriptionAr ||
-    p.descriptionEn ||
-    p.description ||
-    'قطعة أزياء حصرية بإصدار محدود';
-
-  return {
-    ...p,
-    name,
-    nameAr: p.nameAr || name,
-    nameEn: p.nameEn || (p.id === 'prod-1787247537255' ? 'SKMEI Luxury Military Watch' : 'EIFFEL Atelier Leather & Wool Jacket'),
-    subtitle,
-    subtitleAr: p.subtitleAr || subtitle,
-    subtitleEn: p.subtitleEn || 'Exclusive limited edition luxury piece'
-  };
-};
-
 export const productService = {
   getAll: async (params?: ProductQueryParams): Promise<Product[]> => {
     const response = await apiClient.get<ApiResponse<Product[]>>('/products', { params });
-    const list = response.data.data || [];
-    return list.map(normalizeProduct);
+    return response.data.data || [];
   },
 
   getById: async (id: string): Promise<Product> => {
     const response = await apiClient.get<ApiResponse<Product>>(`/products/${id}`);
-    return normalizeProduct(response.data.data);
+    return response.data.data;
   },
 
   getByCategory: async (category: string): Promise<Product[]> => {
     const response = await apiClient.get<ApiResponse<Product[]>>(`/products/category/${category}`);
-    const list = response.data.data || [];
-    return list.map(normalizeProduct);
+    return response.data.data || [];
   },
 
   getBestSellers: async (): Promise<Product[]> => {
     const response = await apiClient.get<ApiResponse<Product[]>>('/products/best-sellers');
-    const list = response.data.data || [];
-    return list.map(normalizeProduct);
+    return response.data.data || [];
   },
 
   getNewArrivals: async (): Promise<Product[]> => {
     const response = await apiClient.get<ApiResponse<Product[]>>('/products/new-arrivals');
-    const list = response.data.data || [];
-    return list.map(normalizeProduct);
+    return response.data.data || [];
   },
 
   create: async (productData: Partial<Product>): Promise<Product> => {
