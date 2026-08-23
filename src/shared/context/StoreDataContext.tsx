@@ -163,7 +163,6 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     staleTime: 1000 * 30,
     retry: 1
   });
-
   // 3. React Query: Fetch Settings from Backend
   const { data: serverSettings, isLoading: isSettingsLoading } = useQuery({
     queryKey: ['settings'],

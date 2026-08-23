@@ -8,7 +8,7 @@ import { AdminProductTable } from '../components/products/AdminProductTable';
 import { AdminProductDeleteModal } from '../components/products/AdminProductDeleteModal';
 
 export const AdminProductsPage: React.FC = () => {
-  const { products, deleteProduct, updateProduct, isProductsLoading } = useStoreData();
+  const { products, categories, deleteProduct, updateProduct, isProductsLoading } = useStoreData();
   const { isRTL } = useLanguage();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -99,6 +99,7 @@ export const AdminProductsPage: React.FC = () => {
         onCategoryChange={setSelectedCategory}
         stockFilter={stockFilter}
         onStockChange={setStockFilter}
+        categories={categories}
       />
 
       {/* Loading / Empty / Table */}

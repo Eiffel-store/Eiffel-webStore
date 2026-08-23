@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 import { useLanguage } from '@/shared';
+import { CategoryItem } from '@/types';
 
 interface AdminProductFilterBarProps {
   searchQuery: string;
@@ -9,6 +10,7 @@ interface AdminProductFilterBarProps {
   onCategoryChange: (cat: string) => void;
   stockFilter: string;
   onStockChange: (st: string) => void;
+  categories: CategoryItem[];
 }
 
 export const AdminProductFilterBar: React.FC<AdminProductFilterBarProps> = ({
@@ -17,7 +19,8 @@ export const AdminProductFilterBar: React.FC<AdminProductFilterBarProps> = ({
   selectedCategory,
   onCategoryChange,
   stockFilter,
-  onStockChange
+  onStockChange,
+  categories
 }) => {
   const { isRTL } = useLanguage();
 
@@ -43,10 +46,11 @@ export const AdminProductFilterBar: React.FC<AdminProductFilterBarProps> = ({
           className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white focus:outline-none focus:border-white transition-colors"
         >
           <option value="all">{isRTL ? 'جميع الأقسام' : 'All Categories'}</option>
-          <option value="men">{isRTL ? 'رجالي (Men)' : 'Men'}</option>
-          <option value="kids">{isRTL ? 'أطفال (Kids)' : 'Kids'}</option>
-          <option value="accessories">{isRTL ? 'إكسسوارات وساعات' : 'Accessories'}</option>
-          <option value="offers">{isRTL ? 'العروض والتخفيضات' : 'Special Offers'}</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {isRTL ? (cat.name || cat.nameEn) : (cat.nameEn || cat.name)}
+            </option>
+          ))}
         </select>
       </div>
 

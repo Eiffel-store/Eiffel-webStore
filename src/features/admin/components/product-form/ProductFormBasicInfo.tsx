@@ -158,11 +158,11 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
             onChange={(e) => onChange({ category: e.target.value })}
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-white transition-colors cursor-pointer"
           >
-            <option value="men">{isRTL ? 'رجال (Men)' : 'Men'}</option>
-            <option value="kids">{isRTL ? 'أطفال (Kids)' : 'Kids'}</option>
-            <option value="accessories">{isRTL ? 'إكسسوارات (Accessories)' : 'Accessories'}</option>
-            {categories.filter(c => !['men', 'kids', 'accessories', 'offers'].includes(c.id)).map(c => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+            <option value="">{isRTL ? '-- اختر القسم --' : '-- Select Category --'}</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {isRTL ? (cat.name || cat.nameEn) : (cat.nameEn || cat.name)}
+              </option>
             ))}
           </select>
         </div>

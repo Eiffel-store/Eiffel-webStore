@@ -19,7 +19,8 @@ export const AdminCategoryCard: React.FC<AdminCategoryCardProps> = ({
 }) => {
   const { isRTL } = useLanguage();
   const isProtected = ['men', 'kids', 'accessories', 'offers'].includes(category.id);
-
+  const displayName = isRTL ? (category.name || category.nameEn) : (category.nameEn || category.name);
+  console.log("cat1",category)
   return (
     <div className="bg-zinc-950 border border-zinc-800 overflow-hidden shadow-xl flex flex-col justify-between group hover:border-zinc-700 transition-colors">
       <div className="relative aspect-[16/9] overflow-hidden bg-zinc-900">
@@ -31,7 +32,7 @@ export const AdminCategoryCard: React.FC<AdminCategoryCardProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
           <span className="font-mono text-[10px] uppercase font-bold text-white bg-black/60 px-2 py-0.5">
-            {category.id}
+            {category.nameEn}
           </span>
           <span className="text-[10px] font-mono text-emerald-400 bg-black/70 px-2 py-0.5 font-bold">
             {productCount} {isRTL ? 'منتج' : 'items'}
@@ -42,7 +43,7 @@ export const AdminCategoryCard: React.FC<AdminCategoryCardProps> = ({
       <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
         <div>
           <h3 className="font-editorial text-lg font-bold text-white tracking-wide">
-            {category.name}
+            {displayName}
           </h3>
           {category.subtitle && (
             <p className="text-xs text-zinc-400 mt-1 line-clamp-2">
