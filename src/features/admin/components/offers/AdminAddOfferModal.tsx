@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Tag, Sparkles, AlertCircle } from 'lucide-react';
+import { Tag, Sparkles, AlertCircle, X, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Product } from '@/types';
 import { useLanguage, useCurrency } from '@/shared';
 
@@ -52,19 +53,58 @@ export const AdminAddOfferModal: React.FC<AdminAddOfferModalProps> = ({
     : 0;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-zinc-950 border border-zinc-800 max-w-md w-full p-6 space-y-5 shadow-2xl animate-fade-in rounded-xl">
-        <div className="flex items-center gap-2 pb-3 border-b border-zinc-800">
-          <Tag className="w-5 h-5 text-amber-400" />
-          <h3 className="font-bold text-sm text-white">
-            {isRTL ? 'إدراج / تعديل منتج في قسم العروض' : 'Apply or Edit Product Discount'}
-          </h3>
+        <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
+          <div className="flex items-center gap-2">
+            <Tag className="w-5 h-5 text-amber-400" />
+            <h3 className="font-bold text-sm text-white">
+              {isRTL ? 'إدراج / تعديل منتج في قسم العروض' : 'Apply or Edit Product Discount'}
+            </h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 text-zinc-400 hover:text-white bg-zinc-900/60 hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {products.length === 0 ? (
-          <div className="py-6 text-center text-zinc-400 space-y-2">
-            <AlertCircle className="w-8 h-8 mx-auto text-amber-400/60" />
-            <p className="text-xs">{isRTL ? 'لا توجد منتجات مضافة في الكتالوج حالياً.' : 'No products found in catalog.'}</p>
+          <div className="py-6 text-center text-zinc-400 space-y-4">
+            <AlertCircle className="w-10 h-10 mx-auto text-amber-400/80" />
+            <div>
+              <p className="text-sm font-semibold text-white">
+                {isRTL ? 'لا توجد منتجات مضافة في الكتالوج حالياً' : 'No products found in catalog.'}
+              </p>
+              <p className="text-xs text-zinc-400 mt-1">
+                {isRTL ? 'يجب إضافة منتجات أولاً في الكتالوج قبل إمكانية إنشاء خصومات أو عروض.' : 'Please add products to your catalog first before applying discounts.'}
+              </p>
+            </div>
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-700 rounded-lg transition-colors cursor-pointer"
+              >
+                {isRTL ? 'إلغاء وإغلاق' : 'Cancel & Close'}
+              </button>
+              <Link
+                to="/admin/products/new"
+                onClick={onClose}
+                className="px-4 py-2 bg-white text-black hover:bg-zinc-200 text-xs font-bold rounded-lg transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>{isRTL ? 'إضافة منتج جديد' : 'Add New Product'}</span>
+              </Link>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
