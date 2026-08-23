@@ -131,6 +131,7 @@ export const useAuthStore = create<AuthState>()(
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('eiffel_auth_token');
+        localStorage.removeItem('eiffel_user');
         sessionStorage.removeItem('token');
         set({
           user: null,
@@ -165,6 +166,13 @@ export const useAuthStore = create<AuthState>()(
       },
 
       fetchProfile: async () => {
+        const storedToken = localStorage.getItem('token') || localStorage.getItem('eiffel_auth_token');
+        if (!storedToken) {
+          // If no token exists, reset authentication state
+          set({ isAuthenticated: false, user: null, token: null, refreshToken: null, role: null });
+          return;
+        }
+
         set({ isProfileLoading: true });
         try {
           const data = await authService.getProfile();
@@ -175,18 +183,52 @@ export const useAuthStore = create<AuthState>()(
             set((state) => ({
               user: state.user ? {
                 ...state.user,
+                id: String(rawUser.id || state.user.id || ''),
                 name: rawUser.name || data.name || state.user.name,
+                email: rawUser.email || data.email || state.user.email,
+                role: rawUser.role || data.role || state.user.role,
                 tier: isVip ? 'VIP' : ((data.tier as any) || rawUser.tier || 'MEMBER'),
                 isVip: isVip,
                 points: rawPoints,
                 tierPoints: rawPoints,
                 phone: rawUser.phone || data.phone || state.user.phone,
                 addresses: rawUser.addresses || state.user.addresses || [],
-              } : null
+              } : {
+                id: String(rawUser.id || ''),
+                name: rawUser.name || data.name || '',
+                email: rawUser.email || data.email || '',
+                role: rawUser.role || data.role || 'ROLE_CUSTOMER',
+                tier: isVip ? 'VIP' : ((data.tier as any) || rawUser.tier || 'MEMBER'),
+                isVip: isVip,
+                points: rawPoints,
+                tierPoints: rawPoints,
+                phone: rawUser.phone || data.phone || '',
+                memberSince: '2026',
+                addresses: rawUser.addresses || [],
+                paymentMethods: [],
+                orders: [],
+              },
+              role: (rawUser.role || data.role || 'ROLE_CUSTOMER') as any,
+              isAuthenticated: true,
             }));
           }
-        } catch {
-          // ignore if unauthenticated or offline
+        } catch (err: any) {
+          // If server rejects (401 Unauthorized / 403 Forbidden / 404 Not Found / user deleted from DB), log out immediately
+          const status = err?.response?.status || err?.status;
+          if (status === 401 || status === 403 || status === 404) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('eiffel_auth_token');
+            localStorage.removeItem('eiffel_user');
+            set({
+              user: null,
+              token: null,
+              refreshToken: null,
+              role: null,
+              isAuthenticated: false,
+              error: null,
+            });
+          }
         } finally {
           set({ isProfileLoading: false });
         }

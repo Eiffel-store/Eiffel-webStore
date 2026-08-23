@@ -98,6 +98,16 @@ apiClient.interceptors.response.use(
       if (!refreshToken) {
         isRefreshing = false;
         useAuthStore.getState().logout();
+
+        // If it was a public catalog request, retry anonymously so the user still sees products
+        if (originalRequest.method?.toUpperCase() === 'GET' &&
+            !originalRequest.url?.includes('/auth/me') &&
+            !originalRequest.url?.includes('/orders/my-orders') &&
+            !originalRequest.url?.includes('/admin/')) {
+          delete originalRequest.headers.Authorization;
+          return axios(originalRequest);
+        }
+
         const message = error.response?.data?.message || 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً';
         return Promise.reject(new Error(message));
       }
@@ -130,6 +140,16 @@ apiClient.interceptors.response.use(
       } catch (refreshErr) {
         processQueue(refreshErr, null);
         useAuthStore.getState().logout();
+
+        // If it was a public catalog request, retry anonymously so the user still sees products
+        if (originalRequest.method?.toUpperCase() === 'GET' &&
+            !originalRequest.url?.includes('/auth/me') &&
+            !originalRequest.url?.includes('/orders/my-orders') &&
+            !originalRequest.url?.includes('/admin/')) {
+          delete originalRequest.headers.Authorization;
+          return axios(originalRequest);
+        }
+
         return Promise.reject(refreshErr);
       } finally {
         isRefreshing = false;
