@@ -200,13 +200,17 @@ export interface RegisterData {
 
 export interface AuthResult {
   token: string;
-  id: number;
+  accessToken?: string;
+  refreshToken?: string;
+  expiresIn?: number;
+  id: number | string;
   name: string;
   email: string;
   role: 'ROLE_ADMIN' | 'ROLE_STAFF' | 'ROLE_CUSTOMER';
   tier?: string;
   tierPoints?: number;
   phone?: string;
+  isVip?: boolean;
 }
 
 export interface HeroBannerSettings {

@@ -6,6 +6,7 @@ import { authService } from '../services/authService';
 interface AuthState {
   user: User | null;
   token: string | null;
+  refreshToken: string | null;
   role: 'ROLE_ADMIN' | 'ROLE_STAFF' | 'ROLE_CUSTOMER' | null;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -15,7 +16,8 @@ interface AuthState {
   login: (credentials: LoginCredentials) => Promise<AuthResult>;
   register: (data: RegisterData) => Promise<AuthResult>;
   logout: () => void;
-  setUser: (user: User, token: string) => void;
+  setUser: (user: User, token: string, refreshToken?: string) => void;
+  setTokens: (token: string, refreshToken?: string) => void;
   fetchProfile: () => Promise<void>;
   updateUserPoints: (delta: number) => void;
   clearError: () => void;
@@ -26,6 +28,7 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       token: null,
+      refreshToken: null,
       role: null,
       isAuthenticated: false,
       isLoading: false,
@@ -39,6 +42,9 @@ export const useAuthStore = create<AuthState>()(
           const rawUser = (data as any).user || (data as any);
           const rawPoints = rawUser.points ?? rawUser.tierPoints ?? data.tierPoints ?? 50;
           const isVip = Boolean(rawUser.isVip ?? (data as any).isVip ?? (rawUser.tier === 'VIP' || rawUser.tier === 'VIP_PLATINUM'));
+          const accessToken = data.accessToken || data.token;
+          const refreshToken = data.refreshToken || null;
+
           const user: User = {
             id: String(rawUser.id || data.id || Date.now()),
             name: rawUser.name || data.name || credentials.email.split('@')[0],
@@ -55,9 +61,13 @@ export const useAuthStore = create<AuthState>()(
             orders: [],
           };
 
+          if (accessToken) localStorage.setItem('token', accessToken);
+          if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+
           set({
             user,
-            token: data.token,
+            token: accessToken,
+            refreshToken,
             role: (rawUser.role || data.role) as any,
             isAuthenticated: true,
             isLoading: false,
@@ -78,6 +88,9 @@ export const useAuthStore = create<AuthState>()(
           const rawUser = (data as any).user || (data as any);
           const rawPoints = rawUser.points ?? rawUser.tierPoints ?? data.tierPoints ?? 50;
           const isVip = Boolean(rawUser.isVip ?? (data as any).isVip ?? (rawUser.tier === 'VIP' || rawUser.tier === 'VIP_PLATINUM'));
+          const accessToken = data.accessToken || data.token;
+          const refreshToken = data.refreshToken || null;
+
           const user: User = {
             id: String(rawUser.id || data.id || Date.now()),
             name: rawUser.name || data.name || registerData.name,
@@ -94,9 +107,13 @@ export const useAuthStore = create<AuthState>()(
             orders: [],
           };
 
+          if (accessToken) localStorage.setItem('token', accessToken);
+          if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+
           set({
             user,
-            token: data.token,
+            token: accessToken,
+            refreshToken,
             role: (rawUser.role || data.role) as any,
             isAuthenticated: true,
             isLoading: false,
@@ -111,22 +128,40 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('eiffel_auth_token');
+        sessionStorage.removeItem('token');
         set({
           user: null,
           token: null,
+          refreshToken: null,
           role: null,
           isAuthenticated: false,
           error: null,
         });
       },
 
-      setUser: (user, token) => {
-        set({
+      setUser: (user, token, refreshToken) => {
+        if (token) localStorage.setItem('token', token);
+        if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+        set((state) => ({
           user,
           token,
+          refreshToken: refreshToken || state.refreshToken,
           role: user.role as any,
           isAuthenticated: true,
-        });
+        }));
+      },
+
+      setTokens: (token, refreshToken) => {
+        if (token) localStorage.setItem('token', token);
+        if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+        set((state) => ({
+          token,
+          refreshToken: refreshToken || state.refreshToken,
+          isAuthenticated: true,
+        }));
       },
 
       fetchProfile: async () => {
