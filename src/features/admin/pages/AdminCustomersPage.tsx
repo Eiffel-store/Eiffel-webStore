@@ -69,7 +69,7 @@ export const AdminCustomersPage: React.FC = () => {
       const primaryKey = emailKey || cleanPhone || String(u.id);
 
       const userPoints = (u as any).points ?? u.tierPoints ?? 0;
-      const isVip = Boolean(u.isVip) || u.tier === 'VIP' || u.tier === 'VIP_PLATINUM' || userPoints >= (settings?.vipRequiredPoints || 500);
+      const isVip = Boolean(u.isVip) || u.tier === 'VIP' || u.tier === 'VIP_PLATINUM';
 
       const entry: User = {
         ...u,
@@ -118,13 +118,6 @@ export const AdminCustomersPage: React.FC = () => {
             target.completedOrdersCount = (target.completedOrdersCount || 0) + 1;
           }
         }
-        if (
-          (target.completedOrdersCount || 0) >= (settings?.vipRequiredOrders || 3) ||
-          (target.tierPoints || 0) >= (settings?.vipRequiredPoints || 500)
-        ) {
-          target.tier = 'VIP';
-          target.isVip = true;
-        }
       } else {
         const fallbackKey = email || cleanPhone || o.id;
         const newCust: User = {
@@ -144,13 +137,6 @@ export const AdminCustomersPage: React.FC = () => {
           paymentMethods: [],
           orders: [o]
         };
-        if (
-          (newCust.completedOrdersCount || 0) >= (settings?.vipRequiredOrders || 3) ||
-          (newCust.tierPoints || 0) >= (settings?.vipRequiredPoints || 500)
-        ) {
-          newCust.tier = 'VIP';
-          newCust.isVip = true;
-        }
         if (email) custMap[email] = newCust;
         if (cleanPhone) custMap[cleanPhone] = newCust;
         custMap[fallbackKey] = newCust;

@@ -139,7 +139,7 @@ export const CheckoutPage: React.FC = () => {
   // Points & Loyalty Calculations
   const availablePoints = user?.tierPoints || 0;
   const [redeemPoints, setRedeemPoints] = useState(false);
-  const isVip = user?.tier === 'VIP' || user?.tier === 'VIP_PLATINUM' || user?.isVip || (Boolean(user?.tierPoints) && (user?.tierPoints || 0) >= (settings?.vipRequiredPoints || 500)) || false;
+  const isVip = Boolean(user?.isVip) || user?.tier === 'VIP' || user?.tier === 'VIP_PLATINUM';
 
   const vipDiscountRate = isVip && settings?.vipDiscountPercentage ? (settings.vipDiscountPercentage / 100) : 0;
   const vipDiscountAmount = subtotal * vipDiscountRate;
