@@ -1,5 +1,34 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useAuthStore } from '../stores/useAuthStore';
+import { authService } from '../services/authService';
+
+vi.mock('../services/authService', () => ({
+  authService: {
+    login: vi.fn(async (creds: any) => ({
+      token: 'mock-access-token',
+      accessToken: 'mock-access-token',
+      refreshToken: 'mock-refresh-token',
+      id: '1',
+      name: creds.email.includes('admin') ? 'Admin User' : creds.email.includes('staff') ? 'Staff User' : 'Customer User',
+      email: creds.email,
+      role: creds.email.includes('admin') ? 'ROLE_ADMIN' : creds.email.includes('staff') ? 'ROLE_STAFF' : 'ROLE_CUSTOMER',
+      tier: 'MEMBER',
+      tierPoints: 50,
+    })),
+    register: vi.fn(async (data: any) => ({
+      token: 'mock-reg-token',
+      accessToken: 'mock-reg-token',
+      refreshToken: 'mock-reg-refresh-token',
+      id: '2',
+      name: data.name,
+      email: data.email,
+      role: 'ROLE_CUSTOMER',
+      tier: 'MEMBER',
+      tierPoints: 50,
+    })),
+    getProfile: vi.fn(async () => null),
+  }
+}));
 
 describe('Authentication & Access Control', () => {
   beforeEach(() => {

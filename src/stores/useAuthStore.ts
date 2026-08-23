@@ -25,7 +25,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       refreshToken: null,
@@ -128,11 +128,14 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('eiffel_auth_token');
-        localStorage.removeItem('eiffel_user');
-        sessionStorage.removeItem('token');
+        try {
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('eiffel_auth_token');
+          localStorage.removeItem('eiffel_user');
+          localStorage.removeItem('eiffel-auth-storage');
+          sessionStorage.clear();
+        } catch {}
         set({
           user: null,
           token: null,
@@ -140,6 +143,8 @@ export const useAuthStore = create<AuthState>()(
           role: null,
           isAuthenticated: false,
           error: null,
+          isLoading: false,
+          isProfileLoading: false,
         });
       },
 
@@ -168,15 +173,14 @@ export const useAuthStore = create<AuthState>()(
       fetchProfile: async () => {
         const storedToken = localStorage.getItem('token') || localStorage.getItem('eiffel_auth_token');
         if (!storedToken) {
-          // If no token exists, reset authentication state
-          set({ isAuthenticated: false, user: null, token: null, refreshToken: null, role: null });
+          get().logout();
           return;
         }
 
         set({ isProfileLoading: true });
         try {
           const data = await authService.getProfile();
-          if (data) {
+          if (data && ((data as any).email || (data as any).user?.email || data.name)) {
             const rawUser = (data as any).user || (data as any);
             const rawPoints = rawUser.points ?? rawUser.tierPoints ?? (data as any).tierPoints ?? 0;
             const isVip = Boolean(rawUser.isVip ?? (data as any).isVip ?? (rawUser.tier === 'VIP' || rawUser.tier === 'VIP_PLATINUM'));
@@ -211,24 +215,12 @@ export const useAuthStore = create<AuthState>()(
               role: (rawUser.role || data.role || 'ROLE_CUSTOMER') as any,
               isAuthenticated: true,
             }));
+          } else {
+            get().logout();
           }
-        } catch (err: any) {
-          // If server rejects (401 Unauthorized / 403 Forbidden / 404 Not Found / user deleted from DB), log out immediately
-          const status = err?.response?.status || err?.status;
-          if (status === 401 || status === 403 || status === 404) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('eiffel_auth_token');
-            localStorage.removeItem('eiffel_user');
-            set({
-              user: null,
-              token: null,
-              refreshToken: null,
-              role: null,
-              isAuthenticated: false,
-              error: null,
-            });
-          }
+        } catch {
+          // If server rejects (401 / 403 / 404 / user deleted from DB), log out immediately
+          get().logout();
         } finally {
           set({ isProfileLoading: false });
         }

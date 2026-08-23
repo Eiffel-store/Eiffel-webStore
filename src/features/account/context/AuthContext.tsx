@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Address, Order, PaymentMethod } from '@/types';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 export interface UserProfile {
   id?: string | number;
@@ -47,20 +48,33 @@ const DEFAULT_EMPTY_USER: UserProfile = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserProfile>(() => {
-    try {
-      const saved = localStorage.getItem('eiffel_user');
-      return saved ? JSON.parse(saved) : DEFAULT_EMPTY_USER;
-    } catch {
-      return DEFAULT_EMPTY_USER;
-    }
-  });
+  const authStoreUser = useAuthStore(state => state.user);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
+  const [user, setUser] = useState<UserProfile>(DEFAULT_EMPTY_USER);
 
   useEffect(() => {
-    if (user.email || user.phone || user.name) {
-      localStorage.setItem('eiffel_user', JSON.stringify(user));
+    if (!isAuthenticated || !authStoreUser) {
+      setUser(DEFAULT_EMPTY_USER);
+      try {
+        localStorage.removeItem('eiffel_user');
+      } catch {}
+    } else {
+      setUser({
+        id: authStoreUser.id,
+        name: authStoreUser.name || '',
+        email: authStoreUser.email || '',
+        phone: authStoreUser.phone || '',
+        tier: authStoreUser.tier || 'MEMBER',
+        tierPoints: authStoreUser.tierPoints ?? 0,
+        isVip: authStoreUser.isVip ?? false,
+        memberSince: authStoreUser.memberSince || '2026',
+        addresses: authStoreUser.addresses || [],
+        paymentMethods: authStoreUser.paymentMethods || [],
+        orders: authStoreUser.orders || []
+      });
     }
-  }, [user]);
+  }, [isAuthenticated, authStoreUser]);
 
   const updateProfile = (data: Partial<UserProfile>) => {
     setUser(prev => ({ ...prev, ...data }));

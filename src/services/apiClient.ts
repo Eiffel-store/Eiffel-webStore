@@ -39,16 +39,33 @@ apiClient.interceptors.request.use(
 // Token Refresh Queue Management
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: (token: string) => void;
+  resolve: (value?: any) => void;
   reject: (error: any) => void;
+  request: InternalAxiosRequestConfig;
 }> = [];
 
+const isPublicCatalogRequest = (request?: InternalAxiosRequestConfig): boolean => {
+  if (!request) return false;
+  const isGet = request.method?.toUpperCase() === 'GET';
+  const url = request.url || '';
+  return isGet &&
+         !url.includes('/auth/me') &&
+         !url.includes('/orders/my-orders') &&
+         !url.includes('/admin/');
+};
+
 const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
+  failedQueue.forEach(({ resolve, reject, request }) => {
     if (error) {
-      prom.reject(error);
+      if (isPublicCatalogRequest(request)) {
+        delete request.headers.Authorization;
+        resolve(axios(request));
+      } else {
+        reject(error);
+      }
     } else if (token) {
-      prom.resolve(token);
+      request.headers.Authorization = `Bearer ${token}`;
+      resolve(apiClient(request));
     }
   });
   failedQueue = [];
@@ -68,14 +85,9 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest?._retry && !isAuthEndpoint) {
       if (isRefreshing) {
         // Queue the request until refreshing finishes
-        return new Promise<string>((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then((newToken) => {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            return apiClient(originalRequest);
-          })
-          .catch((err) => Promise.reject(err));
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject, request: originalRequest });
+        });
       }
 
       originalRequest._retry = true;
@@ -98,12 +110,9 @@ apiClient.interceptors.response.use(
       if (!refreshToken) {
         isRefreshing = false;
         useAuthStore.getState().logout();
+        processQueue(error, null);
 
-        // If it was a public catalog request, retry anonymously so the user still sees products
-        if (originalRequest.method?.toUpperCase() === 'GET' &&
-            !originalRequest.url?.includes('/auth/me') &&
-            !originalRequest.url?.includes('/orders/my-orders') &&
-            !originalRequest.url?.includes('/admin/')) {
+        if (isPublicCatalogRequest(originalRequest)) {
           delete originalRequest.headers.Authorization;
           return axios(originalRequest);
         }
@@ -138,14 +147,10 @@ apiClient.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return apiClient(originalRequest);
       } catch (refreshErr) {
-        processQueue(refreshErr, null);
         useAuthStore.getState().logout();
+        processQueue(refreshErr, null);
 
-        // If it was a public catalog request, retry anonymously so the user still sees products
-        if (originalRequest.method?.toUpperCase() === 'GET' &&
-            !originalRequest.url?.includes('/auth/me') &&
-            !originalRequest.url?.includes('/orders/my-orders') &&
-            !originalRequest.url?.includes('/admin/')) {
+        if (isPublicCatalogRequest(originalRequest)) {
           delete originalRequest.headers.Authorization;
           return axios(originalRequest);
         }
