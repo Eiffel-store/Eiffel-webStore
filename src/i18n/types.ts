@@ -23,6 +23,24 @@ export interface TranslationDictionary {
   accountCreatedSuccess: string;
   instantLogin: string;
   confirmRegister: string;
+  forgotPasswordPrompt: string;
+  forgotPasswordTitle: string;
+  forgotPasswordSubtitle: string;
+  enterOtpTitle: string;
+  enterOtpSubtitle: string;
+  newPasswordTitle: string;
+  newPasswordSubtitle: string;
+  sendOtp: string;
+  verifyOtp: string;
+  resetPasswordButton: string;
+  resendOtp: string;
+  resendOtpIn: string;
+  otpSentSuccess: string;
+  otpVerifiedSuccess: string;
+  passwordResetSuccess: string;
+  confirmNewPassword: string;
+  passwordMismatch: string;
+  backToLogin: string;
 
   // Top Banner & Header
   topBannerPromo: string;

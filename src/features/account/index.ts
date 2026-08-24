@@ -6,5 +6,6 @@ export * from './components/AccountHeader';
 export * from './components/AccountTabsNav';
 export * from './components/AddressModal';
 export * from './components/CardModal';
+export * from './components/ForgotPasswordModal';
 export * from './context/AuthContext';
 export * from './pages/AccountPage';

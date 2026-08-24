@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { ShieldCheck, Mail, Lock, ArrowRight, ArrowLeft, AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useLanguage } from '@/shared';
+import { ForgotPasswordModal } from '@/features/account/components/ForgotPasswordModal';
 
 export const AdminLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ export const AdminLoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
 
   const { loginAdminWithCredentials, isAdminAuthenticated } = useAdminAuth();
   const { isRTL } = useLanguage();
@@ -108,9 +110,18 @@ export const AdminLoginPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-label-bold uppercase tracking-wider text-zinc-300 mb-2">
-              {isRTL ? 'كلمة المرور' : 'Password'}
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-label-bold uppercase tracking-wider text-zinc-300">
+                {isRTL ? 'كلمة المرور' : 'Password'}
+              </label>
+              <button
+                type="button"
+                onClick={() => setIsForgotModalOpen(true)}
+                className="text-[11px] font-mono text-zinc-500 hover:text-amber-400 transition-colors"
+              >
+                {isRTL ? 'نسيت كلمة المرور؟' : 'Forgot Password?'}
+              </button>
+            </div>
             <div className="relative">
               <Lock className="absolute left-3.5 rtl:left-auto rtl:right-3.5 top-3.5 w-4 h-4 text-zinc-500" />
               <input
@@ -191,6 +202,16 @@ export const AdminLoginPage: React.FC = () => {
           SECURE 256-BIT JWT ENCRYPTION • RESTRICTED ACCESS
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={isForgotModalOpen}
+        onClose={() => setIsForgotModalOpen(false)}
+        initialEmail={email}
+        onSuccessLogin={(resetEmail) => {
+          setEmail(resetEmail);
+        }}
+      />
     </div>
   );
 };

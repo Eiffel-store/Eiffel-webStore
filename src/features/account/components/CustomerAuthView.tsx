@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Lock, Mail, User as UserIcon, Phone, ArrowRight, ShieldCheck, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useLanguage } from '@/shared';
+import { ForgotPasswordModal } from './ForgotPasswordModal';
 
 export const CustomerAuthView: React.FC = () => {
   const { t, isRTL } = useLanguage();
@@ -10,6 +11,7 @@ export const CustomerAuthView: React.FC = () => {
   const { login, register, isLoading, error, clearError } = useAuthStore();
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
 
   // Form States
   const [email, setEmail] = useState('');
@@ -166,9 +168,20 @@ export const CustomerAuthView: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-[11px] font-label-bold uppercase tracking-wider text-secondary dark:text-zinc-400 mb-1.5">
-              {t.password}
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-[11px] font-label-bold uppercase tracking-wider text-secondary dark:text-zinc-400">
+                {t.password}
+              </label>
+              {mode === 'login' && (
+                <button
+                  type="button"
+                  onClick={() => setIsForgotModalOpen(true)}
+                  className="text-[11px] font-mono text-zinc-500 hover:text-amber-500 transition-colors"
+                >
+                  {t.forgotPasswordPrompt}
+                </button>
+              )}
+            </div>
             <div className="relative">
               <Lock className="absolute left-3 rtl:left-auto rtl:right-3 top-3 w-4 h-4 text-zinc-400" />
               <input
@@ -242,6 +255,17 @@ export const CustomerAuthView: React.FC = () => {
           </Link>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={isForgotModalOpen}
+        onClose={() => setIsForgotModalOpen(false)}
+        initialEmail={email}
+        onSuccessLogin={(resetEmail) => {
+          setEmail(resetEmail);
+          setMode('login');
+        }}
+      />
     </div>
   );
 };
