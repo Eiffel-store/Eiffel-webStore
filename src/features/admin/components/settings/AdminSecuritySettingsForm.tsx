@@ -1,62 +1,82 @@
 import React, { useState } from 'react';
-import { Shield, KeyRound, Check, AlertCircle } from 'lucide-react';
+import { Shield, KeyRound, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/shared';
-import { useAdminAuth } from '@/features/admin';
+import { authService } from '@/services/authService';
+import toast from 'react-hot-toast';
 
 export const AdminSecuritySettingsForm: React.FC = () => {
   const { isRTL } = useLanguage();
-  const { updateAdminPin } = useAdminAuth();
 
-  const [currentPin, setCurrentPin] = useState('');
-  const [newPin, setNewPin] = useState('');
-  const [confirmPin, setConfirmPin] = useState('');
-  const [pinMessage, setPinMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const handleUpdatePin = (e: React.FormEvent) => {
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPinMessage(null);
+    setStatusMessage(null);
 
-    if (newPin !== confirmPin) {
-      setPinMessage({
-        type: 'error',
-        text: isRTL ? 'كلمة المرور الجديدة غير متطابقة.' : 'New PIN and confirmation do not match.'
-      });
+    if (newPassword.length < 6) {
+      const msg = isRTL
+        ? 'كلمة المرور الجديدة يجب ألا تقل عن 6 أحرف أو أرقام.'
+        : 'New password must be at least 6 characters.';
+      setStatusMessage({ type: 'error', text: msg });
       return;
     }
 
-    const result = updateAdminPin(currentPin, newPin);
-    if (result.success) {
-      setPinMessage({ type: 'success', text: isRTL ? 'تم تحديث رمز الدخول بنجاح!' : 'PIN updated successfully!' });
-      setCurrentPin('');
-      setNewPin('');
-      setConfirmPin('');
-    } else {
-      setPinMessage({ type: 'error', text: result.message });
+    if (newPassword !== confirmPassword) {
+      const msg = isRTL
+        ? 'كلمة المرور الجديدة وتأكيدها غير متطابقين.'
+        : 'New password and confirmation do not match.';
+      setStatusMessage({ type: 'error', text: msg });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await authService.changePassword(currentPassword, newPassword);
+      const successMsg = res.message || (isRTL ? 'تم تحديث كلمة المرور بنجاح!' : 'Password updated successfully!');
+      setStatusMessage({ type: 'success', text: successMsg });
+      toast.success(successMsg);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      const errorMsg = err.message || (isRTL ? 'فشل تغيير كلمة المرور، يرجى التأكد من كلمة المرور الحالية.' : 'Failed to change password.');
+      setStatusMessage({ type: 'error', text: errorMsg });
+      toast.error(errorMsg);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleUpdatePin} className="bg-zinc-950 border border-zinc-800 p-6 space-y-6 shadow-xl">
+    <form onSubmit={handleUpdatePassword} className="bg-zinc-950 border border-zinc-800 p-6 space-y-6 shadow-xl">
       <div className="pb-2 border-b border-zinc-800 flex items-center justify-between">
         <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2">
           <Shield className="w-4 h-4 text-purple-400" />
-          <span>{isRTL ? '3. أمان لوحة التحكم (تغيير رمز الدخول)' : '3. Admin Security & PIN Code'}</span>
+          <span>{isRTL ? '3. أمان الحساب وتغيير كلمة المرور' : '3. Account Security & Password'}</span>
         </h2>
         <span className="text-[11px] text-zinc-500 font-mono">
-          {isRTL ? 'الافتراضي: 123456' : 'Default: 123456'}
+          {isRTL ? 'تشفير BCrypt آمن' : 'Encrypted & Secure'}
         </span>
       </div>
 
-      {pinMessage && (
+      {statusMessage && (
         <div
           className={`p-3 text-xs flex items-center gap-2 rounded animate-fade-in ${
-            pinMessage.type === 'success'
+            statusMessage.type === 'success'
               ? 'bg-emerald-950/60 border border-emerald-800 text-emerald-300'
               : 'bg-red-950/60 border border-red-800 text-red-300'
           }`}
         >
-          {pinMessage.type === 'success' ? <Check className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
-          <span>{pinMessage.text}</span>
+          {statusMessage.type === 'success' ? (
+            <Check className="w-4 h-4 shrink-0" />
+          ) : (
+            <AlertCircle className="w-4 h-4 shrink-0" />
+          )}
+          <span>{statusMessage.text}</span>
         </div>
       )}
 
@@ -64,44 +84,44 @@ export const AdminSecuritySettingsForm: React.FC = () => {
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5 flex items-center gap-1">
             <KeyRound className="w-3 h-3 text-zinc-500" />
-            <span>{isRTL ? 'رمز الدخول الحالي *' : 'Current PIN *'}</span>
+            <span>{isRTL ? 'كلمة المرور الحالية *' : 'Current Password *'}</span>
           </label>
           <input
             type="password"
             required
-            value={currentPin}
-            onChange={(e) => setCurrentPin(e.target.value)}
-            placeholder="••••••"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            placeholder="••••••••"
             className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white tracking-widest focus:outline-none focus:border-white font-mono"
           />
         </div>
 
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'رمز الدخول الجديد *' : 'New PIN *'}
+            {isRTL ? 'كلمة المرور الجديدة *' : 'New Password *'}
           </label>
           <input
             type="password"
             required
-            minLength={4}
-            value={newPin}
-            onChange={(e) => setNewPin(e.target.value)}
-            placeholder="••••••"
+            minLength={6}
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="••••••••"
             className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white tracking-widest focus:outline-none focus:border-white font-mono"
           />
         </div>
 
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'تأكيد الرمز الجديد *' : 'Confirm New PIN *'}
+            {isRTL ? 'تأكيد كلمة المرور الجديدة *' : 'Confirm New Password *'}
           </label>
           <input
             type="password"
             required
-            minLength={4}
-            value={confirmPin}
-            onChange={(e) => setConfirmPin(e.target.value)}
-            placeholder="••••••"
+            minLength={6}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="••••••••"
             className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white tracking-widest focus:outline-none focus:border-white font-mono"
           />
         </div>
@@ -110,10 +130,15 @@ export const AdminSecuritySettingsForm: React.FC = () => {
       <div className="flex justify-end pt-2">
         <button
           type="submit"
-          className="px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-label-bold uppercase tracking-wider flex items-center gap-2 border border-zinc-700"
+          disabled={isLoading}
+          className="px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-label-bold uppercase tracking-wider flex items-center gap-2 border border-zinc-700 transition-colors disabled:opacity-50"
         >
-          <KeyRound className="w-3.5 h-3.5" />
-          <span>{isRTL ? 'تحديث رمز الدخول' : 'Update Admin PIN'}</span>
+          {isLoading ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <KeyRound className="w-3.5 h-3.5" />
+          )}
+          <span>{isRTL ? (isLoading ? 'جاري التحديث...' : 'تحديث كلمة المرور') : (isLoading ? 'Updating...' : 'Update Password')}</span>
         </button>
       </div>
     </form>

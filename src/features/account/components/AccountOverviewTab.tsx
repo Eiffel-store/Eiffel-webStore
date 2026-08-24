@@ -1,7 +1,8 @@
-import React from 'react';
-import { Crown, Coins, Sparkles, Gift, Truck, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Crown, Coins, Sparkles, Gift, Truck, CheckCircle2, KeyRound } from 'lucide-react';
 import { useCurrency, useLanguage, useStoreData } from '@/shared';
 import { User, Order, CartItem } from '@/types';
+import { ChangePasswordModal } from './ChangePasswordModal';
 
 interface AccountOverviewTabProps {
   user: User;
@@ -15,6 +16,7 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
   const { formatPrice } = useCurrency();
   const { t, isRTL } = useLanguage();
   const { settings } = useStoreData();
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   const requiredOrders = settings?.vipRequiredOrders ?? 3;
   const requiredPoints = settings?.vipRequiredPoints ?? 500;
@@ -194,6 +196,17 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
             <span className="text-[10px] font-mono text-secondary uppercase">{t.memberSince}</span>
             <p className="font-mono text-primary dark:text-white">{user?.memberSince || '2026'}</p>
           </div>
+
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => setIsPasswordModalOpen(true)}
+              className="w-full py-2 px-3 rounded-lg bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-800 hover:border-amber-400 text-xs font-mono font-bold text-primary dark:text-zinc-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            >
+              <KeyRound className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
+              <span>{isRTL ? 'تغيير كلمة المرور' : 'Change Password'}</span>
+            </button>
+          </div>
         </div>
 
         <div className="pt-4 border-t border-surface-container dark:border-zinc-800">
@@ -208,6 +221,12 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
         </div>
       </div>
     </div>
+
+    {/* Change Password Modal */}
+    <ChangePasswordModal
+      isOpen={isPasswordModalOpen}
+      onClose={() => setIsPasswordModalOpen(false)}
+    />
   </div>
   );
 };
