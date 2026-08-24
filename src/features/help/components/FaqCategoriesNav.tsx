@@ -11,15 +11,13 @@ export const FaqCategoriesNav: React.FC<FaqCategoriesNavProps> = ({
   activeCategory,
   onSelectCategory,
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const getCategoryTitle = (cat: FAQCategory) => {
-    if (isRTL) {
-      if (cat.id === 'orders') return 'الطلبات والتوصيل الدولي';
-      if (cat.id === 'returns') return 'الإرجاع والاستبدال';
-      if (cat.id === 'sizing') return 'المقاسات ودليل الجسم';
-      return 'الخياطة والأقمشة النادرة';
-    }
+    if (cat.id === 'orders') return t.faqOrdersDelivery;
+    if (cat.id === 'returns') return t.faqReturnsExchange;
+    if (cat.id === 'sizing') return t.faqSizingGuide;
+    if (cat.id === 'craftsmanship') return t.faqCraftsmanshipFabrics;
     return cat.title;
   };
 

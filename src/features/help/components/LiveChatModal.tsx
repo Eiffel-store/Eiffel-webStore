@@ -18,9 +18,7 @@ export const LiveChatModal: React.FC<LiveChatModalProps> = ({ isOpen, onClose })
   const [chatMessages, setChatMessages] = useState<LiveChatMessage[]>([
     {
       sender: 'agent',
-      text: isRTL
-        ? 'مرحباً بكم في كونسيرج إيفل الرقمي. كيف يمكنني مساعدتكم اليوم في استفسارات الأزياء أو المقاسات أو متابعة الطلبات؟'
-        : 'Bonjour. Welcome to the Eiffel Concierge. How may I assist you with your garment selection or order today?',
+      text: t.liveChatWelcome,
       time: '14:00'
     }
   ]);
@@ -41,9 +39,7 @@ export const LiveChatModal: React.FC<LiveChatModalProps> = ({ isOpen, onClose })
         ...prev,
         {
           sender: 'agent',
-          text: isRTL
-            ? `شكراً لاستفساركم بشأن "${userMsg}". يقوم فريق التنسيق في مشغل باريس بمراجعة التفاصيل وسنوافيكم بالرد فوراً.`
-            : `Thank you for your inquiry regarding "${userMsg}". Our atelier styling team is verifying garment specifications for you.`,
+          text: t.liveChatResponse,
           time: 'Now'
         }
       ]);

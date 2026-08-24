@@ -42,7 +42,7 @@ export const ProductDetailPage: React.FC = () => {
   if (isProductsLoading) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
-        <EiffelLoader message={isRTL ? 'جاري تجهيز تفاصيل القطعة الفاخرة...' : 'Loading bespoke garment details...'} />
+        <EiffelLoader message={t.loading} />
       </div>
     );
   }
@@ -51,9 +51,9 @@ export const ProductDetailPage: React.FC = () => {
     return (
       <div className="max-w-4xl mx-auto py-20 px-4">
         <EmptyState
-          title={isRTL ? 'عذراً، القطعة المطلوبة غير متوفرة' : 'Garment Not Found'}
-          description={isRTL ? 'قد تكون هذه القطعة قد تم نقلها أو نفدت كميتها من المشغل حالياً.' : 'The requested item is no longer available or has been moved.'}
-          actionText={isRTL ? 'استكشف التشكيلة المتاحة' : 'Explore Collections'}
+          title={t.noPiecesFound}
+          description={t.noPiecesFoundDesc}
+          actionText={t.exploreCollection}
           actionLink="/collections/men"
         />
       </div>

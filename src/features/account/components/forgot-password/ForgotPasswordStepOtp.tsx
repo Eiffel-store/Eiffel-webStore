@@ -39,7 +39,7 @@ export const ForgotPasswordStepOtp: React.FC<ForgotPasswordStepOtpProps> = ({
           className="hover:text-white transition-colors flex items-center gap-1 text-[11px]"
         >
           {isRTL ? <ArrowRight className="w-3 h-3" /> : <ArrowLeft className="w-3 h-3" />}
-          <span>{isRTL ? 'تعديل البريد' : 'Change email'}</span>
+          <span>{t.changeEmail}</span>
         </button>
 
         <div>

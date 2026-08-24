@@ -6,7 +6,7 @@ interface PasswordStrengthMeterProps {
 }
 
 export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ password }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   if (!password) return null;
 
@@ -22,10 +22,10 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
   const score = calculateScore(password);
 
   const getLabel = () => {
-    if (score <= 25) return isRTL ? 'ضعيفة' : 'Weak';
-    if (score <= 50) return isRTL ? 'متوسطة' : 'Fair';
-    if (score <= 75) return isRTL ? 'جيدة' : 'Good';
-    return isRTL ? 'قوية جداً 🔒' : 'Strong 🔒';
+    if (score <= 25) return t.strengthWeak;
+    if (score <= 50) return t.strengthFair;
+    if (score <= 75) return t.strengthGood;
+    return t.strengthStrong;
   };
 
   const getColorClass = () => {
@@ -41,7 +41,7 @@ export const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({ pa
         <div className={`h-full transition-all duration-300 ${getColorClass()}`} />
       </div>
       <div className="flex justify-between text-[10px] text-zinc-500 font-mono mt-1">
-        <span>{isRTL ? 'قوة كلمة المرور' : 'Strength'}</span>
+        <span>{t.passwordStrength}</span>
         <span>{getLabel()}</span>
       </div>
     </div>

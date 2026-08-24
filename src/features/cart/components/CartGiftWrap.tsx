@@ -42,7 +42,7 @@ export const CartGiftWrap: React.FC<CartGiftWrapProps> = ({
           rows={2}
           value={orderNote}
           onChange={(e) => setOrderNote(e.target.value)}
-          placeholder={isRTL ? "ملاحظات إضافية للمندوب أو الأتيليه..." : "e.g. Please leave package with concierge; custom gift note text..."}
+          placeholder={t.giftNotePlaceholder}
           className="w-full bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-700 p-3 text-xs text-primary dark:text-white focus:outline-none focus:border-primary"
         />
       </div>

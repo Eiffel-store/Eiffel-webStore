@@ -7,7 +7,7 @@ export const ShopTheLook: React.FC = () => {
   const { products = [], homeSettings } = useStoreData();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
-  const { isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
 
   const look = homeSettings?.shopTheLook;
 
@@ -16,8 +16,8 @@ export const ShopTheLook: React.FC = () => {
     return null;
   }
 
-  const title = isRTL ? (look?.titleAr || 'تسوق الإطلالة') : (look?.titleEn || 'Shop The Look');
-  const subtitle = isRTL ? (look?.subtitleAr || 'تنسيق الإطلالة الكاملة') : (look?.subtitleEn || 'Curated Ensemble');
+  const title = isRTL ? (look?.titleAr || t.shopTheLook) : (look?.titleEn || t.shopTheLook);
+  const subtitle = isRTL ? (look?.subtitleAr || t.curatedEnsemble) : (look?.subtitleEn || t.curatedEnsemble);
   const mainImage = look?.imageUrl || products?.[0]?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
   
   // Resolve products configured in look.hotspots or fallback to first 3 products
@@ -77,7 +77,7 @@ export const ShopTheLook: React.FC = () => {
         {/* Products in this Look */}
         <div className="lg:col-span-5 space-y-4">
           <h3 className="text-xs font-label-bold tracking-widest text-secondary dark:text-zinc-400 uppercase">
-            {isRTL ? 'القطع المكونة للإطلالة' : 'Pieces in this look'}
+            {t.piecesInThisLook}
           </h3>
           <div className="space-y-3">
             {lookProducts.map((product, idx) => {
@@ -111,7 +111,7 @@ export const ShopTheLook: React.FC = () => {
                     className="px-3 py-2 bg-primary text-white dark:bg-white dark:text-black text-[11px] font-label-bold tracking-wider uppercase hover:opacity-90 flex items-center gap-1 shrink-0 rounded cursor-pointer"
                   >
                     <ShoppingBag className="w-3.5 h-3.5" />
-                    <span>{isRTL ? 'إضافة' : 'Add'}</span>
+                    <span>{t.add}</span>
                   </button>
                 </div>
               );

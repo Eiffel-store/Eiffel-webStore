@@ -22,15 +22,10 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   onAction,
   className = ''
 }) => {
-  const { isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
 
-  const defaultTitle = isRTL ? 'لا توجد بيانات متاحة حالياً' : 'No items found at the moment';
-  const defaultDesc = isRTL
-    ? 'لم يتم إضافة أي عناصر أو منتجات في هذا القسم حتى الآن. سيتم توفيرها قريباً.'
-    : 'No records are currently available in this section. Please check back soon.';
-
-  const displayTitle = title || defaultTitle;
-  const displayDesc = description || defaultDesc;
+  const displayTitle = title || t.noPiecesFound;
+  const displayDesc = description || t.noPiecesFoundDesc;
 
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 

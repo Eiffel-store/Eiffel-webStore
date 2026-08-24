@@ -14,15 +14,13 @@ export const FaqAccordionList: React.FC<FaqAccordionListProps> = ({
   openAccordions,
   onToggleAccordion,
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const getCategoryTitle = () => {
-    if (isRTL) {
-      if (category.id === 'orders') return 'الطلبات والتوصيل الدولي';
-      if (category.id === 'returns') return 'الإرجاع والاستبدال';
-      if (category.id === 'sizing') return 'المقاسات ودليل الجسم';
-      return 'الخياطة والأقمشة النادرة';
-    }
+    if (category.id === 'orders') return t.faqOrdersDelivery;
+    if (category.id === 'returns') return t.faqReturnsExchange;
+    if (category.id === 'sizing') return t.faqSizingGuide;
+    if (category.id === 'craftsmanship') return t.faqCraftsmanshipFabrics;
     return category.title;
   };
 

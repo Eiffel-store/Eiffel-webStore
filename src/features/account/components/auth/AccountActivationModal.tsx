@@ -19,7 +19,7 @@ export const AccountActivationModal: React.FC<AccountActivationModalProps> = ({
   email,
   onSuccess,
 }) => {
-  const { isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
   const { verifyAccount } = useAuthStore();
 
   const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
@@ -63,7 +63,7 @@ export const AccountActivationModal: React.FC<AccountActivationModalProps> = ({
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     if (currentOtp.length !== 6) {
-      setError(isRTL ? 'يرجى إدخال رمز التحقق كاملاً (6 أرقام)' : 'Please enter the full 6-digit code');
+      setError(t.enterFullSixDigits);
       return;
     }
 
@@ -73,14 +73,14 @@ export const AccountActivationModal: React.FC<AccountActivationModalProps> = ({
     try {
       await verifyAccount(email.trim(), currentOtp);
       setIsSuccess(true);
-      toast.success(isRTL ? 'تم تفعيل حسابك بنجاح! مرحباً بك في متجر إيفل' : 'Account activated successfully! Welcome to Eiffel');
+      toast.success(t.accountActivatedSuccess);
       
       setTimeout(() => {
         onSuccess?.();
         onClose();
       }, 1200);
     } catch (err: any) {
-      const msg = err.response?.data?.message || err.message || (isRTL ? 'رمز التحقق غير صحيح أو منتهي' : 'Invalid or expired activation code');
+      const msg = err.response?.data?.message || err.message || t.invalidOrExpiredOtp;
       setError(msg);
       toast.error(msg);
     } finally {
@@ -96,12 +96,12 @@ export const AccountActivationModal: React.FC<AccountActivationModalProps> = ({
 
     try {
       await authService.resendActivation(email.trim());
-      toast.success(isRTL ? 'تم إرسال رمز تفعيل جديد إلى بريدك الإلكتروني' : 'New activation code sent to your email');
+      toast.success(t.newActivationCodeSent);
       setCountdown(60);
       setCanResend(false);
       setOtpDigits(['', '', '', '', '', '']);
     } catch (err: any) {
-      const msg = err.response?.data?.message || err.message || (isRTL ? 'فشل إعادة الإرسال' : 'Failed to resend code');
+      const msg = err.response?.data?.message || err.message || t.invalidOrExpiredOtp;
       setError(msg);
       toast.error(msg);
     } finally {
@@ -139,10 +139,10 @@ export const AccountActivationModal: React.FC<AccountActivationModalProps> = ({
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <h3 className="text-xl font-serif font-bold text-amber-300 mb-2">
-              {isRTL ? 'تم تفعيل الحساب بنجاح!' : 'Account Activated!'}
+              {t.accountActivatedSuccess}
             </h3>
             <p className="text-xs text-zinc-400">
-              {isRTL ? 'جاري توجيهك إلى حسابك...' : 'Redirecting to your account...'}
+              {t.redirectingToLogin}
             </p>
           </div>
         ) : (
@@ -153,14 +153,12 @@ export const AccountActivationModal: React.FC<AccountActivationModalProps> = ({
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-serif font-bold text-amber-300">
-                {isRTL ? 'تفعيل الحساب الجديد' : 'Activate Your Account'}
+                {t.activateNewAccount}
               </h3>
               <p className="text-xs text-zinc-400 mt-2 flex items-center justify-center gap-1.5 flex-wrap">
                 <Mail className="w-3.5 h-3.5 text-amber-400/80 inline" />
                 <span>
-                  {isRTL
-                    ? 'أدخل رمز التحقق (6 أرقام) المرسل إلى:'
-                    : 'Enter the 6-digit code sent to:'}
+                  {t.enterSixDigitOtp}
                 </span>
                 <strong className="text-amber-200 font-mono underline">{email}</strong>
               </p>
@@ -178,7 +176,7 @@ export const AccountActivationModal: React.FC<AccountActivationModalProps> = ({
             <form onSubmit={handleVerify} className="space-y-6">
               <div>
                 <label className="block text-center text-xs font-medium text-zinc-300 mb-3">
-                  {isRTL ? 'رمز التحقق (OTP)' : 'Verification Code'}
+                  {t.otpCode}
                 </label>
                 <OtpSixDigitInput
                   digits={otpDigits}
@@ -197,13 +195,11 @@ export const AccountActivationModal: React.FC<AccountActivationModalProps> = ({
                     className="text-xs text-amber-400 hover:text-amber-300 transition-colors inline-flex items-center gap-1 font-medium disabled:opacity-50 cursor-pointer"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isResending ? 'animate-spin' : ''}`} />
-                    {isRTL ? 'إعادة إرسال رمز التحقق' : 'Resend Code'}
+                    {t.resendCode}
                   </button>
                 ) : (
                   <span className="text-xs text-zinc-500 font-mono">
-                    {isRTL
-                      ? `إعادة الإرسال متاحة خلال (${countdown} ثانية)`
-                      : `Resend available in (${countdown}s)`}
+                    {t.resendAvailableIn} ({countdown}s)
                   </span>
                 )}
               </div>
@@ -219,7 +215,7 @@ export const AccountActivationModal: React.FC<AccountActivationModalProps> = ({
                 ) : (
                   <>
                     <ShieldCheck className="w-4 h-4" />
-                    <span>{isRTL ? 'تأكيد وتفعيل الحساب' : 'Verify & Activate Account'}</span>
+                    <span>{t.verifyAndActivate}</span>
                   </>
                 )}
               </button>

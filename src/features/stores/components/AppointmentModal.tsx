@@ -112,7 +112,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                 onClick={onClose}
                 className="flex-1 py-3 border border-surface-container dark:border-zinc-800 text-xs font-label-bold uppercase text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white"
               >
-                {isRTL ? 'إلغاء' : 'Cancel'}
+                {t.cancel}
               </button>
               <button
                 type="submit"

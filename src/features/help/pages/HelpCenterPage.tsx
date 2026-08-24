@@ -32,9 +32,7 @@ export const HelpCenterPage: React.FC = () => {
             {t.helpCenterTitle}
           </h1>
           <p className="text-xs sm:text-sm text-secondary dark:text-zinc-400 font-light">
-            {isRTL
-              ? 'إجابات فورية حول الشحن الدولي المجاني، وتعديل المقاسات، والإرجاع خلال 30 يوماً، ومواصفات الأقمشة القطنية والصوفية.'
-              : 'Find immediate answers regarding complimentary global shipping, bespoke tailoring, 30-day returns, and fabric specifications.'}
+            {t.helpCenterDesc}
           </p>
 
           <div className="pt-4 relative max-w-xl mx-auto">

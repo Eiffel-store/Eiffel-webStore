@@ -53,35 +53,33 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
                 </span>
               )}
               <span className="text-xs text-zinc-400 font-mono">
-                {isVip ? (isRTL ? 'عضوية إيفل الحصرية المميزة' : 'Exclusive VIP Membership') : (isRTL ? 'عضوية إيفل القياسية' : 'Standard Member')}
+                {isVip ? t.vipMembershipTitle : t.standardMembershipTitle}
               </span>
             </div>
 
             <div className="pt-2">
-              <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">{isRTL ? 'رصيد نقاط الولاء المتاح للاستبدال:' : 'Redeemable Points Balance:'}</span>
+              <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">{t.redeemablePointsBalance}</span>
               <div className="flex items-baseline gap-3 mt-1">
                 <span className="text-3xl sm:text-4xl font-mono font-bold text-amber-400 tracking-tight">
                   {points} <span className="text-lg text-zinc-400 font-sans">PTS</span>
                 </span>
                 <span className="text-sm font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded">
-                  = {formatPrice(pointsValue)} {isRTL ? 'خصم متاح عند الدفع' : 'cash discount'}
+                  = {formatPrice(pointsValue)} {t.availablePointsDiscount}
                 </span>
               </div>
             </div>
 
             <p className="text-xs text-zinc-400 font-light max-w-xl">
-              {isRTL
-                ? `تكسب ${cashbackPercent}% نقاط ولاء على قيمة كل عملية شراء من المتجر، ويمكنك استخدام رصيد نقاطك للدفع المباشر عند إتمام أي طلب!`
-                : `Earn ${cashbackPercent}% loyalty points on every purchase, and redeem your points balance directly at checkout to pay for orders!`}
+              {t.loyaltyExplanation}
             </p>
           </div>
 
           {/* Perks / Auto-Promotion Progress */}
           <div className="p-4 rounded-lg bg-zinc-950/80 border border-zinc-800 min-w-[280px] space-y-3">
             <div className="flex items-center justify-between text-xs font-mono">
-              <span className="text-zinc-300 font-bold">{isRTL ? 'مستوى التقدم نحو VIP:' : 'VIP Qualification:'}</span>
+              <span className="text-zinc-300 font-bold">{t.vipQualification}</span>
               <span className="text-amber-400 font-bold">
-                {Math.min(requiredOrders, completedOrders)} / {requiredOrders} {isRTL ? 'طلبات' : 'orders'}
+                {Math.min(requiredOrders, completedOrders)} / {requiredOrders} {t.orders}
               </span>
             </div>
 
@@ -96,11 +94,11 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
             <div className="space-y-1.5 text-[11px] text-zinc-400 font-mono">
               <div className="flex items-center gap-2 text-emerald-400">
                 <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                <span>{isVip ? (isRTL ? 'نقاط مضاعفة 2x على المشتريات' : '2x Points Multiplier') : (isRTL ? 'استبدال النقاط بخصم عند الدفع' : 'Redeem Points at Checkout')}</span>
+                <span>{isVip ? t.doublePointsMultiplier : t.redeemPointsAtCheckout}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>{isRTL ? 'شحن سريع لكافة محافظات مصر' : 'Express Courier Delivery'}</span>
+                <span>{t.expressCourierDelivery}</span>
               </div>
             </div>
           </div>
@@ -160,7 +158,7 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
                         const totalUnits = items.reduce((sum: number, it: CartItem) => sum + (it.quantity || 1), 0);
                         return (
                           <p className="text-secondary dark:text-zinc-400 font-light">
-                            {totalUnits} {totalUnits === 1 ? (isRTL ? 'قطعة' : 'item') : totalUnits === 2 ? (isRTL ? 'قطعتين' : 'items') : (isRTL ? 'قطع' : 'items')}
+                            {totalUnits} {totalUnits === 1 ? t.item : t.items}
                           </p>
                         );
                       })()}
@@ -204,7 +202,7 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
               className="w-full py-2 px-3 rounded-lg bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-800 hover:border-amber-400 text-xs font-mono font-bold text-primary dark:text-zinc-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               <KeyRound className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
-              <span>{isRTL ? 'تغيير كلمة المرور' : 'Change Password'}</span>
+              <span>{t.changePassword}</span>
             </button>
           </div>
         </div>
@@ -214,9 +212,7 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
             {t.exclusivePrivileges}
           </h4>
           <p className="text-xs text-secondary dark:text-zinc-400 font-light leading-relaxed">
-            {isRTL
-              ? 'تتمتع بحق الوصول المسبق إلى الكبسولات المعمارية، الشحن السريع المجاني، وجلسات القياس الخاصة في فروعنا بمصر.'
-              : 'Enjoy private atelier fittings, complimentary courier express across Egypt, and first preview access to limited seasonal capsules.'}
+            {t.exclusivePrivilegesDesc}
           </p>
         </div>
       </div>

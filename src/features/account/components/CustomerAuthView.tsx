@@ -171,7 +171,7 @@ export const CustomerAuthView: React.FC = () => {
         onClose={() => setIsActivationModalOpen(false)}
         email={activationEmail}
         onSuccess={() => {
-          setSuccessMsg(isRTL ? 'تم تفعيل الحساب وتسجيل الدخول بنجاح!' : 'Account activated and logged in successfully!');
+          setSuccessMsg(t.accountActivatedSuccess);
         }}
       />
     </div>

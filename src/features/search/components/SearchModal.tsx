@@ -13,7 +13,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
   const navigate = useNavigate();
   const { products = [] } = useStoreData();
   const { formatPrice } = useCurrency();
-  const { isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -68,7 +68,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={isRTL ? 'ابحث عن معطف، قميص، بدلة، حذاء...' : 'Search bespoke overcoats, tailored suits, accessories...'}
+            placeholder={t.searchModalPlaceholder}
             autoFocus
             className="flex-1 bg-transparent px-4 text-sm text-primary dark:text-white placeholder:text-zinc-400 focus:outline-none"
           />
@@ -85,11 +85,11 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
         <div className="p-4 max-h-[60vh] overflow-y-auto">
           {query.trim() === '' ? (
             <div className="text-center py-8 text-xs text-zinc-400 font-mono">
-              {isRTL ? 'اكتب كلمة البحث لاستعراض الكتالوج المباشر' : 'Type keywords to search live catalog'}
+              {t.searchPrompt}
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="text-center py-8 text-xs text-zinc-400 font-mono">
-              {isRTL ? 'لم يتم العثور على قطع مطابقة' : 'No matching pieces found'}
+              {t.noMatchingPieces}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

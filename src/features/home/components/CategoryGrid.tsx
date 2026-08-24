@@ -61,7 +61,7 @@ export const CategoryGrid: React.FC = () => {
               
               <div className="absolute inset-x-0 bottom-0 p-3 sm:p-6 text-white flex flex-col justify-end">
                 <span className="font-mono text-[9px] sm:text-[10px] tracking-widest text-zinc-300 uppercase">
-                  {cat.itemCount || (isRTL ? '12 قطعة' : '12 PIECES')}
+                  {cat.itemCount || t.categoriesPieces}
                 </span>
                 <h3 className="font-editorial text-lg sm:text-2xl tracking-tight text-white mt-0.5 sm:mt-1 group-hover:translate-x-1 transition-transform">
                   {info.title}

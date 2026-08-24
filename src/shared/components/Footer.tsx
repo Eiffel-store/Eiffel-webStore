@@ -127,17 +127,17 @@ export const Footer: React.FC = () => {
               <ul className="space-y-2 text-xs text-zinc-400 font-light">
                 <li>
                   <Link to="/stores" className="hover:text-white transition-colors">
-                    {isRTL ? 'زفتى (الفرع الرئيسي)' : 'Zifta (Flagship Atelier)'}
+                    {t.footerZiftaBranch}
                   </Link>
                 </li>
                 <li>
                   <Link to="/stores" className="hover:text-white transition-colors">
-                    {isRTL ? 'نهطاي (على الطريق)' : 'Nahtay (Roadside Boutique)'}
+                    {t.footerNahtayBranch}
                   </Link>
                 </li>
                 <li>
                   <span className="text-zinc-500 text-[11px]">
-                    {isRTL ? 'محافظة الغربية، مصر' : 'Gharbia Governorate, Egypt'}
+                    {t.footerGharbiaEgypt}
                   </span>
                 </li>
               </ul>

@@ -54,7 +54,7 @@ export const AccountOrdersTab: React.FC<AccountOrdersTabProps> = ({ orders = [] 
                     <div className="flex-1">
                       <h4 className="font-editorial text-base text-primary dark:text-white line-clamp-1">{it?.product?.name || 'Product'}</h4>
                       <p className="text-[11px] text-secondary font-mono">
-                        {it?.selectedSize || 'M'} • {it?.selectedColor || 'Standard'} {it.quantity > 1 ? `• ${isRTL ? `العدد: ${it.quantity}` : `Qty: ${it.quantity}`}` : ''}
+                        {it?.selectedSize || 'M'} • {it?.selectedColor || 'Standard'} {it.quantity > 1 ? `• ${t.qty}: ${it.quantity}` : ''}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="font-mono text-xs font-bold text-primary dark:text-white">

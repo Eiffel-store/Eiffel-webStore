@@ -18,7 +18,7 @@ export const HomePage: React.FC = () => {
   if (isProductsLoading && products.length === 0) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
-        <EiffelLoader size="lg" message={isRTL ? 'جاري تحميل المتجر وتشكيلات الموسم الجديد...' : 'Loading bespoke collections...'} />
+        <EiffelLoader size="lg" message={t.loadingBespokeCollection} />
       </div>
     );
   }
@@ -57,11 +57,11 @@ export const HomePage: React.FC = () => {
         </div>
 
         {isProductsLoading ? (
-          <EiffelLoader message={isRTL ? 'جاري تحميل أحدث الإصدارات...' : 'Loading latest releases...'} />
+          <EiffelLoader message={t.loadingLatestReleases} />
         ) : newArrivals.length === 0 ? (
           <EmptyState
-            title={isRTL ? 'لا توجد منتجات مضافة حالياً' : 'No New Arrivals'}
-            description={isRTL ? 'يتم تحضير وإضافة تشكيلات الموسم الجديد قريباً.' : 'New seasonal silhouettes are coming soon.'}
+            title={t.noNewArrivals}
+            description={t.newArrivalsComingSoon}
           />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

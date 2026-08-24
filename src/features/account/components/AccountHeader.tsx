@@ -34,17 +34,17 @@ export const AccountHeader: React.FC<AccountHeaderProps> = ({ user }) => {
           </div>
           <div>
             <div className="text-[9px] sm:text-[10px] font-mono text-secondary dark:text-zinc-400 uppercase tracking-wider">
-              {isRTL ? 'مستوى العضوية' : 'Membership Tier'}
+              {t.membershipTierLevel}
             </div>
             <div className="font-mono text-xs sm:text-sm font-bold text-primary dark:text-white flex items-center gap-1.5 mt-0.5">
               {isVip ? (
                 <span className="text-amber-400 font-bold flex items-center gap-1">
                   <span>VIP 👑</span>
-                  <span className="text-[11px] text-zinc-400 font-sans">({isRTL ? 'عميل مميز' : 'Exclusive'})</span>
+                  <span className="text-[11px] text-zinc-400 font-sans">({t.vipExclusiveClient})</span>
                 </span>
               ) : (
                 <span className="text-zinc-300">
-                  {isRTL ? 'عضو عادي (Member)' : 'Standard Member'}
+                  {t.standardMember}
                 </span>
               )}
             </div>
@@ -54,7 +54,7 @@ export const AccountHeader: React.FC<AccountHeaderProps> = ({ user }) => {
         {/* Points Display */}
         <div className="border-l rtl:border-l-0 rtl:border-r border-surface-container dark:border-zinc-800 pl-4 rtl:pl-0 rtl:pr-4">
           <div className="text-[9px] sm:text-[10px] font-mono text-secondary dark:text-zinc-400 uppercase tracking-wider">
-            {isRTL ? 'نقاط الولاء المتاحة' : 'Loyalty Points'}
+            {t.availableLoyaltyPoints}
           </div>
           <div className="font-mono text-sm sm:text-base font-bold text-emerald-400 mt-0.5">
             {points} <span className="text-xs text-zinc-400">PTS</span>

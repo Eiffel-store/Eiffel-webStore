@@ -77,7 +77,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) {
-      setError(isRTL ? 'يرجى إدخال البريد الإلكتروني أو الهاتف' : 'Please enter your email or phone');
+      setError(t.emailOrPhone);
       return;
     }
 
@@ -91,7 +91,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
       setResendTimer(60);
       setCanResend(false);
     } catch (err: any) {
-      const msg = err.response?.data?.message || err.message || (isRTL ? 'فشل إرسال رمز التحقق' : 'Failed to send OTP');
+      const msg = err.response?.data?.message || err.message || t.invalidOrExpiredOtp;
       setError(msg);
       toast.error(msg);
     } finally {
@@ -112,7 +112,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
       setCanResend(false);
       setOtpDigits(['', '', '', '', '', '']);
     } catch (err: any) {
-      const msg = err.response?.data?.message || err.message || (isRTL ? 'فشل إعادة الإرسال' : 'Failed to resend OTP');
+      const msg = err.response?.data?.message || err.message || t.invalidOrExpiredOtp;
       setError(msg);
     } finally {
       setIsLoading(false);
@@ -123,7 +123,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (currentOtp.length !== 6) {
-      setError(isRTL ? 'يجب إدخال رمز التحقق كاملاً (6 أرقام)' : 'Please enter all 6 digits');
+      setError(t.enterFullSixDigits);
       return;
     }
 
@@ -135,7 +135,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
       toast.success(t.otpVerifiedSuccess);
       setStep('PASSWORD');
     } catch (err: any) {
-      const msg = err.response?.data?.message || err.message || (isRTL ? 'رمز التحقق غير صحيح' : 'Invalid OTP code');
+      const msg = err.response?.data?.message || err.message || t.invalidOrExpiredOtp;
       setError(msg);
       toast.error(msg);
     } finally {
@@ -148,7 +148,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
     e.preventDefault();
 
     if (newPassword.length < 6) {
-      setError(isRTL ? 'كلمة المرور يجب ألا تقل عن 6 أحرف' : 'Password must be at least 6 characters');
+      setError(t.passwordMinLength);
       return;
     }
 
@@ -175,7 +175,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
         onClose();
       }, 2200);
     } catch (err: any) {
-      const msg = err.response?.data?.message || err.message || (isRTL ? 'فشل إعادة تعيين كلمة المرور' : 'Failed to reset password');
+      const msg = err.response?.data?.message || err.message || t.invalidOrExpiredOtp;
       setError(msg);
       toast.error(msg);
     } finally {
@@ -218,7 +218,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
             {step === 'EMAIL' && t.forgotPasswordTitle}
             {step === 'OTP' && t.enterOtpTitle}
             {step === 'PASSWORD' && t.newPasswordTitle}
-            {step === 'SUCCESS' && (isRTL ? 'تمت العملية بنجاح' : 'Password Updated!')}
+            {step === 'SUCCESS' && t.operationSuccessful}
           </h2>
 
           <p className="text-xs text-zinc-400 mt-1 max-w-sm mx-auto">

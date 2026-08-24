@@ -263,7 +263,14 @@ export interface TranslationDictionary {
   helpCenterTitle: string;
   helpCenterSubtitle: string;
   searchFaqPlaceholder: string;
+  searchModalPlaceholder: string;
+  searchPrompt: string;
+  noMatchingPieces: string;
   topicsAnswered: string;
+  faqOrdersDelivery: string;
+  faqReturnsExchange: string;
+  faqSizingGuide: string;
+  faqCraftsmanshipFabrics: string;
   contactConciergeTitle: string;
   contactConciergeDesc: string;
   inquiryReceived: string;
@@ -273,6 +280,8 @@ export interface TranslationDictionary {
   startLiveChat: string;
   liveChatTitle: string;
   liveChatStatus: string;
+  liveChatWelcome: string;
+  liveChatResponse: string;
   typeMessagePlaceholder: string;
   send: string;
   
@@ -293,6 +302,9 @@ export interface TranslationDictionary {
   footerCollections: string;
   footerClientServices: string;
   footerMaisons: string;
+  footerZiftaBranch: string;
+  footerNahtayBranch: string;
+  footerGharbiaEgypt: string;
   footerCopyright: string;
   privacyPolicy: string;
   termsOfSale: string;
@@ -310,6 +322,7 @@ export interface TranslationDictionary {
   status: string;
   loading: string;
   saving: string;
+  updating: string;
   all: string;
   members: string;
   vipMembers: string;
@@ -329,7 +342,133 @@ export interface TranslationDictionary {
   newPassword: string;
   confirmPassword: string;
   updatePassword: string;
-  updating: string;
+  yes: string;
+  no: string;
+  items: string;
+  item: string;
+  quantity: string;
+  qty: string;
+  defaultBadgeText: string;
+  pinnedOnMap: string;
+  homeType: string;
+  workType: string;
+  otherType: string;
+  saveCard: string;
+  changeEmail: string;
+  passwordStrength: string;
+  strengthWeak: string;
+  strengthFair: string;
+  strengthGood: string;
+  strengthStrong: string;
+  redirectingToLogin: string;
+  operationSuccessful: string;
+  required: string;
+  optional: string;
+  valid: string;
+  complete: string;
+  selected: string;
+  whatsapp: string;
+  facebook: string;
+  add: string;
+  copied: string;
+  copy: string;
+  shopNow: string;
+
+  // Auth & Activation Extensions
+  emailOrPhone: string;
+  registeredEmailOrPhone: string;
+  activateAccount: string;
+  activateNewAccount: string;
+  enterSixDigitOtp: string;
+  otpCode: string;
+  resendCode: string;
+  resendAvailableIn: string;
+  verifyAndActivate: string;
+  accountActivatedSuccess: string;
+  invalidOrExpiredOtp: string;
+  enterFullSixDigits: string;
+  newActivationCodeSent: string;
+
+  // Home & Promo Extensions
+  loadingBespokeCollection: string;
+  loadingLatestReleases: string;
+  noNewArrivals: string;
+  newArrivalsComingSoon: string;
+  piecesInThisLook: string;
+  exclusivePromoCode: string;
+  dontShowAgainToday: string;
+
+  // Account & VIP Extensions
+  vipMembershipTitle: string;
+  standardMembershipTitle: string;
+  redeemablePointsBalance: string;
+  availablePointsDiscount: string;
+  loyaltyExplanation: string;
+  vipQualification: string;
+  doublePointsMultiplier: string;
+  redeemPointsAtCheckout: string;
+  expressCourierDelivery: string;
+  noSavedAddresses: string;
+  membershipTierLevel: string;
+  vipExclusiveClient: string;
+  availableLoyaltyPoints: string;
+  exclusivePrivilegesDesc: string;
+
+  // Cart & Shipping Extensions
+  freeShippingAcrossEgypt: string;
+  addForFreeShippingEgypt: string;
+  emptyBag: string;
+  giftNotePlaceholder: string;
+
+  // Checkout & Maps Extensions
+  chooseSavedAddressOrNew: string;
+  detectGps: string;
+  mapPicker: string;
+  selectDeliveryAddress: string;
+  savedAddressesCount: string;
+  useDifferentOrNewAddress: string;
+  enterNewAddressManualOrMap: string;
+  gpsCoordinatesLinked: string;
+  governorateCity: string;
+  streetDetailedPlaceholder: string;
+  streetDetailedLabel: string;
+  lastPieceLeft: string;
+  onlyLeftInStock: string;
+  redeemLoyaltyPoints: string;
+  pointsDiscountApplied: string;
+  pointsToEarnOnOrder: string;
+  paymentMethodTitle: string;
+  selectPaymentOption: string;
+  cashOnDelivery: string;
+  availableAcrossEgypt: string;
+  payWithPoints: string;
+  insufficientPoints: string;
+  fullPointsCoverage: string;
+  directDeliveryEgypt: string;
+  directDeliveryEgyptDesc: string;
+
+  // Map & Help keys
+  helpCenterDesc: string;
+  startLiveChatAction: string;
+  conciergeMessagePlaceholder: string;
+  passwordMinLength: string;
+  invalidEmail: string;
+  shopTheLook: string;
+  curatedEnsemble: string;
+
+  // Map Picker Modal
+  mapPickerModalTitle: string;
+  mapPickerModalDesc: string;
+  mapPickerPcNote: string;
+  mapQuickRegions: string;
+  mapSearchStreet: string;
+  mapGoogleMapsLink: string;
+  mapPasteLinkPrompt: string;
+  mapSearchPlaceholder: string;
+  mapConfirmedDetails: string;
+  mapSelectedGovernorate: string;
+  mapStreetDetailsLabel: string;
+  mapConfirmLocation: string;
   
   // Reviews & Ratings
   clientReviews: string;

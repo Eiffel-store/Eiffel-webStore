@@ -93,7 +93,7 @@ export const AccountPage: React.FC = () => {
   if (isDataLoading) {
     return (
       <div className="min-h-[75vh] flex items-center justify-center">
-        <EiffelLoader size="lg" message={isRTL ? 'جاري تحميل وتحديث بيانات الحساب...' : 'Loading bespoke client profile...'} />
+        <EiffelLoader size="lg" message={t.loading} />
       </div>
     );
   }

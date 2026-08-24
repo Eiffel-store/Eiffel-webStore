@@ -5,7 +5,7 @@ import { useStoreData, useLanguage } from '@/shared';
 
 export const PromoPopupModal: React.FC = () => {
   const { activeBanners = [], trackBannerImpression, trackBannerClick } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
 
   const [isOpen, setIsOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
@@ -59,7 +59,7 @@ export const PromoPopupModal: React.FC = () => {
   const title = isRTL ? (popupBanner.titleAr || popupBanner.titleEn) : (popupBanner.titleEn || popupBanner.titleAr);
   const subtitle = isRTL ? (popupBanner.subtitleAr || popupBanner.subtitleEn) : (popupBanner.subtitleEn || popupBanner.subtitleAr);
   const tag = isRTL ? (popupBanner.tagAr || popupBanner.tagEn) : (popupBanner.tagEn || popupBanner.tagAr);
-  const buttonText = isRTL ? (popupBanner.buttonTextAr || 'تسوق الآن') : (popupBanner.buttonTextEn || 'CLAIM & SHOP');
+  const buttonText = isRTL ? (popupBanner.buttonTextAr || t.shopNow) : (popupBanner.buttonTextEn || t.shopNow);
   const buttonLink = popupBanner.buttonLink || '/collections/men';
   const imgUrl = popupBanner.desktopImageUrl || popupBanner.mobileImageUrl || 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800&auto=format&fit=crop&q=80';
 
@@ -107,7 +107,7 @@ export const PromoPopupModal: React.FC = () => {
             <div className="p-3 bg-zinc-900 border border-dashed border-amber-500/40 rounded flex items-center justify-between gap-2">
               <div>
                 <div className="text-[9px] uppercase tracking-wider text-zinc-400 font-mono">
-                  {isRTL ? 'كوبون الخصم الحصري' : 'Exclusive Promo Code'}
+                  {t.exclusivePromoCode}
                 </div>
                 <div className="font-mono text-sm font-bold text-amber-300">
                   {popupBanner.discountCode}
@@ -120,12 +120,12 @@ export const PromoPopupModal: React.FC = () => {
                 {copied ? (
                   <>
                     <Check className="w-3.5 h-3.5" />
-                    <span>{isRTL ? 'تم النسخ' : 'Copied'}</span>
+                    <span>{t.copied}</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-3.5 h-3.5" />
-                    <span>{isRTL ? 'نسخ' : 'Copy'}</span>
+                    <span>{t.copy}</span>
                   </>
                 )}
               </button>
@@ -152,7 +152,7 @@ export const PromoPopupModal: React.FC = () => {
                 className="rounded border-zinc-700 bg-zinc-900 text-amber-500 focus:ring-0 cursor-pointer"
               />
               <label htmlFor="dontShowPopup" className="cursor-pointer">
-                {isRTL ? 'عدم إظهار هذا العرض مرة أخرى اليوم' : "Don't show this offer again today"}
+                {t.dontShowAgainToday}
               </label>
             </div>
           </div>

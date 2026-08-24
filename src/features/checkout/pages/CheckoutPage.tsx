@@ -65,29 +65,28 @@ export const CheckoutPage: React.FC = () => {
   const validateField = (field: string, val: string): string | undefined => {
     switch (field) {
       case 'email':
-        if (!val.trim()) return isRTL ? 'البريد الإلكتروني إلزامي' : 'Email address is required';
-        if (!/\S+@\S+\.\S+/.test(val)) return isRTL ? 'يرجى إدخال بريد إلكتروني صالح (مثال: name@example.com)' : 'Please enter a valid email address';
+        if (!val.trim()) return `${t.emailLabel} ${t.required}`;
+        if (!/\S+@\S+\.\S+/.test(val)) return t.invalidEmail || 'Invalid email address';
         return undefined;
       case 'firstName':
-        if (!val.trim()) return isRTL ? 'الاسم الأول إلزامي' : 'First name is required';
-        if (val.trim().length < 2) return isRTL ? 'الاسم الأول يجب أن يتكون من حرفين على الأقل' : 'First name must be at least 2 characters';
+        if (!val.trim()) return `${t.firstNameLabel} ${t.required}`;
+        if (val.trim().length < 2) return `${t.firstNameLabel} ${t.invalidOrExpiredOtp}`;
         return undefined;
       case 'lastName':
-        if (!val.trim()) return isRTL ? 'اسم العائلة إلزامي' : 'Last name is required';
-        if (val.trim().length < 2) return isRTL ? 'اسم العائلة يجب أن يتكون من حرفين على الأقل' : 'Last name must be at least 2 characters';
+        if (!val.trim()) return `${t.lastNameLabel} ${t.required}`;
+        if (val.trim().length < 2) return `${t.lastNameLabel} ${t.invalidOrExpiredOtp}`;
         return undefined;
       case 'phone':
-        if (!val.trim()) return isRTL ? 'رقم الهاتف إلزامي للتواصل ومندوب الشحن' : 'Phone number is required for courier delivery';
-        // Clean phone string
+        if (!val.trim()) return `${t.phoneLabel} ${t.required}`;
         const cleanPhone = val.replace(/\s+/g, '');
-        if (cleanPhone.length < 10) return isRTL ? 'يرجى إدخال رقم هاتف صحيح (11 رقم)' : 'Please enter a valid phone number (10-11 digits)';
+        if (cleanPhone.length < 10) return `${t.phoneLabel} ${t.required}`;
         return undefined;
       case 'city':
-        if (!val.trim()) return isRTL ? 'يرجى اختيار المحافظة' : 'Governorate / City is required';
+        if (!val.trim()) return `${t.governorateCity} ${t.required}`;
         return undefined;
       case 'street':
-        if (!val.trim()) return isRTL ? 'العنوان التفصيلي إلزامي (الشارع والعمارة ورقم الشقة)' : 'Street address is required';
-        if (val.trim().length < 5) return isRTL ? 'يرجى كتابة العنوان بالتفصيل لضمان وصول المندوب' : 'Please provide detailed delivery address';
+        if (!val.trim()) return `${t.streetLabel} ${t.required}`;
+        if (val.trim().length < 5) return `${t.streetDetailedLabel} ${t.required}`;
         return undefined;
       default:
         return undefined;

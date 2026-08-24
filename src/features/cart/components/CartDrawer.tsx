@@ -73,8 +73,8 @@ export const CartDrawer: React.FC = () => {
             <div className="flex justify-between font-mono mb-1.5">
               <span className="text-secondary dark:text-zinc-400">
                 {freeShippingRemaining === 0
-                  ? (isRTL ? 'تهانينا! حصلت على شحن مجاني لكافة محافظات مصر' : 'Complimentary shipping unlocked across Egypt!')
-                  : (isRTL ? `أضف ${formatPrice(freeShippingRemaining)} للحصول على شحن مجاني` : `Add ${formatPrice(freeShippingRemaining)} for free shipping`)}
+                  ? t.freeShippingAcrossEgypt
+                  : `${t.addForFreeShippingEgypt} (${formatPrice(freeShippingRemaining)})`}
               </span>
             </div>
             <div className="w-full bg-zinc-800 h-1.5 overflow-hidden">
@@ -90,7 +90,7 @@ export const CartDrawer: React.FC = () => {
             {cart.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center py-16 text-secondary dark:text-zinc-400">
                 <ShoppingBag className="w-12 h-12 stroke-1 mb-3 opacity-40" />
-                <p className="text-sm font-light">{isRTL ? 'حقيبة التسوق فارغة' : 'Your shopping bag is empty'}</p>
+                <p className="text-sm font-light">{t.emptyBag}</p>
               </div>
             ) : (
               cart.map((item, idx) => {

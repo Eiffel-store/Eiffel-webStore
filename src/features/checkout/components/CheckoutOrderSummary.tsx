@@ -67,7 +67,7 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
                   <span>{item.selectedSize} • {item.selectedColor} (x{item.quantity})</span>
                   {item?.product?.stock !== undefined && item?.product?.stock <= 2 && (
                     <span className="text-[10px] text-amber-400 font-bold px-1.5 py-0.5 bg-amber-400/10 border border-amber-400/20 rounded font-mono">
-                      {item.product.stock === 1 ? (isRTL ? '🔥 آخر قطعة' : '🔥 Last 1 left') : (isRTL ? `متبقي ${item.product.stock} فقط` : `Only ${item.product.stock} left`)}
+                      {item.product.stock === 1 ? t.lastPieceLeft : `${t.onlyLeftInStock} ${item.product.stock}`}
                     </span>
                   )}
                 </p>
@@ -87,7 +87,7 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
             <div className="flex items-center gap-2">
               <Coins className="w-4 h-4 text-amber-400" />
               <span className="text-xs font-mono font-bold text-white">
-                {isRTL ? 'استبدال نقاط الولاء' : 'Redeem Loyalty Points'}
+                {t.redeemLoyaltyPoints}
               </span>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
@@ -102,14 +102,12 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
           </div>
 
           <p className="text-[11px] text-zinc-400 font-mono">
-            {isRTL
-              ? `لديك ${availablePoints} نقطة متاحة (تعادل ${formatPrice(availablePoints)} خصم).`
-              : `You have ${availablePoints} PTS available (= ${formatPrice(availablePoints)} discount).`}
+            {`${availablePoints} PTS (= ${formatPrice(availablePoints)} ${t.availablePointsDiscount})`}
           </p>
 
           {redeemPoints && (
             <div className="pt-2 border-t border-zinc-800 flex items-center justify-between text-xs font-mono text-emerald-400">
-              <span>{isRTL ? 'الخصم المطبق من النقاط:' : 'Points Discount Applied:'}</span>
+              <span>{t.pointsDiscountApplied}</span>
               <span className="font-bold">-{formatPrice(pointsDiscountValue)}</span>
             </div>
           )}
@@ -130,7 +128,7 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
         )}
         {pointsDiscountValue > 0 && (
           <div className="flex justify-between text-amber-500 font-mono font-bold">
-            <span>{isRTL ? 'خصم استبدال النقاط' : 'Loyalty Points Discount'}</span>
+            <span>{t.redeemLoyaltyPoints}</span>
             <span>-{formatPrice(pointsDiscountValue)}</span>
           </div>
         )}
@@ -150,7 +148,7 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
       <div className="p-3 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-between text-xs font-mono">
         <div className="flex items-center gap-2 text-amber-300">
           <Sparkles className="w-4 h-4 text-amber-400" />
-          <span>{isRTL ? 'النقاط المكتسبة (1% من قيمة الطلب):' : 'Points to earn (1% of order):'}</span>
+          <span>{t.pointsToEarnOnOrder}</span>
         </div>
         <div className="flex items-center gap-1.5 font-bold text-amber-400">
           <span>+{pointsToEarn} PTS</span>
@@ -158,8 +156,8 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
       </div>
 
       <div className="p-3 bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-800 text-[11px] text-secondary dark:text-zinc-400 space-y-1 rounded">
-        <p className="font-bold text-primary dark:text-white">🇪🇬 خدمة التوصيل المباشر داخل مصر</p>
-        <p>شحن سريع إلى كافة المحافظات مع إمكانية المعاينة قبل الاستلام والدفع كاش عند الاستلام.</p>
+        <p className="font-bold text-primary dark:text-white">{t.directDeliveryEgypt}</p>
+        <p>{t.directDeliveryEgyptDesc}</p>
       </div>
     </div>
   );

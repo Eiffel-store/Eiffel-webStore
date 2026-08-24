@@ -15,9 +15,8 @@ export const EiffelLoader: React.FC<EiffelLoaderProps> = ({
   size = 'md',
   className = ''
 }) => {
-  const { isRTL } = useLanguage();
-  const defaultMsg = isRTL ? 'جاري تحميل التشكيلة الفاخرة...' : 'Loading bespoke collection...';
-  const displayMsg = message || defaultMsg;
+  const { t } = useLanguage();
+  const displayMsg = message || t.loadingBespokeCollection || t.loading;
 
   const content = (
     <div className={`flex flex-col items-center justify-center gap-4 text-center ${className}`}>

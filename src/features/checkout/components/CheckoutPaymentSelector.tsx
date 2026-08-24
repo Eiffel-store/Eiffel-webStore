@@ -17,7 +17,7 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
   totalBeforePoints = 0,
   pointsDiscountValue = 0,
 }) => {
-  const { isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
   const { formatPrice } = useCurrency();
 
   const hasPoints = availablePoints > 0;
@@ -28,10 +28,10 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
     <div className="space-y-4 pt-4">
       <div className="flex items-center justify-between pb-2 border-b border-surface-container dark:border-zinc-800">
         <h3 className="font-editorial text-xl sm:text-2xl text-primary dark:text-white uppercase">
-          3. {isRTL ? 'طريقة الدفع' : '3. Payment Method'}
+          3. {t.paymentMethodTitle}
         </h3>
         <span className="text-xs font-mono text-secondary dark:text-zinc-400">
-          {isRTL ? 'اختر طريقة السداد المفضلة' : 'Select payment option'}
+          {t.selectPaymentOption}
         </span>
       </div>
 
@@ -58,11 +58,11 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
               </div>
               <div>
                 <h4 className="font-editorial text-base font-bold text-primary dark:text-white flex items-center gap-2">
-                  <span>{isRTL ? 'الدفع عند الاستلام (كاش)' : 'Cash on Delivery (COD)'}</span>
+                  <span>{t.cashOnDelivery}</span>
                 </h4>
                 <p className="text-[11px] font-mono text-emerald-500 dark:text-emerald-400 flex items-center gap-1 mt-0.5">
                   <CheckCircle className="w-3.5 h-3.5 shrink-0" />
-                  <span>{isRTL ? 'متاح لكافة المحافظات' : 'Available across Egypt'}</span>
+                  <span>{t.availableAcrossEgypt}</span>
                 </p>
               </div>
             </div>
@@ -119,7 +119,7 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
               <div>
                 <div className="flex items-center gap-2">
                   <h4 className="font-editorial text-base font-bold text-primary dark:text-white">
-                    {isRTL ? 'الدفع بالنقاط' : 'Pay with Points'}
+                    {t.payWithPoints}
                   </h4>
                   <span className="px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-amber-400/20 text-amber-400 border border-amber-400/30">
                     {availablePoints} PTS
@@ -127,12 +127,8 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
                 </div>
                 <p className="text-[11px] font-mono text-zinc-400 mt-0.5">
                   {hasPoints
-                    ? isRTL
-                      ? `رصيدك يعادل ${formatPrice(availablePoints)} خصم مباشر`
-                      : `Equivalent to ${formatPrice(availablePoints)} discount`
-                    : isRTL
-                    ? 'لا يوجد رصيد نقاط كافٍ'
-                    : 'Insufficient points balance'}
+                    ? `${formatPrice(availablePoints)} ${t.availablePointsDiscount}`
+                    : t.insufficientPoints}
                 </p>
               </div>
             </div>
@@ -155,24 +151,16 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>
                     {isFullPointsCoverage
-                      ? isRTL
-                        ? 'تغطية كاملة بالنقاط (0 ج.م مطلوب كاش)'
-                        : 'Full Points Coverage (0 Cash Due)'
-                      : isRTL
-                      ? `خصم ${formatPrice(pointsDiscountValue || availablePoints)} بالنقاط + دفع ${formatPrice(remainingCash)} كاش عند الاستلام`
-                      : `Points Discount ${formatPrice(pointsDiscountValue || availablePoints)} + ${formatPrice(remainingCash)} Cash on Delivery`}
+                      ? t.fullPointsCoverage
+                      : `${formatPrice(pointsDiscountValue || availablePoints)} + ${formatPrice(remainingCash)} COD`}
                   </span>
                 </div>
               </div>
             ) : (
               <span className="text-secondary dark:text-zinc-400 font-light font-sans">
                 {hasPoints
-                  ? isRTL
-                    ? 'استخدم نقاطك المسجلة بحسابك لدفع قيمة الطلب فوراً أو تخفيضها.'
-                    : 'Redeem your loyalty points to cover all or part of your order total.'
-                  : isRTL
-                  ? 'قم بالشراء واكسب 1% نقاط على كل طلب لتتمكن من استخدامها في مشترياتك القادمة.'
-                  : 'Earn 1% points on every order to redeem on future purchases.'}
+                  ? (isRTL ? 'استخدم نقاطك المسجلة بحسابك لدفع قيمة الطلب فوراً أو تخفيضها.' : 'Redeem your loyalty points to cover all or part of your order total.')
+                  : (isRTL ? 'قم بالشراء واكسب 1% نقاط على كل طلب لتتمكن من استخدامها في مشترياتك القادمة.' : 'Earn 1% points on every order to redeem on future purchases.')}
               </span>
             )}
           </div>

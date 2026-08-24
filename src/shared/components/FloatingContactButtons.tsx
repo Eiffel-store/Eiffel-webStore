@@ -4,7 +4,7 @@ import { useStoreData } from '@/shared';
 import { FacebookIcon, WhatsAppIcon } from './SocialIcons';
 
 export const FloatingContactButtons: React.FC = () => {
-  const { isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
   const { settings } = useStoreData();
 
   const facebookUrl = settings.facebookUrl || 'https://www.facebook.com/profile.php?id=100093268017929';
@@ -26,7 +26,7 @@ export const FloatingContactButtons: React.FC = () => {
       >
         <WhatsAppIcon className="w-5 h-5 fill-current" />
         <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 text-xs font-mono font-bold whitespace-nowrap">
-          {isRTL ? 'واتساب' : 'WhatsApp'}
+          {t.whatsapp}
         </span>
       </a>
 
@@ -41,7 +41,7 @@ export const FloatingContactButtons: React.FC = () => {
       >
         <FacebookIcon className="w-5 h-5 fill-current" />
         <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 text-xs font-mono font-bold whitespace-nowrap">
-          {isRTL ? 'فيسبوك' : 'Facebook'}
+          {t.facebook}
         </span>
       </a>
     </div>

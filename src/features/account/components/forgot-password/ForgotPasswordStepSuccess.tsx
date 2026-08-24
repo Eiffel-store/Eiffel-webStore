@@ -12,7 +12,7 @@ export const ForgotPasswordStepSuccess: React.FC = () => {
       </div>
       <p className="text-sm font-medium text-emerald-300">{t.passwordResetSuccess}</p>
       <p className="text-xs text-zinc-500 font-mono">
-        {isRTL ? 'جاري تحويلك لتسجيل الدخول فوراً...' : 'Redirecting to login...'}
+        {t.redirectingToLogin}
       </p>
     </div>
   );

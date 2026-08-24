@@ -210,9 +210,7 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
             1. {t.stepContact} & {t.stepDelivery}
           </h3>
           <p className="text-xs text-secondary dark:text-zinc-400 mt-0.5">
-            {isRTL
-              ? 'اختر من عناوينك المسجلة أو أدخل عنواناً جديداً عبر الخريطة والـ GPS.'
-              : 'Choose from saved addresses or enter a new address via Map & GPS.'}
+            {t.chooseSavedAddressOrNew}
           </p>
         </div>
 
@@ -223,24 +221,24 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
             onClick={handleQuickGps}
             disabled={isInstantGpsLoading}
             className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded flex items-center gap-1.5 shadow-md transition-all disabled:opacity-50 cursor-pointer"
-            title={isRTL ? 'تحديد موقعي الحالي تلقائياً بالـ GPS' : 'Auto-detect current location via GPS'}
+            title={t.detectGps}
           >
             {isInstantGpsLoading ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
               <Crosshair className="w-3.5 h-3.5 text-emerald-100" />
             )}
-            <span>{isRTL ? '📍 تحديد بالـ GPS' : '📍 Detect GPS'}</span>
+            <span>{t.detectGps}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setShowMapModal(true)}
             className="px-3.5 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs font-bold rounded flex items-center gap-1.5 transition-colors cursor-pointer"
-            title={isRTL ? 'فتح الخريطة واختيار الموقع بدقة' : 'Open map & pick location'}
+            title={t.mapPicker}
           >
             <Map className="w-3.5 h-3.5 text-amber-400" />
-            <span>{isRTL ? 'الخريطة' : 'Map Picker'}</span>
+            <span>{t.mapPicker}</span>
           </button>
         </div>
       </div>
@@ -259,10 +257,10 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
           <div className="flex items-center justify-between">
             <label className="text-xs font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
               <MapPin className="w-4 h-4 text-amber-500" />
-              <span>{isRTL ? 'اختيار عنوان التوصيل من حسابك:' : 'Select Delivery Address:'}</span>
+              <span>{t.selectDeliveryAddress}</span>
             </label>
             <span className="text-[11px] font-mono text-secondary dark:text-zinc-400">
-              {addresses.length} {isRTL ? 'عناوين مسجلة' : 'Saved Addresses'}
+              {addresses.length} {t.savedAddressesCount}
             </span>
           </div>
 
@@ -291,16 +289,16 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
                           {getAddressIcon(addr.type)}
                           <span className="text-xs font-bold text-primary dark:text-white">
                             {addr.type === 'Home'
-                              ? isRTL ? 'المنزل' : 'Home'
+                              ? t.homeType
                               : addr.type === 'Work'
-                              ? isRTL ? 'العمل' : 'Work'
-                              : isRTL ? 'أخرى' : 'Other'}
+                              ? t.workType
+                              : t.otherType}
                           </span>
                         </div>
                       </div>
                       {addr.isDefault && (
                         <span className="text-[10px] font-mono px-1.5 py-0.5 bg-primary text-white dark:bg-white dark:text-black uppercase">
-                          {isRTL ? 'الافتراضي' : 'Default'}
+                          {t.defaultBadgeText}
                         </span>
                       )}
                     </div>
@@ -316,7 +314,7 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
                   {addr.mapUrl && (
                     <div className="mt-2 pt-2 border-t border-zinc-800/40 flex items-center gap-1 text-[10px] text-amber-500 font-mono">
                       <MapPin className="w-3 h-3" />
-                      <span>{isRTL ? 'موقع GPS مثبت' : 'GPS Verified'}</span>
+                      <span>{t.pinnedOnMap}</span>
                     </div>
                   )}
                 </div>
@@ -338,10 +336,10 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
                 <Plus className="w-3.5 h-3.5" />
               </span>
               <span className="text-xs font-bold text-primary dark:text-white">
-                {isRTL ? 'استخدام عنوان آخر / جديد' : 'Use a Different / New Address'}
+                {t.useDifferentOrNewAddress}
               </span>
               <span className="text-[10px] text-secondary dark:text-zinc-400">
-                {isRTL ? 'إدخال تفاصيل عنوان يدوي أو استخدام الخريطة' : 'Enter new address details or use map'}
+                {t.enterNewAddressManualOrMap}
               </span>
             </div>
           </div>
@@ -354,7 +352,7 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-zinc-300">
-              {isRTL ? 'تم ربط إحداثيات موقعك الدقيقة بخرائط Google للطلب' : 'Exact GPS Google Maps coordinates linked to order'}
+              {t.gpsCoordinatesLinked}
             </span>
           </div>
           <a
@@ -377,11 +375,11 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
             <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
               <Mail className="w-3.5 h-3.5 text-zinc-400" />
               <span>{t.emailLabel}</span>
-              <span className="text-red-500 font-bold">* ({isRTL ? 'إلزامي' : 'Required'})</span>
+              <span className="text-red-500 font-bold">* ({t.required})</span>
             </label>
             {touched.email && !errors.email && email && (
               <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
-                <Check className="w-3 h-3" /> {isRTL ? 'صحيح' : 'Valid'}
+                <Check className="w-3 h-3" /> {t.valid}
               </span>
             )}
           </div>
@@ -391,7 +389,7 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onBlur={() => onBlurField('email')}
-            placeholder={isRTL ? 'مثال: name@example.com' : 'e.g. name@example.com'}
+            placeholder="name@example.com"
             className={`w-full bg-surface-container-lowest dark:bg-zinc-950 border p-3 text-xs text-primary dark:text-white font-mono focus:outline-none transition-colors ${
               touched.email && errors.email
                 ? 'border-red-500 bg-red-950/10 focus:border-red-500 ring-1 ring-red-500/30'
@@ -412,11 +410,11 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
             <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
               <User className="w-3.5 h-3.5 text-zinc-400" />
               <span>{t.firstNameLabel}</span>
-              <span className="text-red-500 font-bold">* ({isRTL ? 'إلزامي' : 'Required'})</span>
+              <span className="text-red-500 font-bold">* ({t.required})</span>
             </label>
             {touched.firstName && !errors.firstName && firstName && (
               <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
-                <Check className="w-3 h-3" /> {isRTL ? 'صحيح' : 'Valid'}
+                <Check className="w-3 h-3" /> {t.valid}
               </span>
             )}
           </div>
@@ -426,7 +424,7 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             onBlur={() => onBlurField('firstName')}
-            placeholder={isRTL ? 'الاسم الأول' : 'First Name'}
+            placeholder={t.firstNameLabel}
             className={`w-full bg-surface-container-lowest dark:bg-zinc-950 border p-3 text-xs text-primary dark:text-white focus:outline-none transition-colors ${
               touched.firstName && errors.firstName
                 ? 'border-red-500 bg-red-950/10 focus:border-red-500 ring-1 ring-red-500/30'
@@ -447,11 +445,11 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
             <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
               <User className="w-3.5 h-3.5 text-zinc-400" />
               <span>{t.lastNameLabel}</span>
-              <span className="text-red-500 font-bold">* ({isRTL ? 'إلزامي' : 'Required'})</span>
+              <span className="text-red-500 font-bold">* ({t.required})</span>
             </label>
             {touched.lastName && !errors.lastName && lastName && (
               <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
-                <Check className="w-3 h-3" /> {isRTL ? 'صحيح' : 'Valid'}
+                <Check className="w-3 h-3" /> {t.valid}
               </span>
             )}
           </div>
@@ -461,7 +459,7 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             onBlur={() => onBlurField('lastName')}
-            placeholder={isRTL ? 'اسم العائلة' : 'Last Name'}
+            placeholder={t.lastNameLabel}
             className={`w-full bg-surface-container-lowest dark:bg-zinc-950 border p-3 text-xs text-primary dark:text-white focus:outline-none transition-colors ${
               touched.lastName && errors.lastName
                 ? 'border-red-500 bg-red-950/10 focus:border-red-500 ring-1 ring-red-500/30'
@@ -481,12 +479,12 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
               <Phone className="w-3.5 h-3.5 text-zinc-400" />
-              <span>{t.phoneLabel} ({isRTL ? 'رقم الهاتف للتوصيل' : 'Delivery Phone'})</span>
-              <span className="text-red-500 font-bold">* ({isRTL ? 'إلزامي' : 'Required'})</span>
+              <span>{t.phoneLabel}</span>
+              <span className="text-red-500 font-bold">* ({t.required})</span>
             </label>
             {touched.phone && !errors.phone && phone && (
               <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
-                <Check className="w-3 h-3" /> {isRTL ? 'صحيح' : 'Valid'}
+                <Check className="w-3 h-3" /> {t.valid}
               </span>
             )}
           </div>
@@ -497,7 +495,7 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               onBlur={() => onBlurField('phone')}
-              placeholder={isRTL ? '01012345678' : '+20 10 1234 5678'}
+              placeholder="01012345678"
               className={`w-full bg-surface-container-lowest dark:bg-zinc-950 border p-3 text-xs font-mono text-primary dark:text-white focus:outline-none transition-colors ${
                 touched.phone && errors.phone
                   ? 'border-red-500 bg-red-950/10 focus:border-red-500 ring-1 ring-red-500/30'
@@ -518,12 +516,12 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-zinc-400" />
-              <span>{isRTL ? 'المحافظة / المدينة' : 'Governorate / City'}</span>
-              <span className="text-red-500 font-bold">* ({isRTL ? 'إلزامي' : 'Required'})</span>
+              <span>{t.governorateCity}</span>
+              <span className="text-red-500 font-bold">* ({t.required})</span>
             </label>
             {city && (
               <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
-                <Check className="w-3 h-3" /> {isRTL ? 'محدد' : 'Selected'}
+                <Check className="w-3 h-3" /> {t.selected}
               </span>
             )}
           </div>
@@ -557,7 +555,7 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
               <Hash className="w-3.5 h-3.5 text-zinc-400" />
-              <span>{t.postalCodeLabel} ({isRTL ? 'اختياري' : 'Optional'})</span>
+              <span>{t.postalCodeLabel} ({t.optional})</span>
             </label>
           </div>
           <input
@@ -575,12 +573,12 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-zinc-400" />
-              <span>{t.streetLabel} ({isRTL ? 'الشارع ورقم العمارة والشقة وعلامة مميزة' : 'Street, building, apt, landmark'})</span>
-              <span className="text-red-500 font-bold">* ({isRTL ? 'إلزامي' : 'Required'})</span>
+              <span>{t.streetDetailedLabel}</span>
+              <span className="text-red-500 font-bold">* ({t.required})</span>
             </label>
             {touched.street && !errors.street && street && (
               <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
-                <Check className="w-3 h-3" /> {isRTL ? 'مكتمل' : 'Complete'}
+                <Check className="w-3 h-3" /> {t.complete}
               </span>
             )}
           </div>
@@ -590,11 +588,7 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
             value={street}
             onChange={(e) => setStreet(e.target.value)}
             onBlur={() => onBlurField('street')}
-            placeholder={
-              isRTL
-                ? 'مثال: شارع التسعين الشمالي، عمارة 14، الدور الثالث، شقة 6 - بجوار بنك مصر'
-                : 'e.g. 14 El-Teseen St, 3rd Floor, Apt 6 - near Banque Misr'
-            }
+            placeholder={t.streetDetailedPlaceholder}
             className={`w-full bg-surface-container-lowest dark:bg-zinc-950 border p-3 text-xs text-primary dark:text-white focus:outline-none transition-colors ${
               touched.street && errors.street
                 ? 'border-red-500 bg-red-950/10 focus:border-red-500 ring-1 ring-red-500/30'

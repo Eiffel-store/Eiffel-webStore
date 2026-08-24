@@ -50,7 +50,7 @@ export const ConciergeContactForm: React.FC<ConciergeContactFormProps> = ({
             className="flex items-center justify-center gap-2 py-3 px-4 bg-[#25D366] text-white font-label-bold text-xs uppercase tracking-wider hover:bg-[#20ba5a] transition-colors shadow-sm"
           >
             <WhatsAppIcon className="w-4 h-4 fill-current" />
-            <span>{isRTL ? 'واتساب' : 'WhatsApp'}</span>
+            <span>{t.whatsapp}</span>
           </a>
 
           <a
@@ -60,7 +60,7 @@ export const ConciergeContactForm: React.FC<ConciergeContactFormProps> = ({
             className="flex items-center justify-center gap-2 py-3 px-4 bg-[#1877F2] text-white font-label-bold text-xs uppercase tracking-wider hover:bg-[#166fe5] transition-colors shadow-sm"
           >
             <FacebookIcon className="w-4 h-4 fill-current" />
-            <span>{isRTL ? 'فيسبوك' : 'Facebook'}</span>
+            <span>{t.facebook}</span>
           </a>
         </div>
 
@@ -98,7 +98,7 @@ export const ConciergeContactForm: React.FC<ConciergeContactFormProps> = ({
                 required
                 value={contactMessage}
                 onChange={(e) => setContactMessage(e.target.value)}
-                placeholder={isRTL ? "يرجى كتابة استفسارك أو المقاسات المطلوبة أو طلب فرع زفتى/نهطاي..." : "Please enter your question, sizing inquiry, or Zefta/Nahtay branch request..."}
+                placeholder={t.conciergeMessagePlaceholder}
                 className="w-full bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-700 p-3 text-xs text-primary dark:text-white focus:outline-none"
               />
             </div>
@@ -119,7 +119,7 @@ export const ConciergeContactForm: React.FC<ConciergeContactFormProps> = ({
             className="w-full py-3.5 border border-primary dark:border-white font-label-bold text-xs tracking-widest uppercase text-primary dark:text-white hover:bg-primary hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors flex items-center justify-center gap-2"
           >
             <MessageSquare className="w-4 h-4" />
-            <span>{isRTL ? 'محادثة الموقع الفورية' : 'START LIVE CHAT'}</span>
+            <span>{t.startLiveChatAction}</span>
           </button>
         </div>
       </div>

@@ -73,7 +73,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
                 {t.changePassword}
               </h3>
               <p className="text-xs text-secondary dark:text-zinc-400 font-mono">
-                {isRTL ? 'أمان حسابك مشفر ومحمي' : 'Secure & Encrypted'}
+                {t.encryptionNotice}
               </p>
             </div>
           </div>

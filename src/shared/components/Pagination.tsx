@@ -65,13 +65,11 @@ export const Pagination: React.FC<PaginationProps> = ({
         <div className="text-xs font-mono text-secondary dark:text-zinc-400">
           {startItem && endItem ? (
             <span>
-              {isRTL
-                ? `عرض ${startItem} – ${endItem} من إجمالي ${totalItems} عنصر`
-                : `Showing ${startItem} – ${endItem} of ${totalItems} items`}
+              {`${t.showingResults} ${startItem} – ${endItem} ${t.of} ${totalItems}`}
             </span>
           ) : (
             <span>
-              {isRTL ? `إجمالي ${totalItems} عنصر` : `Total ${totalItems} items`}
+              {`${t.totalCharged || ''} ${totalItems}`}
             </span>
           )}
         </div>
@@ -86,7 +84,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             onClick={() => onPageChange(1)}
             disabled={currentPage === 1}
             className="p-2 rounded border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
-            title={isRTL ? 'الصفحة الأولى' : 'First Page'}
+            title="1"
           >
             <FirstIcon className="w-3.5 h-3.5" />
           </button>
@@ -98,10 +96,10 @@ export const Pagination: React.FC<PaginationProps> = ({
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
           className="p-2 rounded border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors flex items-center gap-1"
-          title={isRTL ? 'السابق' : 'Previous'}
+          title={t.previousPage}
         >
           <PrevIcon className="w-3.5 h-3.5" />
-          <span className="text-xs font-mono hidden md:inline">{isRTL ? 'السابق' : 'Prev'}</span>
+          <span className="text-xs font-mono hidden md:inline">{t.previousPage}</span>
         </button>
 
         {/* Page Numbers */}
@@ -141,9 +139,9 @@ export const Pagination: React.FC<PaginationProps> = ({
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage >= totalPages}
           className="p-2 rounded border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors flex items-center gap-1"
-          title={isRTL ? 'التالي' : 'Next'}
+          title={t.nextPage}
         >
-          <span className="text-xs font-mono hidden md:inline">{isRTL ? 'التالي' : 'Next'}</span>
+          <span className="text-xs font-mono hidden md:inline">{t.nextPage}</span>
           <NextIcon className="w-3.5 h-3.5" />
         </button>
 
@@ -154,7 +152,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             onClick={() => onPageChange(totalPages)}
             disabled={currentPage >= totalPages}
             className="p-2 rounded border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
-            title={isRTL ? 'الصفحة الأخيرة' : 'Last Page'}
+            title={`${totalPages}`}
           >
             <LastIcon className="w-3.5 h-3.5" />
           </button>
@@ -164,7 +162,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       {/* Page Size Selector (Optional) */}
       {onPageSizeChange && pageSize && (
         <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
-          <span>{isRTL ? 'عرض في الصفحة:' : 'Per page:'}</span>
+          <span>{t.itemsPerPage}:</span>
           <select
             value={pageSize}
             onChange={(e) => onPageSizeChange(Number(e.target.value))}

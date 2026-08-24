@@ -32,13 +32,13 @@ export const StoreLocatorPage: React.FC = () => {
         {/* Loading / Empty / Content */}
         {isStoresLoading ? (
           <div className="py-20">
-            <EiffelLoader message={isRTL ? 'جاري تحميل مواقع فروع إيفل...' : 'Loading Eiffel boutique locations...'} />
+            <EiffelLoader message={t.loading} />
           </div>
         ) : stores.length === 0 ? (
           <EmptyState
-            title={isRTL ? 'لا توجد فروع مضافة حالياً' : 'No Stores Listed Currently'}
-            description={isRTL ? 'خدمة التوصيل السريع والدفع عند الاستلام متاحة لكافة المحافظات المصرية عبر المتجر.' : 'Express courier delivery and Cash on Delivery are available nationwide.'}
-            actionText={isRTL ? 'تصفح التشكيلة الآن' : 'Explore Collections'}
+            title={t.noPiecesFound}
+            description={t.directDeliveryEgyptDesc}
+            actionText={t.exploreCollection}
             actionLink="/collections/men"
           />
         ) : (

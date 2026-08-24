@@ -49,7 +49,7 @@ export const AccountAddressesTab: React.FC<AccountAddressesTabProps> = ({
         <div className="p-12 text-center bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800">
           <MapPin className="w-8 h-8 text-secondary dark:text-zinc-500 mx-auto mb-3 opacity-60" />
           <p className="text-xs text-secondary dark:text-zinc-400">
-            {isRTL ? 'لم تقم بإضافة أي عناوين بعد. يمكنك إضافة عنوانك أو تحديده عبر الخريطة الآن.' : 'No saved addresses yet. Add your address or locate it on the map.'}
+            {t.noSavedAddresses}
           </p>
         </div>
       ) : (
@@ -65,16 +65,10 @@ export const AccountAddressesTab: React.FC<AccountAddressesTabProps> = ({
                     {getAddressIcon(addr.type)}
                     <span className="text-[11px] font-bold uppercase tracking-wider text-secondary dark:text-zinc-400">
                       {addr.type === 'Home'
-                        ? isRTL
-                          ? 'المنزل'
-                          : 'Home'
+                        ? t.homeType
                         : addr.type === 'Work'
-                        ? isRTL
-                          ? 'العمل'
-                          : 'Work'
-                        : isRTL
-                        ? 'أخرى'
-                        : 'Other'}
+                        ? t.workType
+                        : t.otherType}
                     </span>
                   </div>
                   {addr.isDefault && (
@@ -113,7 +107,7 @@ export const AccountAddressesTab: React.FC<AccountAddressesTabProps> = ({
                       className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-500 hover:text-amber-400 text-[11px] font-bold rounded transition-colors"
                     >
                       <MapPin className="w-3 h-3" />
-                      <span>{isRTL ? 'موقع مثبت على الخريطة' : 'Pinned on Map'}</span>
+                      <span>{t.pinnedOnMap}</span>
                       <ExternalLink className="w-2.5 h-2.5" />
                     </a>
                   </div>
@@ -129,7 +123,7 @@ export const AccountAddressesTab: React.FC<AccountAddressesTabProps> = ({
                     {t.setDefault}
                   </button>
                 ) : (
-                  <span className="text-[11px] text-emerald-500 font-mono">✓ {isRTL ? 'العنوان الأساسي' : 'Default'}</span>
+                  <span className="text-[11px] text-emerald-500 font-mono">✓ {t.defaultBadgeText}</span>
                 )}
                 <button
                   onClick={() => onDelete(addr.id)}

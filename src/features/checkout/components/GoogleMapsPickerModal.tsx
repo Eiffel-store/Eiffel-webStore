@@ -32,7 +32,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
   initialLat = 30.0444, // Default Cairo Center
   initialLng = 31.2357
 }) => {
-  const { isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
 
   const [lat, setLat] = useState<number>(initialLat);
   const [lng, setLng] = useState<number>(initialLng);
@@ -188,12 +188,10 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
             </div>
             <div>
               <h3 className="font-editorial text-base sm:text-lg font-bold text-white tracking-wide">
-                {isRTL ? 'تحديد وتأكيد موقع التوصيل بدقة' : 'Delivery Location & Address Picker'}
+                {t.mapPickerModalTitle}
               </h3>
               <p className="text-[11px] text-zinc-400">
-                {isRTL
-                  ? 'اختر منطقتك أو استخدم الـ GPS لملء العنوان بدقة 100% ومنع أي أخطاء في التوصيل.'
-                  : 'Select your area or use GPS to auto-fill accurate delivery address.'}
+                {t.mapPickerModalDesc}
               </p>
             </div>
           </div>
@@ -212,9 +210,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
           <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-300 text-xs flex items-start gap-2.5">
             <HelpCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
             <p className="leading-relaxed">
-              {isRTL
-                ? '💡 ملاحظة: إذا كنت تطلب من كمبيوتر (PC)، قد يعطي الـ GPS موقع سنترال الإنترنت بدلاً من بيتك. يمكنك اختيار منطقتك فوراً من "المناطق السريعة" أدناه أو البحث بالاسم لتحديد موقعك الحقيقي.'
-                : '💡 Note: On PC/Desktop, GPS might detect your ISP gateway. Use quick areas or search below to pinpoint your exact neighborhood.'}
+              {t.mapPickerPcNote}
             </p>
           </div>
 
@@ -227,7 +223,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
                 activeMode === 'quick' ? 'bg-white text-black shadow' : 'text-zinc-400 hover:text-white'
               }`}
             >
-              {isRTL ? '⚡ مناطق ومحافظات سريعة' : '⚡ Quick Regions'}
+              {t.mapQuickRegions}
             </button>
             <button
               type="button"
@@ -236,7 +232,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
                 activeMode === 'search' ? 'bg-white text-black shadow' : 'text-zinc-400 hover:text-white'
               }`}
             >
-              {isRTL ? '🔍 بحث عن منطقة / شارع' : '🔍 Search Street'}
+              {t.mapSearchStreet}
             </button>
             <button
               type="button"
@@ -245,7 +241,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
                 activeMode === 'link' ? 'bg-white text-black shadow' : 'text-zinc-400 hover:text-white'
               }`}
             >
-              {isRTL ? '🔗 لصق رابط Google Maps' : '🔗 Google Maps Link'}
+              {t.mapGoogleMapsLink}
             </button>
           </div>
 
@@ -254,7 +250,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] text-zinc-400 font-bold">
-                  {isRTL ? 'اختر منطقتك لنقل الخريطة فوراً إليها:' : 'Click to jump to your area:'}
+                  {t.mapQuickRegions}:
                 </span>
                 <button
                   type="button"
@@ -263,7 +259,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
                   className="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1"
                 >
                   {isDetectingGps ? <Loader2 className="w-3 h-3 animate-spin" /> : <Crosshair className="w-3 h-3" />}
-                  <span>{isRTL ? 'تحديد موقعي التلقائي (GPS)' : 'Auto-detect GPS'}</span>
+                  <span>{t.detectGps}</span>
                 </button>
               </div>
 
@@ -292,7 +288,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={isRTL ? 'اكتب اسم الشارع أو المنطقة (مثال: زفتى، المعادي، شارع البحر)...' : 'Type street or district...'}
+                    placeholder={t.mapSearchPlaceholder}
                     className="w-full bg-zinc-900 border border-zinc-700 pl-8 pr-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400"
                     autoFocus
                   />
@@ -303,7 +299,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
                   disabled={isSearching || !searchQuery.trim()}
                   className="px-4 py-2 bg-white text-black hover:bg-zinc-200 text-xs rounded font-bold transition-colors disabled:opacity-50"
                 >
-                  {isSearching ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : (isRTL ? 'بحث' : 'Search')}
+                  {isSearching ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : t.search}
                 </button>
               </form>
 
@@ -329,7 +325,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
           {activeMode === 'link' && (
             <div className="space-y-2">
               <label className="block text-[11px] text-zinc-400 font-bold">
-                {isRTL ? 'الصق رابط موقعك المنسوخ من تطبيق Google Maps أو الإحداثيات:' : 'Paste Google Maps share link or coordinates:'}
+                {t.mapPasteLinkPrompt}
               </label>
               <div className="flex items-center gap-2">
                 <input
@@ -346,7 +342,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
                   className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded transition-colors disabled:opacity-50 flex items-center gap-1.5"
                 >
                   <Link2 className="w-3.5 h-3.5" />
-                  <span>{isRTL ? 'تطبيق الرابط' : 'Apply'}</span>
+                  <span>{t.apply}</span>
                 </button>
               </div>
             </div>
@@ -393,11 +389,11 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-mono uppercase text-zinc-400 flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{isRTL ? 'بيانات العنوان المعتمدة للتوصيل:' : 'Confirmed Delivery Address Details:'}</span>
+                <span>{t.mapConfirmedDetails}</span>
               </span>
               {isResolvingAddress && (
                 <span className="text-[10px] text-amber-400 flex items-center gap-1 font-mono">
-                  <Loader2 className="w-3 h-3 animate-spin" /> {isRTL ? 'جاري التحديث...' : 'Updating...'}
+                  <Loader2 className="w-3 h-3 animate-spin" /> {t.loading}
                 </span>
               )}
             </div>
@@ -405,7 +401,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
               <div>
                 <label className="block text-[10px] text-zinc-400 font-bold mb-1">
-                  {isRTL ? 'المحافظة المختارة:' : 'Governorate:'}
+                  {t.mapSelectedGovernorate}
                 </label>
                 <input
                   type="text"
@@ -417,13 +413,13 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
 
               <div>
                 <label className="block text-[10px] text-zinc-400 font-bold mb-1">
-                  {isRTL ? 'تفاصيل الشارع والمنطقة (يمكنك تعديلها بحرية):' : 'Street & Neighborhood:'}
+                  {t.mapStreetDetailsLabel}
                 </label>
                 <input
                   type="text"
                   value={customStreet}
                   onChange={(e) => setCustomStreet(e.target.value)}
-                  placeholder={isRTL ? 'مثال: شارع الجمهورية، عمارة 15' : 'e.g. Street, Building'}
+                  placeholder={t.streetDetailedPlaceholder}
                   className="w-full bg-zinc-950 border border-zinc-700 px-2.5 py-1.5 text-xs text-white rounded focus:outline-none focus:border-amber-400"
                 />
               </div>
@@ -438,7 +434,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 border border-zinc-700 hover:bg-zinc-800 text-zinc-300 text-xs font-bold rounded transition-colors"
           >
-            {isRTL ? 'إلغاء' : 'Cancel'}
+            {t.cancel}
           </button>
 
           <button
@@ -447,7 +443,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
             className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 font-label-bold text-xs uppercase tracking-wider rounded flex items-center gap-2 shadow-lg transition-all cursor-pointer"
           >
             <Check className="w-4 h-4" />
-            <span>{isRTL ? 'اعتماد الموقع وتعبئة العنوان' : 'Confirm Location & Auto-Fill'}</span>
+            <span>{t.mapConfirmLocation}</span>
           </button>
         </div>
       </div>

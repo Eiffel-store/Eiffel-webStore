@@ -21,7 +21,7 @@ export const ForgotPasswordStepEmail: React.FC<ForgotPasswordStepEmailProps> = (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
         <label className="block text-[11px] font-label-bold uppercase tracking-wider text-zinc-400 mb-1.5">
-          {isRTL ? 'البريد الإلكتروني أو الهاتف المسجل' : 'Registered Email / Phone'}
+          {t.registeredEmailOrPhone}
         </label>
         <div className="relative">
           <Mail className="absolute left-3 rtl:left-auto rtl:right-3 top-3 w-4 h-4 text-zinc-500" />
