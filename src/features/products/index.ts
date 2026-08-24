@@ -8,5 +8,6 @@ export * from './components/CollectionBanner';
 export * from './components/CollectionFiltersBar';
 export * from './components/ActiveFilters';
 export * from './components/FilterDrawer';
+export * from './components/ProductReviewsSection';
 export * from './pages/ProductDetailPage';
 export * from './pages/CollectionsPage';

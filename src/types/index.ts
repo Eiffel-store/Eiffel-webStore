@@ -318,6 +318,36 @@ export interface PageResponse<T> {
   totalPages: number;
   isFirst: boolean;
   isLast: boolean;
-  hasNext: boolean;
-  hasPrevious: boolean;
+  hasNext?: boolean;
+  hasPrevious?: boolean;
 }
+
+export interface Review {
+  id: string;
+  productId: string;
+  customerName: string;
+  customerEmail?: string;
+  rating: number;
+  title?: string;
+  comment: string;
+  isVerifiedPurchase: boolean;
+  createdAt: string;
+  status?: 'APPROVED' | 'PENDING' | 'REJECTED';
+}
+
+export interface ProductReviewsSummary {
+  averageRating: number;
+  totalReviews: number;
+  recommendationRate: number;
+  ratingDistribution: Record<number, number>;
+  reviews: PageResponse<Review>;
+}
+
+export interface CreateReviewInput {
+  rating: number;
+  customerName: string;
+  customerEmail?: string;
+  title?: string;
+  comment: string;
+}
+

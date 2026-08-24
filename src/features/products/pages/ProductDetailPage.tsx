@@ -5,6 +5,7 @@ import { ProductCard } from '../components/ProductCard';
 import { ProductGallery } from '../components/ProductGallery';
 import { ProductInfo } from '../components/ProductInfo';
 import { ProductAccordion } from '../components/ProductAccordion';
+import { ProductReviewsSection } from '../components/ProductReviewsSection';
 import { SizeGuideModal } from '../components/SizeGuideModal';
 import { useCart } from '@/features/cart';
 import { useWishlist } from '@/features/wishlist';
@@ -133,6 +134,9 @@ export const ProductDetailPage: React.FC = () => {
             />
           </div>
         </div>
+
+        {/* Customer Reviews & Ratings with Pagination */}
+        <ProductReviewsSection product={product} />
 
         {/* You May Also Like Carousel */}
         {relatedProducts.length > 0 && (
