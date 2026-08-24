@@ -10,15 +10,18 @@ import {
   CustomerLoginForm,
   CustomerRegisterForm,
   AuthDemoAccountsBar,
+  AccountActivationModal,
 } from './auth';
 
 export const CustomerAuthView: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
   const { login, register, isLoading, error, clearError } = useAuthStore();
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
+  const [isActivationModalOpen, setIsActivationModalOpen] = useState(false);
+  const [activationEmail, setActivationEmail] = useState('');
 
   // Form States
   const [email, setEmail] = useState('');
@@ -37,8 +40,13 @@ export const CustomerAuthView: React.FC = () => {
       if (res.role === 'ROLE_ADMIN' || res.role === 'ROLE_STAFF') {
         navigate('/admin');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Login error:', err);
+      const errMsg = err.response?.data?.message || err.message || '';
+      if (errMsg.includes('غير مفعّل') || errMsg.includes('تفعيل')) {
+        setActivationEmail(email.trim());
+        setIsActivationModalOpen(true);
+      }
     }
   };
 
@@ -48,8 +56,13 @@ export const CustomerAuthView: React.FC = () => {
     setSuccessMsg(null);
 
     try {
-      await register({ name, email, password, phone });
-      setSuccessMsg(t.accountCreatedSuccess);
+      const res = await register({ name, email, password, phone });
+      if (res && res.requiresActivation) {
+        setActivationEmail(res.email || email.trim());
+        setIsActivationModalOpen(true);
+      } else {
+        setSuccessMsg(t.accountCreatedSuccess);
+      }
     } catch (err) {
       console.error('Register error:', err);
     }
@@ -149,6 +162,16 @@ export const CustomerAuthView: React.FC = () => {
         onSuccessLogin={(resetEmail: string) => {
           setEmail(resetEmail);
           setMode('login');
+        }}
+      />
+
+      {/* Account Activation OTP Modal */}
+      <AccountActivationModal
+        isOpen={isActivationModalOpen}
+        onClose={() => setIsActivationModalOpen(false)}
+        email={activationEmail}
+        onSuccess={() => {
+          setSuccessMsg(isRTL ? 'تم تفعيل الحساب وتسجيل الدخول بنجاح!' : 'Account activated and logged in successfully!');
         }}
       />
     </div>

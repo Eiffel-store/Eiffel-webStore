@@ -7,9 +7,19 @@ export const authService = {
     return response.data.data;
   },
 
-  register: async (userData: RegisterData): Promise<AuthResult> => {
-    const response = await apiClient.post<ApiResponse<AuthResult>>('/auth/register', userData);
+  register: async (userData: RegisterData): Promise<{ success: boolean; requiresActivation: boolean; email: string; message: string }> => {
+    const response = await apiClient.post<ApiResponse<any>>('/auth/register', userData);
+    return response.data.data || response.data;
+  },
+
+  verifyAccount: async (email: string, otp: string): Promise<AuthResult> => {
+    const response = await apiClient.post<ApiResponse<AuthResult>>('/auth/verify-account', { email, otp });
     return response.data.data;
+  },
+
+  resendActivation: async (email: string): Promise<{ success: boolean; message: string }> => {
+    const response = await apiClient.post<ApiResponse<any>>('/auth/resend-activation', { email });
+    return response.data.data || response.data;
   },
 
   getProfile: async (): Promise<AuthResult> => {

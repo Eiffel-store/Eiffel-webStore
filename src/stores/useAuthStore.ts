@@ -14,7 +14,8 @@ interface AuthState {
   error: string | null;
 
   login: (credentials: LoginCredentials) => Promise<AuthResult>;
-  register: (data: RegisterData) => Promise<AuthResult>;
+  register: (data: RegisterData) => Promise<{ success: boolean; requiresActivation: boolean; email: string; message: string }>;
+  verifyAccount: (email: string, otp: string) => Promise<AuthResult>;
   logout: () => void;
   setUser: (user: User, token: string, refreshToken?: string) => void;
   setTokens: (token: string, refreshToken?: string) => void;
@@ -84,7 +85,20 @@ export const useAuthStore = create<AuthState>()(
       register: async (registerData) => {
         set({ isLoading: true, error: null });
         try {
-          const data = await authService.register(registerData);
+          const result = await authService.register(registerData);
+          set({ isLoading: false });
+          return result;
+        } catch (err: any) {
+          const message = err.message || 'فشل إنشاء الحساب';
+          set({ error: message, isLoading: false });
+          throw err;
+        }
+      },
+
+      verifyAccount: async (email: string, otp: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          const data = await authService.verifyAccount(email, otp);
           const rawUser = (data as any).user || (data as any);
           const rawPoints = rawUser.points ?? rawUser.tierPoints ?? data.tierPoints ?? 50;
           const isVip = Boolean(rawUser.isVip ?? (data as any).isVip ?? (rawUser.tier === 'VIP' || rawUser.tier === 'VIP_PLATINUM'));
@@ -93,16 +107,16 @@ export const useAuthStore = create<AuthState>()(
 
           const user: User = {
             id: String(rawUser.id || data.id || Date.now()),
-            name: rawUser.name || data.name || registerData.name,
-            email: rawUser.email || data.email || registerData.email,
+            name: rawUser.name || data.name || email.split('@')[0],
+            email: rawUser.email || data.email || email,
             role: rawUser.role || data.role || 'ROLE_CUSTOMER',
             tier: isVip ? 'VIP' : ((data.tier as any) || rawUser.tier || 'MEMBER'),
             isVip: isVip,
             points: rawPoints,
             tierPoints: rawPoints,
-            phone: rawUser.phone || data.phone || registerData.phone || '',
+            phone: rawUser.phone || data.phone || '',
             memberSince: '2026',
-            addresses: [],
+            addresses: rawUser.addresses || [],
             paymentMethods: [],
             orders: [],
           };
@@ -121,7 +135,7 @@ export const useAuthStore = create<AuthState>()(
 
           return data;
         } catch (err: any) {
-          const message = err.message || 'فشل إنشاء الحساب';
+          const message = err.message || 'فشل تفعيل الحساب';
           set({ error: message, isLoading: false });
           throw err;
         }
