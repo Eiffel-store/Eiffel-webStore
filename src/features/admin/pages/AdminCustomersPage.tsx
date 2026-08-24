@@ -1,31 +1,21 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import {
-  Users,
-  Crown,
-  Sparkles,
-  Coins,
-  Search,
-  Plus,
-  Minus,
-  MessageCircle,
-  Phone,
-  CheckCircle2,
-  Award,
-  RefreshCw,
-  ShoppingBag,
-  User as UserIcon
-} from 'lucide-react';
-import { useStoreData, useLanguage, useCurrency, EiffelLoader, EmptyState, Pagination } from '@/shared';
+import { Users, Crown, RefreshCw } from 'lucide-react';
+import { useStoreData, useLanguage, EiffelLoader, EmptyState } from '@/shared';
 import toast from 'react-hot-toast';
 import { customerService } from '@/services/customerService';
-import { User, Order } from '@/types';
+import { User } from '@/types';
 import { AdminTeamTab } from '../components/team';
+import {
+  CustomerStatsCards,
+  CustomerFiltersBar,
+  CustomerTable,
+  CustomerPointsModal,
+} from '../components/customers';
 
 export const AdminCustomersPage: React.FC = () => {
   const [activeMainTab, setActiveMainTab] = useState<'customers' | 'team'>('customers');
   const { orders, isOrdersLoading, settings } = useStoreData();
   const { isRTL, t } = useLanguage();
-  const { formatPrice } = useCurrency();
 
   const [backendCustomers, setBackendCustomers] = useState<User[]>([]);
   const [isLoadingCustomers, setIsLoadingCustomers] = useState(true);
@@ -34,8 +24,6 @@ export const AdminCustomersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [tierFilter, setTierFilter] = useState<'all' | 'vip' | 'member'>('all');
   const [selectedCustomerForPoints, setSelectedCustomerForPoints] = useState<User | null>(null);
-  const [pointsInput, setPointsInput] = useState<number>(50);
-  const [pointsAction, setPointsAction] = useState<'add' | 'deduct'>('add');
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -58,7 +46,7 @@ export const AdminCustomersPage: React.FC = () => {
     fetchCustomers();
   }, []);
 
-  // 2. Synthesize Real Registered Users + Real Order Customers (No fake mockups)
+  // 2. Synthesize Real Registered Users + Real Order Customers
   const allMergedCustomers = useMemo(() => {
     const custMap: Record<string, User> = {};
 
@@ -96,22 +84,19 @@ export const AdminCustomersPage: React.FC = () => {
       custMap[primaryKey] = entry;
     });
 
-    // Then cross-reference with real actual orders from the database
+    // Cross-reference with real orders from database
     orders.forEach((o) => {
       const email = o.customerEmail ? o.customerEmail.trim().toLowerCase() : '';
       const rawPhone = o.customerPhone || o.shippingAddress?.phone || '';
       const cleanPhone = normalizePhone(rawPhone);
       const name = o.customerName || `${o.shippingAddress?.firstName || ''} ${o.shippingAddress?.lastName || ''}`.trim() || 'عميل إيفل';
 
-      // Find existing registered user by email or normalized phone
       const target = (email && custMap[email]) || (cleanPhone && custMap[cleanPhone]);
-
       const isDelivered = String(o.status || '').toLowerCase() === 'delivered';
       const isNotCancelled = String(o.status || '').toLowerCase() !== 'cancelled';
       const orderAmount = Number(o.total || o.subtotal || 0);
 
       if (target) {
-        // If target already has this order in its orders array, avoid double counting
         const orderExists = target.orders && target.orders.some(existing => existing.id === o.id);
         if (!orderExists) {
           if (!target.orders) target.orders = [];
@@ -149,7 +134,6 @@ export const AdminCustomersPage: React.FC = () => {
       }
     });
 
-    // Deduplicate by ID / unique customer identity
     const uniqueMap = new Map<string, User>();
     Object.values(custMap).forEach((c) => {
       const uid = String(c.id || c.email || c.phone);
@@ -161,7 +145,7 @@ export const AdminCustomersPage: React.FC = () => {
     return Array.from(uniqueMap.values());
   }, [backendCustomers, orders, settings, isRTL]);
 
-  // 3. Toggle VIP Status (Calls backend API & updates state)
+  // 3. Toggle VIP Status
   const handleToggleVip = async (customer: User) => {
     if (!customer.id) return;
     setIsUpdating(true);
@@ -185,11 +169,10 @@ export const AdminCustomersPage: React.FC = () => {
     }
   };
 
-  // 4. Adjust Points (Calls backend API & updates state)
-  const handleSavePoints = async () => {
+  // 4. Adjust Points
+  const handleSavePoints = async (delta: number) => {
     if (!selectedCustomerForPoints || !selectedCustomerForPoints.id) return;
     setIsUpdating(true);
-    const delta = pointsAction === 'add' ? pointsInput : -pointsInput;
 
     try {
       await customerService.adjustPoints(selectedCustomerForPoints.id, delta);
@@ -207,11 +190,11 @@ export const AdminCustomersPage: React.FC = () => {
           ? `تم تحديث رصيد النقاط بنجاح (${delta > 0 ? '+' : ''}${delta} PTS)`
           : `Points updated successfully (${delta > 0 ? '+' : ''}${delta} PTS)`
       );
+      setSelectedCustomerForPoints(null);
     } catch (err) {
       toast.error(isRTL ? 'فشل تعديل النقاط' : 'Failed to adjust points');
     } finally {
       setIsUpdating(false);
-      setSelectedCustomerForPoints(null);
     }
   };
 
@@ -248,465 +231,133 @@ export const AdminCustomersPage: React.FC = () => {
   const isLoading = isLoadingCustomers || isOrdersLoading;
 
   return (
-    <div className="space-y-8">
-      {/* 1. Header & Summary */}
+    <div className="space-y-6 animate-fade-in pb-12">
+      {/* 1. Header & Main Section Tab Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-editorial font-bold text-white tracking-wide">
-              {isRTL ? 'إدارة العملاء ونظام نقاط الولاء وعضوية VIP' : 'Customer CRM & VIP Loyalty Manager'}
-            </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-amber-400/10 text-amber-400 border border-amber-400/20 font-bold flex items-center gap-1">
-              <Crown className="w-3 h-3" />
-              <span>LIVE SYNC</span>
-            </span>
-          </div>
-          <p className="text-xs text-zinc-400 mt-1">
+          <h1 className="text-xl sm:text-2xl font-editorial font-bold text-white tracking-wide">
+            {isRTL ? 'إدارة العملاء وفريق العمل' : 'Customer CRM & Team Management'}
+          </h1>
+          <p className="text-xs text-zinc-400 mt-0.5">
             {isRTL
-              ? 'البيانات الحقيقية المباشرة للعملاء المسجلين والطلبات الواردة من قاعدة البيانات (MongoDB).'
-              : 'Live customer profiles synchronized with MongoDB and active store orders.'}
+              ? 'متابعة حسابات العملاء، عضويات VIP، نقاط الولاء، وإدارة صلاحيات المشرفين والموظفين.'
+              : 'Manage customer accounts, VIP tiers, loyalty balance, and admin/staff privileges.'}
           </p>
         </div>
 
-        {/* Refresh & Preset Info */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
+          {/* Refresh Button */}
           <button
             type="button"
             onClick={fetchCustomers}
             disabled={isLoading}
-            className="p-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-white rounded-lg text-xs font-mono transition-colors"
-            title={isRTL ? 'تحديث البيانات' : 'Refresh'}
+            className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors disabled:opacity-50 cursor-pointer"
+            title={isRTL ? 'تحديث البيانات' : 'Refresh Data'}
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-amber-400' : ''}`} />
           </button>
 
-          <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-lg text-xs font-mono text-zinc-300">
-            <Award className="w-4 h-4 text-amber-400" />
-            <span>{isRTL ? `الترقية لـ VIP: ${settings?.vipRequiredOrders} طلبات مستلمة` : `Auto VIP: ${settings?.vipRequiredOrders} Delivered Orders`}</span>
+          {/* Tab Switcher */}
+          <div className="flex bg-zinc-900 border border-zinc-800 rounded-lg p-1">
+            <button
+              type="button"
+              onClick={() => setActiveMainTab('customers')}
+              className={`px-4 py-1.5 rounded text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeMainTab === 'customers'
+                  ? 'bg-amber-400 text-black shadow-md'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>{isRTL ? 'العملاء وقواعد الولاء' : 'Clients & VIP CRM'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveMainTab('team')}
+              className={`px-4 py-1.5 rounded text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeMainTab === 'team'
+                  ? 'bg-amber-400 text-black shadow-md'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <Crown className="w-3.5 h-3.5" />
+              <span>{isRTL ? 'فريق الإدارة والمشرفين' : 'Admins & Staff'}</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Main Tab Navigation (Customers CRM vs Admin & Staff Team) */}
-      <div className="flex items-center gap-2 border-b border-zinc-800 pb-2">
-        <button
-          type="button"
-          onClick={() => setActiveMainTab('customers')}
-          className={`px-4 py-2 text-xs font-label-bold uppercase tracking-wider transition-all flex items-center gap-2 border-b-2 cursor-pointer ${
-            activeMainTab === 'customers'
-              ? 'border-amber-400 text-amber-400 bg-amber-400/10'
-              : 'border-transparent text-zinc-400 hover:text-white'
-          }`}
-        >
-          <Users className="w-4 h-4" />
-          <span>{isRTL ? 'قائمة العملاء ونظام الولاء (Customers CRM)' : 'Store Customers'}</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveMainTab('team')}
-          className={`px-4 py-2 text-xs font-label-bold uppercase tracking-wider transition-all flex items-center gap-2 border-b-2 cursor-pointer ${
-            activeMainTab === 'team'
-              ? 'border-amber-400 text-amber-400 bg-amber-400/10'
-              : 'border-transparent text-zinc-400 hover:text-white'
-          }`}
-        >
-          <Crown className="w-4 h-4" />
-          <span>{isRTL ? 'فريق الإدارة والمشرفين (Admins & Staff)' : 'Admins & Staff Team'}</span>
-        </button>
-      </div>
-
+      {/* Main View Router */}
       {activeMainTab === 'team' ? (
         <AdminTeamTab />
       ) : isLoading ? (
-        <EiffelLoader message={isRTL ? 'جاري جلب حسابات العملاء وسجل الطلبات من السيرفر...' : 'Loading customer profiles from backend...'} />
+        <div className="py-20">
+          <EiffelLoader message={t.loading} />
+        </div>
       ) : allMergedCustomers.length === 0 ? (
         <EmptyState
-          title={isRTL ? 'لا يوجد عملاء مسجلين حالياً' : 'No Registered Customers Found'}
+          icon={Users}
+          title={isRTL ? 'لا يوجد عملاء مسجلين بعد' : 'No Customers Registered Yet'}
           description={
             isRTL
-              ? 'عند قيام العملاء بإنشاء حسابات أو تسجيل طلبات شراء في المتجر، ستظهر بياناتهم الحقيقية ورصيد نقاطهم هنا فوراً.'
-              : 'As customers register accounts or submit checkout orders, their verified profiles will populate here automatically.'
+              ? 'بمجرد تسجيل العملاء لحساباتهم أو قيامهم بالطلب، ستظهر بياناتهم ونقاط ولائهم هنا.'
+              : 'Once customers register or place orders, their profiles and loyalty balances will appear here.'
           }
         />
       ) : (
         <>
-          {/* 2. Executive Metric Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Total Customers */}
-            <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono text-zinc-400">{isRTL ? 'إجمالي العملاء' : 'Total Customers'}</span>
-                <Users className="w-4 h-4 text-blue-400" />
-              </div>
-              <p className="text-2xl font-mono font-bold text-white mt-2">{totalCustomers}</p>
-              <p className="text-[11px] text-zinc-500 font-mono mt-1">{isRTL ? 'حسابات وبيانات فعلية' : 'Verified profiles'}</p>
-            </div>
+          {/* 2. Customer Summary Statistics Cards */}
+          <CustomerStatsCards
+            totalCustomers={totalCustomers}
+            vipCount={totalVipCount}
+            totalPoints={totalPointsInCirculation}
+            totalSpend={totalCustomerSpend}
+          />
 
-            {/* VIP Members Count */}
-            <div className="p-5 rounded-xl bg-gradient-to-br from-amber-400/10 to-zinc-950 border border-amber-400/30 shadow-md">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono text-amber-400 font-bold">{isRTL ? 'أعضاء إيفل المميزين VIP' : 'VIP Members'}</span>
-                <Crown className="w-4 h-4 text-amber-400" />
-              </div>
-              <p className="text-2xl font-mono font-bold text-amber-300 mt-2">{totalVipCount}</p>
-              <p className="text-[11px] text-zinc-400 font-mono mt-1">{isRTL ? 'مكافأة نقاط مضاعفة 2x' : '2x Points Multiplier'}</p>
-            </div>
-
-            {/* Points in Circulation */}
-            <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono text-zinc-400">{isRTL ? 'إجمالي النقاط المتداولة' : 'Loyalty Points Balance'}</span>
-                <Coins className="w-4 h-4 text-emerald-400" />
-              </div>
-              <p className="text-2xl font-mono font-bold text-emerald-400 mt-2">
-                {totalPointsInCirculation} <span className="text-xs text-zinc-500 font-sans">PTS</span>
-              </p>
-              <p className="text-[11px] text-zinc-500 font-mono mt-1">
-                {isRTL ? `تعادل: ${formatPrice(totalPointsInCirculation)} رصيد شرائي` : `Value: ${formatPrice(totalPointsInCirculation)}`}
-              </p>
-            </div>
-
-            {/* Total Spend */}
-            <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono text-zinc-400">{isRTL ? 'إجمالي المبيعات المحققة' : 'Customer Lifetime Value'}</span>
-                <ShoppingBag className="w-4 h-4 text-purple-400" />
-              </div>
-              <p className="text-2xl font-mono font-bold text-white mt-2">{formatPrice(totalCustomerSpend)}</p>
-              <p className="text-[11px] text-zinc-500 font-mono mt-1">{isRTL ? 'صافي المشتريات' : 'Delivered sales'}</p>
-            </div>
-          </div>
-
-          {/* 3. Search & Filter Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-zinc-950 border border-zinc-800 rounded-xl">
-            {/* Search */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="w-4 h-4 text-zinc-500 absolute top-1/2 -translate-y-1/2 left-3 rtl:left-auto rtl:right-3" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
-                placeholder={isRTL ? 'بحث بالاسم، رقم الهاتف، أو البريد الإلكتروني...' : 'Search by name, phone, or email...'}
-                className="w-full pl-9 pr-3 rtl:pl-3 rtl:pr-9 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400"
-              />
-            </div>
-
-            {/* Tier Filter Pills */}
-            <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg p-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setTierFilter('all');
-                  setCurrentPage(1);
-                }}
-                className={`px-3 py-1.5 rounded text-xs font-mono transition-all ${
-                  tierFilter === 'all' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                {t.all} ({allMergedCustomers.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setTierFilter('vip');
-                  setCurrentPage(1);
-                }}
-                className={`px-3 py-1.5 rounded text-xs font-mono flex items-center gap-1.5 transition-all ${
-                  tierFilter === 'vip' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                <Crown className="w-3.5 h-3.5" />
-                <span>{t.vip} ({totalVipCount})</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setTierFilter('member');
-                  setCurrentPage(1);
-                }}
-                className={`px-3 py-1.5 rounded text-xs font-mono transition-all ${
-                  tierFilter === 'member' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                {t.standardMembers} ({allMergedCustomers.length - totalVipCount})
-              </button>
-            </div>
-          </div>
+          {/* 3. Search & Tier Filter Bar */}
+          <CustomerFiltersBar
+            searchQuery={searchQuery}
+            onSearchChange={(q) => {
+              setSearchQuery(q);
+              setCurrentPage(1);
+            }}
+            tierFilter={tierFilter}
+            onTierFilterChange={(tier) => {
+              setTierFilter(tier);
+              setCurrentPage(1);
+            }}
+            totalCount={allMergedCustomers.length}
+            vipCount={totalVipCount}
+            memberCount={allMergedCustomers.length - totalVipCount}
+          />
 
           {/* 4. Customer Table & Pagination */}
-          <div className="space-y-4">
-            <div className="p-6 rounded-xl bg-zinc-950 border border-zinc-800 shadow-lg">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs font-mono">
-                  <thead className="bg-zinc-900/60 border-b border-zinc-800 text-zinc-400">
-                    <tr>
-                      <th className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>{t.customer}</th>
-                      <th className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>{t.membershipTier}</th>
-                      <th className="p-3.5 text-center">{t.orders}</th>
-                      <th className="p-3.5 text-center">{t.points}</th>
-                      <th className={`p-3.5 ${isRTL ? 'text-left' : 'text-right'}`}>{t.totalSpend}</th>
-                      <th className="p-3.5 text-center">{t.actions}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
-                    {paginatedCustomers.map((cust) => {
-                      const isVip = cust.tier === 'VIP' || cust.isVip;
-                      const cleanPhone = cust.phone ? cust.phone.replace(/\D/g, '') : '';
-                      const waNumber = cleanPhone.startsWith('0') ? `2${cleanPhone}` : cleanPhone;
-
-                      return (
-                        <tr key={cust.id} className="hover:bg-zinc-900/40 transition-colors">
-                          {/* Customer Info */}
-                          <td className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>
-                            <div className="flex items-center gap-3">
-                              <div
-                                className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs ${
-                                  isVip
-                                    ? 'bg-gradient-to-tr from-amber-500 to-amber-300 text-black shadow-lg shadow-amber-500/20'
-                                    : 'bg-zinc-800 text-zinc-300 border border-zinc-700'
-                                }`}
-                              >
-                                {cust.name.slice(0, 1).toUpperCase()}
-                              </div>
-                              <div>
-                                <p className="font-sans font-bold text-white text-sm">{cust.name}</p>
-                                <div className="flex items-center gap-2 text-[11px] text-zinc-400 mt-0.5">
-                                  <span>{cust.phone}</span>
-                                  {cust.email && (
-                                    <>
-                                      <span>•</span>
-                                      <span className="text-zinc-500">{cust.email}</span>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* Tier Badge */}
-                          <td className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>
-                            {isVip ? (
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-amber-400/10 text-amber-300 border border-amber-400/40 text-[11px] font-bold shadow-sm whitespace-nowrap">
-                                <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                                <span>{isRTL ? 'عضوية VIP' : 'EIFFEL VIP'}</span>
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 text-zinc-300 border border-zinc-700/80 text-[11px] font-medium whitespace-nowrap">
-                                <UserIcon className="w-3 h-3 text-zinc-400 shrink-0" />
-                                <span>{isRTL ? 'عضو قياسي' : 'Standard Member'}</span>
-                              </span>
-                            )}
-                          </td>
-
-                          {/* Delivered Orders */}
-                          <td className="p-3.5 text-center font-bold text-white">
-                            <span className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800">
-                              {cust.completedOrdersCount || 0} {isRTL ? 'طلب' : 'orders'}
-                            </span>
-                          </td>
-
-                          {/* Points Balance */}
-                          <td className="p-3.5 text-center">
-                            <div className="inline-flex flex-col items-center">
-                              <span className="font-bold text-emerald-400 text-sm">
-                                {cust.tierPoints || 0} PTS
-                              </span>
-                              <span className="text-[10px] text-zinc-500">
-                                ({formatPrice(cust.tierPoints || 0)})
-                              </span>
-                            </div>
-                          </td>
-
-                          {/* Total Spend */}
-                          <td className={`p-3.5 font-bold text-white ${isRTL ? 'text-left' : 'text-right'}`}>
-                            {formatPrice(cust.totalSpend || 0)}
-                          </td>
-
-                          {/* Actions */}
-                          <td className="p-3.5 text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              {/* Toggle VIP */}
-                              <button
-                                type="button"
-                                onClick={() => handleToggleVip(cust)}
-                                disabled={isUpdating}
-                                className={`px-2.5 py-1.5 rounded text-xs font-mono flex items-center gap-1.5 transition-colors disabled:opacity-50 ${
-                                  isVip
-                                    ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                                    : 'bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 border border-amber-400/30'
-                                }`}
-                                title={isVip ? (isRTL ? 'إلغاء عضوية VIP' : 'Revoke VIP') : (isRTL ? 'ترقية إلى VIP' : 'Promote to VIP')}
-                              >
-                                <Crown className="w-3.5 h-3.5" />
-                                <span>{isVip ? (isRTL ? 'إلغاء VIP' : 'Remove VIP') : (isRTL ? 'ترقية VIP' : 'Make VIP')}</span>
-                              </button>
-
-                              {/* Adjust Points Modal Trigger */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedCustomerForPoints(cust);
-                                  setPointsInput(50);
-                                  setPointsAction('add');
-                                }}
-                                className="px-2.5 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-emerald-400 border border-zinc-700 text-xs font-mono flex items-center gap-1 transition-colors"
-                                title={isRTL ? 'تعديل النقاط' : 'Adjust Points'}
-                              >
-                                <Coins className="w-3.5 h-3.5" />
-                                <span>{isRTL ? 'النقاط' : 'Points'}</span>
-                              </button>
-
-                              {/* WhatsApp Direct Contact */}
-                              {cleanPhone && (
-                                <a
-                                  href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
-                                    isRTL
-                                      ? `مرحباً بك ${cust.name}، يسعدنا تواصلك مع دار أزياء إيفل.`
-                                      : `Hello ${cust.name}, welcome to Eiffel.`
-                                  )}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="p-1.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 transition-colors"
-                                  title={isRTL ? 'محادثة واتساب' : 'WhatsApp'}
-                                >
-                                  <MessageCircle className="w-3.5 h-3.5" />
-                                </a>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Pagination Controls */}
-            {filteredCustomers.length > 0 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalItems={filteredCustomers.length}
-                pageSize={pageSize}
-                onPageChange={setCurrentPage}
-                onPageSizeChange={(s) => {
-                  setPageSize(s);
-                  setCurrentPage(1);
-                }}
-                pageSizeOptions={[5, 10, 20, 50]}
-              />
-            )}
-          </div>
+          <CustomerTable
+            customers={paginatedCustomers}
+            totalFilteredCount={filteredCustomers.length}
+            onToggleVip={handleToggleVip}
+            onOpenPointsModal={setSelectedCustomerForPoints}
+            isUpdating={isUpdating}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(s) => {
+              setPageSize(s);
+              setCurrentPage(1);
+            }}
+          />
         </>
       )}
 
       {/* 5. Points Adjustment Modal */}
-      {selectedCustomerForPoints && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl animate-fade-in text-zinc-100 p-6 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-400/10 text-emerald-400 flex items-center justify-center">
-                  <Coins className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-mono font-bold text-white uppercase">
-                    {isRTL ? 'تعديل رصيد النقاط يدوياً' : 'Adjust Loyalty Points'}
-                  </h3>
-                  <p className="text-xs text-zinc-400 font-sans">{selectedCustomerForPoints.name}</p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setSelectedCustomerForPoints(null)}
-                className="text-zinc-400 hover:text-white"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Current Balance */}
-            <div className="p-3.5 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
-              <span className="text-xs font-mono text-zinc-400">{isRTL ? 'الرصيد الحالي:' : 'Current Balance:'}</span>
-              <span className="text-base font-mono font-bold text-emerald-400">
-                {selectedCustomerForPoints.tierPoints || 0} PTS
-              </span>
-            </div>
-
-            {/* Add / Deduct Switch */}
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setPointsAction('add')}
-                className={`py-2 rounded text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-colors ${
-                  pointsAction === 'add'
-                    ? 'bg-emerald-500 text-black shadow'
-                    : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
-                }`}
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>{t.addPoints}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPointsAction('deduct')}
-                className={`py-2 rounded text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-colors ${
-                  pointsAction === 'deduct'
-                    ? 'bg-rose-500 text-white shadow'
-                    : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white'
-                }`}
-              >
-                <Minus className="w-3.5 h-3.5" />
-                <span>{t.deductPoints}</span>
-              </button>
-            </div>
-
-            {/* Amount Input */}
-            <div>
-              <label className="block text-xs font-mono text-zinc-400 mb-1">
-                {t.pointsAmount}
-              </label>
-              <input
-                type="number"
-                min="1"
-                step="10"
-                value={pointsInput}
-                onChange={(e) => setPointsInput(Math.max(1, parseInt(e.target.value) || 0))}
-                className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm font-mono text-white focus:outline-none focus:border-amber-400"
-              />
-              <p className="text-[11px] text-zinc-500 font-mono mt-1">
-                {isRTL ? `القيمة المعادلة: ${formatPrice(pointsInput)}` : `Value: ${formatPrice(pointsInput)}`}
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-800">
-              <button
-                type="button"
-                onClick={() => setSelectedCustomerForPoints(null)}
-                className="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white cursor-pointer"
-              >
-                {t.cancel}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleSavePoints}
-                disabled={isUpdating}
-                className="px-5 py-2 rounded bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs shadow-lg shadow-amber-400/20 transition-colors disabled:opacity-50 cursor-pointer"
-              >
-                {t.saveChanges}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CustomerPointsModal
+        customer={selectedCustomerForPoints}
+        onClose={() => setSelectedCustomerForPoints(null)}
+        onSave={handleSavePoints}
+        isUpdating={isUpdating}
+      />
     </div>
   );
 };

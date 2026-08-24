@@ -55,3 +55,5 @@ export * from './components/settings/AdminContactSettingsForm';
 export * from './components/settings/AdminAnnouncementSettingsForm';
 export * from './components/settings/AdminSecuritySettingsForm';
 export * from './components/settings/AdminDataBackupCard';
+
+export * from './components/customers';
