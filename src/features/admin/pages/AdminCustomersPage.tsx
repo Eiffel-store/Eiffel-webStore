@@ -24,7 +24,7 @@ import { AdminTeamTab } from '../components/team';
 export const AdminCustomersPage: React.FC = () => {
   const [activeMainTab, setActiveMainTab] = useState<'customers' | 'team'>('customers');
   const { orders, isOrdersLoading, settings } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   const [backendCustomers, setBackendCustomers] = useState<User[]>([]);
@@ -407,7 +407,7 @@ export const AdminCustomersPage: React.FC = () => {
                   tierFilter === 'all' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
                 }`}
               >
-                {isRTL ? 'الكل' : 'All'} ({allMergedCustomers.length})
+                {t.all} ({allMergedCustomers.length})
               </button>
               <button
                 type="button"
@@ -420,7 +420,7 @@ export const AdminCustomersPage: React.FC = () => {
                 }`}
               >
                 <Crown className="w-3.5 h-3.5" />
-                <span>VIP ({totalVipCount})</span>
+                <span>{t.vip} ({totalVipCount})</span>
               </button>
               <button
                 type="button"
@@ -432,7 +432,7 @@ export const AdminCustomersPage: React.FC = () => {
                   tierFilter === 'member' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
                 }`}
               >
-                {isRTL ? 'الأعضاء العاديين' : 'Members'} ({allMergedCustomers.length - totalVipCount})
+                {t.standardMembers} ({allMergedCustomers.length - totalVipCount})
               </button>
             </div>
           </div>
@@ -444,12 +444,12 @@ export const AdminCustomersPage: React.FC = () => {
                 <table className="w-full text-left text-xs font-mono">
                   <thead className="bg-zinc-900/60 border-b border-zinc-800 text-zinc-400">
                     <tr>
-                      <th className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>{isRTL ? 'العميل' : 'Customer'}</th>
-                      <th className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>{isRTL ? 'نوع العضوية' : 'Membership Tier'}</th>
-                      <th className="p-3.5 text-center">{isRTL ? 'الطلبات المسلمة' : 'Delivered Orders'}</th>
-                      <th className="p-3.5 text-center">{isRTL ? 'رصيد النقاط (PTS)' : 'Points Balance'}</th>
-                      <th className={`p-3.5 ${isRTL ? 'text-left' : 'text-right'}`}>{isRTL ? 'إجمالي المشتريات' : 'Total Spend'}</th>
-                      <th className="p-3.5 text-center">{isRTL ? 'إجراءات التحكم' : 'Admin Actions'}</th>
+                      <th className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>{t.customer}</th>
+                      <th className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>{t.membershipTier}</th>
+                      <th className="p-3.5 text-center">{t.orders}</th>
+                      <th className="p-3.5 text-center">{t.points}</th>
+                      <th className={`p-3.5 ${isRTL ? 'text-left' : 'text-right'}`}>{t.totalSpend}</th>
+                      <th className="p-3.5 text-center">{t.actions}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
@@ -650,7 +650,7 @@ export const AdminCustomersPage: React.FC = () => {
                 }`}
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>{isRTL ? 'إضافة نقاط (+)' : 'Credit (+)'}</span>
+                <span>{t.addPoints}</span>
               </button>
 
               <button
@@ -663,14 +663,14 @@ export const AdminCustomersPage: React.FC = () => {
                 }`}
               >
                 <Minus className="w-3.5 h-3.5" />
-                <span>{isRTL ? 'خصم نقاط (-)' : 'Debit (-)'}</span>
+                <span>{t.deductPoints}</span>
               </button>
             </div>
 
             {/* Amount Input */}
             <div>
               <label className="block text-xs font-mono text-zinc-400 mb-1">
-                {isRTL ? 'عدد النقاط المراد تطبيقها:' : 'Points Amount:'}
+                {t.pointsAmount}
               </label>
               <input
                 type="number"
@@ -690,18 +690,18 @@ export const AdminCustomersPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedCustomerForPoints(null)}
-                className="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white"
+                className="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white cursor-pointer"
               >
-                {isRTL ? 'إلغاء' : 'Cancel'}
+                {t.cancel}
               </button>
 
               <button
                 type="button"
                 onClick={handleSavePoints}
                 disabled={isUpdating}
-                className="px-5 py-2 rounded bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs shadow-lg shadow-amber-400/20 transition-colors disabled:opacity-50"
+                className="px-5 py-2 rounded bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs shadow-lg shadow-amber-400/20 transition-colors disabled:opacity-50 cursor-pointer"
               >
-                {isRTL ? 'حفظ وتحديث الرصيد' : 'Save & Update'}
+                {t.saveChanges}
               </button>
             </div>
           </div>

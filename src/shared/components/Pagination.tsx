@@ -23,7 +23,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   pageSizeOptions = [12, 24, 48],
   className = ''
 }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
 
   if (totalPages <= 1 && !totalItems) {
     return null;

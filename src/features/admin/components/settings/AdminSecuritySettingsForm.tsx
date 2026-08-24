@@ -5,7 +5,7 @@ import { authService } from '@/services/authService';
 import toast from 'react-hot-toast';
 
 export const AdminSecuritySettingsForm: React.FC = () => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -26,9 +26,7 @@ export const AdminSecuritySettingsForm: React.FC = () => {
     }
 
     if (newPassword !== confirmPassword) {
-      const msg = isRTL
-        ? 'كلمة المرور الجديدة وتأكيدها غير متطابقين.'
-        : 'New password and confirmation do not match.';
+      const msg = t.passwordMismatch;
       setStatusMessage({ type: 'error', text: msg });
       return;
     }
@@ -36,7 +34,7 @@ export const AdminSecuritySettingsForm: React.FC = () => {
     setIsLoading(true);
     try {
       const res = await authService.changePassword(currentPassword, newPassword);
-      const successMsg = res.message || (isRTL ? 'تم تحديث كلمة المرور بنجاح!' : 'Password updated successfully!');
+      const successMsg = res.message || t.passwordResetSuccess;
       setStatusMessage({ type: 'success', text: successMsg });
       toast.success(successMsg);
       setCurrentPassword('');
@@ -84,7 +82,7 @@ export const AdminSecuritySettingsForm: React.FC = () => {
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5 flex items-center gap-1">
             <KeyRound className="w-3 h-3 text-zinc-500" />
-            <span>{isRTL ? 'كلمة المرور الحالية *' : 'Current Password *'}</span>
+            <span>{t.currentPassword} *</span>
           </label>
           <input
             type="password"
@@ -98,7 +96,7 @@ export const AdminSecuritySettingsForm: React.FC = () => {
 
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'كلمة المرور الجديدة *' : 'New Password *'}
+            {t.newPassword} *
           </label>
           <input
             type="password"
@@ -113,7 +111,7 @@ export const AdminSecuritySettingsForm: React.FC = () => {
 
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'تأكيد كلمة المرور الجديدة *' : 'Confirm New Password *'}
+            {t.confirmPassword} *
           </label>
           <input
             type="password"
@@ -131,14 +129,14 @@ export const AdminSecuritySettingsForm: React.FC = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-label-bold uppercase tracking-wider flex items-center gap-2 border border-zinc-700 transition-colors disabled:opacity-50"
+          className="px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-label-bold uppercase tracking-wider flex items-center gap-2 border border-zinc-700 transition-colors disabled:opacity-50 cursor-pointer"
         >
           {isLoading ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
           ) : (
             <KeyRound className="w-3.5 h-3.5" />
           )}
-          <span>{isRTL ? (isLoading ? 'جاري التحديث...' : 'تحديث كلمة المرور') : (isLoading ? 'Updating...' : 'Update Password')}</span>
+          <span>{isLoading ? t.updating : t.updatePassword}</span>
         </button>
       </div>
     </form>

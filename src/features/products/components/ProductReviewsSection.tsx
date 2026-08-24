@@ -21,7 +21,7 @@ interface ProductReviewsSectionProps {
 }
 
 export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ product }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
 
   const [summary, setSummary] = useState<ProductReviewsSummary | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -172,11 +172,11 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
           <div className="flex items-center gap-2">
             <span className="text-[10px] sm:text-xs font-label-bold text-amber-500 dark:text-amber-400 uppercase tracking-widest flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>{isRTL ? 'تجارب العملاء الحقيقية' : 'Verified Client Reviews'}</span>
+              <span>{t.clientReviews}</span>
             </span>
           </div>
           <h2 className="font-editorial text-2xl sm:text-4xl text-primary dark:text-white mt-1">
-            {isRTL ? 'التقييمات وآراء العملاء' : 'Ratings & Customer Reviews'}
+            {t.ratingsAndReviews}
           </h2>
         </div>
 
@@ -186,7 +186,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
           className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-black font-label-bold text-xs uppercase tracking-wider rounded-lg shadow-lg shadow-amber-400/20 flex items-center gap-2 self-start sm:self-auto transition-all cursor-pointer"
         >
           <MessageSquarePlus className="w-4 h-4" />
-          <span>{isRTL ? 'أضف تقييمك وتجربتك' : 'Write a Review'}</span>
+          <span>{t.writeReview}</span>
         </button>
       </div>
 
@@ -217,14 +217,14 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
 
           <div className="mt-3 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 dark:text-emerald-400 rounded-full text-[11px] font-mono font-bold flex items-center gap-1">
             <ThumbsUp className="w-3 h-3" />
-            <span>{isRTL ? `${recommendationRate}% يوصون بهذا المنتج` : `${recommendationRate}% Recommend this item`}</span>
+            <span>{`${recommendationRate}% ${t.recommendationRate}`}</span>
           </div>
         </div>
 
         {/* Right Star Distribution (8 cols) */}
         <div className="md:col-span-8 flex flex-col justify-center space-y-2.5">
           <div className="flex items-center justify-between text-xs font-mono text-zinc-400 mb-1">
-            <span>{isRTL ? 'توزيع التقييمات:' : 'Rating Breakdown:'}</span>
+            <span>{t.ratingBreakdown}</span>
             {selectedRatingFilter && (
               <button
                 type="button"
@@ -232,9 +232,9 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
                   setSelectedRatingFilter(undefined);
                   setCurrentPage(1);
                 }}
-                className="text-amber-400 hover:underline flex items-center gap-1 text-[11px]"
+                className="text-amber-400 hover:underline flex items-center gap-1 text-[11px] cursor-pointer"
               >
-                <span>{isRTL ? 'إلغاء الفلتر' : 'Clear Filter'}</span>
+                <span>{t.clearFilter}</span>
                 <X className="w-3 h-3" />
               </button>
             )}
@@ -283,25 +283,23 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
       {/* Reviews List & Pagination */}
       {isLoading ? (
         <div className="py-12">
-          <EiffelLoader message={isRTL ? 'جاري جلب تقييمات العملاء...' : 'Loading customer reviews...'} />
+          <EiffelLoader message={t.loading} />
         </div>
       ) : reviewsList.length === 0 ? (
         <div className="text-center py-12 px-4 bg-zinc-950 border border-zinc-800 rounded-xl">
           <Award className="w-10 h-10 text-amber-400 mx-auto mb-3 opacity-60" />
           <h4 className="text-base font-bold text-white mb-1">
-            {isRTL ? 'لا توجد تقييمات بهذا الفلتر حالياً' : 'No Reviews Found for this Filter'}
+            {t.noReviewsFound}
           </h4>
           <p className="text-xs text-zinc-400 max-w-sm mx-auto mb-4">
-            {isRTL
-              ? 'كن أول من يشارك تجربته مع هذه القطعة الفاخرة!'
-              : 'Be the first to share your experience with this bespoke garment!'}
+            {t.noReviewsFoundDesc}
           </p>
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 rounded bg-zinc-900 hover:bg-zinc-800 text-amber-400 border border-amber-400/30 text-xs font-mono"
+            className="px-4 py-2 rounded bg-zinc-900 hover:bg-zinc-800 text-amber-400 border border-amber-400/30 text-xs font-mono cursor-pointer"
           >
-            {isRTL ? 'اكتب مراجعة الآن' : 'Write First Review'}
+            {t.writeFirstReview}
           </button>
         </div>
       ) : (
@@ -327,7 +325,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
                         {rev.isVerifiedPurchase && (
                           <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                             <CheckCircle2 className="w-3 h-3" />
-                            <span>{isRTL ? 'مشتري موثق' : 'Verified Buyer'}</span>
+                            <span>{t.verifiedBuyer}</span>
                           </span>
                         )}
                       </div>
@@ -400,7 +398,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
                 </div>
                 <div>
                   <h3 className="text-sm font-mono font-bold text-white uppercase">
-                    {isRTL ? 'كتابة تقييم ومراجعة للمنتج' : 'Write a Garment Review'}
+                    {t.writeReview}
                   </h3>
                   <p className="text-xs text-zinc-400 font-sans truncate max-w-[280px]">
                     {product.name}
@@ -411,7 +409,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-zinc-400 hover:text-white p-1"
+                className="text-zinc-400 hover:text-white p-1 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -421,7 +419,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
               {/* Interactive Star Rating Selector */}
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-2">
-                  {isRTL ? 'تقييمك الإجمالي:' : 'Overall Rating:'}
+                  {t.overallRating}
                 </label>
                 <div className="flex items-center gap-2">
                   {[1, 2, 3, 4, 5].map((star) => {
@@ -446,7 +444,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
                     );
                   })}
                   <span className="text-xs font-mono font-bold text-amber-400 ml-2 rtl:mr-2">
-                    {formRating} / 5 {isRTL ? 'نجوم' : 'Stars'}
+                    {formRating} / 5 {t.reviews}
                   </span>
                 </div>
               </div>
@@ -455,7 +453,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-mono text-zinc-400 mb-1">
-                    {isRTL ? 'اسمك الكريم *:' : 'Your Name *:'}
+                    {t.yourName} *:
                   </label>
                   <input
                     type="text"
@@ -469,7 +467,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
 
                 <div>
                   <label className="block text-xs font-mono text-zinc-400 mb-1">
-                    {isRTL ? 'البريد الإلكتروني (اختياري):' : 'Email (optional):'}
+                    {t.emailLabel}:
                   </label>
                   <input
                     type="email"
@@ -484,7 +482,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
               {/* Review Title */}
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-1">
-                  {isRTL ? 'عنوان المراجعة:' : 'Headline / Title:'}
+                  {t.reviewTitle}:
                 </label>
                 <input
                   type="text"
@@ -498,7 +496,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
               {/* Review Comment */}
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-1">
-                  {isRTL ? 'تفاصيل تجربتك ورأيك *:' : 'Your Detailed Experience *:'}
+                  {t.reviewComment} *:
                 </label>
                 <textarea
                   required
@@ -519,19 +517,17 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white"
+                  className="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white cursor-pointer"
                 >
-                  {isRTL ? 'إلغاء' : 'Cancel'}
+                  {t.cancel}
                 </button>
 
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs shadow-lg shadow-amber-400/20 transition-colors disabled:opacity-50"
+                  className="px-5 py-2 rounded bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs shadow-lg shadow-amber-400/20 transition-colors disabled:opacity-50 cursor-pointer"
                 >
-                  {isSubmitting
-                    ? (isRTL ? 'جاري الإرسال...' : 'Submitting...')
-                    : (isRTL ? 'إرسال التقييم' : 'Submit Review')}
+                  {isSubmitting ? t.submittingReview : t.submitReview}
                 </button>
               </div>
             </form>

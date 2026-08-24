@@ -10,7 +10,7 @@ interface ChangePasswordModalProps {
 }
 
 export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, onClose }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -33,9 +33,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
     }
 
     if (newPassword !== confirmPassword) {
-      const msg = isRTL
-        ? 'كلمة المرور الجديدة وتأكيدها غير متطابقين.'
-        : 'New password and confirmation do not match.';
+      const msg = t.passwordMismatch;
       setMessage({ type: 'error', text: msg });
       return;
     }
@@ -43,7 +41,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
     setIsLoading(true);
     try {
       const res = await authService.changePassword(currentPassword, newPassword);
-      const successMsg = res.message || (isRTL ? 'تم تغيير كلمة المرور بنجاح!' : 'Password changed successfully!');
+      const successMsg = res.message || t.passwordResetSuccess;
       setMessage({ type: 'success', text: successMsg });
       toast.success(successMsg);
       setTimeout(() => {
@@ -72,7 +70,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
             </div>
             <div>
               <h3 className="font-editorial text-lg text-primary dark:text-white">
-                {isRTL ? 'تغيير كلمة المرور' : 'Change Password'}
+                {t.changePassword}
               </h3>
               <p className="text-xs text-secondary dark:text-zinc-400 font-mono">
                 {isRTL ? 'أمان حسابك مشفر ومحمي' : 'Secure & Encrypted'}
@@ -109,7 +107,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-mono text-secondary dark:text-zinc-400 mb-1.5">
-              {isRTL ? 'كلمة المرور الحالية *' : 'Current Password *'}
+              {t.currentPassword} *
             </label>
             <input
               type="password"
@@ -123,7 +121,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
 
           <div>
             <label className="block text-xs font-mono text-secondary dark:text-zinc-400 mb-1.5">
-              {isRTL ? 'كلمة المرور الجديدة *' : 'New Password *'}
+              {t.newPassword} *
             </label>
             <input
               type="password"
@@ -138,7 +136,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
 
           <div>
             <label className="block text-xs font-mono text-secondary dark:text-zinc-400 mb-1.5">
-              {isRTL ? 'تأكيد كلمة المرور الجديدة *' : 'Confirm New Password *'}
+              {t.confirmPassword} *
             </label>
             <input
               type="password"
@@ -155,9 +153,9 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-mono text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white"
+              className="px-4 py-2 text-xs font-mono text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white cursor-pointer"
             >
-              {isRTL ? 'إلغاء' : 'Cancel'}
+              {t.cancel}
             </button>
 
             <button
@@ -170,7 +168,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
               ) : (
                 <ShieldCheck className="w-3.5 h-3.5" />
               )}
-              <span>{isRTL ? (isLoading ? 'جاري الحفظ...' : 'حفظ كلمة المرور') : (isLoading ? 'Saving...' : 'Save Password')}</span>
+              <span>{isLoading ? t.saving : t.save}</span>
             </button>
           </div>
         </form>

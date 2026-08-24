@@ -298,4 +298,63 @@ export interface TranslationDictionary {
   termsOfSale: string;
   accessibility: string;
   sustainability: string;
+
+  // Common UI Actions & Controls
+  cancel: string;
+  save: string;
+  saveChanges: string;
+  edit: string;
+  close: string;
+  search: string;
+  actions: string;
+  status: string;
+  loading: string;
+  saving: string;
+  all: string;
+  members: string;
+  vipMembers: string;
+  standardMembers: string;
+  standardMember: string;
+  vip: string;
+  points: string;
+  orders: string;
+  totalSpend: string;
+  customer: string;
+  adjustPoints: string;
+  pointsAmount: string;
+  addPoints: string;
+  deductPoints: string;
+  changePassword: string;
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+  updatePassword: string;
+  updating: string;
+  
+  // Reviews & Ratings
+  clientReviews: string;
+  ratingsAndReviews: string;
+  writeReview: string;
+  verifiedBuyer: string;
+  recommendationRate: string;
+  ratingBreakdown: string;
+  clearFilter: string;
+  noReviewsFound: string;
+  noReviewsFoundDesc: string;
+  firstReviewPrompt: string;
+  writeFirstReview: string;
+  overallRating: string;
+  yourName: string;
+  reviewTitle: string;
+  reviewComment: string;
+  submitReview: string;
+  submittingReview: string;
+  
+  // Pagination
+  showingResults: string;
+  page: string;
+  of: string;
+  itemsPerPage: string;
+  previousPage: string;
+  nextPage: string;
 }
