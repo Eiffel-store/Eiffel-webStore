@@ -19,8 +19,10 @@ import { useStoreData, useLanguage, useCurrency, EiffelLoader, EmptyState } from
 import toast from 'react-hot-toast';
 import { customerService } from '@/services/customerService';
 import { User, Order } from '@/types';
+import { AdminTeamTab } from '../components/team';
 
 export const AdminCustomersPage: React.FC = () => {
+  const [activeMainTab, setActiveMainTab] = useState<'customers' | 'team'>('customers');
   const { orders, isOrdersLoading, settings } = useStoreData();
   const { isRTL } = useLanguage();
   const { formatPrice } = useCurrency();
@@ -274,7 +276,38 @@ export const AdminCustomersPage: React.FC = () => {
         </div>
       </div>
 
-      {isLoading ? (
+      {/* Main Tab Navigation (Customers CRM vs Admin & Staff Team) */}
+      <div className="flex items-center gap-2 border-b border-zinc-800 pb-2">
+        <button
+          type="button"
+          onClick={() => setActiveMainTab('customers')}
+          className={`px-4 py-2 text-xs font-label-bold uppercase tracking-wider transition-all flex items-center gap-2 border-b-2 cursor-pointer ${
+            activeMainTab === 'customers'
+              ? 'border-amber-400 text-amber-400 bg-amber-400/10'
+              : 'border-transparent text-zinc-400 hover:text-white'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span>{isRTL ? 'قائمة العملاء ونظام الولاء (Customers CRM)' : 'Store Customers'}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveMainTab('team')}
+          className={`px-4 py-2 text-xs font-label-bold uppercase tracking-wider transition-all flex items-center gap-2 border-b-2 cursor-pointer ${
+            activeMainTab === 'team'
+              ? 'border-amber-400 text-amber-400 bg-amber-400/10'
+              : 'border-transparent text-zinc-400 hover:text-white'
+          }`}
+        >
+          <Crown className="w-4 h-4" />
+          <span>{isRTL ? 'فريق الإدارة والمشرفين (Admins & Staff)' : 'Admins & Staff Team'}</span>
+        </button>
+      </div>
+
+      {activeMainTab === 'team' ? (
+        <AdminTeamTab />
+      ) : isLoading ? (
         <EiffelLoader message={isRTL ? 'جاري جلب حسابات العملاء وسجل الطلبات من السيرفر...' : 'Loading customer profiles from backend...'} />
       ) : allMergedCustomers.length === 0 ? (
         <EmptyState

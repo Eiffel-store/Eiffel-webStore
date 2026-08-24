@@ -41,7 +41,7 @@ export const AdminLayout: React.FC = () => {
     { label: isRTL ? 'إدارة الفروع' : 'Branches & Stores', href: '/admin/branches', icon: MapPin },
     { label: isRTL ? 'الطلبات والمبيعات' : 'Orders', href: '/admin/orders', icon: Package, badge: pendingOrdersCount ? `${pendingOrdersCount}` : undefined, badgeColor: 'bg-amber-500' },
     { label: isRTL ? 'التقارير والإحصائيات' : 'Reports & Analytics', href: '/admin/reports', icon: BarChart3 },
-    { label: isRTL ? 'العملاء وبرنامج VIP' : 'Customers & VIP', href: '/admin/customers', icon: Users },
+    { label: isRTL ? 'المستخدمين وفريق العمل' : 'Users & Team', href: '/admin/customers', icon: Users },
     { label: isRTL ? 'إعدادات المتجر' : 'Store Settings', href: '/admin/settings', icon: Settings }
   ];
 
