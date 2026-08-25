@@ -21,7 +21,7 @@ export const CustomerFiltersBar: React.FC<CustomerFiltersBarProps> = ({
   vipCount,
   memberCount,
 }) => {
-  const { isRTL, t } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-zinc-950 border border-zinc-800 rounded-xl">
@@ -32,7 +32,7 @@ export const CustomerFiltersBar: React.FC<CustomerFiltersBarProps> = ({
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder={isRTL ? 'بحث بالاسم، رقم الهاتف، أو البريد الإلكتروني...' : 'Search by name, phone, or email...'}
+          placeholder={t.adminSearchCustomerPlaceholder}
           className="w-full pl-9 pr-3 rtl:pl-3 rtl:pr-9 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400"
         />
       </div>

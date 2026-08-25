@@ -15,7 +15,7 @@ export const AdminLoginPage: React.FC = () => {
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
 
   const { loginAdminWithCredentials, isAdminAuthenticated } = useAdminAuth();
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -61,7 +61,7 @@ export const AdminLoginPage: React.FC = () => {
           className="flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors"
         >
           {isRTL ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
-          <span>{isRTL ? 'العودة للمتجر' : 'Back to Storefront'}</span>
+          <span>{t.adminLiveStorefront}</span>
         </Link>
       </div>
 
@@ -75,7 +75,7 @@ export const AdminLoginPage: React.FC = () => {
             EIFFEL CONTROL
           </h1>
           <p className="text-xs text-zinc-400 mt-2 font-mono">
-            {isRTL ? 'تسجيل دخول الإدارة والموظفين' : 'Executive & Staff Administration'}
+            {t.adminLoginSubtitle}
           </p>
         </div>
 
@@ -91,7 +91,7 @@ export const AdminLoginPage: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-xs font-label-bold uppercase tracking-wider text-zinc-300 mb-2">
-              {isRTL ? 'البريد الإلكتروني للإدارة' : 'Staff / Admin Email'}
+              {t.adminLoginEmailLabel}
             </label>
             <div className="relative">
               <Mail className="absolute left-3.5 rtl:left-auto rtl:right-3.5 top-3.5 w-4 h-4 text-zinc-500" />
@@ -113,14 +113,14 @@ export const AdminLoginPage: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs font-label-bold uppercase tracking-wider text-zinc-300">
-                {isRTL ? 'كلمة المرور' : 'Password'}
+                {t.password}
               </label>
               <button
                 type="button"
                 onClick={() => setIsForgotModalOpen(true)}
                 className="text-[11px] font-mono text-zinc-500 hover:text-amber-400 transition-colors cursor-pointer"
               >
-                {isRTL ? 'نسيت كلمة المرور؟' : 'Forgot Password?'}
+                {t.forgotPasswordPrompt}
               </button>
             </div>
             <div className="relative">
@@ -154,11 +154,11 @@ export const AdminLoginPage: React.FC = () => {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>{isRTL ? 'جاري التحقق والربط...' : 'Authenticating...'}</span>
+                <span>{t.verifying}</span>
               </>
             ) : (
               <>
-                <span>{isRTL ? 'دخول لوحة التحكم' : 'Authenticate & Enter'}</span>
+                <span>{t.adminLoginButton}</span>
                 <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
               </>
             )}

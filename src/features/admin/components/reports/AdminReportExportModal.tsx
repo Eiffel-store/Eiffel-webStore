@@ -28,7 +28,7 @@ export const AdminReportExportModal: React.FC<AdminReportExportModalProps> = ({
   orders,
   products
 }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   const [preset, setPreset] = useState<ReportPreset>('financial');
@@ -158,17 +158,17 @@ export const AdminReportExportModal: React.FC<AdminReportExportModalProps> = ({
             </div>
             <div>
               <h2 className="text-sm font-mono font-bold uppercase tracking-wider text-white">
-                {isRTL ? 'مركز تخصيص واستخراج التقارير' : 'Custom Report Export Hub'}
+                {t.adminCustomReportExportHub}
               </h2>
               <p className="text-xs text-zinc-400 font-light">
-                {isRTL ? 'اختر نوع التقرير والفترة الزمنية للتصدير إلى Excel/CSV' : 'Select preset template & parameters'}
+                {t.adminSelectReportTemplateDesc}
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -179,14 +179,14 @@ export const AdminReportExportModal: React.FC<AdminReportExportModalProps> = ({
           {/* Preset Selector */}
           <div>
             <label className="block text-xs font-mono text-zinc-400 mb-2">
-              {isRTL ? '1. اختر نموذج التقرير المطلوب:' : '1. Select Report Template:'}
+              {t.adminSelectReportTemplateStep}
             </label>
             <div className="grid grid-cols-2 gap-2.5">
               {[
-                { id: 'financial', labelAr: 'تقرير المبيعات والتدفقات المالية', labelEn: 'Financial & Revenue', icon: DollarSign },
-                { id: 'inventory', labelAr: 'تقرير المخزون للمشغل والمصنع', labelEn: 'Inventory & Stock Value', icon: Layers },
-                { id: 'logistics', labelAr: 'مانفست شحنات شركة الشحن (COD)', labelEn: 'Logistics & Shipping Manifest', icon: Truck },
-                { id: 'vip_customers', labelAr: 'سجل العملاء المميزين VIP', labelEn: 'VIP Clients Directory', icon: Users }
+                { id: 'financial', label: t.adminFinancialRevenueReport, icon: DollarSign },
+                { id: 'inventory', label: t.adminInventoryReport, icon: Layers },
+                { id: 'logistics', label: t.adminLogisticsReport, icon: Truck },
+                { id: 'vip_customers', label: t.adminVipReport, icon: Users }
               ].map((item) => {
                 const Icon = item.icon;
                 const isSelected = preset === item.id;
@@ -195,7 +195,7 @@ export const AdminReportExportModal: React.FC<AdminReportExportModalProps> = ({
                     key={item.id}
                     type="button"
                     onClick={() => setPreset(item.id as ReportPreset)}
-                    className={`p-3 rounded-lg border text-left flex items-start gap-2.5 transition-all ${
+                    className={`p-3 rounded-lg border text-left flex items-start gap-2.5 transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-amber-400/10 border-amber-400 text-amber-300 shadow-md'
                         : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-white'
@@ -204,7 +204,7 @@ export const AdminReportExportModal: React.FC<AdminReportExportModalProps> = ({
                     <Icon className={`w-4 h-4 shrink-0 mt-0.5 ${isSelected ? 'text-amber-400' : 'text-zinc-500'}`} />
                     <div>
                       <p className="text-xs font-mono font-bold leading-tight">
-                        {isRTL ? item.labelAr : item.labelEn}
+                        {item.label}
                       </p>
                     </div>
                   </button>
@@ -217,7 +217,7 @@ export const AdminReportExportModal: React.FC<AdminReportExportModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-zinc-800/80">
             <div>
               <label className="block text-xs font-mono text-zinc-400 mb-1">
-                {isRTL ? 'من تاريخ:' : 'From Date:'}
+                {t.adminFromDate}
               </label>
               <input
                 type="date"
@@ -229,7 +229,7 @@ export const AdminReportExportModal: React.FC<AdminReportExportModalProps> = ({
 
             <div>
               <label className="block text-xs font-mono text-zinc-400 mb-1">
-                {isRTL ? 'إلى تاريخ:' : 'To Date:'}
+                {t.adminToDate}
               </label>
               <input
                 type="date"
@@ -243,18 +243,18 @@ export const AdminReportExportModal: React.FC<AdminReportExportModalProps> = ({
           {preset !== 'inventory' && (
             <div>
               <label className="block text-xs font-mono text-zinc-400 mb-1">
-                {isRTL ? 'تصفية حسب حالة الطلب:' : 'Order Status:'}
+                {t.adminFilterByOrderStatus}
               </label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-3 py-2 rounded bg-zinc-900 border border-zinc-800 text-xs font-mono text-white focus:outline-none focus:border-amber-400 cursor-pointer"
               >
-                <option value="all">{isRTL ? 'جميع الحالات' : 'All Statuses'}</option>
-                <option value="Delivered">{isRTL ? 'تم التسليم فقط' : 'Delivered Only'}</option>
-                <option value="Processing">{isRTL ? 'قيد التجهيز والشحن' : 'Processing / In Transit'}</option>
-                <option value="Pending">{isRTL ? 'قيد المراجعة' : 'Pending'}</option>
-                <option value="Cancelled">{isRTL ? 'الملغي والمرتجع' : 'Cancelled'}</option>
+                <option value="all">{t.adminAllStatuses}</option>
+                <option value="Delivered">{t.adminDeliveredOnly}</option>
+                <option value="Processing">{t.adminProcessingInTransit}</option>
+                <option value="Pending">{t.adminPendingStatus}</option>
+                <option value="Cancelled">{t.adminCancelledReturned}</option>
               </select>
             </div>
           )}
@@ -265,18 +265,18 @@ export const AdminReportExportModal: React.FC<AdminReportExportModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors"
+            className="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors cursor-pointer"
           >
-            {isRTL ? 'إلغاء' : 'Cancel'}
+            {t.cancel}
           </button>
 
           <button
             type="button"
             onClick={handleExportCSV}
-            className="px-5 py-2 rounded bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-400/20 transition-colors"
+            className="px-5 py-2 rounded bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-400/20 transition-colors cursor-pointer"
           >
             <Download className="w-4 h-4" />
-            <span>{isRTL ? 'تنزيل التقرير (Excel / CSV)' : 'Download CSV Report'}</span>
+            <span>{t.adminDownloadCsvReport}</span>
           </button>
         </div>
       </div>

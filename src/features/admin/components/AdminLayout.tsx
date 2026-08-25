@@ -25,7 +25,7 @@ import { useLanguage } from '@/shared';
 export const AdminLayout: React.FC = () => {
   const { logoutAdmin } = useAdminAuth();
   const { orders, products } = useStoreData();
-  const { language, setLanguage, isRTL } = useLanguage();
+  const { language, setLanguage, isRTL, t } = useLanguage();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -33,16 +33,16 @@ export const AdminLayout: React.FC = () => {
   const pendingOrdersCount = orders.filter(o => o.status === 'Pending' || o.status === 'Processing').length;
 
   const navItems = [
-    { label: isRTL ? 'لوحة المعلومات' : 'Dashboard', href: '/admin', icon: LayoutDashboard, end: true },
-    { label: isRTL ? 'إدارة المنتجات' : 'Products', href: '/admin/products', icon: ShoppingBag, badge: products.length },
-    { label: isRTL ? 'الصفحة الرئيسية' : 'Home Page & Banners', href: '/admin/home', icon: LayoutTemplate },
-    { label: isRTL ? 'العروض والكوبونات' : 'Offers & Coupons', href: '/admin/offers', icon: Tag },
-    { label: isRTL ? 'الأقسام والتصنيفات' : 'Categories', href: '/admin/categories', icon: Grid },
-    { label: isRTL ? 'إدارة الفروع' : 'Branches & Stores', href: '/admin/branches', icon: MapPin },
-    { label: isRTL ? 'الطلبات والمبيعات' : 'Orders', href: '/admin/orders', icon: Package, badge: pendingOrdersCount ? `${pendingOrdersCount}` : undefined, badgeColor: 'bg-amber-500' },
-    { label: isRTL ? 'التقارير والإحصائيات' : 'Reports & Analytics', href: '/admin/reports', icon: BarChart3 },
-    { label: isRTL ? 'المستخدمين وفريق العمل' : 'Users & Team', href: '/admin/customers', icon: Users },
-    { label: isRTL ? 'إعدادات المتجر' : 'Store Settings', href: '/admin/settings', icon: Settings }
+    { label: t.adminDashboard, href: '/admin', icon: LayoutDashboard, end: true },
+    { label: t.adminProducts, href: '/admin/products', icon: ShoppingBag, badge: products.length },
+    { label: t.adminHomePage, href: '/admin/home', icon: LayoutTemplate },
+    { label: t.adminOffers, href: '/admin/offers', icon: Tag },
+    { label: t.adminCategories, href: '/admin/categories', icon: Grid },
+    { label: t.adminBranches, href: '/admin/branches', icon: MapPin },
+    { label: t.adminOrders, href: '/admin/orders', icon: Package, badge: pendingOrdersCount ? `${pendingOrdersCount}` : undefined, badgeColor: 'bg-amber-500' },
+    { label: t.adminReports, href: '/admin/reports', icon: BarChart3 },
+    { label: t.adminCustomers, href: '/admin/customers', icon: Users },
+    { label: t.adminSettings, href: '/admin/settings', icon: Settings }
   ];
 
   const handleLogout = () => {
@@ -80,7 +80,7 @@ export const AdminLayout: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="p-1.5 text-zinc-400 hover:text-white rounded-md bg-zinc-900 border border-zinc-800"
-            title={isRTL ? 'معاينة المتجر' : 'View Storefront'}
+            title={t.adminStorePreview}
           >
             <ExternalLink className="w-4 h-4" />
           </Link>
@@ -124,7 +124,7 @@ export const AdminLayout: React.FC = () => {
               className="w-full py-2.5 px-4 bg-white text-black hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2 font-label-bold text-xs uppercase tracking-wider shadow-lg"
             >
               <Plus className="w-4 h-4" />
-              <span>{isRTL ? 'إضافة منتج جديد' : 'Add New Product'}</span>
+              <span>{t.adminAddNewProduct}</span>
             </Link>
           </div>
 
@@ -176,7 +176,7 @@ export const AdminLayout: React.FC = () => {
           >
             <span className="flex items-center gap-2">
               <ExternalLink className="w-3.5 h-3.5" />
-              <span>{isRTL ? 'معاينة المتجر المباشر' : 'Live Storefront'}</span>
+              <span>{t.adminLiveStorefront}</span>
             </span>
             <span className="text-[10px] font-mono text-zinc-500">↗</span>
           </Link>
@@ -188,15 +188,15 @@ export const AdminLayout: React.FC = () => {
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
               </div>
               <div className="text-left rtl:text-right">
-                <div className="text-xs font-bold text-white">Store Admin</div>
-                <div className="text-[10px] text-zinc-500 font-mono">Master Mode</div>
+                <div className="text-xs font-bold text-white">{t.adminStoreAdmin}</div>
+                <div className="text-[10px] text-zinc-500 font-mono">{t.adminMasterMode}</div>
               </div>
             </div>
 
             <button
               onClick={handleLogout}
-              className="p-2 text-zinc-400 hover:text-red-400 hover:bg-red-950/20 rounded transition-colors"
-              title={isRTL ? 'تسجيل الخروج' : 'Logout'}
+              className="p-2 text-zinc-400 hover:text-red-400 hover:bg-red-950/20 rounded transition-colors cursor-pointer"
+              title={t.adminLogout}
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -210,17 +210,17 @@ export const AdminLayout: React.FC = () => {
         <div className="hidden md:flex items-center justify-between px-8 py-4 bg-zinc-950 border-b border-zinc-800/80 sticky top-0 z-30">
           <div className="flex items-center gap-4">
             <h1 className="text-sm font-label-bold uppercase tracking-widest text-zinc-300">
-              {location.pathname === '/admin' && (isRTL ? 'لوحة التحكم الرئيسية' : 'Dashboard Overview')}
-              {location.pathname === '/admin/products' && (isRTL ? 'كتالوج وإدارة المنتجات' : 'Products Catalog')}
-              {location.pathname === '/admin/products/new' && (isRTL ? 'إضافة منتج جديد' : 'New Product Entry')}
-              {location.pathname.startsWith('/admin/products/edit') && (isRTL ? 'تعديل بيانات المنتج' : 'Edit Product Details')}
-              {location.pathname === '/admin/offers' && (isRTL ? 'العروض والتخفيضات والكوبونات' : 'Offers & Promo Codes')}
-              {location.pathname === '/admin/categories' && (isRTL ? 'إدارة الأقسام والتصنيفات' : 'Categories Management')}
-              {location.pathname === '/admin/branches' && (isRTL ? 'إدارة مواقع الفروع' : 'Branch Locations')}
-              {location.pathname === '/admin/orders' && (isRTL ? 'سجل وإدارة طلبات العملاء' : 'Orders Management')}
-              {location.pathname === '/admin/reports' && (isRTL ? 'مركز التقارير والتحليلات المالية' : 'Reports & Financial Analytics')}
-              {location.pathname === '/admin/customers' && (isRTL ? 'إدارة العملاء ونقاط الولاء وعضوية VIP' : 'Customers, Loyalty Points & VIP')}
-              {location.pathname === '/admin/settings' && (isRTL ? 'إعدادات المتجر والنسخ الاحتياطي' : 'Store Settings & Backup')}
+              {location.pathname === '/admin' && t.adminHeaderDashboard}
+              {location.pathname === '/admin/products' && t.adminHeaderProducts}
+              {location.pathname === '/admin/products/new' && t.adminHeaderNewProduct}
+              {location.pathname.startsWith('/admin/products/edit') && t.adminHeaderEditProduct}
+              {location.pathname === '/admin/offers' && t.adminHeaderOffers}
+              {location.pathname === '/admin/categories' && t.adminHeaderCategories}
+              {location.pathname === '/admin/branches' && t.adminHeaderBranches}
+              {location.pathname === '/admin/orders' && t.adminHeaderOrders}
+              {location.pathname === '/admin/reports' && t.adminHeaderReports}
+              {location.pathname === '/admin/customers' && t.adminHeaderCustomers}
+              {location.pathname === '/admin/settings' && t.adminHeaderSettings}
             </h1>
           </div>
 
@@ -228,7 +228,7 @@ export const AdminLayout: React.FC = () => {
             {/* Language Switcher */}
             <button
               onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
-              className="px-2.5 py-1 text-xs font-mono bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 rounded transition-colors"
+              className="px-2.5 py-1 text-xs font-mono bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 rounded transition-colors cursor-pointer"
             >
               {language === 'ar' ? 'English' : 'عربي'}
             </button>
@@ -240,7 +240,7 @@ export const AdminLayout: React.FC = () => {
               rel="noopener noreferrer"
               className="px-3 py-1.5 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 rounded flex items-center gap-1.5 transition-colors"
             >
-              <span>{isRTL ? 'المتجر' : 'Storefront'}</span>
+              <span>{t.adminStorefront}</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </Link>
           </div>

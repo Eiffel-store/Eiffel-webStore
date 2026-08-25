@@ -86,7 +86,7 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                       {isVip ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-amber-400/10 text-amber-300 border border-amber-400/40 text-[11px] font-bold shadow-sm whitespace-nowrap">
                           <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                          <span>{isRTL ? 'عضوية VIP' : 'EIFFEL VIP'}</span>
+                          <span>{t.adminVipTier}</span>
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 text-zinc-300 border border-zinc-700/80 text-[11px] font-medium whitespace-nowrap">
@@ -99,7 +99,7 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                     {/* Delivered Orders */}
                     <td className="p-3.5 text-center font-bold text-white">
                       <span className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800">
-                        {cust.completedOrdersCount || 0} {isRTL ? 'طلب' : 'orders'}
+                        {cust.completedOrdersCount || 0} {t.orders}
                       </span>
                     </td>
 
@@ -133,10 +133,10 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                               ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30'
                               : 'bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 border border-amber-400/30'
                           }`}
-                          title={isVip ? (isRTL ? 'إلغاء عضوية VIP' : 'Revoke VIP') : (isRTL ? 'ترقية إلى VIP' : 'Promote to VIP')}
+                          title={isVip ? t.adminRevokeVip : t.adminPromoteVip}
                         >
                           <Crown className="w-3.5 h-3.5" />
-                          <span>{isVip ? (isRTL ? 'إلغاء VIP' : 'Remove VIP') : (isRTL ? 'ترقية VIP' : 'Make VIP')}</span>
+                          <span>{isVip ? t.adminRevokeVip : t.adminPromoteVip}</span>
                         </button>
 
                         {/* Adjust Points Modal Trigger */}
@@ -154,14 +154,12 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                         {cleanPhone && (
                           <a
                             href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
-                              isRTL
-                                ? `مرحباً بك ${cust.name}، يسعدنا تواصلك مع دار أزياء إيفل.`
-                                : `Hello ${cust.name}, welcome to Eiffel.`
+                              `${t.adminWaHelloIntro} ${cust.name}`
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-1.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 transition-colors cursor-pointer"
-                            title={isRTL ? 'محادثة واتساب' : 'WhatsApp'}
+                            title={t.adminWhatsappChat}
                           >
                             <MessageCircle className="w-3.5 h-3.5" />
                           </a>

@@ -131,7 +131,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
   onClose,
   onSave
 }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const { products = [], coupons = [] } = useStoreData();
 
   const [formData, setFormData] = useState<Partial<Banner>>(() => ({
@@ -311,12 +311,10 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
             <Sparkles className="w-5 h-5 text-amber-400" />
             <div>
               <h2 className="text-base sm:text-lg font-editorial font-bold text-white tracking-wide">
-                {formData.id
-                  ? (isRTL ? 'تعديل البانر والحملة الإعلانية' : 'Edit Campaign Banner')
-                  : (isRTL ? 'إنشاء وتخصيص بانر جديد' : 'Create Campaign Banner')}
+                {formData.id ? t.adminEditCampaignBanner : t.adminCreateCampaignBanner}
               </h2>
               <span className="text-[11px] text-zinc-400">
-                {isRTL ? 'اختر قالباً جاهزاً لتعبئة البيانات تلقائياً أو عدل حسب رغبتك' : 'Choose a ready preset to auto-fill or customize fields'}
+                {t.adminBannerPresetAutoFillDesc}
               </span>
             </div>
           </div>
@@ -337,7 +335,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
             <div className="p-3.5 bg-amber-950/20 border border-amber-500/30 rounded-lg space-y-2">
               <label className="block text-xs font-mono text-amber-300 font-bold flex items-center gap-1.5">
                 <Zap className="w-4 h-4 text-amber-400" />
-                <span>{isRTL ? '⚡ قوالب وحملات تسويقية جاهزة (تعبئة بضغطة زر):' : '⚡ Quick Marketing Presets (Auto-fill with 1 Click):'}</span>
+                <span>{t.adminQuickMarketingPresets}</span>
               </label>
               <select
                 defaultValue=""
@@ -346,7 +344,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
                 }}
                 className="w-full bg-zinc-900 border border-amber-500/40 text-amber-200 rounded p-2 text-xs font-mono focus:border-amber-400 focus:outline-none cursor-pointer"
               >
-                <option value="" disabled>{isRTL ? '-- اختر قالباً جاهزاً للتعبئة الفورية --' : '-- Choose a preset to auto-fill --'}</option>
+                <option value="" disabled>{t.adminChoosePresetAutoFill}</option>
                 {CAMPAIGN_PRESETS.map(preset => (
                   <option key={preset.id} value={preset.id}>
                     {isRTL ? preset.labelAr : preset.labelEn}
@@ -359,24 +357,24 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-1.5">
-                  {isRTL ? 'موضع الظهور (Placement) *' : 'Placement *'}
+                  {t.adminPlacementLabel}
                 </label>
                 <select
                   value={formData.placement}
                   onChange={(e) => setFormData(prev => ({ ...prev, placement: e.target.value as BannerPlacement }))}
                   className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2.5 text-xs font-mono focus:border-amber-500 focus:outline-none cursor-pointer"
                 >
-                  <option value="HERO_SLIDER">{isRTL ? 'سلايدر الهيرو الرئيسي (Hero Slider)' : 'Hero Main Slider'}</option>
-                  <option value="PROMO_EDITORIAL">{isRTL ? 'بانر العروض الترويجي (Promo Editorial)' : 'Promo Editorial'}</option>
-                  <option value="TOP_ANNOUNCEMENT">{isRTL ? 'الشريط العلوي (Top Announcement)' : 'Top Announcement'}</option>
-                  <option value="POPUP_MODAL">{isRTL ? 'نافذة منبثقة (Popup Modal)' : 'Popup Modal'}</option>
-                  <option value="COLLECTION_HEADER">{isRTL ? 'رأس صفحة التصنيف (Collection Header)' : 'Collection Header'}</option>
+                  <option value="HERO_SLIDER">{t.adminHeroSliderPlacement}</option>
+                  <option value="PROMO_EDITORIAL">{t.adminPromoEditorialPlacement}</option>
+                  <option value="TOP_ANNOUNCEMENT">{t.adminTopAnnouncementPlacement}</option>
+                  <option value="POPUP_MODAL">{t.adminPopupModalPlacement}</option>
+                  <option value="COLLECTION_HEADER">{t.adminCollectionHeaderPlacement}</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-1.5">
-                  {isRTL ? 'حالة التفعيل (Status)' : 'Status'}
+                  {t.status}
                 </label>
                 <div className="flex items-center gap-3 pt-1">
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -389,7 +387,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
                     <div className="w-11 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                   </label>
                   <span className="text-xs font-bold text-zinc-300">
-                    {formData.isActive ? (isRTL ? 'نشط ومتاح' : 'Active (Live)') : (isRTL ? 'معطل' : 'Inactive')}
+                    {formData.isActive ? t.adminActiveStatus : t.adminInactiveStatus}
                   </span>
                 </div>
               </div>
@@ -399,7 +397,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-1.5">
-                  {isRTL ? 'العنوان بالعربية *' : 'Arabic Title *'}
+                  {t.adminHeadlineTitleAr}
                 </label>
                 <input
                   type="text"
@@ -412,7 +410,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
               </div>
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-1.5">
-                  {isRTL ? 'العنوان بالإنجليزية *' : 'English Title *'}
+                  {t.adminHeadlineTitleEn}
                 </label>
                 <input
                   type="text"
@@ -429,7 +427,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-1.5">
-                  {isRTL ? 'الوصف بالعربية' : 'Arabic Description'}
+                  {t.adminSubtitleParagraphAr}
                 </label>
                 <textarea
                   rows={2}
@@ -441,7 +439,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
               </div>
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-1.5">
-                  {isRTL ? 'الوصف بالإنجليزية' : 'English Description'}
+                  {t.adminSubtitleParagraphEn}
                 </label>
                 <textarea
                   rows={2}
@@ -457,7 +455,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-1.5">
-                  {isRTL ? 'شارة التميز (عربي)' : 'Tag / Badge (Ar)'}
+                  {t.adminSeasonTagBadgeAr}
                 </label>
                 <input
                   type="text"
@@ -469,7 +467,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
               </div>
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-1.5">
-                  {isRTL ? 'شارة التميز (إنجليزي)' : 'Tag / Badge (En)'}
+                  {t.adminSeasonTagBadgeEn}
                 </label>
                 <input
                   type="text"
@@ -484,14 +482,14 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-1.5 flex items-center gap-1">
                   <Tag className="w-3 h-3 text-amber-400" />
-                  <span>{isRTL ? 'كوبون الخصم المربوط' : 'Coupon Code'}</span>
+                  <span>{t.adminCouponCode}</span>
                 </label>
                 <select
                   value={formData.discountCode || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, discountCode: e.target.value }))}
                   className="w-full bg-zinc-900 border border-zinc-700 text-amber-300 font-mono rounded p-2.5 text-xs focus:border-amber-500 focus:outline-none cursor-pointer"
                 >
-                  <option value="">{isRTL ? '-- بدون كود خصم --' : '-- No Discount Code --'}</option>
+                  <option value="">{t.adminNoCouponCode}</option>
                   {coupons.map(c => (
                     <option key={c.id} value={c.code}>
                       {c.code} ({c.discountPercentage}% OFF)
@@ -506,7 +504,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
               <div className="flex items-center justify-between">
                 <label className="text-xs font-mono text-zinc-400 flex items-center gap-1.5">
                   <Link2 className="w-3.5 h-3.5 text-amber-400" />
-                  <span>{isRTL ? 'رابط التوجيه عند النقر (Destination Link):' : 'Destination Link:'}</span>
+                  <span>{t.adminButtonDestinationLink}</span>
                 </label>
                 <div className="flex items-center gap-1 text-[11px] font-mono">
                   <button
@@ -514,21 +512,21 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
                     onClick={() => setLinkMode('preset')}
                     className={`px-2 py-0.5 rounded cursor-pointer ${linkMode === 'preset' ? 'bg-amber-500 text-black font-bold' : 'text-zinc-400'}`}
                   >
-                    {isRTL ? 'أقسام المتجر' : 'Collections'}
+                    {t.adminStoreCollections}
                   </button>
                   <button
                     type="button"
                     onClick={() => setLinkMode('product')}
                     className={`px-2 py-0.5 rounded cursor-pointer ${linkMode === 'product' ? 'bg-amber-500 text-black font-bold' : 'text-zinc-400'}`}
                   >
-                    {isRTL ? 'منتج محدد' : 'Product'}
+                    {t.product}
                   </button>
                   <button
                     type="button"
                     onClick={() => setLinkMode('custom')}
                     className={`px-2 py-0.5 rounded cursor-pointer ${linkMode === 'custom' ? 'bg-amber-500 text-black font-bold' : 'text-zinc-400'}`}
                   >
-                    {isRTL ? 'مخصص' : 'Custom'}
+                    {t.adminCustomLink}
                   </button>
                 </div>
               </div>
@@ -553,7 +551,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
                   onChange={(e) => setFormData(prev => ({ ...prev, buttonLink: e.target.value }))}
                   className="w-full bg-zinc-900 border border-zinc-700 text-white rounded p-2.5 text-xs font-mono focus:border-amber-500 focus:outline-none cursor-pointer"
                 >
-                  <option value="" disabled>{isRTL ? '-- اختر منتجاً من المتجر --' : '-- Choose a product --'}</option>
+                  <option value="" disabled>{t.adminChooseProductAutoFill}</option>
                   {products.map(p => (
                     <option key={p.id} value={`/product/${p.id}`}>
                       {p.name} ({p.price} EGP)
@@ -577,7 +575,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-mono text-zinc-400">
-                  {isRTL ? 'نص زر التوجيه (CTA Text):' : 'CTA Button Text:'}
+                  {t.adminCtaButtonText}
                 </label>
                 <select
                   defaultValue=""
@@ -587,7 +585,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
                   }}
                   className="bg-zinc-900 border border-zinc-700 text-zinc-300 rounded px-2 py-0.5 text-[11px] font-mono focus:outline-none cursor-pointer"
                 >
-                  <option value="" disabled>{isRTL ? 'اختر نصاً جاهزاً' : 'Choose button preset'}</option>
+                  <option value="" disabled>{t.adminChooseButtonPreset}</option>
                   {BUTTON_PRESETS.map((bp, i) => (
                     <option key={i} value={bp.en}>
                       {isRTL ? bp.ar : bp.en}
@@ -617,7 +615,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
             {/* Responsive Media: Desktop & Mobile Images */}
             <div className="space-y-4 pt-2 border-t border-zinc-800">
               <h3 className="text-xs font-label-bold uppercase text-zinc-300 tracking-wider">
-                {isRTL ? 'صور الوسائط المتجاوبة (Desktop & Mobile Media)' : 'Responsive Images (Desktop & Mobile)'}
+                {t.adminResponsiveImages}
               </h3>
 
               {/* Desktop Image */}
@@ -625,9 +623,9 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
                 <div className="flex items-center justify-between text-xs text-zinc-300">
                   <span className="flex items-center gap-1.5 font-mono">
                     <Monitor className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{isRTL ? 'صورة الكمبيوتر (Desktop 16:9 / 21:9)' : 'Desktop Image (16:9)'}</span>
+                    <span>{t.adminDesktopImage}</span>
                   </span>
-                  {formData.desktopImageUrl && <span className="text-emerald-400 text-[10px]">✓ {isRTL ? 'مرفوعة' : 'Set'}</span>}
+                  {formData.desktopImageUrl && <span className="text-emerald-400 text-[10px]">✓ {t.adminSet}</span>}
                 </div>
 
                 <div className="flex gap-2">
@@ -648,11 +646,11 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
                     }}
                     className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded text-xs cursor-pointer"
                   >
-                    {isRTL ? 'تطبيق' : 'Apply'}
+                    {t.adminApplyBtn}
                   </button>
                   <label className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded text-xs flex items-center gap-1 cursor-pointer">
                     {isUploadingDesktop ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-                    <span>{isRTL ? 'رفع سحابي' : 'Upload'}</span>
+                    <span>{t.adminCloudUpload}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -668,9 +666,9 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
                 <div className="flex items-center justify-between text-xs text-zinc-300">
                   <span className="flex items-center gap-1.5 font-mono">
                     <Smartphone className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{isRTL ? 'صورة الموبايل (Mobile 9:16 / 4:5 - اختياري)' : 'Mobile Image (Portrait - Optional)'}</span>
+                    <span>{t.adminMobileImage}</span>
                   </span>
-                  {formData.mobileImageUrl && <span className="text-emerald-400 text-[10px]">✓ {isRTL ? 'مرفوعة' : 'Set'}</span>}
+                  {formData.mobileImageUrl && <span className="text-emerald-400 text-[10px]">✓ {t.adminSet}</span>}
                 </div>
 
                 <div className="flex gap-2">
@@ -691,11 +689,11 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
                     }}
                     className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded text-xs cursor-pointer"
                   >
-                    {isRTL ? 'تطبيق' : 'Apply'}
+                    {t.adminApplyBtn}
                   </button>
                   <label className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded text-xs flex items-center gap-1 border border-zinc-700 cursor-pointer">
                     {isUploadingMobile ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-                    <span>{isRTL ? 'رفع للموبايل' : 'Upload Mobile'}</span>
+                    <span>{t.adminUploadMobile}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -712,7 +710,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-1.5 flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5 text-amber-400" />
-                  <span>{isRTL ? 'تاريخ بدء الحملة (Start Date)' : 'Start Date (Optional)'}</span>
+                  <span>{t.adminStartDateOptional}</span>
                 </label>
                 <input
                   type="datetime-local"
@@ -724,7 +722,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
               <div>
                 <label className="block text-xs font-mono text-zinc-400 mb-1.5 flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5 text-red-400" />
-                  <span>{isRTL ? 'تاريخ انتهاء الحملة (End Date)' : 'End Date (Optional)'}</span>
+                  <span>{t.adminEndDateOptional}</span>
                 </label>
                 <input
                   type="datetime-local"
@@ -740,7 +738,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
           <div className="lg:col-span-5 space-y-3 flex flex-col items-center">
             <div className="w-full flex items-center justify-between pb-2 border-b border-zinc-800">
               <span className="text-xs font-label-bold text-zinc-300 uppercase">
-                {isRTL ? 'المعاينة التفاعلية الحية' : 'Live Mockup Preview'}
+                {t.adminLiveMockupPreview}
               </span>
               <div className="flex items-center gap-1 bg-zinc-900 p-1 rounded border border-zinc-800">
                 <button
@@ -773,7 +771,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
                   <img src={currentImg} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60" />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-zinc-600 text-xs font-mono">
-                    {isRTL ? 'لا توجد صورة محددة بعد' : 'No image specified'}
+                    {t.adminNoImage}
                   </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
@@ -784,7 +782,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
                     </span>
                   )}
                   <h4 className="font-editorial text-lg font-bold uppercase truncate">
-                    {isRTL ? (formData.titleAr || 'العنوان الرئيسي') : (formData.titleEn || 'Main Title')}
+                    {isRTL ? (formData.titleAr || t.adminHeadlineTitleAr) : (formData.titleEn || t.adminHeadlineTitleEn)}
                   </h4>
                   <p className="text-[10px] text-zinc-300 line-clamp-2">
                     {isRTL ? formData.subtitleAr : formData.subtitleEn}
@@ -804,13 +802,13 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
                   <img src={currentImg} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60" />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-zinc-600 text-xs font-mono">
-                    {isRTL ? 'شاشة الهاتف' : 'Phone Frame'}
+                    {t.adminMobileFrame}
                   </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
                 <div className="relative z-10 space-y-1">
                   <h4 className="font-editorial text-sm font-bold uppercase truncate">
-                    {isRTL ? (formData.titleAr || 'العنوان الرئيسي') : (formData.titleEn || 'Main Title')}
+                    {isRTL ? (formData.titleAr || t.adminHeadlineTitleAr) : (formData.titleEn || t.adminHeadlineTitleEn)}
                   </h4>
                   <p className="text-[9px] text-zinc-300 line-clamp-2">
                     {isRTL ? formData.subtitleAr : formData.subtitleEn}
@@ -835,7 +833,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold rounded cursor-pointer"
           >
-            {isRTL ? 'إلغاء' : 'Cancel'}
+            {t.cancel}
           </button>
           <button
             type="submit"
@@ -844,7 +842,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
             className="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-label-bold uppercase tracking-wider rounded flex items-center gap-2 shadow-lg disabled:opacity-50 cursor-pointer"
           >
             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-            <span>{isRTL ? 'حفظ ونشر البانر' : 'Save & Publish Banner'}</span>
+            <span>{t.adminSavePublishBanner}</span>
           </button>
         </div>
       </div>

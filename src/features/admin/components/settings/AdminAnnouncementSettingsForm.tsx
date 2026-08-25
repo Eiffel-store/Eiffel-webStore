@@ -12,19 +12,19 @@ export const AdminAnnouncementSettingsForm: React.FC<AdminAnnouncementSettingsFo
   settings,
   onChange
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div className="space-y-4 pt-4 border-t border-zinc-800">
       <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2 pb-2 border-b border-zinc-800">
         <DollarSign className="w-4 h-4 text-amber-400" />
-        <span>{isRTL ? '2. شريط الإعلانات والشحن المجاني' : '2. Top Announcement Bar & Free Shipping'}</span>
+        <span>{t.adminAnnouncementSection}</span>
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'نص الإعلان (عربي)' : 'Announcement Text (Arabic)'}
+            {t.adminAnnouncementTextAr}
           </label>
           <input
             type="text"
@@ -36,7 +36,7 @@ export const AdminAnnouncementSettingsForm: React.FC<AdminAnnouncementSettingsFo
 
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'نص الإعلان (إنجليزي)' : 'Announcement Text (English)'}
+            {t.adminAnnouncementTextEn}
           </label>
           <input
             type="text"
@@ -50,7 +50,7 @@ export const AdminAnnouncementSettingsForm: React.FC<AdminAnnouncementSettingsFo
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'الحد الأدنى للشحن المجاني (EGP)' : 'Free Shipping Threshold (EGP)'}
+            {t.adminFreeShippingThresholdEgp}
           </label>
           <input
             type="number"
@@ -62,7 +62,7 @@ export const AdminAnnouncementSettingsForm: React.FC<AdminAnnouncementSettingsFo
 
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'اسم المتجر المعروض' : 'Store Display Name'}
+            {t.adminStoreDisplayName}
           </label>
           <input
             type="text"

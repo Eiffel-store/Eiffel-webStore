@@ -25,7 +25,7 @@ type ReportPeriod = 'today' | '7d' | '30d' | 'all';
 
 export const AdminReportsPage: React.FC = () => {
   const { orders, products, categories, coupons, isOrdersLoading, isProductsLoading } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   const [activeTab, setActiveTab] = useState<ReportTab>('overview');
@@ -60,11 +60,11 @@ export const AdminReportsPage: React.FC = () => {
   const isLoading = isOrdersLoading || isProductsLoading;
 
   const tabs = [
-    { id: 'overview', labelAr: 'الملخص التنفيذي', labelEn: 'Executive Overview', icon: BarChart3 },
-    { id: 'sales', labelAr: 'المبيعات والكوبونات', labelEn: 'Sales & Revenue', icon: DollarSign },
-    { id: 'products', labelAr: 'المنتجات والمقاسات', labelEn: 'Products & Sizing', icon: Layers },
-    { id: 'logistics', labelAr: 'الشحن والمحافظات', labelEn: 'Logistics & Regions', icon: MapPin },
-    { id: 'customers', labelAr: 'العملاء المميزين VIP', labelEn: 'VIP Clients', icon: Users }
+    { id: 'overview', label: t.adminExecutiveSummary, icon: BarChart3 },
+    { id: 'sales', label: t.adminSalesAndCoupons, icon: DollarSign },
+    { id: 'products', label: t.adminProductsAndSizing, icon: Layers },
+    { id: 'logistics', label: t.adminLogisticsAndRegions, icon: MapPin },
+    { id: 'customers', label: t.adminVipClients, icon: Users }
   ] as const;
 
   return (
@@ -74,16 +74,14 @@ export const AdminReportsPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-editorial font-bold text-white tracking-wide">
-              {isRTL ? 'مركز ذكاء الأعمال والتقارير الشاملة' : 'Executive Business Intelligence & Reporting Suite'}
+              {t.adminReportsTitle}
             </h1>
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-amber-400/10 text-amber-400 border border-amber-400/20 font-bold">
               ENTERPRISE
             </span>
           </div>
           <p className="text-xs text-zinc-400 mt-1">
-            {isRTL
-              ? 'نظام تحليلي متكامل لمتابعة الأداء المالي، معدل دوران المخزون، توزيع الطلبات بالمحافظات وسلوك العملاء.'
-              : 'Complete intelligence suite for financial velocity, inventory turnover, regional demand, and customer LTV.'}
+            {t.adminReportsDesc}
           </p>
         </div>
 
@@ -93,23 +91,23 @@ export const AdminReportsPage: React.FC = () => {
           <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded p-1">
             {(
               [
-                { id: 'today', labelAr: 'اليوم', labelEn: 'Today' },
-                { id: '7d', labelAr: 'آخر 7 أيام', labelEn: '7 Days' },
-                { id: '30d', labelAr: 'آخر 30 يوم', labelEn: '30 Days' },
-                { id: 'all', labelAr: 'كل الفترات', labelEn: 'All Time' }
+                { id: 'today', label: t.adminPeriodToday },
+                { id: '7d', label: t.adminPeriod7d },
+                { id: '30d', label: t.adminPeriod30d },
+                { id: 'all', label: t.adminPeriodAll }
               ] as const
             ).map((tab) => (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setPeriod(tab.id)}
-                className={`px-3 py-1.5 rounded text-xs font-mono font-medium transition-all ${
+                className={`px-3 py-1.5 rounded text-xs font-mono font-medium transition-all cursor-pointer ${
                   period === tab.id
                     ? 'bg-amber-400 text-black shadow font-bold'
                     : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
                 }`}
               >
-                {isRTL ? tab.labelAr : tab.labelEn}
+                {tab.label}
               </button>
             ))}
           </div>
@@ -118,22 +116,22 @@ export const AdminReportsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsExportModalOpen(true)}
-            className="px-3.5 py-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 hover:text-white rounded text-xs font-mono flex items-center gap-2 transition-colors"
-            title={isRTL ? 'استخراج وتخصيص تقرير' : 'Custom Report Exporter'}
+            className="px-3.5 py-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 hover:text-white rounded text-xs font-mono flex items-center gap-2 transition-colors cursor-pointer"
+            title={t.adminExportExcel}
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
-            <span>{isRTL ? 'استخراج تقرير Excel' : 'Export Hub'}</span>
+            <span>{t.adminExportExcel}</span>
           </button>
 
           {/* Print Report */}
           <button
             type="button"
             onClick={() => window.print()}
-            className="px-3.5 py-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 hover:text-white rounded text-xs font-mono flex items-center gap-2 transition-colors"
-            title={isRTL ? 'طباعة التقرير' : 'Print'}
+            className="px-3.5 py-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 hover:text-white rounded text-xs font-mono flex items-center gap-2 transition-colors cursor-pointer"
+            title={t.adminPrint}
           >
             <Printer className="w-4 h-4 text-zinc-400" />
-            <span>{isRTL ? 'طباعة' : 'Print'}</span>
+            <span>{t.adminPrint}</span>
           </button>
         </div>
       </div>
@@ -149,14 +147,14 @@ export const AdminReportsPage: React.FC = () => {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as ReportTab)}
-              className={`px-4 py-2.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2.5 whitespace-nowrap transition-all ${
+              className={`px-4 py-2.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2.5 whitespace-nowrap transition-all cursor-pointer ${
                 isActive
                   ? 'bg-amber-400 text-black font-bold shadow-lg shadow-amber-400/10'
                   : 'bg-zinc-900/60 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
               }`}
             >
               <Icon className={`w-4 h-4 ${isActive ? 'text-black' : 'text-zinc-400'}`} />
-              <span>{isRTL ? tab.labelAr : tab.labelEn}</span>
+              <span>{tab.label}</span>
             </button>
           );
         })}
@@ -164,11 +162,11 @@ export const AdminReportsPage: React.FC = () => {
 
       {/* 3. Tab Contents with Dynamic States */}
       {isLoading ? (
-        <EiffelLoader message={isRTL ? 'جاري تجميع وحساب البيانات والمؤشرات التحليلية...' : 'Aggregating business intelligence metrics...'} />
+        <EiffelLoader message={t.adminCalculatingAnalytics} />
       ) : orders.length === 0 ? (
         <EmptyState
-          title={isRTL ? 'لا توجد بيانات كافية لإنشاء التقارير' : 'No Data Available for Analytics'}
-          description={isRTL ? 'عند تسجيل طلبات جديدة من العملاء وإضافة منتجات، ستظهر هنا التحليلات المالية وتقارير الأداء بشكل فوري.' : 'As new orders and products are registered, analytical charts and reports will populate here.'}
+          title={t.adminNoAnalyticsData}
+          description={t.adminNoAnalyticsDataDesc}
         />
       ) : (
         <div>

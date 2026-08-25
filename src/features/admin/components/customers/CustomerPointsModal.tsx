@@ -58,7 +58,7 @@ export const CustomerPointsModal: React.FC<CustomerPointsModalProps> = ({
           {/* Current Balance */}
           <div className="p-3 rounded-lg bg-zinc-900/60 border border-zinc-800 flex items-center justify-between">
             <span className="text-xs font-mono text-zinc-400">
-              {isRTL ? 'الرصيد الحالي:' : 'Current Balance:'}
+              {t.adminCurrentBalance}
             </span>
             <span className="text-sm font-mono font-bold text-emerald-400">
               {customer.tierPoints || customer.points || 0} PTS
@@ -109,7 +109,7 @@ export const CustomerPointsModal: React.FC<CustomerPointsModalProps> = ({
               className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm font-mono text-white focus:outline-none focus:border-amber-400"
             />
             <p className="text-[11px] text-zinc-500 font-mono mt-1">
-              {isRTL ? `القيمة المعادلة: ${formatPrice(pointsInput)}` : `Value: ${formatPrice(pointsInput)}`}
+              {`${t.adminPointsValueEquivalent}: ${formatPrice(pointsInput)}`}
             </p>
           </div>
 

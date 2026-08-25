@@ -5,7 +5,7 @@ import { useStoreData, useLanguage, useCurrency } from '@/shared';
 
 export const AdminRecentOrders: React.FC = () => {
   const { orders } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const { formatPrice } = useCurrency();
   const recentOrders = orders.slice(0, 5);
 
@@ -13,11 +13,11 @@ export const AdminRecentOrders: React.FC = () => {
     <div className="bg-zinc-950 border border-zinc-800 p-6 shadow-xl space-y-4">
       <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
         <div>
-          <h2 className="text-base font-bold text-white">{isRTL ? 'أحدث الطلبات الواردة' : 'Recent Customer Orders'}</h2>
-          <p className="text-xs text-zinc-500">{isRTL ? 'الطلبات التي تم إجراؤها من صفحة الدفع' : 'Orders received from checkout'}</p>
+          <h2 className="text-base font-bold text-white">{t.adminRecentOrdersTitle}</h2>
+          <p className="text-xs text-zinc-500">{t.adminRecentOrdersSubtitle}</p>
         </div>
         <Link to="/admin/orders" className="text-xs text-zinc-400 hover:text-white font-mono flex items-center gap-1">
-          <span>{isRTL ? 'عرض الكل' : 'View All'}</span>
+          <span>{t.viewAll}</span>
           <ArrowRight className={`w-3 h-3 ${isRTL ? 'rotate-180' : ''}`} />
         </Link>
       </div>
@@ -25,8 +25,8 @@ export const AdminRecentOrders: React.FC = () => {
       {recentOrders.length === 0 ? (
         <div className="py-12 text-center text-zinc-500 text-xs">
           <Package className="w-8 h-8 mx-auto mb-2 opacity-40" />
-          <p>{isRTL ? 'لا توجد طلبات مسجلة حتى الآن.' : 'No customer orders placed yet.'}</p>
-          <p className="text-[11px] text-zinc-600 mt-1">{isRTL ? 'ستظهر هنا فور إتمام العميل للطلب في المتجر.' : 'Orders from checkout will appear here live.'}</p>
+          <p>{t.adminNoOrdersYet}</p>
+          <p className="text-[11px] text-zinc-600 mt-1">{t.adminOrdersAppearHere}</p>
         </div>
       ) : (
         <div className="divide-y divide-zinc-800/80">
@@ -54,7 +54,7 @@ export const AdminRecentOrders: React.FC = () => {
 
               <div className="text-right rtl:text-left shrink-0">
                 <div className="font-mono text-xs font-bold text-white">{formatPrice(order.total)}</div>
-                <div className="text-[10px] text-zinc-500 font-mono">{order.items?.length || 0} {isRTL ? 'قطع' : 'items'}</div>
+                <div className="text-[10px] text-zinc-500 font-mono">{order.items?.length || 0} {t.adminPiecesCount}</div>
               </div>
             </div>
           ))}

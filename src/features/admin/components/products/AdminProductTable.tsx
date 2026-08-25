@@ -15,15 +15,15 @@ export const AdminProductTable: React.FC<AdminProductTableProps> = ({
   onToggleStock,
   onDeletePrompt
 }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   if (products.length === 0) {
     return (
       <div className="bg-zinc-950 border border-zinc-800 p-12 text-center text-zinc-500">
         <ShoppingBag className="w-10 h-10 mx-auto mb-3 opacity-30" />
-        <p className="text-sm font-medium">{isRTL ? 'لا توجد منتجات مطابقة لخيارات البحث.' : 'No products found matching criteria.'}</p>
-        <p className="text-xs text-zinc-600 mt-1">{isRTL ? 'جرب البحث باسم آخر أو إزالة التصفية.' : 'Try changing search keywords or category filters.'}</p>
+        <p className="text-sm font-medium">{t.noMatchingPieces}</p>
+        <p className="text-xs text-zinc-600 mt-1">{t.noPiecesFoundDesc}</p>
       </div>
     );
   }
@@ -33,12 +33,12 @@ export const AdminProductTable: React.FC<AdminProductTableProps> = ({
       <table className="w-full text-left rtl:text-right border-collapse min-w-[700px]">
         <thead>
           <tr className="border-b border-zinc-800 bg-zinc-900/60 text-[11px] font-mono uppercase tracking-wider text-zinc-400">
-            <th className="py-3.5 px-4">{isRTL ? 'المنتج' : 'Product'}</th>
-            <th className="py-3.5 px-4">{isRTL ? 'القسم' : 'Category'}</th>
-            <th className="py-3.5 px-4">{isRTL ? 'السعر' : 'Price'}</th>
-            <th className="py-3.5 px-4">{isRTL ? 'المقاسات والألوان' : 'Variants'}</th>
-            <th className="py-3.5 px-4 text-center">{isRTL ? 'حالة المخزون' : 'Stock Status'}</th>
-            <th className="py-3.5 px-4 text-right rtl:text-left">{isRTL ? 'إجراءات' : 'Actions'}</th>
+            <th className="py-3.5 px-4">{t.adminProductTableName}</th>
+            <th className="py-3.5 px-4">{t.adminProductTableCategory}</th>
+            <th className="py-3.5 px-4">{t.adminProductTablePrice}</th>
+            <th className="py-3.5 px-4">{t.adminSizesAndVariants}</th>
+            <th className="py-3.5 px-4 text-center">{t.adminProductTableStatus}</th>
+            <th className="py-3.5 px-4 text-right rtl:text-left">{t.adminProductTableActions}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-800/60 text-xs">
@@ -90,7 +90,7 @@ export const AdminProductTable: React.FC<AdminProductTableProps> = ({
                   {hasSale && (
                     <span className="text-[9px] text-amber-400 font-bold flex items-center gap-0.5 mt-0.5">
                       <Tag className="w-2.5 h-2.5" />
-                      {isRTL ? 'خصم مفعّل' : 'On Sale'}
+                      {t.adminBadgeSale}
                     </span>
                   )}
                 </td>
@@ -131,7 +131,7 @@ export const AdminProductTable: React.FC<AdminProductTableProps> = ({
                         ? 'text-amber-400'
                         : 'text-emerald-400'
                     }`}>
-                      {product.stock !== undefined ? `${product.stock} ${isRTL ? 'قطع' : 'units'}` : (isRTL ? '20 قطعة' : '20 units')}
+                      {product.stock !== undefined ? `${product.stock} ${t.adminPiecesCount}` : `20 ${t.adminPiecesCount}`}
                     </span>
                     <button
                       onClick={() => onToggleStock(product)}
@@ -140,10 +140,10 @@ export const AdminProductTable: React.FC<AdminProductTableProps> = ({
                           ? 'bg-emerald-950/70 border border-emerald-800 text-emerald-300 hover:bg-emerald-900'
                           : 'bg-red-950/70 border border-red-800 text-red-300 hover:bg-red-900'
                       }`}
-                      title={isRTL ? 'اضغط لتغيير الحالة' : 'Click to toggle status'}
+                      title={product.inStock ? t.adminInStock : t.adminOutOfStock}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full ${product.inStock ? 'bg-emerald-400' : 'bg-red-400'}`} />
-                      <span>{product.inStock ? (isRTL ? 'متوفر' : 'In Stock') : (isRTL ? 'نفد' : 'Out of Stock')}</span>
+                      <span>{product.inStock ? t.adminInStock : t.adminOutOfStock}</span>
                     </button>
                   </div>
                 </td>
@@ -156,21 +156,21 @@ export const AdminProductTable: React.FC<AdminProductTableProps> = ({
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition-colors"
-                      title={isRTL ? 'معاينة في المتجر' : 'Live Preview'}
+                      title={t.adminStorePreview}
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                     </Link>
                     <Link
                       to={`/admin/products/edit/${product.id}`}
                       className="p-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition-colors"
-                      title={isRTL ? 'تعديل المنتج' : 'Edit Product'}
+                      title={t.adminHeaderEditProduct}
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </Link>
                     <button
                       onClick={() => onDeletePrompt(product.id)}
-                      className="p-1.5 bg-zinc-900 hover:bg-red-950 text-zinc-400 hover:text-red-400 border border-zinc-800 transition-colors"
-                      title={isRTL ? 'حذف المنتج' : 'Delete Product'}
+                      className="p-1.5 bg-zinc-900 hover:bg-red-950 text-zinc-400 hover:text-red-400 border border-zinc-800 transition-colors cursor-pointer"
+                      title={t.delete}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

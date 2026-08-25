@@ -31,7 +31,7 @@ export const AdminHomePageEditor: React.FC = () => {
     isBannersLoading
   } = useStoreData();
 
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
 
   const [activeTab, setActiveTab] = useState<BannerPlacement | 'SHOP_THE_LOOK'>('HERO_SLIDER');
   const [selectedBanner, setSelectedBanner] = useState<Partial<Banner> | null>(null);
@@ -65,23 +65,21 @@ export const AdminHomePageEditor: React.FC = () => {
   const handleSaveBanner = async (bannerData: Partial<Banner>) => {
     if (bannerData.id) {
       await updateBanner(bannerData.id, bannerData);
-      showSuccess(isRTL ? 'تم تحديث البانر بنجاح' : 'Banner updated successfully');
+      showSuccess(t.adminBannerUpdatedSuccess);
     } else {
       await addBanner(bannerData);
-      showSuccess(isRTL ? 'تمت إضافة البانر الجديد بنجاح' : 'New banner added successfully');
+      showSuccess(t.adminBannerCreatedSuccess);
     }
   };
 
   const handleDeleteBanner = async (id: string) => {
-    if (window.confirm(isRTL ? 'هل أنت متأكد من حذف هذا البانر نهائياً؟' : 'Are you sure you want to delete this banner?')) {
-      await deleteBanner(id);
-      showSuccess(isRTL ? 'تم حذف البانر' : 'Banner deleted');
-    }
+    await deleteBanner(id);
+    showSuccess(t.adminBannerDeleted);
   };
 
   const handleToggle = async (id: string) => {
     await toggleBannerStatus(id);
-    showSuccess(isRTL ? 'تم تغيير حالة تفعيل البانر' : 'Banner status updated');
+    showSuccess(t.adminBannerStatusUpdated);
   };
 
   const handleMove = async (index: number, direction: 'up' | 'down') => {
@@ -94,13 +92,13 @@ export const AdminHomePageEditor: React.FC = () => {
 
     const ids = list.map(b => b.id);
     await reorderBanners(ids);
-    showSuccess(isRTL ? 'تم تحديث ترتيب البانرات' : 'Banners reordered');
+    showSuccess(t.adminBannersReordered);
   };
 
   if (isBannersLoading && banners.length === 0) {
     return (
       <div className="py-24">
-        <EiffelLoader message={isRTL ? 'جاري جلب إعدادات وبانرات الواجهة الرئيسية...' : 'Loading home page CMS editor...'} />
+        <EiffelLoader message={t.loading} />
       </div>
     );
   }
@@ -113,13 +111,11 @@ export const AdminHomePageEditor: React.FC = () => {
           <div className="flex items-center gap-2">
             <LayoutTemplate className="w-5 h-5 text-amber-400" />
             <h1 className="text-xl sm:text-2xl font-editorial font-bold text-white tracking-wide">
-              {isRTL ? 'إدارة الحملات والبانرات التفاعلية' : 'Campaigns & Dynamic Banners CMS'}
+              {t.adminHomeBanners}
             </h1>
           </div>
           <p className="text-xs text-zinc-400 mt-0.5">
-            {isRTL
-              ? 'التحكم في سلايدر البداية، البانرات الترويجية، الأشرطة العلوية، النوافذ المنبثقة، وتتبع نسب التحويل (CTR).'
-              : 'Manage hero carousels, editorial promos, announcement strips, popups, and track CTR conversion live.'}
+            {t.adminCampaignsBannersDesc}
           </p>
         </div>
 
@@ -130,7 +126,7 @@ export const AdminHomePageEditor: React.FC = () => {
             rel="noopener noreferrer"
             className="px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700 rounded text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
           >
-            <span>{isRTL ? 'معاينة المتجر المباشر' : 'Live Storefront'}</span>
+            <span>{t.adminLiveStorefront}</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>
 
@@ -141,7 +137,7 @@ export const AdminHomePageEditor: React.FC = () => {
               className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black font-label-bold text-xs uppercase tracking-wider rounded flex items-center gap-1.5 shadow-lg transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>{isRTL ? 'إضافة بانر جديد' : 'New Banner'}</span>
+              <span>{t.adminAddBanner}</span>
             </button>
           )}
         </div>
@@ -167,11 +163,11 @@ export const AdminHomePageEditor: React.FC = () => {
       {/* Navigation Placement Tabs */}
       <div className="flex flex-wrap gap-2 border-b border-zinc-800 pb-2">
         {[
-          { id: 'HERO_SLIDER', label: isRTL ? 'سلايدر الهيرو الرئيسي' : 'Hero Slider', icon: Sliders, count: banners.filter(b => b.placement === 'HERO_SLIDER').length },
-          { id: 'PROMO_EDITORIAL', label: isRTL ? 'بانر العروض الترويجي' : 'Promo Editorial', icon: Layers, count: banners.filter(b => b.placement === 'PROMO_EDITORIAL').length },
-          { id: 'TOP_ANNOUNCEMENT', label: isRTL ? 'الشريط العلوي' : 'Top Announcement', icon: MessageSquare, count: banners.filter(b => b.placement === 'TOP_ANNOUNCEMENT').length },
-          { id: 'POPUP_MODAL', label: isRTL ? 'نافذة العروض المنبثقة' : 'Popup Modal', icon: Maximize2, count: banners.filter(b => b.placement === 'POPUP_MODAL').length },
-          { id: 'SHOP_THE_LOOK', label: isRTL ? 'تسوق الإطلالة (Lookbook)' : 'Shop The Look', icon: Sparkles, count: null }
+          { id: 'HERO_SLIDER', label: t.adminHeroSliderPlacement, icon: Sliders, count: banners.filter(b => b.placement === 'HERO_SLIDER').length },
+          { id: 'PROMO_EDITORIAL', label: t.adminPromoEditorialPlacement, icon: Layers, count: banners.filter(b => b.placement === 'PROMO_EDITORIAL').length },
+          { id: 'TOP_ANNOUNCEMENT', label: t.adminTopAnnouncementPlacement, icon: MessageSquare, count: banners.filter(b => b.placement === 'TOP_ANNOUNCEMENT').length },
+          { id: 'POPUP_MODAL', label: t.adminPopupModalPlacement, icon: Maximize2, count: banners.filter(b => b.placement === 'POPUP_MODAL').length },
+          { id: 'SHOP_THE_LOOK', label: t.adminShopTheLookPlacement, icon: Sparkles, count: null }
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

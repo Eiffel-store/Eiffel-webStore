@@ -7,7 +7,7 @@ import { AdminBranchModal } from '../components/branches/AdminBranchModal';
 
 export const AdminBranchesPage: React.FC = () => {
   const { stores, addStore, updateStore, deleteStore, isStoresLoading } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const [editingStore, setEditingStore] = useState<StoreLocation | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -76,12 +76,10 @@ export const AdminBranchesPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
         <div>
           <h1 className="text-xl sm:text-2xl font-editorial font-bold text-white tracking-wide">
-            {isRTL ? 'إدارة فروع المتجر' : 'Store Branches Management'}
+            {t.adminBranches}
           </h1>
           <p className="text-xs text-zinc-400 mt-0.5">
-            {isRTL
-              ? 'التحكم في بيانات وعناوين ومواعيد عمل فروع إيفل وإضافة فروع جديدة.'
-              : 'Manage addresses, hours, and contacts for Eiffel boutiques.'}
+            {t.adminStorefront}
           </p>
         </div>
 
@@ -112,18 +110,18 @@ export const AdminBranchesPage: React.FC = () => {
           className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 transition-colors font-label-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>{isRTL ? 'إضافة فرع جديد' : 'Add New Branch'}</span>
+          <span>{t.adminAddBranch}</span>
         </button>
       </div>
 
       {/* Loading / Empty / Content */}
       {isStoresLoading ? (
-        <EiffelLoader message={isRTL ? 'جاري جلب بيانات الفروع من قاعدة البيانات...' : 'Fetching boutique branches...'} />
+        <EiffelLoader message={t.loading} />
       ) : stores.length === 0 ? (
         <EmptyState
-          title={isRTL ? 'لا توجد فروع مسجلة حتى الآن' : 'No Branches Found'}
-          description={isRTL ? 'يمكنك إضافة فروع إيفل وعناوينها ومواعيد العمل لتظهر للعملاء على الخريطة.' : 'Add your boutique locations, addresses, and hours.'}
-          actionText={isRTL ? '+ إضافة أول فرع' : '+ Add First Branch'}
+          title={t.adminBranches}
+          description={t.adminStorefront}
+          actionText={t.adminAddBranch}
           onAction={() => setShowModal(true)}
         />
       ) : (

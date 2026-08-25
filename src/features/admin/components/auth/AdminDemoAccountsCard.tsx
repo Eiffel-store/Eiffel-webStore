@@ -6,12 +6,12 @@ interface AdminDemoAccountsCardProps {
 }
 
 export const AdminDemoAccountsCard: React.FC<AdminDemoAccountsCardProps> = ({ onQuickFill }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div className="mt-8 pt-6 border-t border-zinc-800">
       <div className="flex items-center justify-between mb-3 text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
-        <span>{isRTL ? 'حسابات الإدارة الجاهزة (Quick Fill):' : 'Pre-configured Staff Accounts:'}</span>
+        <span>{t.demoAccounts}:</span>
       </div>
 
       <div className="grid grid-cols-2 gap-2">

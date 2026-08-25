@@ -5,7 +5,7 @@ import { useStoreData, useLanguage, useCurrency } from '@/shared';
 
 export const AdminStatCards: React.FC = () => {
   const { products, stores, coupons, orders } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   const totalProducts = products.length;
@@ -21,7 +21,7 @@ export const AdminStatCards: React.FC = () => {
       <div className="bg-zinc-950 border border-zinc-800 p-5 shadow-lg relative overflow-hidden group hover:border-zinc-700 transition-colors">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">
-            {isRTL ? 'إجمالي المنتجات' : 'Total Products'}
+            {t.adminTotalProducts}
           </span>
           <div className="p-2 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded">
             <ShoppingBag className="w-4 h-4" />
@@ -30,17 +30,17 @@ export const AdminStatCards: React.FC = () => {
         <div className="mt-3 flex items-baseline gap-3">
           <span className="text-3xl font-editorial font-bold text-white">{totalProducts}</span>
           <span className="text-xs text-emerald-400 font-mono">
-            {inStockProducts} {isRTL ? 'متوفر' : 'in stock'}
+            {inStockProducts} {t.adminInStock}
           </span>
         </div>
         {outOfStockProducts > 0 && (
           <div className="mt-2 text-[11px] text-amber-400 flex items-center gap-1 font-mono">
             <AlertTriangle className="w-3 h-3" />
-            <span>{outOfStockProducts} {isRTL ? 'قطع نفدت' : 'out of stock'}</span>
+            <span>{outOfStockProducts} {t.adminOutOfStock}</span>
           </div>
         )}
         <Link to="/admin/products" className="mt-3 block text-[11px] text-zinc-400 hover:text-white flex items-center gap-1">
-          <span>{isRTL ? 'عرض الكتالوج' : 'View Catalog'}</span>
+          <span>{t.adminViewCatalog}</span>
           <ArrowRight className={`w-3 h-3 ${isRTL ? 'rotate-180' : ''}`} />
         </Link>
       </div>
@@ -49,7 +49,7 @@ export const AdminStatCards: React.FC = () => {
       <div className="bg-zinc-950 border border-zinc-800 p-5 shadow-lg relative overflow-hidden group hover:border-zinc-700 transition-colors">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">
-            {isRTL ? 'العروض والتخفيضات' : 'Active Offers'}
+            {t.adminActiveOffers}
           </span>
           <div className="p-2 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded">
             <Tag className="w-4 h-4 text-amber-400" />
@@ -58,14 +58,14 @@ export const AdminStatCards: React.FC = () => {
         <div className="mt-3 flex items-baseline gap-3">
           <span className="text-3xl font-editorial font-bold text-white">{offersCount}</span>
           <span className="text-xs text-amber-400 font-mono">
-            {coupons.filter(c => c.isActive).length} {isRTL ? 'كوبونات نشطة' : 'coupons'}
+            {coupons.filter(c => c.isActive).length} {t.adminActiveCoupons}
           </span>
         </div>
         <p className="mt-2 text-[11px] text-zinc-500 font-mono">
-          {isRTL ? 'قسم العروض في المتجر' : 'Active on /offers collection'}
+          {t.adminOffersSection}
         </p>
         <Link to="/admin/offers" className="mt-3 block text-[11px] text-zinc-400 hover:text-white flex items-center gap-1">
-          <span>{isRTL ? 'إدارة العروض' : 'Manage Offers'}</span>
+          <span>{t.adminManageOffers}</span>
           <ArrowRight className={`w-3 h-3 ${isRTL ? 'rotate-180' : ''}`} />
         </Link>
       </div>
@@ -74,7 +74,7 @@ export const AdminStatCards: React.FC = () => {
       <div className="bg-zinc-950 border border-zinc-800 p-5 shadow-lg relative overflow-hidden group hover:border-zinc-700 transition-colors">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">
-            {isRTL ? 'فروع المتجر' : 'Store Branches'}
+            {t.adminStoreBranches}
           </span>
           <div className="p-2 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded">
             <MapPin className="w-4 h-4 text-emerald-400" />
@@ -87,10 +87,10 @@ export const AdminStatCards: React.FC = () => {
           </span>
         </div>
         <p className="mt-2 text-[11px] text-zinc-500 font-mono">
-          {isRTL ? 'محافظة الغربية (زفتى / نهطاي)' : 'Gharbia Governorate'}
+          {t.adminGharbiaBranches}
         </p>
         <Link to="/admin/branches" className="mt-3 block text-[11px] text-zinc-400 hover:text-white flex items-center gap-1">
-          <span>{isRTL ? 'تعديل الفروع' : 'Edit Branches'}</span>
+          <span>{t.adminEditBranches}</span>
           <ArrowRight className={`w-3 h-3 ${isRTL ? 'rotate-180' : ''}`} />
         </Link>
       </div>
@@ -99,7 +99,7 @@ export const AdminStatCards: React.FC = () => {
       <div className="bg-zinc-950 border border-zinc-800 p-5 shadow-lg relative overflow-hidden group hover:border-zinc-700 transition-colors">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">
-            {isRTL ? 'إجمالي الطلبات' : 'Orders & Revenue'}
+            {t.adminOrders}
           </span>
           <div className="p-2 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded">
             <Package className="w-4 h-4 text-blue-400" />
@@ -108,14 +108,14 @@ export const AdminStatCards: React.FC = () => {
         <div className="mt-3 flex items-baseline gap-3">
           <span className="text-3xl font-editorial font-bold text-white">{orders.length}</span>
           <span className="text-xs text-blue-400 font-mono">
-            {pendingOrders.length} {isRTL ? 'قيد المتابعة' : 'pending'}
+            {pendingOrders.length} {t.adminFilterPending}
           </span>
         </div>
         <p className="mt-2 text-[11px] text-emerald-400 font-mono font-bold">
           {formatPrice(totalRevenue)}
         </p>
         <Link to="/admin/orders" className="mt-3 block text-[11px] text-zinc-400 hover:text-white flex items-center gap-1">
-          <span>{isRTL ? 'سجل الطلبات' : 'View Orders'}</span>
+          <span>{t.adminHeaderOrders}</span>
           <ArrowRight className={`w-3 h-3 ${isRTL ? 'rotate-180' : ''}`} />
         </Link>
       </div>

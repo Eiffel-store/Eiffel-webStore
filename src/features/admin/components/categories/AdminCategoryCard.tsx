@@ -17,10 +17,10 @@ export const AdminCategoryCard: React.FC<AdminCategoryCardProps> = ({
   onEdit,
   onDelete
 }) => {
-  const { isRTL } = useLanguage();
+  const { language, t } = useLanguage();
   const isProtected = ['men', 'kids', 'accessories', 'offers'].includes(category.id);
-  const displayName = isRTL ? (category.name || category.nameEn) : (category.nameEn || category.name);
-  console.log("cat1",category)
+  const displayName = language === 'ar' ? (category.name || category.nameEn) : (category.nameEn || category.name);
+
   return (
     <div className="bg-zinc-950 border border-zinc-800 overflow-hidden shadow-xl flex flex-col justify-between group hover:border-zinc-700 transition-colors">
       <div className="relative aspect-[16/9] overflow-hidden bg-zinc-900">
@@ -35,7 +35,7 @@ export const AdminCategoryCard: React.FC<AdminCategoryCardProps> = ({
             {category.nameEn}
           </span>
           <span className="text-[10px] font-mono text-emerald-400 bg-black/70 px-2 py-0.5 font-bold">
-            {productCount} {isRTL ? 'منتج' : 'items'}
+            {productCount} {t.items}
           </span>
         </div>
       </div>
@@ -59,23 +59,23 @@ export const AdminCategoryCard: React.FC<AdminCategoryCardProps> = ({
             rel="noopener noreferrer"
             className="text-[11px] text-zinc-400 hover:text-white flex items-center gap-1 font-mono"
           >
-            <span>{isRTL ? 'معاينة في المتجر' : 'Store Preview'}</span>
+            <span>{t.adminStorePreview}</span>
             <ExternalLink className="w-3 h-3" />
           </Link>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => onEdit(category)}
-              className="p-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700 text-xs transition-colors"
-              title={isRTL ? 'تعديل القسم' : 'Edit Category'}
+              className="p-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700 text-xs transition-colors cursor-pointer"
+              title={t.adminEditCategory}
             >
               <Edit2 className="w-3.5 h-3.5" />
             </button>
             {!isProtected && (
               <button
                 onClick={() => onDelete(category.id)}
-                className="p-1.5 bg-zinc-900 hover:bg-red-950 text-zinc-400 hover:text-red-400 border border-zinc-700 text-xs transition-colors"
-                title={isRTL ? 'حذف القسم' : 'Delete Category'}
+                className="p-1.5 bg-zinc-900 hover:bg-red-950 text-zinc-400 hover:text-red-400 border border-zinc-700 text-xs transition-colors cursor-pointer"
+                title={t.delete}
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>

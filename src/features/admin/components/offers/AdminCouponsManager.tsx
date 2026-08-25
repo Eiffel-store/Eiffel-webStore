@@ -4,7 +4,7 @@ import { useLanguage, useCurrency, useStoreData } from '@/shared';
 
 export const AdminCouponsManager: React.FC = () => {
   const { coupons, addCoupon, updateCoupon, deleteCoupon } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   const [newCouponCode, setNewCouponCode] = useState('');
@@ -31,14 +31,14 @@ export const AdminCouponsManager: React.FC = () => {
     <div className="bg-zinc-950 border border-zinc-800 p-6 shadow-xl space-y-6">
       <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2 pb-3 border-b border-zinc-800">
         <Percent className="w-4 h-4 text-emerald-400" />
-        <span>{isRTL ? 'أكواد الخصم والكوبونات الترويجية (Promo Codes)' : 'Promo Coupon Codes'}</span>
+        <span>{t.adminCouponsPromoCodes}</span>
       </h2>
 
       {/* Create Coupon Form */}
       <form onSubmit={handleCreateCoupon} className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-4 bg-zinc-900/60 border border-zinc-800">
         <div className="sm:col-span-4">
           <label className="block text-[11px] text-zinc-400 font-bold mb-1">
-            {isRTL ? 'كود الخصم (Promo Code) *' : 'Coupon Code *'}
+            {t.adminCouponsPromoCodes} *
           </label>
           <input
             type="text"
@@ -52,7 +52,7 @@ export const AdminCouponsManager: React.FC = () => {
 
         <div className="sm:col-span-3">
           <label className="block text-[11px] text-zinc-400 font-bold mb-1">
-            {isRTL ? 'نسبة الخصم (%) *' : 'Discount Percentage (%) *'}
+            {t.adminDiscountPercentage} (%) *
           </label>
           <input
             type="number"
@@ -67,7 +67,7 @@ export const AdminCouponsManager: React.FC = () => {
 
         <div className="sm:col-span-3">
           <label className="block text-[11px] text-zinc-400 font-bold mb-1">
-            {isRTL ? 'الحد الأدنى للطلب (EGP)' : 'Min Order (EGP)'}
+            {t.adminMinOrderEgp}
           </label>
           <input
             type="number"
@@ -81,10 +81,10 @@ export const AdminCouponsManager: React.FC = () => {
         <div className="sm:col-span-2 flex items-end">
           <button
             type="submit"
-            className="w-full py-2 bg-white text-black hover:bg-zinc-200 text-xs font-label-bold uppercase tracking-wider flex items-center justify-center gap-1.5"
+            className="w-full py-2 bg-white text-black hover:bg-zinc-200 text-xs font-label-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>{isRTL ? 'إنشاء' : 'Create'}</span>
+            <span>{t.adminAddOffer}</span>
           </button>
         </div>
       </form>
@@ -94,11 +94,11 @@ export const AdminCouponsManager: React.FC = () => {
         <table className="w-full text-left rtl:text-right text-xs">
           <thead>
             <tr className="border-b border-zinc-800 text-zinc-500 font-mono uppercase text-[11px]">
-              <th className="py-3 px-3">{isRTL ? 'كود الكوبون' : 'Code'}</th>
-              <th className="py-3 px-3">{isRTL ? 'قيمة الخصم' : 'Discount'}</th>
-              <th className="py-3 px-3">{isRTL ? 'الحد الأدنى' : 'Min Order'}</th>
-              <th className="py-3 px-3 text-center">{isRTL ? 'الحالة' : 'Status'}</th>
-              <th className="py-3 px-3 text-right rtl:text-left">{isRTL ? 'حذف' : 'Action'}</th>
+              <th className="py-3 px-3">{t.adminCouponsPromoCodes}</th>
+              <th className="py-3 px-3">{t.adminDiscountPercentage}</th>
+              <th className="py-3 px-3">{t.adminMinOrderEgp}</th>
+              <th className="py-3 px-3 text-center">{t.adminProductTableStatus}</th>
+              <th className="py-3 px-3 text-right rtl:text-left">{t.adminProductTableActions}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-800/50">
@@ -116,21 +116,21 @@ export const AdminCouponsManager: React.FC = () => {
                 <td className="py-3 px-3 text-center">
                   <button
                     onClick={() => updateCoupon(coupon.id, { isActive: !coupon.isActive })}
-                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-mono font-bold ${
+                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-mono font-bold cursor-pointer ${
                       coupon.isActive
                         ? 'bg-emerald-950/80 border border-emerald-800 text-emerald-300'
                         : 'bg-zinc-900 border border-zinc-700 text-zinc-400'
                     }`}
                   >
                     {coupon.isActive ? <CheckCircle className="w-3 h-3 text-emerald-400" /> : <XCircle className="w-3 h-3 text-zinc-500" />}
-                    <span>{coupon.isActive ? (isRTL ? 'مفعل' : 'Active') : (isRTL ? 'معطل' : 'Disabled')}</span>
+                    <span>{coupon.isActive ? t.adminActiveStatus : t.adminInactiveStatus}</span>
                   </button>
                 </td>
                 <td className="py-3 px-3 text-right rtl:text-left">
                   <button
                     onClick={() => deleteCoupon(coupon.id)}
-                    className="p-1 text-zinc-500 hover:text-red-400 transition-colors"
-                    title={isRTL ? 'حذف الكوبون' : 'Delete Coupon'}
+                    className="p-1 text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
+                    title={t.delete}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

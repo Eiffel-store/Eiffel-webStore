@@ -20,7 +20,7 @@ export const AdminCategoryModal: React.FC<AdminCategoryModalProps> = ({
   setFormCategory,
   onSave
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const [newSubCat, setNewSubCat] = useState('');
 
   if (!isOpen) return null;
@@ -58,10 +58,10 @@ export const AdminCategoryModal: React.FC<AdminCategoryModalProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-base text-white tracking-wide">
-                {isEditing ? (isRTL ? 'تعديل بيانات القسم' : 'Edit Category') : (isRTL ? 'إضافة قسم جديد للكتالوج' : 'Add New Catalog Category')}
+                {isEditing ? t.adminEditCategory : t.adminAddCategory}
               </h3>
               <p className="text-xs text-zinc-400 mt-0.5">
-                {isRTL ? 'إعداد اسم القسم وصورة الغلاف في المتجر.' : 'Configure category name and cover banner.'}
+                {t.adminCategoryConfigDesc}
               </p>
             </div>
           </div>
@@ -80,26 +80,26 @@ export const AdminCategoryModal: React.FC<AdminCategoryModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-zinc-200 font-bold mb-1.5">
-                {isRTL ? 'اسم القسم (عربي) *' : 'Category Name (AR) *'}
+                {t.adminCategoryNameAr}
               </label>
               <input
                 type="text"
                 required
                 value={formCategory.name}
                 onChange={(e) => setFormCategory({ ...formCategory, name: e.target.value })}
-                placeholder={isRTL ? 'مثال: أزياء الرجال' : 'e.g. أزياء الرجال'}
+                placeholder="أزياء الرجال"
                 className="w-full bg-zinc-900/90 border border-zinc-700/80 px-3.5 py-2.5 text-xs text-white rounded-xl focus:outline-none focus:border-amber-400 transition-colors"
               />
             </div>
             <div>
               <label className="block text-xs text-zinc-200 font-bold mb-1.5">
-                {isRTL ? 'اسم القسم (إنجليزي)' : 'Category Name (EN)'}
+                {t.adminCategoryNameEn}
               </label>
               <input
                 type="text"
                 value={formCategory.nameEn || ''}
                 onChange={(e) => setFormCategory({ ...formCategory, nameEn: e.target.value })}
-                placeholder="e.g. MEN COLLECTION"
+                placeholder="MEN COLLECTION"
                 className="w-full bg-zinc-900/90 border border-zinc-700/80 px-3.5 py-2.5 text-xs text-white rounded-xl focus:outline-none focus:border-amber-400 transition-colors"
               />
             </div>
@@ -108,13 +108,13 @@ export const AdminCategoryModal: React.FC<AdminCategoryModalProps> = ({
           {/* Subtitle */}
           <div>
             <label className="block text-xs text-zinc-200 font-bold mb-1.5">
-              {isRTL ? 'الوصف الفرعي / السلوجان' : 'Category Subtitle / Slogan'}
+              {t.adminCategorySubtitle}
             </label>
             <input
               type="text"
               value={formCategory.subtitle}
               onChange={(e) => setFormCategory({ ...formCategory, subtitle: e.target.value })}
-              placeholder={isRTL ? 'مثال: قصات معمارية انسيابية وخامات قطن فاخرة' : 'e.g. Brutalist silhouettes & precision tailoring'}
+              placeholder="Brutalist silhouettes & precision tailoring"
               className="w-full bg-zinc-900/90 border border-zinc-700/80 px-3.5 py-2.5 text-xs text-white rounded-xl focus:outline-none focus:border-amber-400 transition-colors"
             />
           </div>
@@ -122,7 +122,7 @@ export const AdminCategoryModal: React.FC<AdminCategoryModalProps> = ({
           {/* Sub-Categories */}
           <div>
             <label className="block text-xs text-zinc-200 font-bold mb-2">
-              {isRTL ? 'الأقسام الفرعية (Sub-Categories)' : 'Sub-Categories'}
+              {t.adminSubCategories}
             </label>
 
             {/* Tags */}
@@ -153,7 +153,7 @@ export const AdminCategoryModal: React.FC<AdminCategoryModalProps> = ({
                 value={newSubCat}
                 onChange={(e) => setNewSubCat(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={isRTL ? 'مثال: كعب عالي... ثم اضغط Enter' : 'e.g. Sneakers... then press Enter'}
+                placeholder="Sneakers..."
                 className="flex-1 bg-zinc-900/90 border border-zinc-700/80 px-3.5 py-2.5 text-xs text-white rounded-xl focus:outline-none focus:border-amber-400 transition-colors"
               />
               <button
@@ -165,18 +165,18 @@ export const AdminCategoryModal: React.FC<AdminCategoryModalProps> = ({
               </button>
             </div>
             <p className="text-[10px] text-zinc-500 mt-1.5">
-              {isRTL ? 'اضغط Enter أو + لإضافة قسم فرعي، واضغط X لحذفه.' : 'Press Enter or + to add, X to remove a sub-category.'}
+              {t.adminSubCategoryAddHelp}
             </p>
           </div>
 
           {/* Cover Image */}
           <ImageUploadInput
-            label={isRTL ? 'صورة الغلاف للقسم (Cover Banner)' : 'Category Cover Banner'}
+            label={t.adminCategoryCoverBanner}
             value={formCategory.image}
             onChange={(url) => setFormCategory({ ...formCategory, image: url })}
             aspectRatio="16/9"
             required={true}
-            helpText={isRTL ? 'اختر صورة عالية الجودة تُظهر طابع القسم في الصفحة الرئيسية.' : 'Select a high resolution banner for the storefront.'}
+            helpText={t.adminCategoryCoverBannerHelp}
           />
 
           {/* Actions */}
@@ -186,13 +186,13 @@ export const AdminCategoryModal: React.FC<AdminCategoryModalProps> = ({
               onClick={onClose}
               className="px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-semibold border border-zinc-700/80 rounded-xl transition-colors cursor-pointer"
             >
-              {isRTL ? 'إلغاء' : 'Cancel'}
+              {t.cancel}
             </button>
             <button
               type="submit"
               className="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded-xl transition-all shadow-lg active:scale-95 cursor-pointer"
             >
-              {isEditing ? (isRTL ? 'حفظ التعديل' : 'Save Changes') : (isRTL ? 'إضافة القسم' : 'Add Category')}
+              {isEditing ? t.saveChanges : t.adminAddCategory}
             </button>
           </div>
 

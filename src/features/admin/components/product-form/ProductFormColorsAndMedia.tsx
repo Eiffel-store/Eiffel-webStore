@@ -35,7 +35,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
   onImagesChange,
   onSizesChange
 }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
 
   // New color form state
   const [newColorName, setNewColorName] = useState('');
@@ -115,7 +115,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
   // Add new color with its linked image
   const handleAddColor = () => {
     if (!newColorName.trim()) {
-      alert(isRTL ? 'يرجى إدخال اسم اللون.' : 'Please enter a color name.');
+      alert(t.adminEnterColorName);
       return;
     }
 
@@ -209,10 +209,10 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
       <div className="pb-3 border-b border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2">
           <ImageIcon className="w-4 h-4 text-amber-400" />
-          <span>{isRTL ? '2. ألوان وصور المنتج (ربط كل لون بصورته تلقائياً)' : '2. Colors & Color-Specific Imagery'}</span>
+          <span>{t.adminColorsAndMediaSection}</span>
         </h2>
         <span className="text-[11px] text-zinc-400 font-mono">
-          {isRTL ? 'ارفع صورة كل لون مباشرة لترتبط به فوراً في المتجر' : 'Add each color and attach its exact image'}
+          {t.adminAttachColorImageTip}
         </span>
       </div>
 
@@ -220,10 +220,10 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <label className="text-xs text-zinc-200 font-bold block">
-            {isRTL ? 'الألوان المتاحة للقطعة وصورة كل لون:' : 'Product Colors & Respective Photos:'}
+            {t.adminAvailableColorsLabel}
           </label>
           <span className="text-[11px] text-emerald-400 font-mono">
-            {isRTL ? `(${colors.length} ألوان مضافة)` : `(${colors.length} colors added)`}
+            ({colors.length} {t.adminColorsAdded})
           </span>
         </div>
 
@@ -244,13 +244,13 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                     value={c.hex}
                     onChange={(e) => handleUpdateColor(idx, { hex: e.target.value })}
                     className="w-6 h-6 rounded-full border border-zinc-600 cursor-pointer p-0 shrink-0 bg-transparent"
-                    title={isRTL ? 'تعديل درجة اللون' : 'Change color hex'}
+                    title={t.adminEditColorDegree}
                   />
                   <input
                     type="text"
                     value={c.name}
                     onChange={(e) => handleUpdateColor(idx, { name: e.target.value })}
-                    placeholder={isRTL ? 'اسم اللون (مثال: كحلي)' : 'Color name'}
+                    placeholder={t.adminColorNamePlaceholder}
                     className="bg-zinc-800/80 border border-zinc-700 px-2 py-1 text-xs text-white rounded font-bold w-full focus:outline-none focus:border-amber-400"
                   />
                 </div>
@@ -259,7 +259,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                   type="button"
                   onClick={() => handleRemoveColor(idx)}
                   className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-950/50 rounded transition-colors cursor-pointer shrink-0"
-                  title={isRTL ? 'حذف هذا اللون' : 'Delete color'}
+                  title={t.adminDeleteColor}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -277,7 +277,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
                       <label className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs rounded flex items-center gap-1.5 cursor-pointer shadow">
                         <Upload className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>{isRTL ? 'تغيير الصورة' : 'Change'}</span>
+                        <span>{t.adminChangePhoto}</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -289,7 +289,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                         type="button"
                         onClick={() => handleUpdateColor(idx, { image: undefined })}
                         className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded shadow cursor-pointer"
-                        title={isRTL ? 'إزالة الصورة' : 'Remove image'}
+                        title={t.adminRemovePhoto}
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -299,10 +299,10 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                   <label className="flex flex-col items-center justify-center gap-1.5 p-4 text-center cursor-pointer w-full h-full hover:bg-zinc-900/60 transition-colors">
                     <Upload className="w-6 h-6 text-amber-400" />
                     <span className="text-xs font-bold text-zinc-200">
-                      {isRTL ? `رفع صورة لون (${c.name || 'هذا اللون'})` : `Upload ${c.name || 'Color'} Photo`}
+                      {t.adminUploadColorPhoto} ({c.name || ''})
                     </span>
                     <span className="text-[10px] text-zinc-500 font-mono">
-                      {isRTL ? 'اضغط لاختيار صورة من جهازك' : 'Click to browse from device'}
+                      {t.adminClickToBrowseDevice}
                     </span>
                     <input
                       type="file"
@@ -322,14 +322,14 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-white flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>{isRTL ? '+ إضافة لون جديد وصورته مباشرة:' : '+ Add New Color Variant with Image:'}</span>
+              <span>{t.adminAddNewColorWithPhoto}</span>
             </span>
           </div>
 
           {/* Quick Presets */}
           <div>
             <span className="text-[11px] text-zinc-400 block mb-1.5">
-              {isRTL ? 'ألوان شائعة جاهزة (اضغط لاختيار فوري):' : 'Quick Color Presets:'}
+              {t.adminPopularColorPresets}
             </span>
             <div className="flex flex-wrap gap-1.5">
               {POPULAR_COLOR_PRESETS.map((preset, pIdx) => (
@@ -364,7 +364,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                 type="text"
                 value={newColorName}
                 onChange={(e) => setNewColorName(e.target.value)}
-                placeholder={isRTL ? 'اسم اللون (مثال: كحلي، بيج)' : 'Color Name (e.g. Navy, Beige)'}
+                placeholder={t.adminColorNamePlaceholder}
                 className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-bold"
               />
             </div>
@@ -381,8 +381,8 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                 )}
                 <span>
                   {newColorImage
-                    ? isRTL ? '✓ تم رفع صورة اللون' : '✓ Photo Selected'
-                    : isRTL ? 'رفع صورة هذا اللون' : 'Upload Color Photo'}
+                    ? t.adminColorPhotoUploaded
+                    : t.adminUploadColorPhoto}
                 </span>
                 <input
                   type="file"
@@ -397,7 +397,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                 type="url"
                 value={newColorImage}
                 onChange={(e) => setNewColorImage(e.target.value)}
-                placeholder={isRTL ? 'أو رابط صورة...' : 'Or image URL...'}
+                placeholder={t.adminOrImageUrl}
                 className="w-28 bg-zinc-900 border border-zinc-700 px-2 py-1.5 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-mono"
               />
             </div>
@@ -410,7 +410,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                 className="w-full py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow"
               >
                 <Plus className="w-4 h-4" />
-                <span>{isRTL ? 'إضافة اللون وصورته' : 'Add Color & Image'}</span>
+                <span>{t.adminAddColorAndImage}</span>
               </button>
             </div>
           </div>
@@ -419,13 +419,13 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
           {newColorImage && (
             <div className="flex items-center gap-2 p-2 bg-zinc-950 rounded border border-emerald-800 text-[11px] text-emerald-400 font-mono">
               <img src={newColorImage} alt="Preview" className="w-8 h-8 rounded object-cover border border-emerald-500" />
-              <span>{isRTL ? 'الصورة جاهزة وسيتم حفظها مع هذا اللون عند الضغط على "إضافة اللون"' : 'Image ready to be linked with this color variant'}</span>
+              <span>{t.adminColorPhotoReadyTip}</span>
               <button
                 type="button"
                 onClick={() => setNewColorImage('')}
                 className="text-red-400 hover:underline text-[10px] ml-auto rtl:ml-0 rtl:mr-auto cursor-pointer"
               >
-                {isRTL ? 'إلغاء' : 'Clear'}
+                {t.cancel}
               </button>
             </div>
           )}
@@ -435,7 +435,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
       {/* 3. Additional Gallery Angles (Optional extra images) */}
       <div className="space-y-3 pt-4 border-t border-zinc-800">
         <label className="text-xs text-zinc-300 font-bold block">
-          {isRTL ? 'صور وزوايا إضافية للقطعة (اختياري - كالتفاصيل والظهر والأقمشة):' : 'Additional Detailed Angles (Optional):'}
+          {t.adminExtraGalleryImages}
         </label>
 
         <div className="flex flex-col sm:flex-row gap-3">
@@ -447,7 +447,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
             ) : (
               <Upload className="w-4 h-4 text-emerald-400" />
             )}
-            <span>{isRTL ? 'رفع صور إضافية من الجهاز (ملفات متعددة)' : 'Upload Additional Photos from Device'}</span>
+            <span>{t.adminUploadMultiplePhotosFromDevice}</span>
             <input
               type="file"
               multiple
@@ -463,7 +463,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
               type="url"
               value={extraUrlInput}
               onChange={(e) => setExtraUrlInput(e.target.value)}
-              placeholder={isRTL ? 'أو ضع رابط صورة مباشر...' : 'Or direct image URL...'}
+              placeholder={t.adminOrDirectImageUrl}
               className="flex-1 bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-mono"
             />
             <button
@@ -471,7 +471,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
               onClick={handleAddExtraUrl}
               className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium border border-zinc-700 rounded transition-colors shrink-0 cursor-pointer"
             >
-              {isRTL ? 'إضافة' : 'Add'}
+              {t.adminAddPhotoBtn}
             </button>
           </div>
         </div>
@@ -499,7 +499,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                     type="button"
                     onClick={() => handleRemoveExtraImage(img)}
                     className="absolute top-1 right-1 rtl:right-auto rtl:left-1 p-1 bg-red-600 text-white rounded shadow opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                    title={isRTL ? 'حذف هذه الصورة' : 'Delete image'}
+                    title={t.adminRemovePhoto}
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -513,7 +513,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
       {/* 4. Sizes Matrix */}
       <div className="space-y-3 pt-4 border-t border-zinc-800">
         <label className="block text-xs text-zinc-300 font-bold">
-          {isRTL ? 'المقاسات المتاحة للقطعة (اختر المقاسات المتوفرة):' : 'Available Garment Sizes:'}
+          {t.adminGarmentSizesLabel}
         </label>
         <div className="flex flex-wrap gap-2">
           {AVAILABLE_SIZES.map((size) => {

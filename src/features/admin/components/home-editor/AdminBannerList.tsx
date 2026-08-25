@@ -28,19 +28,17 @@ export const AdminBannerList: React.FC<AdminBannerListProps> = ({
   onDelete,
   onMove,
 }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
 
   if (banners.length === 0) {
     return (
       <div className="p-12 text-center bg-zinc-950 border border-zinc-800 rounded-lg space-y-3">
         <ImageIcon className="w-10 h-10 text-zinc-600 mx-auto" />
         <h3 className="text-sm font-bold text-zinc-300">
-          {isRTL ? 'لا توجد بانرات مضافة في هذا الموضع بعد' : 'No banners created for this placement yet'}
+          {t.adminNoBannersYet}
         </h3>
         <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-          {isRTL
-            ? 'قم بإضافة بانر جديد وتخصيص العنوان، الصور، وروابط التوجيه لنشره فوراً.'
-            : 'Create a new banner and customize titles, images and CTA links.'}
+          {t.adminCampaignsBannersDesc}
         </p>
         <button
           type="button"
@@ -48,7 +46,7 @@ export const AdminBannerList: React.FC<AdminBannerListProps> = ({
           className="mt-2 px-4 py-2 bg-amber-500 text-black font-bold text-xs rounded hover:bg-amber-400 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>{isRTL ? 'إضافة أول بانر' : 'Add First Banner'}</span>
+          <span>{t.adminAddBanner}</span>
         </button>
       </div>
     );
@@ -81,7 +79,7 @@ export const AdminBannerList: React.FC<AdminBannerListProps> = ({
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-zinc-600 text-[10px]">
-                    {isRTL ? 'بدون صورة' : 'No Image'}
+                    {t.adminNoImage}
                   </div>
                 )}
                 {banner.mobileImageUrl && (
@@ -101,7 +99,7 @@ export const AdminBannerList: React.FC<AdminBannerListProps> = ({
                         : 'bg-zinc-900 text-zinc-400'
                     }`}
                   >
-                    {banner.isActive ? (isRTL ? '● نشط لايف' : '● Live') : (isRTL ? '✕ معطل' : '✕ Inactive')}
+                    {banner.isActive ? `● ${t.adminActiveStatus}` : `✕ ${t.adminInactiveStatus}`}
                   </span>
 
                   {banner.tagAr && (
@@ -146,7 +144,7 @@ export const AdminBannerList: React.FC<AdminBannerListProps> = ({
                 onClick={() => onMove(index, 'up')}
                 disabled={index === 0}
                 className="p-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
-                title={isRTL ? 'تحريك لأعلى' : 'Move Up'}
+                title={t.adminMoveUp}
               >
                 <ArrowUp className="w-4 h-4" />
               </button>
@@ -156,7 +154,7 @@ export const AdminBannerList: React.FC<AdminBannerListProps> = ({
                 onClick={() => onMove(index, 'down')}
                 disabled={index === banners.length - 1}
                 className="p-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
-                title={isRTL ? 'تحريك لأسفل' : 'Move Down'}
+                title={t.adminMoveDown}
               >
                 <ArrowDown className="w-4 h-4" />
               </button>
@@ -170,14 +168,14 @@ export const AdminBannerList: React.FC<AdminBannerListProps> = ({
                     : 'bg-emerald-950 text-emerald-400 hover:bg-emerald-900 border border-emerald-800'
                 }`}
               >
-                {banner.isActive ? (isRTL ? 'تعطيل' : 'Disable') : (isRTL ? 'تفعيل' : 'Enable')}
+                {banner.isActive ? t.adminDisableAction : t.adminEnableAction}
               </button>
 
               <button
                 type="button"
                 onClick={() => onOpenEdit(banner)}
                 className="p-1.5 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white cursor-pointer"
-                title={isRTL ? 'تعديل' : 'Edit'}
+                title={t.adminEditCategory}
               >
                 <Edit2 className="w-4 h-4" />
               </button>
@@ -186,7 +184,7 @@ export const AdminBannerList: React.FC<AdminBannerListProps> = ({
                 type="button"
                 onClick={() => onDelete(banner.id)}
                 className="p-1.5 rounded bg-zinc-900 hover:bg-rose-950 text-zinc-400 hover:text-rose-400 cursor-pointer"
-                title={isRTL ? 'حذف' : 'Delete'}
+                title={t.delete}
               >
                 <Trash2 className="w-4 h-4" />
               </button>

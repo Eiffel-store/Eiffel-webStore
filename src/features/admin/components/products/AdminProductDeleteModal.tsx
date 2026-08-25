@@ -13,7 +13,7 @@ export const AdminProductDeleteModal: React.FC<AdminProductDeleteModalProps> = (
   onConfirm,
   onCancel
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   if (!productId) return null;
 
@@ -23,26 +23,24 @@ export const AdminProductDeleteModal: React.FC<AdminProductDeleteModalProps> = (
         <div className="flex items-center gap-3 text-red-400">
           <AlertCircle className="w-6 h-6 shrink-0" />
           <h3 className="font-bold text-sm text-white">
-            {isRTL ? 'تأكيد حذف المنتج؟' : 'Delete Product?'}
+            {t.adminDeleteProductConfirm}
           </h3>
         </div>
         <p className="text-xs text-zinc-400">
-          {isRTL
-            ? 'هل أنت متأكد من حذف هذه القطعة من الكتالوج؟ لن تظهر مجدداً في المتجر.'
-            : 'Are you sure you want to remove this piece from the catalog? This action is permanent.'}
+          {t.adminDeleteProductWarning}
         </p>
         <div className="flex items-center justify-end gap-3 pt-2">
           <button
             onClick={onCancel}
-            className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-700 transition-colors"
+            className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-700 transition-colors cursor-pointer"
           >
-            {isRTL ? 'إلغاء' : 'Cancel'}
+            {t.cancel}
           </button>
           <button
             onClick={() => onConfirm(productId)}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors"
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors cursor-pointer"
           >
-            {isRTL ? 'نعم، احذف' : 'Delete'}
+            {t.delete}
           </button>
         </div>
       </div>

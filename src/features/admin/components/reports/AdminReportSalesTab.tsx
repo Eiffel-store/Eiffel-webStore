@@ -23,7 +23,7 @@ export const AdminReportSalesTab: React.FC<AdminReportSalesTabProps> = ({
   categories,
   coupons
 }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   const nonCancelledOrders = orders.filter((o) => o.status !== 'Cancelled');
@@ -93,41 +93,41 @@ export const AdminReportSalesTab: React.FC<AdminReportSalesTabProps> = ({
         {/* Gross Sales */}
         <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-zinc-400">{isRTL ? 'إجمالي المبيعات (Gross)' : 'Gross Merchandise Value'}</span>
+            <span className="text-xs font-mono text-zinc-400">{t.adminGrossSales}</span>
             <Receipt className="w-4 h-4 text-zinc-400" />
           </div>
           <p className="text-2xl font-mono font-bold text-white mt-2">{formatPrice(grossSales)}</p>
-          <p className="text-[11px] text-zinc-500 font-mono mt-1">{isRTL ? 'قبل الخصومات والشحن' : 'Before discounts & shipping'}</p>
+          <p className="text-[11px] text-zinc-500 font-mono mt-1">{t.adminBeforeDiscountsShipping}</p>
         </div>
 
         {/* Shipping Revenue */}
         <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-zinc-400">{isRTL ? 'رسوم الشحن المحصلة' : 'Shipping Collected'}</span>
+            <span className="text-xs font-mono text-zinc-400">{t.adminShippingRevenueCollected}</span>
             <Banknote className="w-4 h-4 text-blue-400" />
           </div>
           <p className="text-2xl font-mono font-bold text-white mt-2">{formatPrice(totalShippingCollected)}</p>
-          <p className="text-[11px] text-zinc-500 font-mono mt-1">{isRTL ? 'شحن المحافظات كاش' : 'Express courier delivery'}</p>
+          <p className="text-[11px] text-zinc-500 font-mono mt-1">{t.adminExpressCourierDelivery}</p>
         </div>
 
         {/* Discounts Impact */}
         <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-zinc-400">{isRTL ? 'إجمالي الخصومات الممنوحة' : 'Discounts & Promos'}</span>
+            <span className="text-xs font-mono text-zinc-400">{t.adminDiscountsGivenTotal}</span>
             <Percent className="w-4 h-4 text-amber-400" />
           </div>
           <p className="text-2xl font-mono font-bold text-amber-400 mt-2">-{formatPrice(totalDiscountsGiven)}</p>
-          <p className="text-[11px] text-zinc-500 font-mono mt-1">{isRTL ? 'وفورات العملاء والكوبونات' : 'Coupons & promotional discounts'}</p>
+          <p className="text-[11px] text-zinc-500 font-mono mt-1">{t.adminCouponsPromosSavings}</p>
         </div>
 
         {/* Net Revenue */}
         <div className="p-5 rounded-xl bg-gradient-to-br from-amber-400/10 to-zinc-950 border border-amber-400/30 shadow-md">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-amber-400 font-bold">{isRTL ? 'صافي التدفق المالي المحقق' : 'Net Cash Realized'}</span>
+            <span className="text-xs font-mono text-amber-400 font-bold">{t.adminNetCashRealized}</span>
             <DollarSign className="w-4 h-4 text-amber-400" />
           </div>
           <p className="text-2xl font-mono font-bold text-white mt-2">{formatPrice(netRevenue)}</p>
-          <p className="text-[11px] text-emerald-400 font-mono mt-1">{isRTL ? 'دفع عند الاستلام (COD)' : 'Cash On Delivery'}</p>
+          <p className="text-[11px] text-emerald-400 font-mono mt-1">{t.cod}</p>
         </div>
       </div>
 
@@ -139,10 +139,10 @@ export const AdminReportSalesTab: React.FC<AdminReportSalesTabProps> = ({
             <div className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-amber-400" />
               <h2 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
-                {isRTL ? 'حصة مبيعات الأقسام والتصنيفات' : 'Sales by Category Breakdown'}
+                {t.adminSalesByCategoryBreakdown}
               </h2>
             </div>
-            <span className="text-xs font-mono text-zinc-500">{categories.length} {isRTL ? 'أقسام' : 'categories'}</span>
+            <span className="text-xs font-mono text-zinc-500">{categories.length} {t.adminCategoriesCountUnit}</span>
           </div>
 
           <div className="space-y-4">
@@ -151,7 +151,7 @@ export const AdminReportSalesTab: React.FC<AdminReportSalesTabProps> = ({
                 <div className="flex justify-between items-center text-xs font-mono">
                   <span className="text-zinc-200 font-medium">{isRTL ? cat.name : cat.nameEn}</span>
                   <div className="flex items-center gap-3">
-                    <span className="text-zinc-400">{cat.count} {isRTL ? 'قطعة' : 'items'}</span>
+                    <span className="text-zinc-400">{cat.count} {t.items}</span>
                     <span className="text-white font-bold">{formatPrice(cat.revenue)}</span>
                     <span className="text-amber-400 font-bold w-10 text-right">{cat.percentage}%</span>
                   </div>
@@ -174,10 +174,10 @@ export const AdminReportSalesTab: React.FC<AdminReportSalesTabProps> = ({
             <div className="flex items-center gap-2">
               <PieChart className="w-4 h-4 text-purple-400" />
               <h2 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
-                {isRTL ? 'توزيع شرائح قيمة الطلبات' : 'Order Basket Size Distribution'}
+                {t.adminOrderBasketSizeDistribution}
               </h2>
             </div>
-            <span className="text-xs font-mono text-zinc-500">{nonCancelledOrders.length} {isRTL ? 'طلب' : 'orders'}</span>
+            <span className="text-xs font-mono text-zinc-500">{nonCancelledOrders.length} {t.orders}</span>
           </div>
 
           <div className="space-y-4">
@@ -186,7 +186,7 @@ export const AdminReportSalesTab: React.FC<AdminReportSalesTabProps> = ({
                 <div className="flex justify-between items-center text-xs font-mono">
                   <span className="text-zinc-200 font-medium">{isRTL ? tier.labelAr : tier.labelEn}</span>
                   <div className="flex items-center gap-3">
-                    <span className="text-zinc-400">{tier.count} {isRTL ? 'طلب' : 'orders'}</span>
+                    <span className="text-zinc-400">{tier.count} {t.orders}</span>
                     <span className="text-purple-400 font-bold w-10 text-right">{tier.percent}%</span>
                   </div>
                 </div>
@@ -209,10 +209,10 @@ export const AdminReportSalesTab: React.FC<AdminReportSalesTabProps> = ({
           <div className="flex items-center gap-2">
             <Tag className="w-4 h-4 text-emerald-400" />
             <h2 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
-              {isRTL ? 'أداء الكوبونات والخصومات الترويجية' : 'Promotional Coupon Performance'}
+              {t.adminPromotionalCouponPerformance}
             </h2>
           </div>
-          <span className="text-xs font-mono text-zinc-500">{coupons.length} {isRTL ? 'كوبونات نشطة' : 'active codes'}</span>
+          <span className="text-xs font-mono text-zinc-500">{coupons.length} {t.adminActiveCodesUnit}</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -223,16 +223,16 @@ export const AdminReportSalesTab: React.FC<AdminReportSalesTabProps> = ({
                   {coupon.code}
                 </span>
                 <span className="text-xs font-mono text-emerald-400 font-bold">
-                  {coupon.discountPercentage}% {isRTL ? 'خصم' : 'OFF'}
+                  {coupon.discountPercentage}% {t.adminBadgeSale}
                 </span>
               </div>
               <p className="text-xs text-zinc-400 font-mono">
-                {isRTL ? `الحد الأدنى للطلب: ${formatPrice(coupon.minOrderAmount || 0)}` : `Min Spend: ${formatPrice(coupon.minOrderAmount || 0)}`}
+                {`${t.adminMinSpend}: ${formatPrice(coupon.minOrderAmount || 0)}`}
               </p>
               <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-between text-[11px] font-mono text-zinc-500">
-                <span>{isRTL ? 'الحالة:' : 'Status:'}</span>
+                <span>{t.adminProductTableStatus}</span>
                 <span className={coupon.isActive ? 'text-emerald-400' : 'text-zinc-500'}>
-                  {coupon.isActive ? (isRTL ? 'فعال ومتاح' : 'Active') : (isRTL ? 'معطل' : 'Disabled')}
+                  {coupon.isActive ? t.adminActiveStatus : t.adminInactiveStatus}
                 </span>
               </div>
             </div>

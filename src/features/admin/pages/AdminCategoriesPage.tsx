@@ -7,7 +7,7 @@ import { AdminCategoryModal } from '../components/categories/AdminCategoryModal'
 
 export const AdminCategoriesPage: React.FC = () => {
   const { categories, addCategory, updateCategory, deleteCategory, products, isCategoriesLoading } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -54,12 +54,10 @@ export const AdminCategoriesPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
         <div>
           <h1 className="text-xl sm:text-2xl font-editorial font-bold text-white tracking-wide">
-            {isRTL ? 'إدارة الأقسام والتصنيفات' : 'Categories Management'}
+            {t.adminCategoriesTitle}
           </h1>
           <p className="text-xs text-zinc-400 mt-0.5">
-            {isRTL
-              ? 'التحكم في الأقسام الرئيسية لمتجر إيفل وتغيير صور أغلفة الأقسام.'
-              : 'Manage main store collections and update category cover banners.'}
+            {t.adminCategoryConfigDesc}
           </p>
         </div>
 
@@ -79,18 +77,18 @@ export const AdminCategoriesPage: React.FC = () => {
           className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 transition-colors font-label-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>{isRTL ? 'إضافة قسم جديد' : 'Add Category'}</span>
+          <span>{t.adminAddCategory}</span>
         </button>
       </div>
 
       {/* Loading / Empty / Content */}
       {isCategoriesLoading ? (
-        <EiffelLoader message={isRTL ? 'جاري جلب الأقسام من قاعدة البيانات...' : 'Fetching categories...'} />
+        <EiffelLoader message={t.loading} />
       ) : categories.length === 0 ? (
         <EmptyState
-          title={isRTL ? 'لا توجد أقسام مسجلة حتى الآن' : 'No Categories Found'}
-          description={isRTL ? 'يمكنك إضافة أقسام جديدة مثل (الرجال، الأطفال، الإكسسوارات) لتنظيم كتالوج المتجر.' : 'Create categories to organize your product catalog.'}
-          actionText={isRTL ? '+ إضافة أول قسم' : '+ Add First Category'}
+          title={t.adminCategoriesTitle}
+          description={t.adminCategoryConfigDesc}
+          actionText={t.adminAddCategory}
           onAction={() => setShowAddModal(true)}
         />
       ) : (

@@ -24,24 +24,24 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
   care,
   onChange
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div className="bg-zinc-950 border border-zinc-800 p-6 space-y-5 shadow-xl">
       <h2 className="text-sm font-label-bold uppercase tracking-wider text-white pb-2 border-b border-zinc-800">
-        {isRTL ? '4. الوصف والمواصفات وخامة التصنيع' : '4. Specifications & Material Details'}
+        {t.adminDetailsAndCareSection}
       </h2>
 
       {/* Description */}
       <div>
         <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-          {isRTL ? 'الوصف المفصل' : 'Full Description'}
+          {t.adminFullDescription}
         </label>
         <textarea
           rows={3}
           value={description}
           onChange={(e) => onChange({ description: e.target.value })}
-          placeholder={isRTL ? 'اكتب وصفاً مفصلاً للقطعة...' : 'Write an architectural description of the garment...'}
+          placeholder="Architectural garment description..."
           className="w-full bg-zinc-900 border border-zinc-700 p-3 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-white transition-colors"
         />
       </div>
@@ -50,13 +50,13 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
         {/* Composition */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'نوع القماش والخامة (Composition)' : 'Fabric Composition'}
+            {t.adminFabricComposition}
           </label>
           <input
             type="text"
             value={composition}
             onChange={(e) => onChange({ composition: e.target.value })}
-            placeholder={isRTL ? 'مثال: 100% Egyptian Cotton (280 GSM)' : 'e.g. 100% Egyptian Cotton (280 GSM)'}
+            placeholder="100% Egyptian Cotton (280 GSM)"
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-white transition-colors"
           />
         </div>
@@ -64,13 +64,13 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
         {/* Fit */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'قصة القطعة (Fit)' : 'Cut / Fit'}
+            {t.adminCutAndFit}
           </label>
           <input
             type="text"
             value={fit}
             onChange={(e) => onChange({ fit: e.target.value })}
-            placeholder={isRTL ? 'مثال: Relaxed Drop-Shoulder Boxy Fit' : 'e.g. Relaxed Drop-Shoulder Boxy Fit'}
+            placeholder="Relaxed Drop-Shoulder Boxy Fit"
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-white transition-colors"
           />
         </div>
@@ -80,7 +80,7 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
         {/* Bullet Details */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'نقاط مميزات القطعة (مفصولة بأسطر جديدة)' : 'Key Highlights (one per line)'}
+            {t.adminKeyHighlights}
           </label>
           <textarea
             rows={3}
@@ -94,7 +94,7 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
         {/* Care Instructions */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'تعليمات العناية والغسيل (مفصولة بأسطر)' : 'Care Instructions (one per line)'}
+            {t.adminCareInstructions}
           </label>
           <textarea
             rows={3}

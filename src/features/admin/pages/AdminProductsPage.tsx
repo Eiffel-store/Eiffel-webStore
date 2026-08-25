@@ -9,7 +9,7 @@ import { AdminProductDeleteModal } from '../components/products/AdminProductDele
 
 export const AdminProductsPage: React.FC = () => {
   const { products, categories, deleteProduct, updateProduct, isProductsLoading } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -73,12 +73,10 @@ export const AdminProductsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
         <div>
           <h1 className="text-xl sm:text-2xl font-editorial font-bold text-white tracking-wide">
-            {isRTL ? 'إدارة المنتجات' : 'Products Catalog'}
+            {t.adminProducts}
           </h1>
           <p className="text-xs text-zinc-400 mt-0.5">
-            {isRTL
-              ? `إجمالي ${products.length} قطعة في الكتالوج — التعديلات تنعكس على المتجر فوراً.`
-              : `Total ${products.length} products available. Changes reflect live on the storefront.`}
+            {products.length} {t.adminTotalProducts}
           </p>
         </div>
 
@@ -87,7 +85,7 @@ export const AdminProductsPage: React.FC = () => {
           className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 transition-colors font-label-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
-          <span>{isRTL ? 'إضافة منتج جديد' : 'Add New Product'}</span>
+          <span>{t.adminAddNewProduct}</span>
         </Link>
       </div>
 
@@ -104,19 +102,19 @@ export const AdminProductsPage: React.FC = () => {
 
       {/* Loading / Empty / Table */}
       {isProductsLoading ? (
-        <EiffelLoader message={isRTL ? 'جاري جلب كتالوج المنتجات من قاعدة البيانات...' : 'Fetching product catalog from database...'} />
+        <EiffelLoader message={t.loading} />
       ) : products.length === 0 ? (
         <EmptyState
-          title={isRTL ? 'كتالوج المنتجات فارغ حالياً' : 'Product Catalog is Empty'}
-          description={isRTL ? 'لم يتم العثور على أي منتجات في قاعدة البيانات. اضغط أدناه لإضافة أول قطعة في المتجر.' : 'No products found in the database. Add your first item below.'}
-          actionText={isRTL ? '+ إضافة أول منتج' : '+ Add First Product'}
+          title={t.adminProductsCatalogTitle}
+          description={t.noPiecesFoundDesc}
+          actionText={t.adminAddNewProduct}
           actionLink="/admin/products/new"
         />
       ) : filteredProducts.length === 0 ? (
         <EmptyState
-          title={isRTL ? 'لا توجد نتائج مطابقة للبحث أو التصفية' : 'No matching products found'}
-          description={isRTL ? 'يرجى تجربة كلمات بحث أخرى أو إعادة ضبط عوامل التصفية.' : 'Try changing your search query or active filters.'}
-          actionText={isRTL ? 'إعادة ضبط الفلاتر' : 'Reset Filters'}
+          title={t.noMatchingPieces}
+          description={t.noPiecesFoundDesc}
+          actionText={t.resetFilters}
           onAction={() => {
             setSearchQuery('');
             setSelectedCategory('all');

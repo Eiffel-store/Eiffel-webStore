@@ -15,7 +15,7 @@ export const AdminOrderFilterBar: React.FC<AdminOrderFilterBarProps> = ({
   statusFilter,
   onStatusChange
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-zinc-950 p-4 border border-zinc-800">
@@ -25,7 +25,7 @@ export const AdminOrderFilterBar: React.FC<AdminOrderFilterBarProps> = ({
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder={isRTL ? 'بحث برقم الطلب، اسم العميل، رقم الهاتف، أو المدينة...' : 'Search by order ID, customer name, phone, or city...'}
+          placeholder={t.adminSearchOrdersPlaceholder}
           className="w-full bg-zinc-900 border border-zinc-700 pl-9 pr-4 rtl:pl-4 rtl:pr-9 py-2 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-white transition-colors"
         />
       </div>
@@ -36,14 +36,14 @@ export const AdminOrderFilterBar: React.FC<AdminOrderFilterBarProps> = ({
           onChange={(e) => onStatusChange(e.target.value)}
           className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white focus:outline-none focus:border-white transition-colors"
         >
-          <option value="all">{isRTL ? 'جميع الحالات (الكل)' : 'All Order Statuses'}</option>
-          <option value="Awaiting_Confirmation">{isRTL ? '📞 في انتظار التأكيد (Awaiting Confirmation)' : 'Awaiting Confirmation'}</option>
-          <option value="Confirmed">{isRTL ? '✅ تم التأكيد (Confirmed)' : 'Confirmed'}</option>
-          <option value="Pending">Pending (جديد)</option>
-          <option value="Processing">Processing (قيد التجهيز)</option>
-          <option value="Shipped">Shipped (خرج للتوصيل)</option>
-          <option value="Delivered">Delivered (تم التسليم)</option>
-          <option value="Cancelled">Cancelled (ملغي)</option>
+          <option value="all">{t.adminAllStatuses}</option>
+          <option value="Awaiting_Confirmation">📞 {t.adminAwaitingConfirmation}</option>
+          <option value="Confirmed">✅ {t.adminConfirmedStatus}</option>
+          <option value="Pending">⏳ {t.adminPendingStatus}</option>
+          <option value="Processing">📦 {t.adminProcessingStatus}</option>
+          <option value="Shipped">🚚 {t.adminShippedStatus}</option>
+          <option value="Delivered">✓ {t.adminDeliveredStatus}</option>
+          <option value="Cancelled">✕ {t.adminCancelledStatus}</option>
         </select>
       </div>
     </div>

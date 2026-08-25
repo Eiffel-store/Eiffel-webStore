@@ -19,7 +19,7 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
   orders,
   products
 }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   // 1. Detailed Product Analytics
@@ -100,7 +100,7 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
     orders.forEach((o) => {
       if (o.status === 'Cancelled') return;
       o.items?.forEach((item) => {
-        const col = item.selectedColor || (isRTL ? 'أسود معماري (Noir)' : 'Architectural Noir');
+        const col = item.selectedColor || t.adminArchitecturalNoir;
         colorMap[col] = (colorMap[col] || 0) + (item.quantity || 1);
         totalItems += item.quantity || 1;
       });
@@ -115,7 +115,7 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
       }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
-  }, [orders, isRTL]);
+  }, [orders, t]);
 
   return (
     <div className="space-y-6">
@@ -125,10 +125,10 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-amber-400" />
             <h2 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
-              {isRTL ? 'جدول أداء المنتجات ومعدل دوران المبيعات' : 'Product Sales Velocity & Revenue Matrix'}
+              {t.adminProductVelocityMatrix}
             </h2>
           </div>
-          <span className="text-xs font-mono text-zinc-500">{productStats.topSelling.length} {isRTL ? 'قطع رائدة' : 'items'}</span>
+          <span className="text-xs font-mono text-zinc-500">{productStats.topSelling.length} {t.adminLeadingItemsCountUnit}</span>
         </div>
 
         <div className="overflow-x-auto">
@@ -136,10 +136,10 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
             <thead className="bg-zinc-900/60 border-b border-zinc-800 text-zinc-400">
               <tr>
                 <th className={`p-3 ${isRTL ? 'text-right' : 'text-left'}`}>#</th>
-                <th className={`p-3 ${isRTL ? 'text-right' : 'text-left'}`}>{isRTL ? 'المنتج' : 'Product'}</th>
-                <th className="p-3 text-center">{isRTL ? 'الكمية المباعة' : 'Units Sold'}</th>
-                <th className="p-3 text-center">{isRTL ? 'المخزون المتبقي' : 'In Stock'}</th>
-                <th className={`p-3 ${isRTL ? 'text-left' : 'text-right'}`}>{isRTL ? 'إجمالي الدخل' : 'Gross Revenue'}</th>
+                <th className={`p-3 ${isRTL ? 'text-right' : 'text-left'}`}>{t.product}</th>
+                <th className="p-3 text-center">{t.adminUnitsSold}</th>
+                <th className="p-3 text-center">{t.adminRemainingStock}</th>
+                <th className={`p-3 ${isRTL ? 'text-left' : 'text-right'}`}>{t.adminGrossRevenue}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
@@ -164,7 +164,7 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
                     </div>
                   </td>
                   <td className="p-3 text-center font-bold text-white">
-                    {item.qty} {isRTL ? 'قطعة' : 'pcs'}
+                    {item.qty} {t.items}
                   </td>
                   <td className="p-3 text-center">
                     <span
@@ -172,7 +172,7 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
                         item.stock <= 5 ? 'bg-amber-400/10 text-amber-400' : 'bg-zinc-800 text-zinc-300'
                       }`}
                     >
-                      {item.stock} {isRTL ? 'متبقي' : 'left'}
+                      {item.stock} {t.adminRemainingUnits}
                     </span>
                   </td>
                   <td className={`p-3 font-bold text-emerald-400 ${isRTL ? 'text-left' : 'text-right'}`}>
@@ -193,10 +193,10 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
             <div className="flex items-center gap-2">
               <Scissors className="w-4 h-4 text-blue-400" />
               <h2 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
-                {isRTL ? 'تفضيلات المقاسات الأكثر طلباً' : 'Size Demand & Popularity'}
+                {t.adminSizeDemandPopularity}
               </h2>
             </div>
-            <span className="text-xs font-mono text-zinc-500">{isRTL ? 'قصات إيفل' : 'Eiffel Sizing'}</span>
+            <span className="text-xs font-mono text-zinc-500">{t.adminEiffelSizing}</span>
           </div>
 
           <div className="space-y-4">
@@ -207,7 +207,7 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
                     <span className="w-6 h-6 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center font-bold text-white">
                       {sz.size}
                     </span>
-                    <span className="text-zinc-400">{sz.count} {isRTL ? 'قطعة مطلوبة' : 'ordered'}</span>
+                    <span className="text-zinc-400">{sz.count} {t.adminOrderedPiecesUnit}</span>
                   </div>
                   <span className="text-blue-400 font-bold">{sz.percent}%</span>
                 </div>
@@ -229,10 +229,10 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
             <div className="flex items-center gap-2">
               <Palette className="w-4 h-4 text-amber-400" />
               <h2 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
-                {isRTL ? 'تفضيلات ألوان التشكيلات' : 'Colorway Demand Analysis'}
+                {t.adminColorwayDemandAnalysis}
               </h2>
             </div>
-            <span className="text-xs font-mono text-zinc-500">{colorStats.length} {isRTL ? 'ألوان' : 'colorways'}</span>
+            <span className="text-xs font-mono text-zinc-500">{colorStats.length} {t.adminColorwaysCountUnit}</span>
           </div>
 
           <div className="space-y-4">
@@ -241,7 +241,7 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
                 <div className="flex justify-between items-center text-xs font-mono">
                   <span className="text-zinc-200 font-medium truncate max-w-[200px]">{col.color}</span>
                   <div className="flex items-center gap-3">
-                    <span className="text-zinc-400">{col.count} {isRTL ? 'قطعة' : 'sold'}</span>
+                    <span className="text-zinc-400">{col.count} {t.items}</span>
                     <span className="text-amber-400 font-bold">{col.percent}%</span>
                   </div>
                 </div>
@@ -265,11 +265,11 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
             <div className="flex items-center gap-2 text-amber-400">
               <AlertOctagon className="w-4 h-4" />
               <h2 className="text-sm font-mono font-bold uppercase tracking-wider">
-                {isRTL ? 'المنتجات الراكدة والمخزون بطيء الحركة' : 'Slow-Moving / Idle Inventory Diagnostics'}
+                {t.adminSlowMovingInventory}
               </h2>
             </div>
             <span className="text-xs font-mono text-zinc-500">
-              {isRTL ? 'اقتراح: إطلاق عروض تخفيض أو كوبونات لتسريع التصريف' : 'Action: Apply discount promo'}
+              {t.adminSlowMovingSuggestion}
             </span>
           </div>
 
@@ -286,7 +286,7 @@ export const AdminReportProductsTab: React.FC<AdminReportProductsTabProps> = ({
                   </div>
                 </div>
                 <span className="px-2 py-1 rounded bg-zinc-800 text-[10px] font-mono text-amber-300 font-bold shrink-0">
-                  {item.stock} {isRTL ? 'بالمخزن' : 'in stock'}
+                  {item.stock} {t.adminInStockUnits}
                 </span>
               </div>
             ))}

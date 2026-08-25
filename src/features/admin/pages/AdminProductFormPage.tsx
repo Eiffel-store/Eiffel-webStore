@@ -12,7 +12,7 @@ export const AdminProductFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const isEditing = Boolean(id);
   const { products, addProduct, updateProduct } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<Omit<Product, 'id'>>({
@@ -71,21 +71,21 @@ export const AdminProductFormPage: React.FC = () => {
           isLimited: existing.isLimited || false
         });
       } else {
-        setError(isRTL ? 'المنتج غير موجود' : 'Product not found');
+        setError(t.error);
       }
     }
-  }, [id, products, isRTL]);
+  }, [id, products, t]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) {
-      setError(isRTL ? 'يرجى إدخال اسم المنتج.' : 'Product name is required.');
+      setError(t.adminProductNameRequired);
       return;
     }
 
     const cleanImages = formData.images.filter(img => img.trim() !== '');
     if (cleanImages.length === 0) {
-      setError(isRTL ? 'يرجى إضافة صورة واحدة على الأقل للمنتج.' : 'At least one product image is required.');
+      setError(t.adminProductImageRequired);
       return;
     }
 
@@ -96,12 +96,12 @@ export const AdminProductFormPage: React.FC = () => {
 
     if (isEditing && id) {
       updateProduct(id, payload);
-      const msg = isRTL ? 'تم تحديث المنتج بنجاح!' : 'Product updated successfully!';
+      const msg = t.adminProductUpdatedSuccess;
       setSuccessMessage(msg);
       toast.success(msg, { id: 'admin-prod-save' });
     } else {
       addProduct(payload);
-      const msg = isRTL ? 'تمت إضافة المنتج للكتالوج بنجاح!' : 'New product created successfully!';
+      const msg = t.adminProductCreatedSuccess;
       setSuccessMessage(msg);
       toast.success(msg, { id: 'admin-prod-save' });
     }
@@ -125,13 +125,11 @@ export const AdminProductFormPage: React.FC = () => {
           <div>
             <h1 className="text-xl sm:text-2xl font-editorial font-bold text-white tracking-wide">
               {isEditing
-                ? (isRTL ? `تعديل المنتج: ${formData.name || id}` : `Edit Product: ${formData.name || id}`)
-                : (isRTL ? 'إضافة منتج جديد للكتالوج' : 'Add New Product')}
+                ? `${t.adminHeaderEditProduct}: ${formData.name || id}`
+                : t.adminAddNewProduct}
             </h1>
             <p className="text-xs text-zinc-400 mt-0.5">
-              {isRTL
-                ? 'أدخل بيانات القطعة والصور والأسعار لتظهر فوراً في المتجر.'
-                : 'Fill in garment details, imagery, sizing and pricing.'}
+              {t.adminProductFormSubtitle}
             </p>
           </div>
         </div>
@@ -185,14 +183,14 @@ export const AdminProductFormPage: React.FC = () => {
             to="/admin/products"
             className="px-6 py-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-700 transition-colors"
           >
-            {isRTL ? 'إلغاء' : 'Cancel'}
+            {t.cancel}
           </Link>
           <button
             type="submit"
-            className="px-8 py-3 bg-white text-black hover:bg-zinc-200 transition-colors font-label-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xl"
+            className="px-8 py-3 bg-white text-black hover:bg-zinc-200 transition-colors font-label-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-xl cursor-pointer"
           >
             <Check className="w-4 h-4" />
-            <span>{isEditing ? (isRTL ? 'حفظ التعديلات' : 'Save Changes') : (isRTL ? 'نشر المنتج الآن' : 'Publish Product')}</span>
+            <span>{isEditing ? t.saveChanges : t.adminPublishProduct}</span>
           </button>
         </div>
       </form>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { ShoppingBag, Upload, Loader2, Plus, Trash2, Crosshair, Sparkles, Check, Zap, Move } from 'lucide-react';
+import { ShoppingBag, Upload, Loader2, Plus, Trash2, Crosshair, Zap, Move } from 'lucide-react';
 import { ShopTheLookSettings, LookbookHotspot } from '@/types';
 import { useLanguage, useStoreData } from '@/shared';
 import { uploadService } from '@/services/uploadService';
@@ -40,7 +40,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
   shopLook,
   onChange
 }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const { products = [] } = useStoreData();
 
   const [urlInput, setUrlInput] = useState('');
@@ -64,7 +64,6 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
 
   useEffect(() => {
     shopLookRef.current = shopLook;
-    // Only sync from parent if we're not actively dragging
     if (draggingIndexRef.current === null) {
       setLocalHotspots(shopLook.hotspots || []);
     }
@@ -165,7 +164,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
     }
   };
 
-  // Fast coordinate update using requestAnimationFrame for zero-lag 60fps
+  // Fast coordinate update using requestAnimationFrame
   const updatePinCoordinates = useCallback((clientX: number, clientY: number, targetIndex: number, commitToParent: boolean = false) => {
     if (!imageContainerRef.current) return;
     const rect = imageContainerRef.current.getBoundingClientRect();
@@ -201,7 +200,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
     setActivePinIndex(index);
   };
 
-  // Global mouse & touch listeners with high performance RAF throttling
+  // Global mouse & touch listeners
   useEffect(() => {
     if (draggingIndex === null) return;
 
@@ -233,7 +232,6 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
         rafIdRef.current = null;
       }
 
-      // Commit final coordinates to parent context on drag end
       const activeIdx = draggingIndexRef.current;
       draggingIndexRef.current = null;
       setDraggingIndex(null);
@@ -265,7 +263,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
     };
   }, [draggingIndex, updatePinCoordinates, onChange]);
 
-  // Click anywhere on image to place/move the active pin
+  // Click on image background to place/move the active pin
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (draggingIndex !== null) return;
     if (activePinIndex !== null && localHotspots[activePinIndex]) {
@@ -280,11 +278,11 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
         <div className="flex items-center gap-2">
           <ShoppingBag className="w-5 h-5 text-purple-400" />
           <h2 className="text-base font-editorial font-bold uppercase tracking-wider text-white">
-            {isRTL ? 'إدارة قسم تسوق الإطلالة (Shop The Look Editorial)' : 'Shop The Look Editorial'}
+            {t.adminShopTheLookSection}
           </h2>
         </div>
         <span className="text-[11px] text-zinc-400 font-mono">
-          {isRTL ? 'يظهر أسفل الصفحة مع نقاط تفاعلية لشراء قطع الموديل مباشرة' : 'Displays interactive pins to buy styled outfit items'}
+          {t.adminShopTheLookDesc}
         </span>
       </div>
 
@@ -292,7 +290,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
       <div className="p-3.5 bg-purple-950/20 border border-purple-500/30 rounded-lg space-y-2">
         <label className="block text-xs font-mono text-purple-300 font-bold flex items-center gap-1.5">
           <Zap className="w-4 h-4 text-purple-400" />
-          <span>{isRTL ? '⚡ قوالب جاهزة للقسم (تعبئة بضغطة زر):' : '⚡ Ready Section Presets:'}</span>
+          <span>{t.adminReadySectionPresets}</span>
         </label>
         <select
           defaultValue=""
@@ -301,7 +299,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
           }}
           className="w-full bg-zinc-900 border border-purple-500/40 text-purple-200 rounded p-2 text-xs font-mono focus:outline-none cursor-pointer"
         >
-          <option value="" disabled>{isRTL ? '-- اختر قالباً للإطلالة لتعبئة العناوين تلقائياً --' : '-- Choose a preset to auto-fill --'}</option>
+          <option value="" disabled>{t.adminChoosePresetAutoFill}</option>
           {LOOKBOOK_PRESETS.map((p, idx) => (
             <option key={idx} value={idx}>
               {isRTL ? p.labelAr : p.titleEn}
@@ -318,7 +316,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
           <div className="flex items-center justify-between text-xs text-zinc-300 font-mono">
             <span className="flex items-center gap-1 text-purple-400 font-bold">
               <Move className="w-3.5 h-3.5" />
-              <span>{isRTL ? 'اسحب الأرقام لتحديد موضعها (Drag & Drop):' : 'Drag & Drop Pins to reposition:'}</span>
+              <span>{t.adminDragDropPins}</span>
             </span>
           </div>
 
@@ -358,7 +356,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
                       ? 'w-8 h-8 bg-amber-400 text-black shadow-xl ring-2 ring-white z-30'
                       : 'w-7 h-7 bg-white text-black shadow-lg border-2 border-black hover:scale-105 z-20'
                   }`}
-                  title={`${isRTL ? 'اسحب لتحريك' : 'Drag to move'} #${idx + 1}: ${spot.titleAr}`}
+                  title={`${t.adminDragToMove} #${idx + 1}: ${isRTL ? spot.titleAr : (spot.titleEn || spot.titleAr)}`}
                 >
                   <span className="text-xs pointer-events-none">{idx + 1}</span>
 
@@ -378,22 +376,20 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
             {localHotspots.length === 0 && (
               <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-black/40 text-zinc-300 text-xs">
                 <Crosshair className="w-8 h-8 text-purple-400 mb-2 animate-bounce" />
-                <span>{isRTL ? 'اضغط "إضافة قطعة" لإضافة أول نقطة تفاعلية' : 'Click "Add Item" to add your first interactive pin'}</span>
+                <span>{t.adminClickAddItemHotspot}</span>
               </div>
             )}
           </div>
 
           <p className="text-[11px] text-zinc-400 font-mono text-center">
-            {isRTL
-              ? '💡 يمكنك سحب أي رقم بالماوس وإفلاته مباشرة في المكان المطلوب على ملابس الموديل.'
-              : '💡 Click and drag any number directly with your mouse over the outfit piece.'}
+            {t.adminDragDropTip}
           </p>
         </div>
 
         {/* Media Controls & Collection Link */}
         <div className="lg:col-span-7 space-y-4">
           <label className="block text-xs text-zinc-300 font-bold">
-            {isRTL ? 'صورة الموديل الرئيسية (Editorial Model Image)' : 'Editorial Model Image'}
+            {t.adminEditorialModelImage}
           </label>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -403,7 +399,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
               ) : (
                 <Upload className="w-4 h-4 text-purple-400" />
               )}
-              <span>{isUploading ? (isRTL ? 'جاري الرفع...' : 'Uploading...') : (isRTL ? 'رفع صورة جديدة' : 'Upload Image')}</span>
+              <span>{isUploading ? t.adminUploading : t.adminUploadNewImage}</span>
               <input
                 type="file"
                 accept="image/*"
@@ -418,7 +414,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
                 type="url"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
-                placeholder={isRTL ? 'أو ضع رابط صورة مباشر...' : 'Or paste image URL...'}
+                placeholder={t.adminPasteImageUrl}
                 className="flex-1 bg-zinc-900 border border-zinc-700 px-3 py-1.5 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none"
               />
               <button
@@ -426,7 +422,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
                 onClick={handleApplyUrl}
                 className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium border border-zinc-700 transition-colors rounded cursor-pointer"
               >
-                {isRTL ? 'تطبيق' : 'Apply'}
+                {t.adminApplyBtn}
               </button>
             </div>
           </div>
@@ -434,7 +430,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
           {/* Collection Link Dropdown */}
           <div>
             <label className="block text-xs font-mono text-zinc-400 mb-1.5">
-              {isRTL ? 'القسم المربوط عند الضغط (Collection Link)' : 'Collection Link'}
+              {t.adminCollectionLink}
             </label>
             <select
               value={shopLook.collectionLink || '/collections/men'}
@@ -455,7 +451,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-zinc-800">
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'عنوان القسم (عربي)' : 'Title (Arabic)'}
+            {t.adminSectionTitleAr}
           </label>
           <input
             type="text"
@@ -468,7 +464,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
 
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'عنوان القسم (إنجليزي)' : 'Title (English)'}
+            {t.adminSectionTitleEn}
           </label>
           <input
             type="text"
@@ -486,10 +482,10 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
           <div>
             <h3 className="text-sm font-label-bold text-white uppercase tracking-wider flex items-center gap-2">
               <Crosshair className="w-4 h-4 text-purple-400" />
-              <span>{isRTL ? 'القطع والمنتجات المحددة في الإطلالة (Interactive Hotspots)' : 'Interactive Hotspot Items'}</span>
+              <span>{t.adminInteractiveHotspots}</span>
             </h3>
             <span className="text-[11px] text-zinc-400">
-              {isRTL ? 'اختر المنتج من القائمة وسيقوم بتعبئة البيانات تلقائياً، واسحب الرقم فوق الصورة لتعديل مكانه' : 'Choose product and drag pin on photo to set exact position'}
+              {t.adminInteractiveHotspotsDesc}
             </span>
           </div>
           <button
@@ -498,7 +494,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
             className="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded text-xs font-bold flex items-center gap-1 shadow cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>{isRTL ? 'إضافة قطعة' : 'Add Item'}</span>
+            <span>{t.adminAddItemHotspot}</span>
           </button>
         </div>
 
@@ -527,14 +523,14 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
                 {/* Product Dropdown (Auto-fill) */}
                 <div className="sm:col-span-6">
                   <label className="block text-[10px] font-mono text-zinc-400 mb-1">
-                    {isRTL ? 'اختر المنتج من المخزون (تعبئة تلقائية):' : 'Select Product (Auto-fill):'}
+                    {t.adminSelectProductAutoFill}
                   </label>
                   <select
                     value={spot.productId || ''}
                     onChange={(e) => handleSelectProductForHotspot(index, e.target.value)}
                     className="w-full bg-zinc-950 border border-zinc-700 text-purple-300 font-bold rounded p-2 text-xs focus:outline-none cursor-pointer"
                   >
-                    <option value="" disabled>{isRTL ? '-- اختر منتجاً لتعبئة البيانات --' : '-- Choose product --'}</option>
+                    <option value="" disabled>{t.adminChooseProductAutoFill}</option>
                     {products.map(p => (
                       <option key={p.id} value={p.id}>
                         {p.name} ({p.price} EGP)
@@ -561,7 +557,7 @@ export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
                       handleDeleteHotspot(index);
                     }}
                     className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-zinc-800 rounded transition-colors cursor-pointer"
-                    title="Remove Item"
+                    title={t.delete}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

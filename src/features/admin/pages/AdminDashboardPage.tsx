@@ -8,12 +8,12 @@ import { useStoreData, useLanguage, EiffelLoader } from '@/shared';
 
 export const AdminDashboardPage: React.FC = () => {
   const { isProductsLoading, isOrdersLoading } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   if (isProductsLoading && isOrdersLoading) {
     return (
       <div className="py-24">
-        <EiffelLoader message={isRTL ? 'جاري تحميل لوحة المؤشرات والبيانات الحية...' : 'Loading live dashboard analytics...'} />
+        <EiffelLoader message={t.adminLoadingDashboard} />
       </div>
     );
   }

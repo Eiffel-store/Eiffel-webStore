@@ -15,7 +15,7 @@ export const CustomerStatsCards: React.FC<CustomerStatsCardsProps> = ({
   totalPoints,
   totalSpend,
 }) => {
-  const { isRTL, t } = useLanguage();
+  const { t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   return (
@@ -24,13 +24,13 @@ export const CustomerStatsCards: React.FC<CustomerStatsCardsProps> = ({
       <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono text-zinc-400">
-            {isRTL ? 'إجمالي العملاء المسجلين' : 'Total Customers'}
+            {t.adminTotalRegisteredCustomers}
           </span>
           <Users className="w-4 h-4 text-amber-400" />
         </div>
         <p className="text-2xl font-mono font-bold text-white mt-2">{totalCustomers}</p>
         <p className="text-[11px] text-zinc-500 font-mono mt-1">
-          {isRTL ? 'عملاء المتجر وقاعدة البيانات' : 'Store & DB registered'}
+          {t.adminStoreDbRegistered}
         </p>
       </div>
 
@@ -38,13 +38,13 @@ export const CustomerStatsCards: React.FC<CustomerStatsCardsProps> = ({
       <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono text-zinc-400">
-            {isRTL ? 'أعضاء النخبة VIP' : 'VIP Privé Members'}
+            {t.adminVipPrivMembers}
           </span>
           <Crown className="w-4 h-4 text-amber-400" />
         </div>
         <p className="text-2xl font-mono font-bold text-amber-400 mt-2">{vipCount}</p>
         <p className="text-[11px] text-zinc-500 font-mono mt-1">
-          {isRTL ? 'مؤهلون للخصومات الحصرية' : 'Exclusive discount eligible'}
+          {t.adminExclusiveDiscountEligible}
         </p>
       </div>
 
@@ -52,7 +52,7 @@ export const CustomerStatsCards: React.FC<CustomerStatsCardsProps> = ({
       <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono text-zinc-400">
-            {isRTL ? 'إجمالي النقاط المتداولة' : 'Loyalty Points Balance'}
+            {t.adminTotalPointsBalance}
           </span>
           <Coins className="w-4 h-4 text-emerald-400" />
         </div>
@@ -60,7 +60,7 @@ export const CustomerStatsCards: React.FC<CustomerStatsCardsProps> = ({
           {totalPoints} <span className="text-xs text-zinc-500 font-sans">PTS</span>
         </p>
         <p className="text-[11px] text-zinc-500 font-mono mt-1">
-          {isRTL ? `تعادل: ${formatPrice(totalPoints)} رصيد شرائي` : `Value: ${formatPrice(totalPoints)}`}
+          {`${t.adminPointsValueEquivalent}: ${formatPrice(totalPoints)}`}
         </p>
       </div>
 
@@ -68,13 +68,13 @@ export const CustomerStatsCards: React.FC<CustomerStatsCardsProps> = ({
       <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono text-zinc-400">
-            {isRTL ? 'إجمالي المبيعات المحققة' : 'Customer Lifetime Value'}
+            {t.adminCustomerLifetimeValue}
           </span>
           <ShoppingBag className="w-4 h-4 text-purple-400" />
         </div>
         <p className="text-2xl font-mono font-bold text-white mt-2">{formatPrice(totalSpend)}</p>
         <p className="text-[11px] text-zinc-500 font-mono mt-1">
-          {isRTL ? 'صافي المشتريات المسلمة' : 'Delivered sales'}
+          {t.adminDeliveredSalesNet}
         </p>
       </div>
     </div>

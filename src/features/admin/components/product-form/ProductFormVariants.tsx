@@ -21,12 +21,11 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
   onColorsChange,
   onSizesChange
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const [newColorName, setNewColorName] = useState('');
   const [newColorHex, setNewColorHex] = useState('#000000');
   const [newColorImage, setNewColorImage] = useState<string>('');
   const [isUploadingSwatch, setIsUploadingSwatch] = useState(false);
-  const [editingColorIndex, setEditingColorIndex] = useState<number | null>(null);
 
   const cleanProductImages = productImages.filter(img => img && img.trim() !== '');
 
@@ -106,16 +105,16 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
   return (
     <div className="bg-zinc-950 border border-zinc-800 p-6 space-y-6 shadow-xl rounded-lg">
       <h2 className="text-sm font-label-bold uppercase tracking-wider text-white pb-2 border-b border-zinc-800 flex items-center justify-between">
-        <span>{isRTL ? '3. خيارات الألوان والصور المخصصة لكل لون' : '3. Colors & Color-Specific Imagery'}</span>
+        <span>{t.adminColorsAndMediaSection}</span>
         <span className="text-[11px] text-zinc-500 font-mono font-normal">
-          {isRTL ? 'اربط كل لون بصورته لتظهر للعميل فور اختياره' : 'Assign specific photo per color'}
+          {t.adminAttachColorImageTip}
         </span>
       </h2>
 
       {/* Colors Manager */}
       <div className="space-y-4">
         <label className="block text-xs text-zinc-300 font-bold">
-          {isRTL ? 'الألوان المضافة حالياً للقطعة (مع صورها):' : 'Configured Colors (with images):'}
+          {t.adminAvailableColorsLabel}
         </label>
 
         {/* Existing color cards */}
@@ -144,7 +143,7 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
                     <span className="w-2 h-2 rounded-full inline-block shrink-0" style={{ backgroundColor: c.hex }} />
                   </div>
                   <div className="text-[10px] text-zinc-500 font-mono">
-                    {c.image ? (isRTL ? '✓ مربوط بصورة' : '✓ Photo linked') : (isRTL ? 'بدون صورة خاصة' : 'No custom photo')}
+                    {c.image ? t.adminColorPhotoUploaded : t.adminUploadColorPhoto}
                   </div>
                 </div>
               </div>
@@ -156,12 +155,12 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
                     value={c.image || ''}
                     onChange={(e) => handleUpdateColorImage(idx, e.target.value)}
                     className="w-16 bg-zinc-800 border border-zinc-700 text-[10px] text-zinc-300 rounded p-1"
-                    title={isRTL ? 'اختر صورة من صور المنتج لهذا اللون' : 'Select from product photos'}
+                    title={t.adminUploadColorPhoto}
                   >
-                    <option value="">{isRTL ? 'اختر صورة' : 'Photo...'}</option>
+                    <option value="">{t.adminProductTableImages}...</option>
                     {cleanProductImages.map((img, pIdx) => (
                       <option key={pIdx} value={img}>
-                        {isRTL ? `صورة ${pIdx + 1}` : `Photo ${pIdx + 1}`}
+                        {t.adminProductTableImages} #{pIdx + 1}
                       </option>
                     ))}
                   </select>
@@ -169,7 +168,7 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
 
                 <label
                   className="p-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white rounded cursor-pointer transition-colors"
-                  title={isRTL ? 'رفع صورة خاصة لهذا اللون من الجهاز' : 'Upload photo for this color'}
+                  title={t.adminUploadColorPhoto}
                 >
                   <Upload className="w-3.5 h-3.5" />
                   <input
@@ -184,7 +183,7 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
                   type="button"
                   onClick={() => handleRemoveColor(idx)}
                   className="p-1.5 bg-zinc-800 hover:bg-red-950 text-zinc-400 hover:text-red-400 rounded transition-colors cursor-pointer"
-                  title={isRTL ? 'حذف اللون' : 'Delete color'}
+                  title={t.adminDeleteColor}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -196,7 +195,7 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
         {/* Add New Color Form */}
         <div className="p-4 bg-zinc-900/60 border border-dashed border-zinc-800 rounded-lg space-y-3">
           <span className="text-xs font-bold text-zinc-300 block">
-            {isRTL ? '+ إضافة لون جديد للقطعة وتحديد صورته:' : '+ Add New Color Variant:'}
+            {t.adminAddNewColorWithPhoto}
           </span>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -211,7 +210,7 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
               type="text"
               value={newColorName}
               onChange={(e) => setNewColorName(e.target.value)}
-              placeholder={isRTL ? 'اسم اللون (مثال: أسود فحمي / كحلي)' : 'Color Name (e.g. Noir, Slate)'}
+              placeholder={t.adminColorNamePlaceholder}
               className="flex-1 min-w-[160px] bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400"
             />
 
@@ -222,10 +221,10 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
                 onChange={(e) => setNewColorImage(e.target.value)}
                 className="bg-zinc-900 border border-zinc-700 px-2.5 py-2 text-xs text-zinc-300 rounded focus:outline-none focus:border-amber-400"
               >
-                <option value="">{isRTL ? '-- اختر صورة من صور المنتج --' : '-- Choose from product images --'}</option>
+                <option value="">{t.adminUploadColorPhoto}</option>
                 {cleanProductImages.map((img, pIdx) => (
                   <option key={pIdx} value={img}>
-                    {isRTL ? `صورة المنتج رقم ${pIdx + 1}` : `Product Image #${pIdx + 1}`}
+                    {t.adminProductTableImages} #{pIdx + 1}
                   </option>
                 ))}
               </select>
@@ -238,7 +237,7 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
               ) : (
                 <Upload className="w-3.5 h-3.5 text-emerald-400" />
               )}
-              <span className="text-[11px]">{newColorImage ? (isRTL ? 'تم اختيار صورة ✓' : 'Photo Selected ✓') : (isRTL ? 'رفع صورة من الجهاز' : 'Upload File')}</span>
+              <span className="text-[11px]">{newColorImage ? t.adminColorPhotoUploaded : t.adminUploadColorPhoto}</span>
               <input
                 type="file"
                 accept="image/*"
@@ -254,20 +253,20 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
               className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded transition-colors flex items-center gap-1 cursor-pointer shadow"
             >
               <Plus className="w-4 h-4" />
-              <span>{isRTL ? 'إضافة اللون' : 'Add Color'}</span>
+              <span>{t.adminAddColorAndImage}</span>
             </button>
           </div>
 
           {newColorImage && (
             <div className="flex items-center gap-2 pt-1 text-[11px] text-emerald-400 font-mono">
               <img src={newColorImage} alt="Color preview" className="w-7 h-7 rounded object-cover border border-emerald-500" />
-              <span>{isRTL ? 'تم تجهيز الصورة الخاصة بهذا اللون بنجاح' : 'Color photo ready to be assigned'}</span>
+              <span>{t.adminColorPhotoReadyTip}</span>
               <button
                 type="button"
                 onClick={() => setNewColorImage('')}
-                className="text-red-400 hover:underline text-[10px] ml-2"
+                className="text-red-400 hover:underline text-[10px] ml-2 cursor-pointer"
               >
-                {isRTL ? 'إلغاء الصورة' : 'Clear'}
+                {t.cancel}
               </button>
             </div>
           )}
@@ -277,7 +276,7 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
       {/* Sizes Matrix */}
       <div className="space-y-3 pt-3 border-t border-zinc-800/80">
         <label className="block text-xs text-zinc-300 font-bold">
-          {isRTL ? 'المقاسات المتوفرة (اختر المقاسات المتاحة للقطعة)' : 'Available Sizes'}
+          {t.adminGarmentSizesLabel}
         </label>
         <div className="flex flex-wrap gap-2">
           {AVAILABLE_SIZES.map((size) => {

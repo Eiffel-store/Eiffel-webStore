@@ -19,7 +19,7 @@ import { AdminAddUserModal } from './AdminAddUserModal';
 import toast from 'react-hot-toast';
 
 export const AdminTeamTab: React.FC = () => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const { user: currentUser } = useAuthStore();
 
   const [users, setUsers] = useState<any[]>([]);
@@ -36,7 +36,7 @@ export const AdminTeamTab: React.FC = () => {
       setUsers(data || []);
     } catch (err) {
       console.error('Failed to load team users:', err);
-      toast.error(isRTL ? 'فشل تحميل بيانات فريق العمل' : 'Failed to load team users');
+      toast.error(t.adminTeamLoadFailed);
     } finally {
       setIsLoading(false);
     }
@@ -54,12 +54,12 @@ export const AdminTeamTab: React.FC = () => {
         prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
       );
       toast.success(
-        isRTL
-          ? `تم تحديث صلاحية المستخدم إلى ${newRole === 'ROLE_ADMIN' ? 'مدير عام 👑' : 'موظف 💼'}`
-          : `Role updated to ${newRole}`
+        newRole === 'ROLE_ADMIN'
+          ? `${t.adminRoleUpdatedSuccess} (Admin 👑)`
+          : `${t.adminRoleUpdatedSuccess} (Staff 💼)`
       );
     } catch (err: any) {
-      toast.error(isRTL ? 'فشل تعديل الصلاحية' : 'Failed to update role');
+      toast.error(t.adminRoleUpdateFailed);
     } finally {
       setRoleUpdatingId(null);
     }
@@ -67,20 +67,16 @@ export const AdminTeamTab: React.FC = () => {
 
   const handleDeleteUser = async (user: any) => {
     if (user.email === currentUser?.email) {
-      toast.error(isRTL ? 'لا يمكنك حذف حسابك الحالي أثناء تسجيل الدخول به!' : 'You cannot delete your own active account!');
-      return;
-    }
-
-    if (!window.confirm(isRTL ? `هل أنت متأكد من حذف حساب (${user.name || user.email}) نهائياً؟` : `Delete ${user.name || user.email}?`)) {
+      toast.error(t.adminCannotDeleteSelf);
       return;
     }
 
     try {
       await adminService.deleteUser(user.id);
       setUsers((prev) => prev.filter((u) => u.id !== user.id));
-      toast.success(isRTL ? 'تم حذف الحساب بنجاح' : 'User account deleted');
+      toast.success(t.adminUserDeletedSuccess);
     } catch (err: any) {
-      toast.error(isRTL ? 'فشل حذف الحساب' : 'Failed to delete user');
+      toast.error(t.adminUserDeleteFailed);
     }
   };
 
@@ -105,12 +101,10 @@ export const AdminTeamTab: React.FC = () => {
         <div>
           <h2 className="text-lg font-editorial font-bold text-white flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-amber-400" />
-            <span>{isRTL ? 'فريق الإدارة والمشرفين (Executive Staff & Admins)' : 'Team & Staff Accounts'}</span>
+            <span>{t.adminTeamAndStaffTab}</span>
           </h2>
           <p className="text-xs text-zinc-400 mt-0.5">
-            {isRTL
-              ? 'إدارة صلاحيات الوصول، إضافة موظفين جدد، وتعيين الأدوار القيادية'
-              : 'Manage role access control and onboard new team members'}
+            {t.adminTeamPrivilegesDesc}
           </p>
         </div>
 
@@ -119,7 +113,7 @@ export const AdminTeamTab: React.FC = () => {
             onClick={fetchUsers}
             disabled={isLoading}
             className="p-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 rounded text-xs transition-colors cursor-pointer"
-            title={isRTL ? 'تحديث القائمة' : 'Refresh'}
+            title={t.refresh}
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
@@ -129,7 +123,7 @@ export const AdminTeamTab: React.FC = () => {
             className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-black font-label-bold text-xs tracking-wider uppercase flex items-center gap-2 transition-all shadow-lg cursor-pointer rounded"
           >
             <UserPlus className="w-4 h-4" />
-            <span>{isRTL ? 'إضافة مسؤول / موظف جديد' : 'Add Admin / Staff'}</span>
+            <span>{t.adminAddMember}</span>
           </button>
         </div>
       </div>
@@ -141,7 +135,7 @@ export const AdminTeamTab: React.FC = () => {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={isRTL ? 'البحث بالاسم، البريد الإلكتروني أو الهاتف...' : 'Search team by name, email, phone...'}
+          placeholder={t.adminSearchTeamPlaceholder}
           className="w-full pl-9 rtl:pl-3 rtl:pr-9 pr-3 py-2.5 bg-zinc-900 border border-zinc-800 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-amber-400 transition-colors rounded"
         />
       </div>
@@ -149,24 +143,24 @@ export const AdminTeamTab: React.FC = () => {
       {/* Users Table / Grid */}
       {isLoading ? (
         <div className="py-16">
-          <EiffelLoader message={isRTL ? 'جاري تحميل قائمة المشرفين...' : 'Loading team members...'} />
+          <EiffelLoader message={t.loading} />
         </div>
       ) : filteredTeam.length === 0 ? (
         <EmptyState
           icon={ShieldCheck}
-          title={isRTL ? 'لا يوجد أعضاء مطابقين' : 'No team members found'}
-          description={isRTL ? 'لم يتم العثور على أي مسؤولين أو موظفين بهذا البحث' : 'No matching staff members found'}
+          title={t.adminNoTeamMembersFound}
+          description={t.adminNoTeamMembersFoundDesc}
         />
       ) : (
         <div className="overflow-x-auto border border-zinc-800 rounded-lg bg-zinc-950">
           <table className="w-full text-left rtl:text-right border-collapse">
             <thead>
               <tr className="border-b border-zinc-800 bg-zinc-900/50 text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
-                <th className="py-3.5 px-4">{isRTL ? 'المستخدم' : 'Member'}</th>
-                <th className="py-3.5 px-4">{isRTL ? 'البريد / الهاتف' : 'Contact'}</th>
-                <th className="py-3.5 px-4">{isRTL ? 'الصلاحية الحالية' : 'Current Role'}</th>
-                <th className="py-3.5 px-4">{isRTL ? 'تاريخ الإنشاء' : 'Created'}</th>
-                <th className="py-3.5 px-4 text-center">{isRTL ? 'الإجراءات' : 'Actions'}</th>
+                <th className="py-3.5 px-4">{t.adminTeamMemberHeader}</th>
+                <th className="py-3.5 px-4">{t.adminTeamContactHeader}</th>
+                <th className="py-3.5 px-4">{t.adminTeamRoleHeader}</th>
+                <th className="py-3.5 px-4">{t.adminTeamCreatedHeader}</th>
+                <th className="py-3.5 px-4 text-center">{t.adminProductTableActions}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/60 text-xs">
@@ -191,7 +185,7 @@ export const AdminTeamTab: React.FC = () => {
                             <span>{user.name || 'Admin User'}</span>
                             {isCurrentSelf && (
                               <span className="px-1.5 py-0.5 bg-zinc-800 text-zinc-400 text-[9px] font-mono rounded">
-                                {isRTL ? 'أنت (حسابك)' : 'You'}
+                                {t.adminYouCurrentAccount}
                               </span>
                             )}
                           </div>
@@ -232,10 +226,10 @@ export const AdminTeamTab: React.FC = () => {
                           } disabled:opacity-60 disabled:cursor-not-allowed`}
                         >
                           <option value="ROLE_ADMIN" className="bg-zinc-900 text-white">
-                            👑 ROLE_ADMIN (مدير عام)
+                            👑 {t.adminRoleAdmin}
                           </option>
                           <option value="ROLE_STAFF" className="bg-zinc-900 text-white">
-                            💼 ROLE_STAFF (موظف)
+                            💼 {t.adminRoleStaff}
                           </option>
                         </select>
                       </div>
@@ -244,7 +238,7 @@ export const AdminTeamTab: React.FC = () => {
                     {/* Created Date */}
                     <td className="py-4 px-4 font-mono text-[11px] text-zinc-400">
                       {user.createdAt
-                        ? new Date(user.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')
+                        ? new Date(user.createdAt).toLocaleDateString()
                         : '2026'}
                     </td>
 
@@ -254,7 +248,7 @@ export const AdminTeamTab: React.FC = () => {
                         <button
                           onClick={() => handleDeleteUser(user)}
                           className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
-                          title={isRTL ? 'حذف الحساب' : 'Delete user'}
+                          title={t.delete}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

@@ -12,7 +12,7 @@ export const AdminDataBackupCard: React.FC<AdminDataBackupCardProps> = ({
   onError
 }) => {
   const { exportData, importData, resetAllToDefault } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const handleExportBackup = () => {
@@ -24,7 +24,7 @@ export const AdminDataBackupCard: React.FC<AdminDataBackupCardProps> = ({
     a.download = `eiffel_store_backup_${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    onSuccess(isRTL ? 'تم تصدير النسخة الاحتياطية بنجاح!' : 'Backup exported successfully!');
+    onSuccess(t.adminBackupExportSuccess);
   };
 
   const handleImportBackup = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,10 +37,10 @@ export const AdminDataBackupCard: React.FC<AdminDataBackupCardProps> = ({
       if (content) {
         const success = importData(content);
         if (success) {
-          onSuccess(isRTL ? 'تم استيراد قاعدة البيانات بنجاح!' : 'Database restored successfully!');
+          onSuccess(t.adminDatabaseRestoreSuccess);
           setTimeout(() => window.location.reload(), 1000);
         } else {
-          onError(isRTL ? 'الملف غير صالح أو تالف.' : 'Invalid backup file format.');
+          onError(t.adminInvalidBackupFile);
         }
       }
     };
@@ -50,7 +50,7 @@ export const AdminDataBackupCard: React.FC<AdminDataBackupCardProps> = ({
   const handleResetFactory = () => {
     resetAllToDefault();
     setShowResetConfirm(false);
-    onSuccess(isRTL ? 'تمت استعادة الإعدادات الافتراضية بنجاح!' : 'Reset to default data completed!');
+    onSuccess(t.adminResetDefaultSuccess);
     setTimeout(() => window.location.reload(), 800);
   };
 
@@ -59,12 +59,10 @@ export const AdminDataBackupCard: React.FC<AdminDataBackupCardProps> = ({
       <div className="pb-2 border-b border-zinc-800">
         <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2">
           <Download className="w-4 h-4 text-blue-400" />
-          <span>{isRTL ? '4. النسخ الاحتياطي واستعادة البيانات (Backup & Restore)' : '4. Database Backup & Restore'}</span>
+          <span>{t.adminBackupRestoreSection}</span>
         </h2>
         <p className="text-xs text-zinc-400 mt-1">
-          {isRTL
-            ? 'احفظ نسخة من كافة المنتجات والفروع والعروض والطلبات على جهازك واستعدها في أي وقت.'
-            : 'Export or import your entire store database as a JSON file.'}
+          {t.adminBackupRestoreDesc}
         </p>
       </div>
 
@@ -74,17 +72,17 @@ export const AdminDataBackupCard: React.FC<AdminDataBackupCardProps> = ({
           <div>
             <div className="text-xs font-bold text-white flex items-center gap-1.5 mb-1">
               <Download className="w-4 h-4 text-blue-400" />
-              <span>{isRTL ? 'تصدير نسخة احتياطية' : 'Export JSON Backup'}</span>
+              <span>{t.adminExportBackup}</span>
             </div>
             <p className="text-[11px] text-zinc-400">
-              {isRTL ? 'تنزيل ملف JSON يحتوي على كافة بيانات المتجر.' : 'Download complete snapshot of catalog and settings.'}
+              {t.adminExportBackupDesc}
             </p>
           </div>
           <button
             onClick={handleExportBackup}
-            className="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-mono font-bold border border-zinc-700 transition-colors"
+            className="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-mono font-bold border border-zinc-700 transition-colors cursor-pointer"
           >
-            {isRTL ? 'تنزيل ملف النسخة (JSON)' : 'Download Backup'}
+            {t.adminDownloadBackupJson}
           </button>
         </div>
 
@@ -93,14 +91,14 @@ export const AdminDataBackupCard: React.FC<AdminDataBackupCardProps> = ({
           <div>
             <div className="text-xs font-bold text-white flex items-center gap-1.5 mb-1">
               <Upload className="w-4 h-4 text-emerald-400" />
-              <span>{isRTL ? 'استيراد نسخة سابقة' : 'Restore from JSON'}</span>
+              <span>{t.adminRestoreBackup}</span>
             </div>
             <p className="text-[11px] text-zinc-400">
-              {isRTL ? 'رفع ملف JSON تم تنزيله مسبقاً لاستعادة البيانات.' : 'Upload a previously exported backup file.'}
+              {t.adminRestoreBackupDesc}
             </p>
           </div>
           <label className="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-mono font-bold border border-zinc-700 transition-colors text-center cursor-pointer block">
-            {isRTL ? 'اختيار ملف الاستيراد' : 'Select Backup File'}
+            {t.adminSelectBackupFile}
             <input
               type="file"
               accept=".json,application/json"
@@ -115,17 +113,17 @@ export const AdminDataBackupCard: React.FC<AdminDataBackupCardProps> = ({
           <div>
             <div className="text-xs font-bold text-red-400 flex items-center gap-1.5 mb-1">
               <RefreshCw className="w-4 h-4" />
-              <span>{isRTL ? 'إعادة الضبط الافتراضي' : 'Factory Reset'}</span>
+              <span>{t.adminFactoryReset}</span>
             </div>
             <p className="text-[11px] text-zinc-400">
-              {isRTL ? 'إرجاع المتجر للكتالوج والبيانات الأولية الأصلية.' : 'Reset all products and branches to default.'}
+              {t.adminFactoryResetDesc}
             </p>
           </div>
           <button
             onClick={() => setShowResetConfirm(true)}
-            className="w-full py-2 bg-red-950/60 hover:bg-red-900 text-red-300 text-xs font-mono font-bold border border-red-800 transition-colors"
+            className="w-full py-2 bg-red-950/60 hover:bg-red-900 text-red-300 text-xs font-mono font-bold border border-red-800 transition-colors cursor-pointer"
           >
-            {isRTL ? 'إعادة ضبط المتجر' : 'Reset to Default'}
+            {t.adminResetStore}
           </button>
         </div>
       </div>
@@ -137,26 +135,24 @@ export const AdminDataBackupCard: React.FC<AdminDataBackupCardProps> = ({
             <div className="flex items-center gap-3 text-red-400">
               <AlertCircle className="w-6 h-6 shrink-0" />
               <h3 className="font-bold text-sm text-white">
-                {isRTL ? 'تأكيد استعادة الضبط الافتراضي؟' : 'Confirm Factory Reset?'}
+                {t.adminConfirmFactoryResetTitle}
               </h3>
             </div>
             <p className="text-xs text-zinc-300">
-              {isRTL
-                ? 'سيتم مسح كافة التعديلات والمنتجات الجديدة وإرجاع الكتالوج الأصلي. هل تريد الاستمرار؟'
-                : 'This will revert all products, branches and coupons to their initial demo state.'}
+              {t.adminConfirmFactoryResetDesc}
             </p>
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={() => setShowResetConfirm(false)}
-                className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-700"
+                className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-700 cursor-pointer"
               >
-                {isRTL ? 'إلغاء' : 'Cancel'}
+                {t.cancel}
               </button>
               <button
                 onClick={handleResetFactory}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold"
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold cursor-pointer"
               >
-                {isRTL ? 'نعم، استعد الافتراضي' : 'Reset All'}
+                {t.adminYesResetDefault}
               </button>
             </div>
           </div>

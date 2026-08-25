@@ -157,13 +157,11 @@ export const AdminCustomersPage: React.FC = () => {
         prev.map((c) => (c.id === customer.id ? { ...c, tier: nextVip ? 'VIP' : 'MEMBER', isVip: nextVip } : c))
       );
       toast.success(
-        isRTL
-          ? (nextVip ? `تمت ترقية ${customer.name || 'العميل'} إلى VIP 👑` : `تم إلغاء عضوية VIP عن ${customer.name || 'العميل'}`)
-          : (nextVip ? `Customer upgraded to VIP 👑` : `VIP revoked`),
+        nextVip ? `${t.adminVipUpgradeSuccess} 👑` : t.adminVipRevokeSuccess,
         { id: `vip-toggle-${customer.id}` }
       );
     } catch (err) {
-      toast.error(isRTL ? 'فشل تعديل حالة VIP' : 'Failed to update VIP status');
+      toast.error(t.adminVipToggleError);
     } finally {
       setIsUpdating(false);
     }
@@ -186,13 +184,11 @@ export const AdminCustomersPage: React.FC = () => {
         })
       );
       toast.success(
-        isRTL
-          ? `تم تحديث رصيد النقاط بنجاح (${delta > 0 ? '+' : ''}${delta} PTS)`
-          : `Points updated successfully (${delta > 0 ? '+' : ''}${delta} PTS)`
+        `${t.adminPointsUpdateSuccess} (${delta > 0 ? '+' : ''}${delta} PTS)`
       );
       setSelectedCustomerForPoints(null);
     } catch (err) {
-      toast.error(isRTL ? 'فشل تعديل النقاط' : 'Failed to adjust points');
+      toast.error(t.adminPointsAdjustError);
     } finally {
       setIsUpdating(false);
     }
@@ -236,12 +232,10 @@ export const AdminCustomersPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
         <div>
           <h1 className="text-xl sm:text-2xl font-editorial font-bold text-white tracking-wide">
-            {isRTL ? 'إدارة العملاء وفريق العمل' : 'Customer CRM & Team Management'}
+            {t.adminCustomersAndTeam}
           </h1>
           <p className="text-xs text-zinc-400 mt-0.5">
-            {isRTL
-              ? 'متابعة حسابات العملاء، عضويات VIP، نقاط الولاء، وإدارة صلاحيات المشرفين والموظفين.'
-              : 'Manage customer accounts, VIP tiers, loyalty balance, and admin/staff privileges.'}
+            {t.adminCustomersAndTeamDesc}
           </p>
         </div>
 
@@ -252,7 +246,7 @@ export const AdminCustomersPage: React.FC = () => {
             onClick={fetchCustomers}
             disabled={isLoading}
             className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors disabled:opacity-50 cursor-pointer"
-            title={isRTL ? 'تحديث البيانات' : 'Refresh Data'}
+            title={t.refresh}
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-amber-400' : ''}`} />
           </button>
@@ -269,7 +263,7 @@ export const AdminCustomersPage: React.FC = () => {
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>{isRTL ? 'العملاء وقواعد الولاء' : 'Clients & VIP CRM'}</span>
+              <span>{t.adminCustomersAndLoyaltyTab}</span>
             </button>
 
             <button
@@ -282,7 +276,7 @@ export const AdminCustomersPage: React.FC = () => {
               }`}
             >
               <Crown className="w-3.5 h-3.5" />
-              <span>{isRTL ? 'فريق الإدارة والمشرفين' : 'Admins & Staff'}</span>
+              <span>{t.adminTeamAndStaffTab}</span>
             </button>
           </div>
         </div>
@@ -298,12 +292,8 @@ export const AdminCustomersPage: React.FC = () => {
       ) : allMergedCustomers.length === 0 ? (
         <EmptyState
           icon={Users}
-          title={isRTL ? 'لا يوجد عملاء مسجلين بعد' : 'No Customers Registered Yet'}
-          description={
-            isRTL
-              ? 'بمجرد تسجيل العملاء لحساباتهم أو قيامهم بالطلب، ستظهر بياناتهم ونقاط ولائهم هنا.'
-              : 'Once customers register or place orders, their profiles and loyalty balances will appear here.'
-          }
+          title={t.adminNoCustomersYet}
+          description={t.adminNoCustomersDesc}
         />
       ) : (
         <>

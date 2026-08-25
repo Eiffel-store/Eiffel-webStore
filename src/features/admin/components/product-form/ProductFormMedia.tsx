@@ -12,7 +12,7 @@ export const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
   images,
   onChange
 }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const [imageUrlInput, setImageUrlInput] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -45,7 +45,7 @@ export const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
         const currentImages = images.filter(img => img.trim() !== '');
         onChange([...currentImages, ...validUrls]);
       } catch {
-        setUploadError(err.message || 'فشل رفع الصور إلى السيرفر');
+        setUploadError(err.message || 'Error uploading images');
       }
     } finally {
       setIsUploading(false);
@@ -92,10 +92,10 @@ export const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-zinc-800 gap-2">
         <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2">
           <ImageIcon className="w-4 h-4 text-zinc-400" />
-          <span>{isRTL ? '2. صور المنتج (رفع ملفات حقيقية من الجهاز أو روابط)' : '2. Product Images'}</span>
+          <span>{t.adminColorsAndMediaSection}</span>
         </h2>
         <span className="text-[11px] text-zinc-500 font-mono">
-          {isRTL ? 'الصورة الأولى هي الصورة الرئيسية للمنتج' : 'First image is used as primary thumbnail'}
+          {t.adminFirstImagePrimary}
         </span>
       </div>
 
@@ -121,7 +121,7 @@ export const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
             <>
               <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
               <p className="text-sm font-bold text-white">
-                {isRTL ? 'جاري رفع ومعالجة الصور...' : 'Uploading and Processing Images...'}
+                {t.adminUploadingImages}
               </p>
             </>
           ) : (
@@ -130,14 +130,14 @@ export const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
                 <Upload className="w-6 h-6" />
               </div>
               <p className="text-xs sm:text-sm font-bold text-white">
-                {isRTL ? 'اسحب الصور وأفلتها هنا مباشرة، أو اضغط للاختيار من جهازك' : 'Drag & drop image files here, or click to browse'}
+                {t.adminDragDropImages}
               </p>
               <p className="text-[11px] text-zinc-400 font-mono">
-                {isRTL ? 'يدعم اختيار صور متعددة معاً (JPG, PNG, WebP)' : 'Supports multiple image files simultaneously (JPG, PNG, WebP)'}
+                {t.adminSupportsMultipleImages}
               </p>
               <label className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded cursor-pointer transition-colors shadow">
                 <Upload className="w-4 h-4" />
-                <span>{isRTL ? 'اختيار صور من الجهاز' : 'Select Images from Device'}</span>
+                <span>{t.adminSelectImagesFromDevice}</span>
                 <input
                   type="file"
                   multiple
@@ -155,14 +155,14 @@ export const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
       {/* Alternative: Add from URL */}
       <div className="pt-2 border-t border-zinc-800/60 flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
         <span className="text-xs text-zinc-400 shrink-0">
-          {isRTL ? 'أو إضافة عبر رابط مباشر:' : 'Or add via direct URL:'}
+          {t.adminOrAddViaDirectUrl}
         </span>
         <div className="flex-1 flex gap-2">
           <input
             type="url"
             value={imageUrlInput}
             onChange={(e) => setImageUrlInput(e.target.value)}
-            placeholder={isRTL ? 'ضع رابط صورة مباشر (https://...)' : 'Paste direct image URL (https://...)'}
+            placeholder="https://..."
             className="flex-1 bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-mono"
           />
           <button
@@ -171,7 +171,7 @@ export const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
             className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium border border-zinc-700 rounded transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>{isRTL ? 'إضافة' : 'Add'}</span>
+            <span>{t.adminAddPhotoBtn}</span>
           </button>
         </div>
       </div>
@@ -192,7 +192,7 @@ export const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
             />
             {idx === 0 && (
               <span className="absolute top-1.5 left-1.5 rtl:left-auto rtl:right-1.5 bg-amber-500 text-black text-[9px] font-bold px-2 py-0.5 rounded shadow">
-                {isRTL ? 'الرئيسية' : 'Primary'}
+                {t.adminPrimaryThumbnail}
               </span>
             )}
             <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
@@ -203,14 +203,14 @@ export const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
                   className="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-white text-[10px] rounded flex items-center gap-1 cursor-pointer"
                 >
                   <Check className="w-3 h-3 text-emerald-400" />
-                  <span>{isRTL ? 'تعيين كرئيسية' : 'Make Primary'}</span>
+                  <span>{t.adminMakePrimary}</span>
                 </button>
               )}
               <button
                 type="button"
                 onClick={() => handleRemoveImage(idx)}
                 className="p-1.5 bg-red-600 hover:bg-red-700 text-white text-[10px] rounded-full shadow cursor-pointer"
-                title={isRTL ? 'حذف الصورة' : 'Delete'}
+                title={t.adminRemovePhoto}
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>

@@ -22,7 +22,7 @@ export const AdminProductFilterBar: React.FC<AdminProductFilterBarProps> = ({
   onStockChange,
   categories
 }) => {
-  const { isRTL } = useLanguage();
+  const { language, t } = useLanguage();
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-zinc-950 p-4 border border-zinc-800">
@@ -33,7 +33,7 @@ export const AdminProductFilterBar: React.FC<AdminProductFilterBarProps> = ({
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder={isRTL ? 'بحث باسم المنتج أو الكود...' : 'Search by product name or code...'}
+          placeholder={t.adminSearchProductsPlaceholder}
           className="w-full bg-zinc-900 border border-zinc-700 pl-9 pr-4 rtl:pl-4 rtl:pr-9 py-2 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-white transition-colors"
         />
       </div>
@@ -45,10 +45,10 @@ export const AdminProductFilterBar: React.FC<AdminProductFilterBarProps> = ({
           onChange={(e) => onCategoryChange(e.target.value)}
           className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white focus:outline-none focus:border-white transition-colors"
         >
-          <option value="all">{isRTL ? 'جميع الأقسام' : 'All Categories'}</option>
+          <option value="all">{t.adminAllCategories}</option>
           {categories.map((cat) => (
             <option key={cat.id} value={cat.id}>
-              {isRTL ? (cat.name || cat.nameEn) : (cat.nameEn || cat.name)}
+              {language === 'ar' ? (cat.name || cat.nameEn) : (cat.nameEn || cat.name)}
             </option>
           ))}
         </select>
@@ -61,9 +61,9 @@ export const AdminProductFilterBar: React.FC<AdminProductFilterBarProps> = ({
           onChange={(e) => onStockChange(e.target.value)}
           className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white focus:outline-none focus:border-white transition-colors"
         >
-          <option value="all">{isRTL ? 'حالة المخزون (الكل)' : 'All Stock Status'}</option>
-          <option value="in-stock">{isRTL ? 'متوفر بالمخزون' : 'In Stock Only'}</option>
-          <option value="out-of-stock">{isRTL ? 'نفد من المخزون' : 'Out of Stock'}</option>
+          <option value="all">{t.adminProductTableStatus} ({t.all})</option>
+          <option value="in-stock">{t.adminFilterInStock}</option>
+          <option value="out-of-stock">{t.adminFilterOutOfStock}</option>
         </select>
       </div>
     </div>

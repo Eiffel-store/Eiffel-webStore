@@ -22,7 +22,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
   setFormStore,
   onSave
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [isGpsLoading, setIsGpsLoading] = useState(false);
@@ -49,11 +49,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
       coordinates: coords
     }));
 
-    setLocationSuccessNotice(
-      isRTL
-        ? '✓ تم تحديد موقع الفرع وتعبئة المدينة والعنوان والخريطة بنجاح'
-        : '✓ Branch location resolved and address fields auto-filled'
-    );
+    setLocationSuccessNotice(t.adminBranchAddressAutofilledNotice);
     setTimeout(() => setLocationSuccessNotice(null), 4000);
   };
 
@@ -81,7 +77,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
           <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
             <h3 className="font-bold text-sm text-white font-editorial flex items-center gap-2">
               <MapPin className="w-4 h-4 text-amber-400" />
-              <span>{isEditing ? (isRTL ? 'تعديل بيانات الفرع' : 'Edit Branch') : (isRTL ? 'إضافة فرع جديد' : 'Add New Branch')}</span>
+              <span>{isEditing ? t.adminEditBranch : t.adminAddBranch}</span>
             </h3>
           </div>
 
@@ -90,10 +86,10 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>{isRTL ? 'إضافة وتحديد موقع الفرع تلقائياً' : 'Auto-Detect & Pick Branch Location'}</span>
+                <span>{t.adminBranchAutodetect}</span>
               </span>
               <span className="text-[10px] text-zinc-400 font-mono">
-                {isRTL ? 'تعبئة العنوان والخريطة بضغطة واحدة' : '1-Click Auto-Fill'}
+                {t.adminOneClickAutofill}
               </span>
             </div>
 
@@ -105,7 +101,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
                 className="flex-1 min-w-[140px] px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded flex items-center justify-center gap-1.5 shadow transition-all disabled:opacity-50 cursor-pointer"
               >
                 {isGpsLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Crosshair className="w-3.5 h-3.5" />}
-                <span>{isRTL ? 'تحديد الموقع بالـ GPS' : 'Detect via GPS'}</span>
+                <span>{t.adminDetectGps}</span>
               </button>
 
               <button
@@ -114,7 +110,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
                 className="flex-1 min-w-[140px] px-3 py-2 bg-white text-black hover:bg-zinc-200 text-xs font-bold rounded flex items-center justify-center gap-1.5 shadow transition-all cursor-pointer"
               >
                 <MapPin className="w-3.5 h-3.5 text-red-500" />
-                <span>{isRTL ? 'اختيار من الخريطة / المناطق' : 'Pick on Map / Cities'}</span>
+                <span>{t.adminPickOnMap}</span>
               </button>
             </div>
 
@@ -130,7 +126,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-zinc-300 font-bold mb-1">
-                  {isRTL ? 'اسم الفرع (عربي) *' : 'Branch Name (Arabic) *'}
+                  {t.adminBranchNameAr} *
                 </label>
                 <input
                   type="text"
@@ -144,7 +140,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
 
               <div>
                 <label className="block text-xs text-zinc-300 font-bold mb-1">
-                  {isRTL ? 'اسم الفرع (إنجليزي) *' : 'Branch Name (English) *'}
+                  {t.adminBranchNameEn} *
                 </label>
                 <input
                   type="text"
@@ -160,7 +156,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-zinc-300 font-bold mb-1">
-                  {isRTL ? 'المدينة / المحافظة *' : 'City / Governorate *'}
+                  {t.adminCityGovernorate} *
                 </label>
                 <input
                   type="text"
@@ -174,7 +170,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
 
               <div>
                 <label className="block text-xs text-zinc-300 font-bold mb-1">
-                  {isRTL ? 'نوع الفرع' : 'Branch Type'}
+                  {t.adminBranchType}
                 </label>
                 <select
                   value={formStore.type}
@@ -191,7 +187,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
 
             <div>
               <label className="block text-xs text-zinc-300 font-bold mb-1">
-                {isRTL ? 'العنوان بالتفصيل *' : 'Detailed Address *'}
+                {t.adminDetailedAddress} *
               </label>
               <input
                 type="text"
@@ -205,7 +201,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
 
             <div>
               <label className="block text-xs text-zinc-300 font-bold mb-1">
-                {isRTL ? 'مواعيد العمل *' : 'Working Hours *'}
+                {t.adminWorkingHours} *
               </label>
               <input
                 type="text"
@@ -220,7 +216,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-zinc-300 font-bold mb-1">
-                  {isRTL ? 'رقم الهاتف' : 'Phone Number'}
+                  {t.phone}
                 </label>
                 <input
                   type="text"
@@ -233,7 +229,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
 
               <div>
                 <label className="block text-xs text-zinc-300 font-bold mb-1">
-                  {isRTL ? 'البريد الإلكتروني' : 'Email Address'}
+                  {t.emailAddress}
                 </label>
                 <input
                   type="email"
@@ -249,10 +245,10 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
             <div className="flex items-center justify-between p-3 bg-zinc-900/60 border border-zinc-800 rounded">
               <div>
                 <span className="block text-xs font-bold text-white">
-                  {isRTL ? 'حالة تفعيل الفرع' : 'Branch Active Status'}
+                  {t.adminBranchActiveStatus}
                 </span>
                 <span className="text-[11px] text-zinc-400">
-                  {isRTL ? 'يظهر الفرع في صفحة الفروع وخريطة المتجر للعملاء' : 'Show branch on store locator map and customer pages'}
+                  {t.adminBranchActiveStatusDesc}
                 </span>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -268,11 +264,11 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
 
             {/* Branch Storefront Image Upload (Device Upload + Direct URL) */}
             <ImageUploadInput
-              label={isRTL ? 'صورة واجهة الفرع (Storefront Image)' : 'Storefront Image'}
+              label={t.adminStorefrontImage}
               value={formStore.image || ''}
               onChange={(url) => setFormStore({ ...formStore, image: url })}
               aspectRatio="16/9"
-              helpText={isRTL ? 'يمكنك رفع صورة من جهازك أو وضع رابط صورة' : 'Upload from your device or paste an image URL'}
+              helpText={t.adminStorefrontImageHelp}
             />
 
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-800">
@@ -281,13 +277,13 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
                 onClick={onClose}
                 className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-700 rounded transition-colors cursor-pointer"
               >
-                {isRTL ? 'إلغاء' : 'Cancel'}
+                {t.cancel}
               </button>
               <button
                 type="submit"
                 className="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded transition-colors cursor-pointer"
               >
-                {isEditing ? (isRTL ? 'حفظ التعديل' : 'Save Changes') : (isRTL ? 'إضافة الفرع' : 'Add Branch')}
+                {isEditing ? t.saveChanges : t.adminAddBranch}
               </button>
             </div>
           </form>

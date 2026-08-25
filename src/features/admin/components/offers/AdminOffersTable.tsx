@@ -15,7 +15,7 @@ export const AdminOffersTable: React.FC<AdminOffersTableProps> = ({
   onRemoveOffer,
   onOpenAddModal
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   return (
@@ -24,12 +24,10 @@ export const AdminOffersTable: React.FC<AdminOffersTableProps> = ({
         <div>
           <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2">
             <Tag className="w-4 h-4 text-amber-400" />
-            <span>{isRTL ? 'المنتجات المدرجة في قسم العروض والتخفيضات' : 'Discounted Products on Live Sale'}</span>
+            <span>{t.adminDiscountedProductsOnSale}</span>
           </h2>
           <p className="text-xs text-zinc-400 mt-0.5">
-            {isRTL
-              ? `إجمالي ${products.length} قطعة معروضة بأسعار مخفضة وتظهر في صفحة العروض.`
-              : `Total ${products.length} items currently on sale in /collections/offers.`}
+            {products.length} {t.items}
           </p>
         </div>
         <Link
@@ -38,7 +36,7 @@ export const AdminOffersTable: React.FC<AdminOffersTableProps> = ({
           rel="noopener noreferrer"
           className="text-xs text-zinc-400 hover:text-white flex items-center gap-1 font-mono"
         >
-          <span>{isRTL ? 'معاينة صفحة العروض' : 'Preview Live'}</span>
+          <span>{t.adminStorePreview}</span>
           <ExternalLink className="w-3.5 h-3.5" />
         </Link>
       </div>
@@ -46,12 +44,12 @@ export const AdminOffersTable: React.FC<AdminOffersTableProps> = ({
       {products.length === 0 ? (
         <div className="py-12 text-center text-zinc-500 space-y-3">
           <Tag className="w-10 h-10 mx-auto opacity-30 text-amber-400" />
-          <p className="text-xs">{isRTL ? 'لا توجد منتجات مخفضة حالياً.' : 'No discounted items currently active.'}</p>
+          <p className="text-xs">{t.noMatchingPieces}</p>
           <button
             onClick={onOpenAddModal}
-            className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium border border-zinc-700 inline-flex items-center gap-1.5"
+            className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium border border-zinc-700 inline-flex items-center gap-1.5 cursor-pointer"
           >
-            {isRTL ? 'إضافة منتج وتحديد نسبة الخصم' : 'Apply Discount to a Product'}
+            {t.adminApplyDiscount}
           </button>
         </div>
       ) : (
@@ -59,11 +57,11 @@ export const AdminOffersTable: React.FC<AdminOffersTableProps> = ({
           <table className="w-full text-left rtl:text-right text-xs">
             <thead>
               <tr className="border-b border-zinc-800 text-zinc-500 font-mono uppercase text-[11px]">
-                <th className="py-3 px-3">{isRTL ? 'المنتج' : 'Product'}</th>
-                <th className="py-3 px-3">{isRTL ? 'السعر الأصلي' : 'Original'}</th>
-                <th className="py-3 px-3">{isRTL ? 'سعر العرض' : 'Sale Price'}</th>
-                <th className="py-3 px-3">{isRTL ? 'نسبة الخصم' : 'Discount %'}</th>
-                <th className="py-3 px-3 text-right rtl:text-left">{isRTL ? 'إلغاء الخصم' : 'Action'}</th>
+                <th className="py-3 px-3">{t.adminProductTableName}</th>
+                <th className="py-3 px-3">{t.adminOriginalPrice}</th>
+                <th className="py-3 px-3">{t.adminCurrentPrice}</th>
+                <th className="py-3 px-3">{t.adminDiscountPercentage}</th>
+                <th className="py-3 px-3 text-right rtl:text-left">{t.adminProductTableActions}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/50">
@@ -101,11 +99,11 @@ export const AdminOffersTable: React.FC<AdminOffersTableProps> = ({
                     <td className="py-3 px-3 text-right rtl:text-left">
                       <button
                         onClick={() => onRemoveOffer(p.id)}
-                        className="px-2.5 py-1 bg-zinc-900 hover:bg-red-950 text-zinc-400 hover:text-red-400 border border-zinc-800 text-[11px] transition-colors flex items-center gap-1 inline-flex"
-                        title={isRTL ? 'إلغاء الخصم وإرجاع السعر الأصلي' : 'Remove discount and restore price'}
+                        className="px-2.5 py-1 bg-zinc-900 hover:bg-red-950 text-zinc-400 hover:text-red-400 border border-zinc-800 text-[11px] transition-colors flex items-center gap-1 inline-flex cursor-pointer"
+                        title={t.adminRemoveDiscount}
                       >
                         <Trash2 className="w-3 h-3" />
-                        <span>{isRTL ? 'إلغاء العرض' : 'Remove'}</span>
+                        <span>{t.adminRemoveDiscount}</span>
                       </button>
                     </td>
                   </tr>

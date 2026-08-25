@@ -25,7 +25,7 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
   orders,
   products
 }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   // Metrics
@@ -76,7 +76,7 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
         {/* Total Revenue */}
         <div className="p-5 rounded-xl bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800 relative overflow-hidden shadow-xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-zinc-400">{isRTL ? 'إجمالي الدخل المالي' : 'Gross Revenue'}</span>
+            <span className="text-xs font-mono text-zinc-400">{t.adminGrossRevenue}</span>
             <div className="w-9 h-9 rounded-lg bg-amber-400/10 border border-amber-400/20 text-amber-400 flex items-center justify-center">
               <DollarSign className="w-5 h-5" />
             </div>
@@ -87,32 +87,32 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
           <div className="flex items-center gap-1.5 text-xs text-emerald-400 mt-2 font-mono">
             <TrendingUp className="w-3.5 h-3.5" />
             <span className="font-semibold">+18.4%</span>
-            <span className="text-zinc-500 font-sans text-[11px]">{isRTL ? 'مقارنة بالفترة السابقة' : 'vs last period'}</span>
+            <span className="text-zinc-500 font-sans text-[11px]">{t.adminVsLastPeriod}</span>
           </div>
         </div>
 
         {/* Total Orders */}
         <div className="p-5 rounded-xl bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800 shadow-xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-zinc-400">{isRTL ? 'إجمالي الطلبات' : 'Total Orders'}</span>
+            <span className="text-xs font-mono text-zinc-400">{t.adminTotalOrders}</span>
             <div className="w-9 h-9 rounded-lg bg-blue-400/10 border border-blue-400/20 text-blue-400 flex items-center justify-center">
               <ShoppingBag className="w-5 h-5" />
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-mono font-bold text-white mt-3 tracking-tight">
-            {totalOrdersCount} <span className="text-xs text-zinc-500 font-sans">{isRTL ? 'طلب' : 'orders'}</span>
+            {totalOrdersCount} <span className="text-xs text-zinc-500 font-sans">{t.orders}</span>
           </div>
           <div className="flex items-center gap-2 text-xs text-zinc-400 mt-2 font-mono">
-            <span className="text-emerald-400">{deliveredOrders.length} {isRTL ? 'مكتمل' : 'delivered'}</span>
+            <span className="text-emerald-400">{deliveredOrders.length} {t.adminDeliveredStatus}</span>
             <span>•</span>
-            <span className="text-amber-400">{processingOrders.length + pendingOrders.length} {isRTL ? 'نشط' : 'active'}</span>
+            <span className="text-amber-400">{processingOrders.length + pendingOrders.length} {t.adminActiveStatus}</span>
           </div>
         </div>
 
         {/* Average Order Value (AOV) */}
         <div className="p-5 rounded-xl bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800 shadow-xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-zinc-400">{isRTL ? 'متوسط قيمة السلة (AOV)' : 'Avg Order Value'}</span>
+            <span className="text-xs font-mono text-zinc-400">{t.adminAvgOrderValue}</span>
             <div className="w-9 h-9 rounded-lg bg-purple-400/10 border border-purple-400/20 text-purple-400 flex items-center justify-center">
               <PackageCheck className="w-5 h-5" />
             </div>
@@ -122,14 +122,14 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
           </div>
           <div className="flex items-center gap-1.5 text-xs text-zinc-400 mt-2 font-mono">
             <span className="text-emerald-400 font-bold">{deliverySuccessRate}%</span>
-            <span>{isRTL ? 'نسبة نجاح التوصيل (COD)' : 'Delivery Success Rate'}</span>
+            <span>{t.adminDeliverySuccessRate}</span>
           </div>
         </div>
 
         {/* Inventory Value */}
         <div className="p-5 rounded-xl bg-gradient-to-br from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800 shadow-xl">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-zinc-400">{isRTL ? 'قيمة الأصول بالمخزن' : 'Inventory Asset Value'}</span>
+            <span className="text-xs font-mono text-zinc-400">{t.adminInventoryAssetValue}</span>
             <div className="w-9 h-9 rounded-lg bg-emerald-400/10 border border-emerald-400/20 text-emerald-400 flex items-center justify-center">
               <Layers className="w-5 h-5" />
             </div>
@@ -138,7 +138,7 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
             {formatPrice(totalInventoryValue)}
           </div>
           <div className="flex items-center gap-1 text-xs text-zinc-400 mt-2 font-mono">
-            <span>{products.length} {isRTL ? 'موديل معروض' : 'active SKU'}</span>
+            <span>{products.length} {t.adminActiveSkuUnit}</span>
           </div>
         </div>
       </div>
@@ -151,15 +151,15 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
             <div>
               <h2 className="text-sm font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>{isRTL ? 'منحنى التدفق المالي والمبيعات اليومية' : 'Daily Sales & Revenue Velocity'}</span>
+                <span>{t.adminDailySalesVelocity}</span>
               </h2>
               <p className="text-xs text-zinc-400 mt-0.5 font-light">
-                {isRTL ? 'توزيع المبيعات والقيمة الإجمالية للطلبات على مدار الأيام' : 'Daily revenue distribution and sales volume trajectory'}
+                {t.adminDailySalesVelocityDesc}
               </p>
             </div>
 
             <span className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-[11px] font-mono text-amber-400">
-              {isRTL ? 'تحديث فوري' : 'Live Calculated'}
+              {t.adminLiveCalculated}
             </span>
           </div>
 
@@ -172,7 +172,7 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
                   {/* Tooltip / Value on Hover */}
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-zinc-900 border border-zinc-700 text-white px-2 py-1 rounded text-[10px] font-mono text-center shadow-lg pointer-events-none mb-1">
                     <p className="text-amber-400 font-bold">{formatPrice(item.revenue)}</p>
-                    <p className="text-zinc-400">{item.ordersCount} {isRTL ? 'طلب' : 'orders'}</p>
+                    <p className="text-zinc-400">{item.ordersCount} {t.orders}</p>
                   </div>
 
                   {/* Visual Bar Column */}
@@ -198,10 +198,10 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
           <div>
             <div className="pb-4 border-b border-zinc-800/80 mb-5">
               <h2 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
-                {isRTL ? 'مراحل وحالة الطلبات' : 'Order Fulfillment Funnel'}
+                {t.adminOrderFulfillmentFunnel}
               </h2>
               <p className="text-xs text-zinc-400 mt-0.5">
-                {isRTL ? 'توزيع الطلبات حسب مراحل الشحن والتسليم' : 'Status breakdown from checkout to delivery'}
+                {t.adminOrderFulfillmentFunnelDesc}
               </p>
             </div>
 
@@ -213,8 +213,8 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
                     <CheckCircle2 className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-white">{isRTL ? 'تم التسليم بنجاح' : 'Delivered'}</p>
-                    <p className="text-[10px] font-mono text-zinc-400">{deliveredOrders.length} {isRTL ? 'طلب تم تحصيله' : 'orders collected'}</p>
+                    <p className="text-xs font-bold text-white">{t.adminDeliveredStatus}</p>
+                    <p className="text-[10px] font-mono text-zinc-400">{deliveredOrders.length} {t.adminOrdersCollectedUnit}</p>
                   </div>
                 </div>
                 <span className="text-xs font-mono font-bold text-emerald-400">
@@ -229,8 +229,8 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
                     <Truck className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-white">{isRTL ? 'قيد الشحن والتوصيل' : 'In Transit / Shipping'}</p>
-                    <p className="text-[10px] font-mono text-zinc-400">{processingOrders.length} {isRTL ? 'طلب مع المندوب' : 'with couriers'}</p>
+                    <p className="text-xs font-bold text-white">{t.adminInTransitShipping}</p>
+                    <p className="text-[10px] font-mono text-zinc-400">{processingOrders.length} {t.adminWithCouriersUnit}</p>
                   </div>
                 </div>
                 <span className="text-xs font-mono font-bold text-blue-400">
@@ -245,8 +245,8 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
                     <Clock className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-white">{isRTL ? 'قيد المراجعة والتأكيد' : 'Pending Confirmation'}</p>
-                    <p className="text-[10px] font-mono text-zinc-400">{pendingOrders.length} {isRTL ? 'طلب جديد' : 'new orders'}</p>
+                    <p className="text-xs font-bold text-white">{t.adminAwaitingConfirmation}</p>
+                    <p className="text-[10px] font-mono text-zinc-400">{pendingOrders.length} {t.adminNewOrdersUnit}</p>
                   </div>
                 </div>
                 <span className="text-xs font-mono font-bold text-amber-400">
@@ -261,8 +261,8 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
                     <XCircle className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-white">{isRTL ? 'طلبات ملغاة / مرتجعة' : 'Cancelled / Returned'}</p>
-                    <p className="text-[10px] font-mono text-zinc-400">{cancelledOrders.length} {isRTL ? 'طلب ملغي' : 'cancelled'}</p>
+                    <p className="text-xs font-bold text-white">{t.adminCancelledStatus}</p>
+                    <p className="text-[10px] font-mono text-zinc-400">{cancelledOrders.length} {t.adminOrdersCancelledUnit}</p>
                   </div>
                 </div>
                 <span className="text-xs font-mono font-bold text-rose-400">
@@ -273,7 +273,7 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
           </div>
 
           <div className="pt-4 border-t border-zinc-800/80 mt-4 text-[11px] font-mono text-zinc-400 flex justify-between">
-            <span>{isRTL ? 'معدل التحصيل كاش:' : 'COD Recovery:'}</span>
+            <span>{t.adminCodRecoveryRate}</span>
             <span className="text-emerald-400 font-bold">{deliverySuccessRate}%</span>
           </div>
         </div>

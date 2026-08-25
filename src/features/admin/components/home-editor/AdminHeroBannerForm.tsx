@@ -13,7 +13,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
   hero,
   onChange
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const [urlInput, setUrlInput] = useState('');
   const [isUploading, setIsUploading] = useState(false);
 
@@ -56,10 +56,10 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
       <div className="pb-3 border-b border-zinc-800 flex items-center justify-between">
         <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-amber-400" />
-          <span>{isRTL ? '1. بانر البداية الرئيسي (Hero Banner)' : '1. Main Hero Banner'}</span>
+          <span>{t.adminMainHeroBanner}</span>
         </h2>
         <span className="text-[11px] text-zinc-500 font-mono">
-          {isRTL ? 'يظهر في أعلى الصفحة الرئيسية' : 'Displays at the top of the homepage'}
+          {t.adminDisplaysTopHomepage}
         </span>
       </div>
 
@@ -74,7 +74,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-3">
             <span className="text-[10px] font-mono text-zinc-300 bg-black/70 px-2 py-0.5 border border-white/10">
-              {isRTL ? 'معاينة الغلاف' : 'Cover Preview'}
+              {t.adminCoverPreview}
             </span>
           </div>
         </div>
@@ -82,7 +82,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
         {/* Upload Controls */}
         <div className="lg:col-span-7 space-y-3">
           <label className="block text-xs text-zinc-300 font-bold">
-            {isRTL ? 'صورة الغلاف الرئيسية (Hero Image)' : 'Hero Background Image'}
+            {t.adminHeroBgImage}
           </label>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -92,7 +92,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
               ) : (
                 <Upload className="w-4 h-4 text-emerald-400" />
               )}
-              <span>{isUploading ? (isRTL ? 'جاري الرفع...' : 'Uploading...') : (isRTL ? 'رفع صورة من الجهاز' : 'Upload from Device')}</span>
+              <span>{isUploading ? t.adminUploading : t.adminUploadFromDevice}</span>
               <input
                 type="file"
                 accept="image/*"
@@ -107,21 +107,21 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
                 type="url"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
-                placeholder={isRTL ? 'أو ضع رابط صورة مباشر...' : 'Or paste image URL...'}
+                placeholder={t.adminPasteImageUrl}
                 className="flex-1 bg-zinc-900 border border-zinc-700 px-3 py-1.5 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-white"
               />
               <button
                 type="button"
                 onClick={handleApplyUrl}
-                className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium border border-zinc-700 transition-colors"
+                className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium border border-zinc-700 transition-colors cursor-pointer"
               >
-                {isRTL ? 'تطبيق' : 'Apply'}
+                {t.adminApplyBtn}
               </button>
             </div>
           </div>
 
           <p className="text-[11px] text-zinc-500 font-mono">
-            {isRTL ? 'المقاس المفضل: 1920×1080 بكسل بدقة عالية.' : 'Recommended size: 1920x1080px landscape high-res.'}
+            {t.adminRecommendedSizeHero}
           </p>
         </div>
       </div>
@@ -131,7 +131,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
         {/* Title Ar */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'العنوان الرئيسي الكبير (عربي) *' : 'Headline Title (Arabic) *'}
+            {t.adminHeadlineTitleAr}
           </label>
           <input
             type="text"
@@ -146,7 +146,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
         {/* Title En */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'العنوان الرئيسي الكبير (إنجليزي) *' : 'Headline Title (English) *'}
+            {t.adminHeadlineTitleEn}
           </label>
           <input
             type="text"
@@ -163,7 +163,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
         {/* Subtitle Ar */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'الوصف الفرعي (عربي)' : 'Subtitle Paragraph (Arabic)'}
+            {t.adminSubtitleParagraphAr}
           </label>
           <textarea
             rows={2}
@@ -177,7 +177,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
         {/* Subtitle En */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'الوصف الفرعي (إنجليزي)' : 'Subtitle Paragraph (English)'}
+            {t.adminSubtitleParagraphEn}
           </label>
           <textarea
             rows={2}
@@ -193,7 +193,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
         {/* Tag Ar */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'شارة الموسم الصغيرة (عربي)' : 'Season Tag Badge (Arabic)'}
+            {t.adminSeasonTagBadgeAr}
           </label>
           <input
             type="text"
@@ -207,7 +207,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
         {/* Tag En */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'شارة الموسم الصغيرة (إنجليزي)' : 'Season Tag Badge (English)'}
+            {t.adminSeasonTagBadgeEn}
           </label>
           <input
             type="text"
@@ -223,7 +223,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-zinc-800/80">
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'نص الزر الرئيسي (عربي)' : 'Main CTA Text (Arabic)'}
+            {t.adminMainCtaTextAr}
           </label>
           <input
             type="text"
@@ -236,7 +236,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
 
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'نص الزر الرئيسي (إنجليزي)' : 'Main CTA Text (English)'}
+            {t.adminMainCtaTextEn}
           </label>
           <input
             type="text"
@@ -250,7 +250,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1 flex items-center gap-1">
             <LinkIcon className="w-3 h-3 text-zinc-500" />
-            <span>{isRTL ? 'رابط توجيه الزر' : 'Button Destination Link'}</span>
+            <span>{t.adminButtonDestinationLink}</span>
           </label>
           <input
             type="text"

@@ -15,7 +15,7 @@ export const AdminAddUserModal: React.FC<AdminAddUserModalProps> = ({
   onClose,
   onUserCreated,
 }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
 
   const [formData, setFormData] = useState<AdminUserData>({
     name: '',
@@ -33,12 +33,12 @@ export const AdminAddUserModal: React.FC<AdminAddUserModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.email.trim() || !formData.password?.trim()) {
-      setError(isRTL ? 'يرجى إكمال جميع الحقول المطلوبة' : 'Please fill all required fields');
+      setError(t.adminFillRequiredFields);
       return;
     }
 
     if ((formData.password || '').length < 6) {
-      setError(isRTL ? 'كلمة المرور يجب ألا تقل عن 6 أحرف' : 'Password must be at least 6 characters');
+      setError(t.adminPasswordMinLength);
       return;
     }
 
@@ -48,9 +48,9 @@ export const AdminAddUserModal: React.FC<AdminAddUserModalProps> = ({
     try {
       await adminService.createUser(formData);
       toast.success(
-        isRTL
-          ? `تم إنشاء حساب ${formData.role === 'ROLE_ADMIN' ? 'المدير (Admin)' : 'الموظف (Staff)'} بنجاح! 🎉`
-          : `User (${formData.role === 'ROLE_ADMIN' ? 'Admin' : 'Staff'}) created successfully! 🎉`
+        formData.role === 'ROLE_ADMIN'
+          ? `${t.adminAccountCreatedSuccess} (Admin) 🎉`
+          : `${t.adminAccountCreatedSuccess} (Staff) 🎉`
       );
       onUserCreated();
       onClose();
@@ -58,7 +58,7 @@ export const AdminAddUserModal: React.FC<AdminAddUserModalProps> = ({
       const msg =
         err.response?.data?.message ||
         err.message ||
-        (isRTL ? 'فشل إنشاء الحساب الإداري' : 'Failed to create user');
+        t.adminAccountCreateFailed;
       setError(msg);
       toast.error(msg);
     } finally {
@@ -78,7 +78,7 @@ export const AdminAddUserModal: React.FC<AdminAddUserModalProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 rtl:right-auto rtl:left-5 text-zinc-400 hover:text-white transition-colors p-1"
+          className="absolute top-5 right-5 rtl:right-auto rtl:left-5 text-zinc-400 hover:text-white transition-colors p-1 cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -92,12 +92,10 @@ export const AdminAddUserModal: React.FC<AdminAddUserModalProps> = ({
             EIFFEL ACCESS CONTROL
           </span>
           <h2 className="font-editorial text-2xl text-white mt-1">
-            {isRTL ? 'إضافة مسؤول أو موظف جديد' : 'Add New Admin / Staff'}
+            {t.adminAddMember}
           </h2>
           <p className="text-xs text-zinc-400 mt-1">
-            {isRTL
-              ? 'إنشاء حساب رسمي جديد بصلاحيات إدارية خاصة'
-              : 'Grant administrative or operational credentials'}
+            {t.adminAccountRoleDesc}
           </p>
         </div>
 
@@ -113,43 +111,43 @@ export const AdminAddUserModal: React.FC<AdminAddUserModalProps> = ({
           {/* Role Selection */}
           <div>
             <label className="block text-[11px] font-label-bold uppercase tracking-wider text-zinc-400 mb-1.5">
-              {isRTL ? 'نوع الصلاحية (Role)' : 'Account Role'}
+              {t.adminRole}
             </label>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, role: 'ROLE_STAFF' })}
-                className={`py-2 px-3 text-xs font-mono font-bold border transition-all text-center ${
+                className={`py-2 px-3 text-xs font-mono font-bold border transition-all text-center cursor-pointer ${
                   formData.role === 'ROLE_STAFF'
                     ? 'bg-amber-400/20 border-amber-400 text-amber-300'
                     : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-700'
                 }`}
               >
-                💼 {isRTL ? 'موظف (Staff)' : 'Staff Member'}
+                💼 {t.adminRoleStaff}
               </button>
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, role: 'ROLE_ADMIN' })}
-                className={`py-2 px-3 text-xs font-mono font-bold border transition-all text-center ${
+                className={`py-2 px-3 text-xs font-mono font-bold border transition-all text-center cursor-pointer ${
                   formData.role === 'ROLE_ADMIN'
                     ? 'bg-red-500/20 border-red-500 text-red-300'
                     : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-700'
                 }`}
               >
-                👑 {isRTL ? 'مدير عام (Admin)' : 'Executive Admin'}
+                👑 {t.adminRoleAdmin}
               </button>
             </div>
             <p className="text-[10px] text-zinc-500 font-mono mt-1">
               {formData.role === 'ROLE_ADMIN'
-                ? (isRTL ? 'صلاحيات كاملة: تحكم بالنظام، الإعدادات، المستخدمين والتقارير' : 'Full access: Users, Settings, Products, Orders')
-                : (isRTL ? 'صلاحيات تشغيلية: إدارة المنتجات، الطلبات، المخزون والعملاء' : 'Operational access: Products, Orders, Inventory')}
+                ? t.adminRoleFullAccessDesc
+                : t.adminRoleOperationalDesc}
             </p>
           </div>
 
           {/* Full Name */}
           <div>
             <label className="block text-[11px] font-label-bold uppercase tracking-wider text-zinc-400 mb-1.5">
-              {isRTL ? 'الاسم بالكامل' : 'Full Name'}
+              {t.fullName}
             </label>
             <div className="relative">
               <UserIcon className="absolute left-3 rtl:left-auto rtl:right-3 top-3 w-4 h-4 text-zinc-500" />
@@ -167,7 +165,7 @@ export const AdminAddUserModal: React.FC<AdminAddUserModalProps> = ({
           {/* Email */}
           <div>
             <label className="block text-[11px] font-label-bold uppercase tracking-wider text-zinc-400 mb-1.5">
-              {isRTL ? 'البريد الإلكتروني' : 'Email Address'}
+              {t.emailAddress}
             </label>
             <div className="relative">
               <Mail className="absolute left-3 rtl:left-auto rtl:right-3 top-3 w-4 h-4 text-zinc-500" />
@@ -185,7 +183,7 @@ export const AdminAddUserModal: React.FC<AdminAddUserModalProps> = ({
           {/* Phone */}
           <div>
             <label className="block text-[11px] font-label-bold uppercase tracking-wider text-zinc-400 mb-1.5">
-              {isRTL ? 'رقم الهاتف' : 'Phone Number'}
+              {t.phone}
             </label>
             <div className="relative">
               <Phone className="absolute left-3 rtl:left-auto rtl:right-3 top-3 w-4 h-4 text-zinc-500" />
@@ -202,7 +200,7 @@ export const AdminAddUserModal: React.FC<AdminAddUserModalProps> = ({
           {/* Password */}
           <div>
             <label className="block text-[11px] font-label-bold uppercase tracking-wider text-zinc-400 mb-1.5">
-              {isRTL ? 'كلمة المرور الابتدائية' : 'Initial Password'}
+              {t.adminInitialPassword}
             </label>
             <div className="relative">
               <Lock className="absolute left-3 rtl:left-auto rtl:right-3 top-3 w-4 h-4 text-zinc-500" />
@@ -226,12 +224,12 @@ export const AdminAddUserModal: React.FC<AdminAddUserModalProps> = ({
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>{isRTL ? 'جاري الإنشاء...' : 'Creating...'}</span>
+                <span>{t.adminCreating}</span>
               </>
             ) : (
               <>
                 <ShieldCheck className="w-4 h-4" />
-                <span>{isRTL ? 'تأكيد وإنشاء الحساب' : 'Create User Account'}</span>
+                <span>{t.adminCreateAccountBtn}</span>
               </>
             )}
           </button>

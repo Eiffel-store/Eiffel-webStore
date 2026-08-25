@@ -17,13 +17,13 @@ export const AdminBannerStatsCards: React.FC<AdminBannerStatsCardsProps> = ({
   totalClicks,
   overallCtr,
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-lg space-y-1 shadow-md">
         <div className="flex items-center justify-between text-zinc-400 text-xs">
-          <span>{isRTL ? 'الحملات النشطة' : 'Active Campaigns'}</span>
+          <span>{t.adminActiveCampaigns}</span>
           <Sparkles className="w-4 h-4 text-amber-400" />
         </div>
         <div className="text-2xl font-mono font-bold text-white">
@@ -33,7 +33,7 @@ export const AdminBannerStatsCards: React.FC<AdminBannerStatsCardsProps> = ({
 
       <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-lg space-y-1 shadow-md">
         <div className="flex items-center justify-between text-zinc-400 text-xs">
-          <span>{isRTL ? 'إجمالي المشاهدات' : 'Total Impressions'}</span>
+          <span>{t.adminTotalImpressions}</span>
           <Eye className="w-4 h-4 text-sky-400" />
         </div>
         <div className="text-2xl font-mono font-bold text-white">
@@ -43,7 +43,7 @@ export const AdminBannerStatsCards: React.FC<AdminBannerStatsCardsProps> = ({
 
       <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-lg space-y-1 shadow-md">
         <div className="flex items-center justify-between text-zinc-400 text-xs">
-          <span>{isRTL ? 'إجمالي النقرات' : 'Total Clicks'}</span>
+          <span>{t.adminTotalClicks}</span>
           <MousePointerClick className="w-4 h-4 text-emerald-400" />
         </div>
         <div className="text-2xl font-mono font-bold text-white">
@@ -53,7 +53,7 @@ export const AdminBannerStatsCards: React.FC<AdminBannerStatsCardsProps> = ({
 
       <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-lg space-y-1 shadow-md">
         <div className="flex items-center justify-between text-zinc-400 text-xs">
-          <span>{isRTL ? 'معدل التحويل والنقر' : 'Avg Click-Through (CTR)'}</span>
+          <span>{t.adminAvgCtr}</span>
           <TrendingUp className="w-4 h-4 text-amber-400" />
         </div>
         <div className="text-2xl font-mono font-bold text-amber-400">

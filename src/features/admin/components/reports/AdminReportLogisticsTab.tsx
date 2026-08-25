@@ -14,7 +14,7 @@ interface AdminReportLogisticsTabProps {
 }
 
 export const AdminReportLogisticsTab: React.FC<AdminReportLogisticsTabProps> = ({ orders }) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   // 1. Regional Statistics
@@ -32,7 +32,7 @@ export const AdminReportLogisticsTab: React.FC<AdminReportLogisticsTabProps> = (
     > = {};
 
     orders.forEach((o) => {
-      const city = o.shippingAddress?.city?.trim() || (isRTL ? 'القاهرة الكبرى' : 'Greater Cairo');
+      const city = o.shippingAddress?.city?.trim() || t.adminGreaterCairo;
       if (!govMap[city]) {
         govMap[city] = {
           city,
@@ -54,7 +54,7 @@ export const AdminReportLogisticsTab: React.FC<AdminReportLogisticsTabProps> = (
     });
 
     return Object.values(govMap).sort((a, b) => b.totalOrders - a.totalOrders);
-  }, [orders, isRTL]);
+  }, [orders, t]);
 
   const totalDelivered = orders.filter((o) => o.status === 'Delivered').length;
   const totalCancelled = orders.filter((o) => o.status === 'Cancelled').length;
@@ -66,31 +66,31 @@ export const AdminReportLogisticsTab: React.FC<AdminReportLogisticsTabProps> = (
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-zinc-400">{isRTL ? 'تغطية الشحن بالمحافظات' : 'Governorates Active'}</span>
+            <span className="text-xs font-mono text-zinc-400">{t.adminGovernoratesActive}</span>
             <MapPin className="w-4 h-4 text-blue-400" />
           </div>
-          <p className="text-2xl font-mono font-bold text-white mt-2">{regionalData.length} {isRTL ? 'محافظة' : 'cities'}</p>
-          <p className="text-[11px] text-zinc-500 font-mono mt-1">{isRTL ? 'شحن فوري لباب المنزل' : 'Express courier delivery'}</p>
+          <p className="text-2xl font-mono font-bold text-white mt-2">{regionalData.length} {t.adminGovernoratesUnit}</p>
+          <p className="text-[11px] text-zinc-500 font-mono mt-1">{t.adminExpressCourierDelivery}</p>
         </div>
 
         <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-zinc-400">{isRTL ? 'معدل نجاح التسليم (COD)' : 'Delivery Success Rate'}</span>
+            <span className="text-xs font-mono text-zinc-400">{t.adminDeliverySuccessRate}</span>
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           </div>
           <p className="text-2xl font-mono font-bold text-emerald-400 mt-2">{overallSuccessRate}%</p>
-          <p className="text-[11px] text-zinc-500 font-mono mt-1">{totalDelivered} {isRTL ? 'طلب مستلم بنجاح' : 'orders delivered'}</p>
+          <p className="text-[11px] text-zinc-500 font-mono mt-1">{totalDelivered} {t.adminOrdersDeliveredUnit}</p>
         </div>
 
         <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800 shadow-md">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-zinc-400">{isRTL ? 'نسبة المرتجعات / الإلغاء' : 'Cancellation & Returns'}</span>
+            <span className="text-xs font-mono text-zinc-400">{t.adminCancellationReturns}</span>
             <XCircle className="w-4 h-4 text-rose-400" />
           </div>
           <p className="text-2xl font-mono font-bold text-rose-400 mt-2">
             {orders.length > 0 ? Math.round((totalCancelled / orders.length) * 100) : 0}%
           </p>
-          <p className="text-[11px] text-zinc-500 font-mono mt-1">{totalCancelled} {isRTL ? 'طلب تم إلغاؤه' : 'cancelled orders'}</p>
+          <p className="text-[11px] text-zinc-500 font-mono mt-1">{totalCancelled} {t.adminCancelledOrdersUnit}</p>
         </div>
       </div>
 
@@ -100,22 +100,22 @@ export const AdminReportLogisticsTab: React.FC<AdminReportLogisticsTabProps> = (
           <div className="flex items-center gap-2">
             <Truck className="w-4 h-4 text-amber-400" />
             <h2 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
-              {isRTL ? 'سجل وكفاءة الشحن والتوزيع عبر محافظات مصر' : 'Egyptian Governorates Delivery Performance'}
+              {t.adminLogisticsPerformanceTitle}
             </h2>
           </div>
-          <span className="text-xs font-mono text-zinc-500">{regionalData.length} {isRTL ? 'محافظات مسجلة' : 'regions'}</span>
+          <span className="text-xs font-mono text-zinc-500">{regionalData.length} {t.adminRegionsUnit}</span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-mono">
             <thead className="bg-zinc-900/60 border-b border-zinc-800 text-zinc-400">
               <tr>
-                <th className={`p-3 ${isRTL ? 'text-right' : 'text-left'}`}>{isRTL ? 'المحافظة / المدينة' : 'Governorate'}</th>
-                <th className="p-3 text-center">{isRTL ? 'إجمالي الطلبات' : 'Total Orders'}</th>
-                <th className="p-3 text-center">{isRTL ? 'مكتمل' : 'Delivered'}</th>
-                <th className="p-3 text-center">{isRTL ? 'مرتجع / ملغي' : 'Cancelled'}</th>
-                <th className="p-3 text-center">{isRTL ? 'معدل النجاح' : 'Success Rate'}</th>
-                <th className={`p-3 ${isRTL ? 'text-left' : 'text-right'}`}>{isRTL ? 'إجمالي الإيرادات' : 'Total Revenue'}</th>
+                <th className={`p-3 ${isRTL ? 'text-right' : 'text-left'}`}>{t.adminGovernorateHeader}</th>
+                <th className="p-3 text-center">{t.adminTotalOrders}</th>
+                <th className="p-3 text-center">{t.adminDeliveredStatus}</th>
+                <th className="p-3 text-center">{t.adminCancelledStatus}</th>
+                <th className="p-3 text-center">{t.adminSuccessRate}</th>
+                <th className={`p-3 ${isRTL ? 'text-left' : 'text-right'}`}>{t.adminGrossRevenue}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/60 text-zinc-300">

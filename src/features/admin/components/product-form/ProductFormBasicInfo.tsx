@@ -59,7 +59,7 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
   formData,
   onChange
 }) => {
-  const { isRTL } = useLanguage();
+  const { language, t } = useLanguage();
   const { categories } = useStoreData();
   const [isCustomSubCategory, setIsCustomSubCategory] = useState(false);
 
@@ -83,21 +83,21 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
   return (
     <div className="bg-zinc-950 border border-zinc-800 p-6 space-y-5 shadow-xl">
       <h2 className="text-sm font-label-bold uppercase tracking-wider text-white pb-2 border-b border-zinc-800">
-        {isRTL ? '1. البيانات الأساسية والتسعير' : '1. Basic Information & Pricing'}
+        {t.adminBasicInfoSection}
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Name */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'اسم المنتج *' : 'Product Name *'}
+            {t.adminProductName} *
           </label>
           <input
             type="text"
             required
             value={formData.name}
             onChange={(e) => onChange({ name: e.target.value })}
-            placeholder={isRTL ? 'مثال: Oversized Heavyweight Tee' : 'e.g. Oversized Heavyweight Tee'}
+            placeholder="Oversized Heavyweight Tee"
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-white transition-colors"
           />
         </div>
@@ -105,13 +105,13 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
         {/* Subtitle */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'العنوان الفرعي / الوصف القصير' : 'Subtitle / Tagline'}
+            {t.adminProductSubtitle}
           </label>
           <input
             type="text"
             value={formData.subtitle}
             onChange={(e) => onChange({ subtitle: e.target.value })}
-            placeholder={isRTL ? 'مثال: Brutalist Raw Seam Construction' : 'e.g. Brutalist Raw Seam Construction'}
+            placeholder="Brutalist Raw Seam Construction"
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-white transition-colors"
           />
         </div>
@@ -121,7 +121,7 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
         {/* Price */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'السعر الحالي (EGP) *' : 'Current Price (EGP) *'}
+            {t.adminCurrentPrice} *
           </label>
           <input
             type="number"
@@ -136,14 +136,14 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
         {/* Original Price / Sale */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'السعر قبل الخصم (إن وجد)' : 'Original Price (Sale)'}
+            {t.adminOriginalPrice}
           </label>
           <input
             type="number"
             min={1}
             value={formData.originalPrice || ''}
             onChange={(e) => onChange({ originalPrice: e.target.value ? parseFloat(e.target.value) : undefined })}
-            placeholder={isRTL ? 'يترك فارغاً إذا لا يوجد خصم' : 'Leave empty if regular price'}
+            placeholder="EGP"
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white font-mono focus:outline-none focus:border-white transition-colors"
           />
         </div>
@@ -151,17 +151,17 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
         {/* Category */}
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-            {isRTL ? 'القسم الرئيسي *' : 'Main Category *'}
+            {t.adminProductTableCategory} *
           </label>
           <select
             value={formData.category}
             onChange={(e) => onChange({ category: e.target.value })}
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-white transition-colors cursor-pointer"
           >
-            <option value="">{isRTL ? '-- اختر القسم --' : '-- Select Category --'}</option>
+            <option value="">{t.adminAllCategories}</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>
-                {isRTL ? (cat.name || cat.nameEn) : (cat.nameEn || cat.name)}
+                {language === 'ar' ? (cat.name || cat.nameEn) : (cat.nameEn || cat.name)}
               </option>
             ))}
           </select>
@@ -171,7 +171,7 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="block text-xs text-zinc-300 font-bold">
-              {isRTL ? 'القسم الفرعي (Sub-Category)' : 'Sub-Category'}
+              {t.adminSubCategories}
             </label>
             <button
               type="button"
@@ -179,7 +179,7 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
               className="text-[11px] text-amber-400 hover:text-amber-300 underline flex items-center gap-1 cursor-pointer"
             >
               <Edit3 className="w-3 h-3" />
-              <span>{isCustomSubCategory ? (isRTL ? 'اختيار من القائمة' : 'Select from list') : (isRTL ? 'كتابة قسم يدوي' : 'Custom input')}</span>
+              <span>{isCustomSubCategory ? t.adminAllCategories : t.adminCustomize}</span>
             </button>
           </div>
 
@@ -188,7 +188,7 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
               type="text"
               value={formData.subCategory || ''}
               onChange={(e) => onChange({ subCategory: e.target.value })}
-              placeholder={isRTL ? 'اكتب القسم الفرعي هنا...' : 'Type custom sub-category...'}
+              placeholder="Sub-category..."
               className="w-full bg-zinc-900 border border-amber-500 px-3.5 py-2 text-xs text-white focus:outline-none transition-colors"
               autoFocus
             />
@@ -198,11 +198,11 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
               onChange={handleSubCategorySelect}
               className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-white transition-colors cursor-pointer"
             >
-              <option value="">{isRTL ? '-- اختر القسم الفرعي --' : '-- Select Sub-Category --'}</option>
+              <option value="">-- {t.adminSubCategories} --</option>
               
               {/* Dynamic Categories from DB if any */}
               {dynamicSubCategories.length > 0 && (
-                <optgroup label={isRTL ? 'الأقسام المسجلة في قاعدة البيانات' : 'Categories from Database'}>
+                <optgroup label={t.adminCategoriesTitle}>
                   {dynamicSubCategories.map((sub, idx) => (
                     <option key={`db-${idx}`} value={sub}>
                       {sub}
@@ -212,29 +212,29 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
               )}
 
               {/* Popular Category Specific Presets */}
-              <optgroup label={isRTL ? `الأكثر شيوعاً لقسم (${formData.category})` : `Popular for (${formData.category})`}>
+              <optgroup label={`Popular (${formData.category})`}>
                 {currentCategoryOptions.map((sub) => (
                   <option key={sub.value} value={sub.value}>
-                    {isRTL ? sub.labelAr : sub.labelEn}
+                    {language === 'ar' ? sub.labelAr : sub.labelEn}
                   </option>
                 ))}
               </optgroup>
 
               {/* Other Common Apparel Options if not in current list */}
-              <optgroup label={isRTL ? 'أقسام إضافية شائعة' : 'Other Common Apparel'}>
+              <optgroup label={t.adminCatalog}>
                 {Object.entries(POPULAR_SUBCATEGORIES)
                   .filter(([catKey]) => catKey !== formData.category)
                   .flatMap(([, items]) => items)
                   .filter((item, idx, arr) => arr.findIndex(i => i.value === item.value) === idx)
                   .map((sub) => (
                     <option key={`other-${sub.value}`} value={sub.value}>
-                      {isRTL ? sub.labelAr : sub.labelEn}
+                      {language === 'ar' ? sub.labelAr : sub.labelEn}
                     </option>
                   ))}
               </optgroup>
 
               <option value="__custom__">
-                {isRTL ? '✏️ + كتابة قسم فرعي يدوي مخصص...' : '✏️ + Enter custom sub-category...'}
+                ✏️ + {t.adminCustomize}...
               </option>
             </select>
           )}
@@ -245,7 +245,7 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
       <div className="pt-3 border-t border-zinc-800/80 flex flex-wrap items-center gap-6">
         <div className="flex items-center gap-2">
           <label className="text-xs text-zinc-300 font-bold">
-            {isRTL ? 'الكمية المتوفرة في المخزون (Stock Units):' : 'Stock Quantity:'}
+            {t.adminStockQuantity}:
           </label>
           <input
             type="number"
@@ -266,7 +266,7 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
             onChange={(e) => onChange({ inStock: e.target.checked })}
             className="w-4 h-4 rounded bg-zinc-900 border-zinc-700 text-white focus:ring-0"
           />
-          <span className="text-xs text-zinc-300">{isRTL ? 'متوفر بالمخزون (In Stock)' : 'In Stock'}</span>
+          <span className="text-xs text-zinc-300">{t.adminInStock}</span>
         </label>
 
         <label className="flex items-center gap-2 cursor-pointer">
@@ -276,7 +276,7 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
             onChange={(e) => onChange({ isNew: e.target.checked })}
             className="w-4 h-4 rounded bg-zinc-900 border-zinc-700 text-white focus:ring-0"
           />
-          <span className="text-xs text-zinc-300">{isRTL ? 'جديد (New Arrival)' : 'New Arrival'}</span>
+          <span className="text-xs text-zinc-300">{t.newArrivals}</span>
         </label>
 
         <label className="flex items-center gap-2 cursor-pointer">
@@ -286,7 +286,7 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
             onChange={(e) => onChange({ isBestSeller: e.target.checked })}
             className="w-4 h-4 rounded bg-zinc-900 border-zinc-700 text-white focus:ring-0"
           />
-          <span className="text-xs text-zinc-300">{isRTL ? 'الأكثر مبيعاً (Best Seller)' : 'Best Seller'}</span>
+          <span className="text-xs text-zinc-300">{t.adminBadgeBestSeller}</span>
         </label>
 
         <label className="flex items-center gap-2 cursor-pointer">
@@ -296,7 +296,7 @@ export const ProductFormBasicInfo: React.FC<ProductFormBasicInfoProps> = ({
             onChange={(e) => onChange({ isLimited: e.target.checked })}
             className="w-4 h-4 rounded bg-zinc-900 border-zinc-700 text-white focus:ring-0"
           />
-          <span className="text-xs text-zinc-300">{isRTL ? 'إصدار محدود (Limited Edition)' : 'Limited Edition'}</span>
+          <span className="text-xs text-zinc-300">{t.adminBadgeLimited}</span>
         </label>
       </div>
     </div>

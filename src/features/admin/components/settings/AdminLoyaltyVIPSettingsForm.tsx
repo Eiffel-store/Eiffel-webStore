@@ -12,7 +12,7 @@ export const AdminLoyaltyVIPSettingsForm: React.FC<AdminLoyaltyVIPSettingsFormPr
   settings,
   onChange,
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const requiredOrders = settings.vipRequiredOrders ?? 3;
   const requiredPoints = settings.vipRequiredPoints ?? 500;
@@ -29,15 +29,13 @@ export const AdminLoyaltyVIPSettingsForm: React.FC<AdminLoyaltyVIPSettingsFormPr
         </div>
         <div>
           <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2">
-            <span>{isRTL ? 'إعدادات نادي كبار العملاء (VIP) وبرنامج النقاط' : 'VIP Club & Loyalty Program Settings'}</span>
+            <span>{t.adminLoyaltyVipSettings}</span>
             <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] rounded font-mono font-bold">
               DYNAMIC
             </span>
           </h2>
           <p className="text-xs text-zinc-400 mt-0.5">
-            {isRTL
-              ? 'حدد عدد الطلبات أو النقاط اللازمة لترقية العميل تلقائياً إلى عضوية VIP المميزة والامتيازات الحصرية.'
-              : 'Configure order count threshold, cashback rates, and exclusive perks for VIP tier customers.'}
+            {t.adminLoyaltyVipSettingsDesc}
           </p>
         </div>
       </div>
@@ -48,10 +46,10 @@ export const AdminLoyaltyVIPSettingsForm: React.FC<AdminLoyaltyVIPSettingsFormPr
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-white flex items-center gap-1.5">
               <ShoppingBag className="w-4 h-4 text-amber-400" />
-              <span>{isRTL ? 'عدد الطلبات المطلوبة لـ VIP:' : 'Required Orders for VIP:'}</span>
+              <span>{t.adminRequiredOrdersVip}</span>
             </label>
             <span className="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-              {requiredOrders} {isRTL ? 'طلبات' : 'Orders'}
+              {requiredOrders} {t.orders}
             </span>
           </div>
 
@@ -68,13 +66,13 @@ export const AdminLoyaltyVIPSettingsForm: React.FC<AdminLoyaltyVIPSettingsFormPr
 
           {/* Quick Presets */}
           <div className="flex items-center gap-1.5 pt-1">
-            <span className="text-[10px] text-zinc-500">{isRTL ? 'خيارات سريعة:' : 'Presets:'}</span>
+            <span className="text-[10px] text-zinc-500">{t.adminQuickPresets}</span>
             {[1, 2, 3, 5, 10].map((preset) => (
               <button
                 key={preset}
                 type="button"
                 onClick={() => onChange({ vipRequiredOrders: preset })}
-                className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded border transition-colors ${
+                className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded border transition-colors cursor-pointer ${
                   requiredOrders === preset
                     ? 'bg-amber-400 text-black border-amber-400'
                     : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-white'
@@ -85,9 +83,7 @@ export const AdminLoyaltyVIPSettingsForm: React.FC<AdminLoyaltyVIPSettingsFormPr
             ))}
           </div>
           <p className="text-[11px] text-zinc-500">
-            {isRTL
-              ? 'يتم ترقية العميل تلقائياً إلى VIP بمجرد تسليم هذا العدد من الطلبات بنجاح.'
-              : 'Customer unlocks VIP tier automatically after completing this number of delivered orders.'}
+            {t.adminVipAutoUpgradeOrdersDesc}
           </p>
         </div>
 
@@ -96,7 +92,7 @@ export const AdminLoyaltyVIPSettingsForm: React.FC<AdminLoyaltyVIPSettingsFormPr
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-white flex items-center gap-1.5">
               <Coins className="w-4 h-4 text-emerald-400" />
-              <span>{isRTL ? 'أو الوصول لرصيد نقاط (PTS):' : 'Or Minimum Points Balance:'}</span>
+              <span>{t.adminOrMinPointsBalance}</span>
             </label>
             <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
               {requiredPoints} PTS
@@ -113,9 +109,7 @@ export const AdminLoyaltyVIPSettingsForm: React.FC<AdminLoyaltyVIPSettingsFormPr
           />
 
           <p className="text-[11px] text-zinc-500">
-            {isRTL
-              ? 'الترقية تتم أيضاً إذا وصل رصيد نقاط العميل إلى هذا الحد من خلال المشتريات.'
-              : 'Customer also achieves VIP if their accumulated loyalty points reach this threshold.'}
+            {t.adminVipAutoUpgradePointsDesc}
           </p>
         </div>
 
@@ -124,7 +118,7 @@ export const AdminLoyaltyVIPSettingsForm: React.FC<AdminLoyaltyVIPSettingsFormPr
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-white flex items-center gap-1.5">
               <Percent className="w-4 h-4 text-blue-400" />
-              <span>{isRTL ? 'نسبة الكاش باك من كل أوردر (%):' : 'Loyalty Cashback Rate (%):'}</span>
+              <span>{t.adminLoyaltyCashbackRate}</span>
             </label>
             <span className="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
               {cashbackRatePercent}%
@@ -147,9 +141,7 @@ export const AdminLoyaltyVIPSettingsForm: React.FC<AdminLoyaltyVIPSettingsFormPr
           </div>
 
           <p className="text-[11px] text-zinc-500">
-            {isRTL
-              ? 'النسبة المئوية من إجمالي الطلب التي تُضاف كنقاط ولاء في حساب العميل فور استلام الأوردر.'
-              : 'Percentage of order total awarded as loyalty points when order is delivered.'}
+            {t.adminLoyaltyCashbackDesc}
           </p>
         </div>
 
@@ -158,7 +150,7 @@ export const AdminLoyaltyVIPSettingsForm: React.FC<AdminLoyaltyVIPSettingsFormPr
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-white flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>{isRTL ? 'خصم أعضاء VIP الحصري (%):' : 'VIP Exclusive Discount (%):'}</span>
+              <span>{t.adminVipExclusiveDiscount}</span>
             </label>
             <span className="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
               {vipDiscount}%
@@ -178,9 +170,7 @@ export const AdminLoyaltyVIPSettingsForm: React.FC<AdminLoyaltyVIPSettingsFormPr
           </div>
 
           <p className="text-[11px] text-zinc-500">
-            {isRTL
-              ? 'خصم تلقائي خاص يتم تطبيقه لأعضاء VIP في صفحة إتمام الشراء.'
-              : 'Exclusive automatic discount applied at checkout for VIP members.'}
+            {t.adminVipExclusiveDiscountDesc}
           </p>
         </div>
       </div>
@@ -191,10 +181,10 @@ export const AdminLoyaltyVIPSettingsForm: React.FC<AdminLoyaltyVIPSettingsFormPr
           <Truck className="w-4 h-4 text-emerald-400" />
           <div>
             <span className="text-xs font-bold text-white block">
-              {isRTL ? 'شحن مجاني دائم لكافة طلبات أعضاء VIP' : 'Complimentary Free Express Shipping for VIP Members'}
+              {t.adminVipFreeShippingAlways}
             </span>
             <span className="text-[11px] text-zinc-400 block">
-              {isRTL ? 'إعفاء أعضاء VIP من أي مصاريف شحن بغض النظر عن قيمة السلة' : 'Waive shipping fees for VIP customers unconditionally'}
+              {t.adminVipFreeShippingDesc}
             </span>
           </div>
         </div>

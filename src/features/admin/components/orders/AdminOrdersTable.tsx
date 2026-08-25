@@ -61,7 +61,7 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
   onUpdateStatus,
   onDeleteOrder
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const { formatPrice } = useCurrency();
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
@@ -78,7 +78,7 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
     return (
       <div className="bg-zinc-950 border border-zinc-800 p-12 text-center text-zinc-500 rounded-xl">
         <Package className="w-10 h-10 mx-auto mb-3 opacity-30 text-amber-400" />
-        <p className="text-sm font-medium">{isRTL ? 'لا توجد طلبات مسجلة حالياً.' : 'No orders found matching criteria.'}</p>
+        <p className="text-sm font-medium">{t.noMatchingPieces}</p>
       </div>
     );
   }
@@ -88,18 +88,17 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
       <table className="w-full text-left rtl:text-right border-collapse min-w-[750px]">
         <thead>
           <tr className="border-b border-zinc-800 bg-zinc-900/60 text-[11px] font-mono uppercase tracking-wider text-zinc-400">
-            <th className="py-3.5 px-4">{isRTL ? 'رقم الطلب' : 'Order ID'}</th>
-            <th className="py-3.5 px-4">{isRTL ? 'بيانات العميل' : 'Customer'}</th>
-            <th className="py-3.5 px-4">{isRTL ? 'المنتجات المطلوبة' : 'Items'}</th>
-            <th className="py-3.5 px-4">{isRTL ? 'المبلغ المطلوب' : 'Total'}</th>
-            <th className="py-3.5 px-4">{isRTL ? 'تغيير حالة الطلب' : 'Change Status'}</th>
-            <th className="py-3.5 px-4 text-right rtl:text-left">{isRTL ? 'إجراءات' : 'Actions'}</th>
+            <th className="py-3.5 px-4">{t.adminOrderId}</th>
+            <th className="py-3.5 px-4">{t.adminCustomer}</th>
+            <th className="py-3.5 px-4">{t.adminOrderItems}</th>
+            <th className="py-3.5 px-4">{t.adminTotalCashDue}</th>
+            <th className="py-3.5 px-4">{t.adminChangeOrderStatus}</th>
+            <th className="py-3.5 px-4 text-right rtl:text-left">{t.adminProductTableActions}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-800/60 text-xs">
           {orders.map((order) => {
             const currentConfig = STATUS_CONFIG[order.status] || STATUS_CONFIG.Pending;
-            const Icon = currentConfig.icon;
             const isUpdating = updatingOrderId === order.id;
 
             return (
@@ -138,10 +137,10 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                     return (
                       <>
                         <div className="font-mono text-zinc-300 font-bold">
-                          {totalUnits} {isRTL ? (totalUnits === 1 ? 'قطعة' : totalUnits === 2 ? 'قطعتين' : totalUnits <= 10 ? 'قطع' : 'قطعة') : (totalUnits === 1 ? 'item' : 'items')}
+                          {totalUnits} {t.items}
                         </div>
-                        <div className="text-[10px] text-zinc-400 truncate max-w-[200px] mt-0.5" title={order.items?.map(i => `${i.product?.name || 'قطعة'} (${i.selectedColor || ''})${i.quantity > 1 ? ` ×${i.quantity}` : ''}`).join(' • ')}>
-                          {order.items?.map(i => `${i.product?.name || 'قطعة'} (${i.selectedColor || ''})${i.quantity > 1 ? ` ×${i.quantity}` : ''}`).join(' • ')}
+                        <div className="text-[10px] text-zinc-400 truncate max-w-[200px] mt-0.5" title={order.items?.map(i => `${i.product?.name || 'Item'} (${i.selectedColor || ''})${i.quantity > 1 ? ` ×${i.quantity}` : ''}`).join(' • ')}>
+                          {order.items?.map(i => `${i.product?.name || 'Item'} (${i.selectedColor || ''})${i.quantity > 1 ? ` ×${i.quantity}` : ''}`).join(' • ')}
                         </div>
                       </>
                     );
@@ -151,7 +150,7 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                 {/* Total & Payment */}
                 <td className="py-3.5 px-4 font-mono">
                   <div className="font-bold text-emerald-400 text-sm">{formatPrice(order.total)}</div>
-                  <div className="text-[10px] text-zinc-500 mt-0.5">{order.paymentMethod || 'الدفع عند الاستلام'}</div>
+                  <div className="text-[10px] text-zinc-500 mt-0.5">{order.paymentMethod || t.cod}</div>
                 </td>
 
                 {/* Interactive Status Selector */}
@@ -167,25 +166,25 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                         }`}
                       >
                         <option value="Awaiting_Confirmation" className="bg-zinc-900 text-amber-300">
-                          📞 {isRTL ? 'في انتظار التأكيد (Awaiting Confirmation)' : 'Awaiting Confirmation'}
+                          📞 {t.adminAwaitingConfirmation}
                         </option>
                         <option value="Confirmed" className="bg-zinc-900 text-emerald-300">
-                          ✅ {isRTL ? 'تم التأكيد (Confirmed)' : 'Confirmed'}
+                          ✅ {t.adminConfirmedStatus}
                         </option>
                         <option value="Pending" className="bg-zinc-900 text-amber-300">
-                          ⏳ {isRTL ? 'قيد الانتظار (Pending)' : 'Pending'}
+                          ⏳ {t.adminPendingStatus}
                         </option>
                         <option value="Processing" className="bg-zinc-900 text-indigo-300">
-                          📦 {isRTL ? 'جاري التجهيز (Processing)' : 'Processing'}
+                          📦 {t.adminProcessingStatus}
                         </option>
                         <option value="Shipped" className="bg-zinc-900 text-blue-300">
-                          🚚 {isRTL ? 'خرج للتوصيل (Shipped)' : 'Out for Delivery'}
+                          🚚 {t.adminShippedStatus}
                         </option>
                         <option value="Delivered" className="bg-zinc-900 text-emerald-300">
-                          ✓ {isRTL ? 'تم التسليم (Delivered)' : 'Delivered'}
+                          ✓ {t.adminDeliveredStatus}
                         </option>
                         <option value="Cancelled" className="bg-zinc-900 text-red-300">
-                          ✕ {isRTL ? 'ملغي (Cancelled)' : 'Cancelled'}
+                          ✕ {t.adminCancelledStatus}
                         </option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
@@ -201,18 +200,14 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                     <button
                       onClick={() => onSelectOrder(order)}
                       className="p-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700 rounded-lg transition-colors cursor-pointer shadow"
-                      title={isRTL ? 'عرض تفاصيل الطلب والتواصل واتساب' : 'View Order Details & WhatsApp'}
+                      title={t.adminViewOrderDetails}
                     >
                       <Eye className="w-3.5 h-3.5" />
                     </button>
                     <button
-                      onClick={() => {
-                        if (confirm(isRTL ? `هل أنت متأكد من حذف الطلب رقم ${order.id}؟` : `Delete order ${order.id}?`)) {
-                          onDeleteOrder(order.id);
-                        }
-                      }}
+                      onClick={() => onDeleteOrder(order.id)}
                       className="p-2 bg-zinc-900 hover:bg-red-950 text-zinc-400 hover:text-red-400 border border-zinc-700 rounded-lg transition-colors cursor-pointer"
-                      title={isRTL ? 'حذف السجل' : 'Delete Order'}
+                      title={t.delete}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

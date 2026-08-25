@@ -5,18 +5,18 @@ import { useStoreData, useLanguage, useCurrency } from '@/shared';
 
 export const AdminCatalogPreview: React.FC = () => {
   const { products } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { isRTL, t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   return (
     <div className="bg-zinc-950 border border-zinc-800 p-6 shadow-xl space-y-4">
       <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
         <div>
-          <h2 className="text-base font-bold text-white">{isRTL ? 'منتجات إيفل' : 'Featured Catalog'}</h2>
-          <p className="text-xs text-zinc-500">{isRTL ? 'أحدث القطع في المتجر' : 'Latest pieces added'}</p>
+          <h2 className="text-base font-bold text-white">{t.adminFeaturedCatalog}</h2>
+          <p className="text-xs text-zinc-500">{t.adminLatestPiecesAdded}</p>
         </div>
         <Link to="/admin/products" className="text-xs text-zinc-400 hover:text-white font-mono flex items-center gap-1">
-          <span>{isRTL ? 'إدارة الكل' : 'Manage All'}</span>
+          <span>{t.adminManageAll}</span>
           <ArrowRight className={`w-3 h-3 ${isRTL ? 'rotate-180' : ''}`} />
         </Link>
       </div>
@@ -39,7 +39,7 @@ export const AdminCatalogPreview: React.FC = () => {
                   p.inStock ? 'text-emerald-400 bg-emerald-950/50' : 'text-red-400 bg-red-950/50'
                 }`}
               >
-                {p.inStock ? (isRTL ? 'متوفر' : 'In Stock') : (isRTL ? 'نفد' : 'Sold Out')}
+                {p.inStock ? t.adminInStock : t.adminSoldOut}
               </span>
             </div>
           </div>

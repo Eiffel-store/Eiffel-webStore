@@ -10,7 +10,7 @@ import { AdminDataBackupCard } from '../components/settings/AdminDataBackupCard'
 
 export const AdminSettingsPage: React.FC = () => {
   const { settings, updateSettings } = useStoreData();
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const [formSettings, setFormSettings] = useState(settings);
   const [successMessage, setSuccessMessage] = useState('');
@@ -25,7 +25,7 @@ export const AdminSettingsPage: React.FC = () => {
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
     updateSettings(formSettings);
-    const msg = isRTL ? 'تم حفظ إعدادات المتجر بنجاح!' : 'Store settings updated successfully!';
+    const msg = t.adminSettingsSavedSuccess;
     setSuccessMessage(msg);
     toast.success(msg, { id: 'store-settings-save' });
     setTimeout(() => setSuccessMessage(''), 3000);
@@ -36,12 +36,10 @@ export const AdminSettingsPage: React.FC = () => {
       {/* Header */}
       <div className="pb-4 border-b border-zinc-800">
         <h1 className="text-xl sm:text-2xl font-editorial font-bold text-white tracking-wide">
-          {isRTL ? 'إعدادات المتجر والنسخ الاحتياطي' : 'Store Settings & Data Backup'}
+          {t.adminSettings}
         </h1>
         <p className="text-xs text-zinc-400 mt-0.5">
-          {isRTL
-            ? 'التحكم في أرقام وروابط التواصل، شريط الإعلانات، وحفظ نسخة احتياطية من قاعدة بيانات المتجر.'
-            : 'Configure contact links, announcement text, security credentials, and JSON backup.'}
+          {t.adminSettingsDesc}
         </p>
       </div>
 
@@ -80,10 +78,10 @@ export const AdminSettingsPage: React.FC = () => {
         <div className="flex justify-end pt-3 border-t border-zinc-800">
           <button
             type="submit"
-            className="px-8 py-3 bg-white text-black hover:bg-zinc-200 text-xs font-label-bold uppercase tracking-wider flex items-center gap-2 shadow-lg"
+            className="px-8 py-3 bg-white text-black hover:bg-zinc-200 text-xs font-label-bold uppercase tracking-wider flex items-center gap-2 shadow-lg cursor-pointer"
           >
             <Check className="w-4 h-4" />
-            <span>{isRTL ? 'حفظ كافة الإعدادات' : 'Save Store Settings'}</span>
+            <span>{t.saveChanges}</span>
           </button>
         </div>
       </form>

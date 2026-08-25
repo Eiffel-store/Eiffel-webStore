@@ -17,7 +17,7 @@ export const AdminAddOfferModal: React.FC<AdminAddOfferModalProps> = ({
   products,
   onApplyOffer
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   const [selectedProductId, setSelectedProductId] = useState('');
@@ -64,7 +64,7 @@ export const AdminAddOfferModal: React.FC<AdminAddOfferModalProps> = ({
           <div className="flex items-center gap-2">
             <Tag className="w-5 h-5 text-amber-400" />
             <h3 className="font-bold text-sm text-white">
-              {isRTL ? 'إدراج / تعديل منتج في قسم العروض' : 'Apply or Edit Product Discount'}
+              {t.adminAddProductToOffers}
             </h3>
           </div>
           <button
@@ -82,10 +82,10 @@ export const AdminAddOfferModal: React.FC<AdminAddOfferModalProps> = ({
             <AlertCircle className="w-10 h-10 mx-auto text-amber-400/80" />
             <div>
               <p className="text-sm font-semibold text-white">
-                {isRTL ? 'لا توجد منتجات مضافة في الكتالوج حالياً' : 'No products found in catalog.'}
+                {t.noProductsFound}
               </p>
               <p className="text-xs text-zinc-400 mt-1">
-                {isRTL ? 'يجب إضافة منتجات أولاً في الكتالوج قبل إمكانية إنشاء خصومات أو عروض.' : 'Please add products to your catalog first before applying discounts.'}
+                {t.noPiecesFoundDesc}
               </p>
             </div>
             <div className="flex items-center justify-center gap-3 pt-2">
@@ -94,7 +94,7 @@ export const AdminAddOfferModal: React.FC<AdminAddOfferModalProps> = ({
                 onClick={onClose}
                 className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-700 rounded-lg transition-colors cursor-pointer"
               >
-                {isRTL ? 'إلغاء وإغلاق' : 'Cancel & Close'}
+                {t.cancel}
               </button>
               <Link
                 to="/admin/products/new"
@@ -102,7 +102,7 @@ export const AdminAddOfferModal: React.FC<AdminAddOfferModalProps> = ({
                 className="px-4 py-2 bg-white text-black hover:bg-zinc-200 text-xs font-bold rounded-lg transition-colors inline-flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>{isRTL ? 'إضافة منتج جديد' : 'Add New Product'}</span>
+                <span>{t.adminAddNewProduct}</span>
               </Link>
             </div>
           </div>
@@ -110,20 +110,20 @@ export const AdminAddOfferModal: React.FC<AdminAddOfferModalProps> = ({
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs text-zinc-300 font-bold mb-1.5">
-                {isRTL ? 'اختر المنتج من الكتالوج *' : 'Select Product *'}
+                {t.adminProductTableName} *
               </label>
               <select
                 required
                 value={selectedProductId}
                 onChange={(e) => handleProductSelect(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2.5 text-xs text-white rounded focus:outline-none focus:border-amber-400"
+                className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2.5 text-xs text-white rounded focus:outline-none focus:border-amber-400 cursor-pointer"
               >
-                <option value="">{isRTL ? '-- اختر منتجاً من الكتالوج --' : '-- Choose a product --'}</option>
+                <option value="">-- {t.adminCatalog} --</option>
                 {products.map((p) => {
                   const isOnSale = p.originalPrice && p.originalPrice > p.price;
                   return (
                     <option key={p.id} value={p.id}>
-                      {p.name} ({formatPrice(p.price)}) {isOnSale ? (isRTL ? '— [مدرج بالعروض]' : '— [On Sale]') : ''}
+                      {p.name} ({formatPrice(p.price)}) {isOnSale ? `— [${t.adminBadgeSale}]` : ''}
                     </option>
                   );
                 })}
@@ -147,7 +147,7 @@ export const AdminAddOfferModal: React.FC<AdminAddOfferModalProps> = ({
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[11px] text-zinc-400 font-medium mb-1">
-                      {isRTL ? 'السعر الأصلي (قبل الخصم):' : 'Original Price:'}
+                      {t.adminOriginalPrice}:
                     </label>
                     <input
                       type="number"
@@ -161,7 +161,7 @@ export const AdminAddOfferModal: React.FC<AdminAddOfferModalProps> = ({
 
                   <div>
                     <label className="block text-[11px] text-amber-400 font-bold mb-1">
-                      {isRTL ? 'سعر العرض الجديد:' : 'Sale Price:'}
+                      {t.adminCurrentPrice}:
                     </label>
                     <input
                       type="number"
@@ -177,7 +177,7 @@ export const AdminAddOfferModal: React.FC<AdminAddOfferModalProps> = ({
 
                 {discountPercentage > 0 && (
                   <div className="text-xs text-emerald-400 font-mono flex items-center justify-between p-2 bg-emerald-950/40 border border-emerald-800/60 rounded">
-                    <span>{isRTL ? 'نسبة الخصم المحسوبة:' : 'Calculated Discount:'}</span>
+                    <span>{t.adminDiscountPercentage}:</span>
                     <span className="font-bold text-sm">
                       {discountPercentage}% OFF
                     </span>
@@ -190,17 +190,17 @@ export const AdminAddOfferModal: React.FC<AdminAddOfferModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-700 rounded transition-colors"
+                className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium border border-zinc-700 rounded transition-colors cursor-pointer"
               >
-                {isRTL ? 'إلغاء' : 'Cancel'}
+                {t.cancel}
               </button>
               <button
                 type="submit"
                 disabled={!selectedProductId || offerSalePrice <= 0 || offerSalePrice >= originalPriceInput}
-                className="px-5 py-2 bg-white text-black hover:bg-zinc-200 disabled:opacity-40 text-xs font-bold rounded transition-colors flex items-center gap-1.5 shadow"
+                className="px-5 py-2 bg-white text-black hover:bg-zinc-200 disabled:opacity-40 text-xs font-bold rounded transition-colors flex items-center gap-1.5 shadow cursor-pointer"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                <span>{isRTL ? 'تفعيل / تحديث العرض' : 'Apply Discount'}</span>
+                <span>{t.adminApplyDiscount}</span>
               </button>
             </div>
           </form>

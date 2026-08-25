@@ -5,7 +5,7 @@ import { authService } from '@/services/authService';
 import toast from 'react-hot-toast';
 
 export const AdminSecuritySettingsForm: React.FC = () => {
-  const { isRTL, t } = useLanguage();
+  const { t } = useLanguage();
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -18,9 +18,7 @@ export const AdminSecuritySettingsForm: React.FC = () => {
     setStatusMessage(null);
 
     if (newPassword.length < 6) {
-      const msg = isRTL
-        ? 'كلمة المرور الجديدة يجب ألا تقل عن 6 أحرف أو أرقام.'
-        : 'New password must be at least 6 characters.';
+      const msg = t.adminPasswordMinLength;
       setStatusMessage({ type: 'error', text: msg });
       return;
     }
@@ -41,7 +39,7 @@ export const AdminSecuritySettingsForm: React.FC = () => {
       setNewPassword('');
       setConfirmPassword('');
     } catch (err: any) {
-      const errorMsg = err.message || (isRTL ? 'فشل تغيير كلمة المرور، يرجى التأكد من كلمة المرور الحالية.' : 'Failed to change password.');
+      const errorMsg = err.message || t.adminChangePasswordError;
       setStatusMessage({ type: 'error', text: errorMsg });
       toast.error(errorMsg);
     } finally {
@@ -54,10 +52,10 @@ export const AdminSecuritySettingsForm: React.FC = () => {
       <div className="pb-2 border-b border-zinc-800 flex items-center justify-between">
         <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2">
           <Shield className="w-4 h-4 text-purple-400" />
-          <span>{isRTL ? '3. أمان الحساب وتغيير كلمة المرور' : '3. Account Security & Password'}</span>
+          <span>{t.adminAccountSecuritySection}</span>
         </h2>
         <span className="text-[11px] text-zinc-500 font-mono">
-          {isRTL ? 'تشفير BCrypt آمن' : 'Encrypted & Secure'}
+          {t.adminBcryptSecure}
         </span>
       </div>
 

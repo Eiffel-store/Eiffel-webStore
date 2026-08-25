@@ -13,7 +13,7 @@ export const AdminPromoBannerForm: React.FC<AdminPromoBannerFormProps> = ({
   promo,
   onChange
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const [urlInput, setUrlInput] = useState('');
   const [isUploading, setIsUploading] = useState(false);
 
@@ -54,10 +54,10 @@ export const AdminPromoBannerForm: React.FC<AdminPromoBannerFormProps> = ({
       <div className="pb-3 border-b border-zinc-800 flex items-center justify-between">
         <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2">
           <Tag className="w-4 h-4 text-emerald-400" />
-          <span>{isRTL ? '2. بانر العرض الترويجي في منتصف الصفحة (Promo Editorial)' : '2. Mid-Page Promo Editorial'}</span>
+          <span>{t.adminPromoEditorialSection}</span>
         </h2>
         <span className="text-[11px] text-zinc-500 font-mono">
-          {isRTL ? 'يظهر بين الأقسام وقسم وصل حديثاً' : 'Displays between categories and new arrivals'}
+          {t.adminDisplaysBetweenCategories}
         </span>
       </div>
 
@@ -76,7 +76,7 @@ export const AdminPromoBannerForm: React.FC<AdminPromoBannerFormProps> = ({
 
         <div className="lg:col-span-7 space-y-3">
           <label className="block text-xs text-zinc-300 font-bold">
-            {isRTL ? 'صورة البانر الترويجي (Promo Image)' : 'Promo Banner Image'}
+            {t.adminPromoBannerImage}
           </label>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -86,7 +86,7 @@ export const AdminPromoBannerForm: React.FC<AdminPromoBannerFormProps> = ({
               ) : (
                 <Upload className="w-4 h-4 text-emerald-400" />
               )}
-              <span>{isUploading ? (isRTL ? 'جاري الرفع...' : 'Uploading...') : (isRTL ? 'رفع صورة من الجهاز' : 'Upload from Device')}</span>
+              <span>{isUploading ? t.adminUploading : t.adminUploadFromDevice}</span>
               <input
                 type="file"
                 accept="image/*"
@@ -101,15 +101,15 @@ export const AdminPromoBannerForm: React.FC<AdminPromoBannerFormProps> = ({
                 type="url"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
-                placeholder={isRTL ? 'أو ضع رابط صورة مباشر...' : 'Or paste image URL...'}
+                placeholder={t.adminPasteImageUrl}
                 className="flex-1 bg-zinc-900 border border-zinc-700 px-3 py-1.5 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-white"
               />
               <button
                 type="button"
                 onClick={handleApplyUrl}
-                className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium border border-zinc-700 transition-colors"
+                className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium border border-zinc-700 transition-colors cursor-pointer"
               >
-                {isRTL ? 'تطبيق' : 'Apply'}
+                {t.adminApplyBtn}
               </button>
             </div>
           </div>
@@ -120,7 +120,7 @@ export const AdminPromoBannerForm: React.FC<AdminPromoBannerFormProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'عنوان العرض (عربي) *' : 'Promo Title (Arabic) *'}
+            {t.adminPromoTitleAr}
           </label>
           <input
             type="text"
@@ -134,7 +134,7 @@ export const AdminPromoBannerForm: React.FC<AdminPromoBannerFormProps> = ({
 
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'عنوان العرض (إنجليزي) *' : 'Promo Title (English) *'}
+            {t.adminPromoTitleEn}
           </label>
           <input
             type="text"
@@ -151,7 +151,7 @@ export const AdminPromoBannerForm: React.FC<AdminPromoBannerFormProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'نص الوصف (عربي)' : 'Description (Arabic)'}
+            {t.adminPromoDescAr}
           </label>
           <textarea
             rows={2}
@@ -163,7 +163,7 @@ export const AdminPromoBannerForm: React.FC<AdminPromoBannerFormProps> = ({
 
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'نص الوصف (إنجليزي)' : 'Description (English)'}
+            {t.adminPromoDescEn}
           </label>
           <textarea
             rows={2}
@@ -178,7 +178,7 @@ export const AdminPromoBannerForm: React.FC<AdminPromoBannerFormProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-zinc-800/80">
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'شارة الخصم (عربي)' : 'Discount Badge (Arabic)'}
+            {t.adminDiscountBadgeAr}
           </label>
           <input
             type="text"
@@ -191,7 +191,7 @@ export const AdminPromoBannerForm: React.FC<AdminPromoBannerFormProps> = ({
 
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'نص الزر (عربي)' : 'Button Text (Arabic)'}
+            {t.adminButtonTextAr}
           </label>
           <input
             type="text"
@@ -204,7 +204,7 @@ export const AdminPromoBannerForm: React.FC<AdminPromoBannerFormProps> = ({
 
         <div>
           <label className="block text-xs text-zinc-300 font-bold mb-1">
-            {isRTL ? 'رابط التوجيه' : 'Destination Link'}
+            {t.adminButtonDestinationLink}
           </label>
           <input
             type="text"

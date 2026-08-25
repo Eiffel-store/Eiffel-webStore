@@ -14,7 +14,7 @@ export const AdminBranchCard: React.FC<AdminBranchCardProps> = ({
   onEdit,
   onDelete
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div className="bg-zinc-950 border border-zinc-800 overflow-hidden shadow-xl flex flex-col justify-between group hover:border-zinc-700 transition-colors">
@@ -31,7 +31,7 @@ export const AdminBranchCard: React.FC<AdminBranchCardProps> = ({
               ? 'bg-emerald-500/90 text-white'
               : 'bg-zinc-800/90 text-zinc-400 border border-zinc-700'
           }`}>
-            {store.active !== false ? (isRTL ? 'نشط' : 'Active') : (isRTL ? 'معطل' : 'Inactive')}
+            {store.active !== false ? t.adminActiveStatus : t.adminInactiveStatus}
           </span>
         </div>
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
@@ -81,7 +81,7 @@ export const AdminBranchCard: React.FC<AdminBranchCardProps> = ({
                 className="text-[11px] text-sky-400 hover:underline flex items-center gap-1 font-mono"
               >
                 <MapPin className="w-3 h-3" />
-                <span>{isRTL ? 'فتح موقع الفرع على خرائط Google' : 'Open in Google Maps'} &rarr;</span>
+                <span>{t.openInGoogleMaps} &rarr;</span>
               </a>
             </div>
           )}
@@ -91,15 +91,15 @@ export const AdminBranchCard: React.FC<AdminBranchCardProps> = ({
         <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-end gap-2">
           <button
             onClick={() => onEdit(store)}
-            className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700 text-xs font-medium transition-colors flex items-center gap-1.5"
+            className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <Edit2 className="w-3 h-3" />
-            <span>{isRTL ? 'تعديل البيانات' : 'Edit Branch'}</span>
+            <span>{t.adminEditBranch}</span>
           </button>
           <button
             onClick={() => onDelete(store.id)}
-            className="p-1.5 bg-zinc-900 hover:bg-red-950 text-zinc-400 hover:text-red-400 border border-zinc-700 text-xs transition-colors"
-            title={isRTL ? 'حذف الفرع' : 'Delete Branch'}
+            className="p-1.5 bg-zinc-900 hover:bg-red-950 text-zinc-400 hover:text-red-400 border border-zinc-700 text-xs transition-colors cursor-pointer"
+            title={t.delete}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
