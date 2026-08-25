@@ -1,23 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  MapPin,
-  Crosshair,
-  Search,
-  Check,
-  X,
-  Loader2,
-  ExternalLink,
-  Navigation,
-  ShieldCheck,
-  AlertCircle,
-  Link2,
-  HelpCircle,
-  Building
-} from 'lucide-react';
+import { HelpCircle, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/shared';
 import { locationService, GeocodedAddress, POPULAR_EGYPT_AREAS } from '@/services/locationService';
+import {
+  MapPickerHeader,
+  MapPickerTabs,
+  MapPickerTabMode,
+  MapQuickAreasTab,
+  MapSearchTab,
+  MapLinkPasteTab,
+  MapPreviewFrame,
+  MapAddressDetailsForm,
+  MapPickerFooter,
+} from './map-picker';
 
-interface GoogleMapsPickerModalProps {
+export interface GoogleMapsPickerModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectLocation: (location: GeocodedAddress) => void;
@@ -55,7 +52,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
   const [pastedUrl, setPastedUrl] = useState('');
 
   // Active Tab
-  const [activeMode, setActiveMode] = useState<'quick' | 'search' | 'link'>('quick');
+  const [activeMode, setActiveMode] = useState<MapPickerTabMode>('quick');
 
   const mapFrameRef = useRef<HTMLIFrameElement | null>(null);
 
@@ -172,37 +169,11 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Map view URL
-  const bboxPadding = 0.008;
-  const bbox = `${lng - bboxPadding},${lat - bboxPadding},${lng + bboxPadding},${lat + bboxPadding}`;
-  const mapEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`;
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in">
       <div className="relative w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
         {/* Header */}
-        <div className="p-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/80">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center">
-              <MapPin className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="font-editorial text-base sm:text-lg font-bold text-white tracking-wide">
-                {t.mapPickerModalTitle}
-              </h3>
-              <p className="text-[11px] text-zinc-400">
-                {t.mapPickerModalDesc}
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={onClose}
-            className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        <MapPickerHeader onClose={onClose} />
 
         {/* Content Body */}
         <div className="p-4 space-y-4 overflow-y-auto">
@@ -215,137 +186,39 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
           </div>
 
           {/* Mode Tabs */}
-          <div className="flex items-center gap-1 bg-zinc-900 p-1 rounded-lg border border-zinc-800 text-xs">
-            <button
-              type="button"
-              onClick={() => setActiveMode('quick')}
-              className={`flex-1 py-1.5 px-2.5 rounded font-bold transition-colors ${
-                activeMode === 'quick' ? 'bg-white text-black shadow' : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              {t.mapQuickRegions}
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveMode('search')}
-              className={`flex-1 py-1.5 px-2.5 rounded font-bold transition-colors ${
-                activeMode === 'search' ? 'bg-white text-black shadow' : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              {t.mapSearchStreet}
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveMode('link')}
-              className={`flex-1 py-1.5 px-2.5 rounded font-bold transition-colors ${
-                activeMode === 'link' ? 'bg-white text-black shadow' : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              {t.mapGoogleMapsLink}
-            </button>
-          </div>
+          <MapPickerTabs
+            activeMode={activeMode}
+            onModeChange={setActiveMode}
+          />
 
           {/* Tab 1: Quick Popular Areas */}
           {activeMode === 'quick' && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-zinc-400 font-bold">
-                  {t.mapQuickRegions}:
-                </span>
-                <button
-                  type="button"
-                  onClick={handleDetectGps}
-                  disabled={isDetectingGps}
-                  className="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1"
-                >
-                  {isDetectingGps ? <Loader2 className="w-3 h-3 animate-spin" /> : <Crosshair className="w-3 h-3" />}
-                  <span>{t.detectGps}</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-40 overflow-y-auto pr-1">
-                {POPULAR_EGYPT_AREAS.map((preset, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => handleSelectPreset(preset)}
-                    className="p-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-amber-400/50 rounded text-left text-xs transition-colors flex items-center gap-1.5 cursor-pointer group"
-                  >
-                    <MapPin className="w-3 h-3 text-amber-400 group-hover:scale-110 transition-transform shrink-0" />
-                    <span className="text-zinc-200 truncate text-[11px] font-medium">{preset.nameAr}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <MapQuickAreasTab
+              onSelectPreset={handleSelectPreset}
+              onDetectGps={handleDetectGps}
+              isDetectingGps={isDetectingGps}
+            />
           )}
 
           {/* Tab 2: Search Box */}
           {activeMode === 'search' && (
-            <div className="space-y-2">
-              <form onSubmit={handleSearch} className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={t.mapSearchPlaceholder}
-                    className="w-full bg-zinc-900 border border-zinc-700 pl-8 pr-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400"
-                    autoFocus
-                  />
-                  <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-3" />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSearching || !searchQuery.trim()}
-                  className="px-4 py-2 bg-white text-black hover:bg-zinc-200 text-xs rounded font-bold transition-colors disabled:opacity-50"
-                >
-                  {isSearching ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : t.search}
-                </button>
-              </form>
-
-              {searchResults.length > 0 && (
-                <div className="bg-zinc-900 border border-zinc-700 rounded-lg divide-y divide-zinc-800 max-h-36 overflow-y-auto">
-                  {searchResults.map((r, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => handleSelectSearchResult(r)}
-                      className="w-full text-left p-2 text-xs text-zinc-300 hover:bg-zinc-800 flex items-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                      <span className="truncate">{r.displayName}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <MapSearchTab
+              searchQuery={searchQuery}
+              onSearchQueryChange={setSearchQuery}
+              onSearchSubmit={handleSearch}
+              isSearching={isSearching}
+              searchResults={searchResults}
+              onSelectSearchResult={handleSelectSearchResult}
+            />
           )}
 
           {/* Tab 3: Paste Google Maps Link */}
           {activeMode === 'link' && (
-            <div className="space-y-2">
-              <label className="block text-[11px] text-zinc-400 font-bold">
-                {t.mapPasteLinkPrompt}
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={pastedUrl}
-                  onChange={(e) => setPastedUrl(e.target.value)}
-                  placeholder="e.g. https://maps.google.com/?q=30.7126,31.2464"
-                  className="flex-1 bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-mono"
-                />
-                <button
-                  type="button"
-                  onClick={handleParsePastedUrl}
-                  disabled={!pastedUrl.trim()}
-                  className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded transition-colors disabled:opacity-50 flex items-center gap-1.5"
-                >
-                  <Link2 className="w-3.5 h-3.5" />
-                  <span>{t.apply}</span>
-                </button>
-              </div>
-            </div>
+            <MapLinkPasteTab
+              pastedUrl={pastedUrl}
+              onPastedUrlChange={setPastedUrl}
+              onParsePastedUrl={handleParsePastedUrl}
+            />
           )}
 
           {/* Error Message */}
@@ -357,95 +230,27 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
           )}
 
           {/* Interactive Map Container */}
-          <div className="relative w-full h-52 sm:h-56 rounded-lg overflow-hidden border border-zinc-700 shadow-inner bg-zinc-900">
-            <iframe
-              ref={mapFrameRef}
-              src={mapEmbedUrl}
-              title="Delivery Location Map"
-              className="w-full h-full border-0 pointer-events-auto"
-            />
-
-            {/* Direct Google Maps Link badge */}
-            <div className="absolute top-2 right-2 z-10">
-              <a
-                href={`https://maps.google.com/?q=${lat},${lng}`}
-                target="_blank"
-                rel="noreferrer"
-                className="px-2.5 py-1 bg-black/80 hover:bg-black text-amber-400 border border-amber-400/40 rounded text-[10px] font-mono flex items-center gap-1.5 backdrop-blur-sm shadow transition-colors"
-              >
-                <span>Google Maps</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-
-            {/* Live GPS Coordinates Tag */}
-            <div className="absolute bottom-2 left-2 z-10 px-2.5 py-1 bg-black/80 text-zinc-300 rounded text-[10px] font-mono border border-zinc-800 backdrop-blur-sm">
-              GPS: {lat.toFixed(5)}, {lng.toFixed(5)}
-            </div>
-          </div>
+          <MapPreviewFrame
+            ref={mapFrameRef}
+            lat={lat}
+            lng={lng}
+          />
 
           {/* Detected / Editable Address Form */}
-          <div className="p-3.5 bg-zinc-900/90 border border-zinc-800 rounded-lg space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono uppercase text-zinc-400 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{t.mapConfirmedDetails}</span>
-              </span>
-              {isResolvingAddress && (
-                <span className="text-[10px] text-amber-400 flex items-center gap-1 font-mono">
-                  <Loader2 className="w-3 h-3 animate-spin" /> {t.loading}
-                </span>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-              <div>
-                <label className="block text-[10px] text-zinc-400 font-bold mb-1">
-                  {t.mapSelectedGovernorate}
-                </label>
-                <input
-                  type="text"
-                  value={customGov}
-                  onChange={(e) => setCustomGov(e.target.value)}
-                  className="w-full bg-zinc-950 border border-zinc-700 px-2.5 py-1.5 text-xs text-white rounded focus:outline-none focus:border-amber-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] text-zinc-400 font-bold mb-1">
-                  {t.mapStreetDetailsLabel}
-                </label>
-                <input
-                  type="text"
-                  value={customStreet}
-                  onChange={(e) => setCustomStreet(e.target.value)}
-                  placeholder={t.streetDetailedPlaceholder}
-                  className="w-full bg-zinc-950 border border-zinc-700 px-2.5 py-1.5 text-xs text-white rounded focus:outline-none focus:border-amber-400"
-                />
-              </div>
-            </div>
-          </div>
+          <MapAddressDetailsForm
+            customGov={customGov}
+            onCustomGovChange={setCustomGov}
+            customStreet={customStreet}
+            onCustomStreetChange={setCustomStreet}
+            isResolvingAddress={isResolvingAddress}
+          />
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 border-t border-zinc-800 bg-zinc-900/70 flex items-center justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 border border-zinc-700 hover:bg-zinc-800 text-zinc-300 text-xs font-bold rounded transition-colors"
-          >
-            {t.cancel}
-          </button>
-
-          <button
-            type="button"
-            onClick={handleConfirm}
-            className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 font-label-bold text-xs uppercase tracking-wider rounded flex items-center gap-2 shadow-lg transition-all cursor-pointer"
-          >
-            <Check className="w-4 h-4" />
-            <span>{t.mapConfirmLocation}</span>
-          </button>
-        </div>
+        <MapPickerFooter
+          onClose={onClose}
+          onConfirm={handleConfirm}
+        />
       </div>
     </div>
   );
