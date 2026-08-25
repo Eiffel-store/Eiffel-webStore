@@ -1158,5 +1158,22 @@ export interface TranslationDictionary {
   adminLiveMockupPreview: string;
   adminMobileFrame: string;
   adminSavePublishBanner: string;
+
+  // Looks / Lookbook Manager
+  adminAddNewLook: string;
+  adminEditLook: string;
+  adminLookbookManager: string;
+  adminLookbookManagerDesc: string;
+  adminNoLooksFound: string;
+  adminCreateFirstLook: string;
+  adminHotspotsCount: string;
+  adminConfirmDeleteLook: string;
+  adminLookDetails: string;
+  adminLookCategory: string;
+  adminLookStatusActive: string;
+  adminLookStatusInactive: string;
+  adminAllLooks: string;
+  exploreLook: string;
+  added: string;
 }
 

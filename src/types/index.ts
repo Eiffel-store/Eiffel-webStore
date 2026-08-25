@@ -254,6 +254,24 @@ export interface LookbookHotspot {
   productId?: string;
 }
 
+export interface Look {
+  id: string;
+  titleAr: string;
+  titleEn: string;
+  subtitleAr?: string;
+  subtitleEn?: string;
+  descriptionAr?: string;
+  descriptionEn?: string;
+  imageUrl: string;
+  collectionLink?: string;
+  hotspots: LookbookHotspot[];
+  active?: boolean;
+  displayOrder?: number;
+  category?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface ShopTheLookSettings {
   titleEn: string;
   titleAr: string;

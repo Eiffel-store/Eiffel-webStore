@@ -1,117 +1,237 @@
-import React from 'react';
-import { ShoppingBag } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShoppingBag, Sparkles, Check } from 'lucide-react';
 import { useStoreData, useCurrency, useLanguage } from '@/shared';
 import { useCart } from '@/features/cart';
+import { Look } from '@/types';
 
 export const ShopTheLook: React.FC = () => {
-  const { products = [], homeSettings } = useStoreData();
+  const { products = [], activeLooks = [], homeSettings } = useStoreData();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
   const { t, isRTL } = useLanguage();
 
-  const look = homeSettings?.shopTheLook;
+  const [selectedLookIndex, setSelectedLookIndex] = useState(0);
+  const [highlightedPinIndex, setHighlightedPinIndex] = useState<number | null>(null);
+  const [addedItemIds, setAddedItemIds] = useState<Record<string, boolean>>({});
 
-  // Don't render empty dummy look if nothing is configured and no products exist
-  if (!look?.imageUrl && (!products || products.length === 0)) {
+  // Fallback look from homeSettings if no database looks exist yet
+  const fallbackLook: Partial<Look> | null = homeSettings?.shopTheLook?.imageUrl ? {
+    id: 'legacy-home-look',
+    titleAr: homeSettings.shopTheLook.titleAr || t.shopTheLook,
+    titleEn: homeSettings.shopTheLook.titleEn || t.shopTheLook,
+    subtitleAr: homeSettings.shopTheLook.subtitleAr || t.curatedEnsemble,
+    subtitleEn: homeSettings.shopTheLook.subtitleEn || t.curatedEnsemble,
+    imageUrl: homeSettings.shopTheLook.imageUrl,
+    hotspots: homeSettings.shopTheLook.hotspots || [],
+    category: 'men'
+  } : null;
+
+  const displayLooks: Partial<Look>[] = activeLooks.length > 0
+    ? activeLooks
+    : (fallbackLook ? [fallbackLook] : []);
+
+  // If no looks and no products exist, do not render empty section
+  if (displayLooks.length === 0 && (!products || products.length === 0)) {
     return null;
   }
 
-  const title = isRTL ? (look?.titleAr || t.shopTheLook) : (look?.titleEn || t.shopTheLook);
-  const subtitle = isRTL ? (look?.subtitleAr || t.curatedEnsemble) : (look?.subtitleEn || t.curatedEnsemble);
-  const mainImage = look?.imageUrl || products?.[0]?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
-  
-  // Resolve products configured in look.hotspots or fallback to first 3 products
-  const hotspots = look?.hotspots || [];
+  const currentLook = displayLooks[selectedLookIndex] || displayLooks[0];
+  const title = isRTL ? (currentLook?.titleAr || t.shopTheLook) : (currentLook?.titleEn || t.shopTheLook);
+  const subtitle = isRTL ? (currentLook?.subtitleAr || t.curatedEnsemble) : (currentLook?.subtitleEn || t.curatedEnsemble);
+  const mainImage = currentLook?.imageUrl || products?.[0]?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
+
+  const hotspots = currentLook?.hotspots || [];
   const lookProducts = hotspots.length > 0
     ? hotspots.map(spot => {
         const matching = products.find(p => p.id === spot.productId);
         if (matching) return matching;
         return {
           id: spot.productId || spot.id,
-          name: isRTL ? spot.titleAr : spot.titleEn,
+          name: isRTL ? (spot.titleAr || spot.titleEn) : (spot.titleEn || spot.titleAr),
           subtitle: isRTL ? spot.titleEn : spot.titleAr,
-          price: spot.price,
+          price: spot.price || 0,
           images: [mainImage],
-          category: 'men',
+          category: currentLook?.category || 'men',
           inStock: true
         } as any;
       })
     : (products || []).slice(0, 3);
 
+  const handleAddToCartWithFeedback = (product: any, itemId: string) => {
+    addToCart(product);
+    setAddedItemIds(prev => ({ ...prev, [itemId]: true }));
+    setTimeout(() => {
+      setAddedItemIds(prev => ({ ...prev, [itemId]: false }));
+    }, 1800);
+  };
+
   return (
     <section className="py-12 sm:py-20 px-3 sm:px-8 md:px-12 max-w-[1440px] mx-auto w-full">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-10 pb-3 sm:pb-4 border-b border-surface-container dark:border-zinc-800">
+      
+      {/* Header & Multi-Look Selector Tabs */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-surface-container dark:border-zinc-800 gap-4">
         <div>
-          <span className="text-[10px] sm:text-xs font-label-bold text-secondary dark:text-zinc-400 uppercase tracking-widest">
-            {subtitle}
+          <span className="text-[10px] sm:text-xs font-label-bold text-secondary dark:text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+            <span>{subtitle}</span>
           </span>
-          <h2 className="font-editorial text-3xl sm:text-5xl text-primary dark:text-white mt-1">
+          <h2 className="font-editorial text-3xl sm:text-5xl text-primary dark:text-white mt-1 transition-all duration-300">
             {title}
           </h2>
         </div>
+
+        {/* Dynamic Looks Tabs Switcher (when multiple looks exist) */}
+        {displayLooks.length > 1 && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 max-w-full scrollbar-none">
+            {displayLooks.map((lookItem, idx) => {
+              const isActive = selectedLookIndex === idx;
+              const lookTabName = isRTL
+                ? (lookItem.titleAr || `إطلالة ${idx + 1}`)
+                : (lookItem.titleEn || `Look ${idx + 1}`);
+
+              return (
+                <button
+                  key={lookItem.id || idx}
+                  type="button"
+                  onClick={() => {
+                    setSelectedLookIndex(idx);
+                    setHighlightedPinIndex(null);
+                  }}
+                  className={`px-4 py-2 rounded-full text-xs font-label-bold whitespace-nowrap transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                    isActive
+                      ? 'bg-primary text-white dark:bg-white dark:text-black shadow-lg scale-105 ring-2 ring-primary/20 dark:ring-white/20'
+                      : 'bg-surface-container dark:bg-zinc-900 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white hover:bg-surface-container-high dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-purple-400 animate-ping' : 'bg-zinc-500'}`} />
+                  <span>{lookTabName}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
-        {/* Editorial Visual with Pins */}
-        <div className="lg:col-span-7 relative aspect-[3/4] sm:aspect-[4/3] lg:aspect-[3/4] bg-zinc-950 overflow-hidden shadow-xl group rounded-lg">
+      {/* Main Grid: Visual with Pins + Products List */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 items-start">
+        
+        {/* Editorial Visual with Numbered Hotspot Pins */}
+        <div className="lg:col-span-7 relative aspect-[3/4] sm:aspect-[4/3] lg:aspect-[3/4] bg-zinc-950 overflow-hidden shadow-2xl group rounded-xl border border-surface-container dark:border-zinc-800">
           <img
+            key={currentLook?.id || selectedLookIndex}
             src={mainImage}
             alt={title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 animate-in fade-in zoom-in-95 duration-500"
           />
-          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
           {/* Interactive Pins Overlay */}
-          {hotspots.map((spot, idx) => (
-            <div
-              key={spot.id || idx}
-              style={{ top: `${spot.y}%`, left: `${spot.x}%` }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white text-black text-[11px] font-bold flex items-center justify-center shadow-2xl border-2 border-black animate-pulse"
-              title={`${isRTL ? spot.titleAr : spot.titleEn} (${spot.price} EGP)`}
-            >
-              {idx + 1}
-            </div>
-          ))}
+          {hotspots.map((spot, idx) => {
+            const isHighlighted = highlightedPinIndex === idx;
+
+            return (
+              <div
+                key={spot.id || idx}
+                style={{ top: `${spot.y}%`, left: `${spot.x}%` }}
+                onMouseEnter={() => setHighlightedPinIndex(idx)}
+                onMouseLeave={() => setHighlightedPinIndex(null)}
+                className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full flex items-center justify-center font-bold text-[11px] font-mono shadow-2xl transition-all duration-300 cursor-pointer z-30 ${
+                  isHighlighted
+                    ? 'w-9 h-9 bg-purple-500 text-white ring-4 ring-purple-300 scale-125 z-40'
+                    : 'w-7 h-7 bg-white text-black border-2 border-black hover:scale-110 hover:bg-purple-100'
+                }`}
+                title={`${isRTL ? (spot.titleAr || spot.titleEn) : (spot.titleEn || spot.titleAr)} (${spot.price || 0} EGP)`}
+              >
+                <span>{idx + 1}</span>
+
+                {/* Hotspot Floating Tooltip */}
+                <div
+                  className={`absolute bottom-full mb-2 whitespace-nowrap px-3 py-1.5 bg-black/95 text-white text-[11px] rounded-md font-sans shadow-2xl border border-zinc-700 pointer-events-none transition-all duration-200 ${
+                    isHighlighted ? 'opacity-100 scale-100 -translate-y-1' : 'opacity-0 scale-95 pointer-events-none'
+                  }`}
+                >
+                  <div className="font-bold">{isRTL ? (spot.titleAr || spot.titleEn) : (spot.titleEn || spot.titleAr)}</div>
+                  <div className="text-[10px] text-purple-300 font-mono">{formatPrice(spot.price || 0)}</div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Products in this Look */}
         <div className="lg:col-span-5 space-y-4">
-          <h3 className="text-xs font-label-bold tracking-widest text-secondary dark:text-zinc-400 uppercase">
-            {t.piecesInThisLook}
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-label-bold tracking-widest text-secondary dark:text-zinc-400 uppercase">
+              {t.piecesInThisLook}
+            </h3>
+            <span className="text-[11px] text-zinc-500 font-mono">
+              {lookProducts.length} {isRTL ? 'قطع' : 'items'}
+            </span>
+          </div>
+
           <div className="space-y-3">
             {lookProducts.map((product, idx) => {
               if (!product) return null;
               const prodImg = product?.images?.[0] || mainImage;
+              const isPinHighlighted = highlightedPinIndex === idx;
+              const isAdded = addedItemIds[product.id || String(idx)];
+
               return (
                 <div
                   key={product.id || idx}
-                  className="flex items-center justify-between p-3 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 hover:border-primary dark:hover:border-white transition-colors rounded"
+                  onMouseEnter={() => setHighlightedPinIndex(idx)}
+                  onMouseLeave={() => setHighlightedPinIndex(null)}
+                  className={`flex items-center justify-between p-3.5 bg-surface-container-low dark:bg-zinc-900 border transition-all duration-300 rounded-lg group ${
+                    isPinHighlighted
+                      ? 'border-purple-500 bg-purple-950/10 dark:bg-purple-950/20 shadow-md ring-1 ring-purple-500/40 -translate-y-0.5'
+                      : 'border-surface-container dark:border-zinc-800 hover:border-primary/50 dark:hover:border-zinc-600'
+                  }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="w-5 h-5 rounded-full bg-zinc-800 text-zinc-300 text-[10px] font-mono font-bold flex items-center justify-center shrink-0">
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <span className={`w-6 h-6 rounded-full text-xs font-mono font-bold flex items-center justify-center shrink-0 transition-colors ${
+                      isPinHighlighted
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-zinc-800 text-zinc-300 group-hover:bg-zinc-700'
+                    }`}>
                       {idx + 1}
                     </span>
+
                     <img
                       src={prodImg}
                       alt={product.name || 'Product'}
-                      className="w-14 h-18 object-cover bg-zinc-800 rounded"
+                      className="w-14 h-18 object-cover bg-zinc-800 rounded-md shrink-0"
                     />
-                    <div>
-                      <h4 className="font-editorial text-sm font-bold text-primary dark:text-white line-clamp-1">
+
+                    <div className="min-w-0 pr-2">
+                      <h4 className="font-editorial text-sm font-bold text-primary dark:text-white truncate">
                         {product.name}
                       </h4>
-                      <p className="text-[11px] text-secondary dark:text-zinc-400 font-mono">
+                      <p className="text-xs text-secondary dark:text-purple-300 font-mono font-bold mt-0.5">
                         {formatPrice(product.price || 0)}
                       </p>
                     </div>
                   </div>
+
                   <button
-                    onClick={() => addToCart(product)}
-                    className="px-3 py-2 bg-primary text-white dark:bg-white dark:text-black text-[11px] font-label-bold tracking-wider uppercase hover:opacity-90 flex items-center gap-1 shrink-0 rounded cursor-pointer"
+                    type="button"
+                    onClick={() => handleAddToCartWithFeedback(product, product.id || String(idx))}
+                    className={`px-3.5 py-2.5 text-xs font-label-bold tracking-wider uppercase flex items-center gap-1.5 shrink-0 rounded-md cursor-pointer transition-all duration-200 ${
+                      isAdded
+                        ? 'bg-emerald-600 text-white scale-95'
+                        : 'bg-primary text-white dark:bg-white dark:text-black hover:opacity-90 hover:shadow-md'
+                    }`}
                   >
-                    <ShoppingBag className="w-3.5 h-3.5" />
-                    <span>{t.add}</span>
+                    {isAdded ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>{t.added}</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingBag className="w-3.5 h-3.5" />
+                        <span>{t.add}</span>
+                      </>
+                    )}
                   </button>
                 </div>
               );

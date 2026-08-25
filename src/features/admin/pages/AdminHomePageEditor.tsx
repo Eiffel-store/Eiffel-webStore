@@ -14,20 +14,19 @@ import {
 import { useStoreData, useLanguage, EiffelLoader } from '@/shared';
 import { Banner, BannerPlacement } from '@/types';
 import { AdminBannerModal } from '../components/banners/AdminBannerModal';
-import { AdminShopLookForm } from '../components/home-editor/AdminShopLookForm';
+import { AdminShopTheLookManager } from '../components/home-editor/AdminShopTheLookManager';
 import { AdminBannerStatsCards } from '../components/home-editor/AdminBannerStatsCards';
 import { AdminBannerList } from '../components/home-editor/AdminBannerList';
 
 export const AdminHomePageEditor: React.FC = () => {
   const {
     banners = [],
+    looks = [],
     addBanner,
     updateBanner,
     deleteBanner,
     toggleBannerStatus,
     reorderBanners,
-    homeSettings,
-    updateHomeSettings,
     isBannersLoading
   } = useStoreData();
 
@@ -167,7 +166,7 @@ export const AdminHomePageEditor: React.FC = () => {
           { id: 'PROMO_EDITORIAL', label: t.adminPromoEditorialPlacement, icon: Layers, count: banners.filter(b => b.placement === 'PROMO_EDITORIAL').length },
           { id: 'TOP_ANNOUNCEMENT', label: t.adminTopAnnouncementPlacement, icon: MessageSquare, count: banners.filter(b => b.placement === 'TOP_ANNOUNCEMENT').length },
           { id: 'POPUP_MODAL', label: t.adminPopupModalPlacement, icon: Maximize2, count: banners.filter(b => b.placement === 'POPUP_MODAL').length },
-          { id: 'SHOP_THE_LOOK', label: t.adminShopTheLookPlacement, icon: Sparkles, count: null }
+          { id: 'SHOP_THE_LOOK', label: t.adminShopTheLookPlacement, icon: Sparkles, count: looks.length }
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -196,12 +195,7 @@ export const AdminHomePageEditor: React.FC = () => {
 
       {/* Tab Content */}
       {activeTab === 'SHOP_THE_LOOK' ? (
-        <div className="space-y-6">
-          <AdminShopLookForm
-            shopLook={homeSettings.shopTheLook}
-            onChange={(shopTheLook) => updateHomeSettings({ shopTheLook })}
-          />
-        </div>
+        <AdminShopTheLookManager />
       ) : (
         <AdminBannerList
           banners={currentTabBanners}

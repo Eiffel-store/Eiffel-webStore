@@ -1158,5 +1158,22 @@ export const ar: TranslationDictionary = {
   adminLiveMockupPreview: "المعاينة التفاعلية الحية",
   adminMobileFrame: "شاشة الهاتف",
   adminSavePublishBanner: "حفظ ونشر البانر",
+
+  // Looks / Lookbook Manager
+  adminAddNewLook: "إضافة إطلالة جديدة",
+  adminEditLook: "تعديل الإطلالة",
+  adminLookbookManager: "إدارة إطلالات تسوق المظهر (Shop The Look Manager)",
+  adminLookbookManagerDesc: "إنشاء تنسيقات أزياء متكاملة مع نقاط تفاعلية مرقمة مرتبطة بمنتجات المتجر مباشرة",
+  adminNoLooksFound: "لا توجد أي إطلالات مضافة حتى الآن. ابدأ بإضافة أول إطلالة وتنسيق لعرضه في واجهة المتجر.",
+  adminCreateFirstLook: "إنشاء أول إطلالة أزياء",
+  adminHotspotsCount: "نقاط تفاعلية",
+  adminConfirmDeleteLook: "هل أنت متأكد من رغبتك في حذف هذه الإطلالة؟",
+  adminLookDetails: "بيانات وتفاصيل الإطلالة",
+  adminLookCategory: "التصنيف",
+  adminLookStatusActive: "نشط (معروض في المتجر)",
+  adminLookStatusInactive: "مخفي (مسودة)",
+  adminAllLooks: "جميع الإطلالات",
+  exploreLook: "استكشف الإطلالة",
+  added: "تمت الإضافة",
 };
 

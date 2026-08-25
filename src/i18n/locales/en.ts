@@ -1143,5 +1143,22 @@ export const en: TranslationDictionary = {
   adminLiveMockupPreview: "Live Mockup Preview",
   adminMobileFrame: "Phone Frame",
   adminSavePublishBanner: "Save & Publish Banner",
+
+  // Looks / Lookbook Manager
+  adminAddNewLook: "Add New Look",
+  adminEditLook: "Edit Look",
+  adminLookbookManager: "Shop The Look & Lookbook Manager",
+  adminLookbookManagerDesc: "Create interactive styled ensembles with numbered pins linking directly to store products",
+  adminNoLooksFound: "No looks created yet. Start creating styled ensembles to showcase on your homepage.",
+  adminCreateFirstLook: "Create Your First Look",
+  adminHotspotsCount: "Interactive Pins",
+  adminConfirmDeleteLook: "Are you sure you want to delete this look ensemble?",
+  adminLookDetails: "Look Details",
+  adminLookCategory: "Category",
+  adminLookStatusActive: "Active (Visible on Homepage)",
+  adminLookStatusInactive: "Hidden (Draft)",
+  adminAllLooks: "All Looks",
+  exploreLook: "Explore Look",
+  added: "Added",
 };
 

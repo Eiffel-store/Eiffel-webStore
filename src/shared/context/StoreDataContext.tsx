@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Product, StoreLocation, CategoryItem, Coupon, Order, StoreSettings, HomePageSettings, Banner } from '@/types';
+import { Product, StoreLocation, CategoryItem, Coupon, Order, StoreSettings, HomePageSettings, Banner, Look } from '@/types';
 import { productService } from '@/services/productService';
 import { categoryService } from '@/services/categoryService';
 import { storeService } from '@/services/storeService';
@@ -9,6 +9,7 @@ import { couponService } from '@/services/couponService';
 import { settingsService } from '@/services/settingsService';
 import { homeSettingsService } from '@/services/homeSettingsService';
 import { bannerService } from '@/services/bannerService';
+import { lookService } from '@/services/lookService';
 import { useAuthStore } from '@/stores/useAuthStore';
 import toast from 'react-hot-toast';
 
@@ -131,6 +132,16 @@ interface StoreDataContextType {
   trackBannerImpression: (id: string) => void;
   trackBannerClick: (id: string) => void;
 
+  // Looks / Lookbook Management
+  looks: Look[];
+  activeLooks: Look[];
+  isLooksLoading: boolean;
+  addLook: (look: Partial<Look>) => Promise<Look>;
+  updateLook: (id: string, updates: Partial<Look>) => Promise<Look>;
+  deleteLook: (id: string) => Promise<void>;
+  toggleLookStatus: (id: string) => Promise<Look>;
+  reorderLooks: (ids: string[]) => Promise<void>;
+
   // Stock Inventory Management
   decrementStock: (id: string, quantity?: number) => void;
   incrementStock: (id: string, quantity?: number) => void;
@@ -222,7 +233,27 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const isBannersLoading = isActiveBannersLoading || (isAdminOrStaff && isAllBannersLoading);
 
-  // 8. React Query: Fetch Orders (Admin/Staff Only - Gated to prevent unwanted requests from regular visitors)
+  // 8. React Query: Fetch Looks (All for Admin, Active for Storefront)
+  const { data: serverAllLooks = [], isLoading: isAllLooksLoading } = useQuery({
+    queryKey: ['looks', 'all'],
+    queryFn: () => lookService.getAllLooks().catch(() => []),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
+    enabled: Boolean(isAdminOrStaff),
+    retry: 1
+  });
+
+  const { data: serverActiveLooks = [], isLoading: isActiveLooksLoading } = useQuery({
+    queryKey: ['looks', 'active'],
+    queryFn: () => lookService.getActiveLooks().catch(() => []),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
+    retry: 1
+  });
+
+  const isLooksLoading = isActiveLooksLoading || (isAdminOrStaff && isAllLooksLoading);
+
+  // 9. React Query: Fetch Orders (Admin/Staff Only - Gated to prevent unwanted requests from regular visitors)
   const { data: serverOrders = [], isLoading: isOrdersLoading } = useQuery({
     queryKey: ['orders'],
     queryFn: () => orderService.getAll().catch(() => []),
@@ -251,8 +282,10 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const homeSettings = serverHomeSettings || localHomeSettings;
   const banners = Array.isArray(serverAllBanners) && serverAllBanners.length > 0 ? serverAllBanners : (Array.isArray(serverActiveBanners) ? serverActiveBanners : []);
   const activeBanners = Array.isArray(serverActiveBanners) ? serverActiveBanners : [];
+  const looks = Array.isArray(serverAllLooks) && serverAllLooks.length > 0 ? serverAllLooks : (Array.isArray(serverActiveLooks) ? serverActiveLooks : []);
+  const activeLooks = Array.isArray(serverActiveLooks) ? serverActiveLooks : [];
 
-  const isLoading = isProductsLoading || isCategoriesLoading || isStoresLoading || isOrdersLoading || isBannersLoading || isCouponsLoading || isSettingsLoading;
+  const isLoading = isProductsLoading || isCategoriesLoading || isStoresLoading || isOrdersLoading || isBannersLoading || isCouponsLoading || isSettingsLoading || isLooksLoading;
 
   // Mutations: Home Settings
   const updateHomeSettingsMutation = useMutation({
@@ -319,6 +352,64 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const trackBannerClick = (id: string) => {
     bannerService.trackClick(id);
+  };
+
+  // Mutations: Looks / Lookbook
+  const addLookMutation = useMutation({
+    mutationFn: (look: Partial<Look>) => lookService.create(look),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['looks'] });
+      toast.success('تمت إضافة الإطلالة بنجاح');
+    },
+  });
+
+  const updateLookMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Look> }) => lookService.update(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['looks'] });
+      toast.success('تم تحديث الإطلالة بنجاح');
+    },
+  });
+
+  const toggleLookStatusMutation = useMutation({
+    mutationFn: (id: string) => lookService.toggleStatus(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['looks'] });
+      toast.success('تم تعديل حالة الإطلالة');
+    },
+  });
+
+  const reorderLooksMutation = useMutation({
+    mutationFn: (ids: string[]) => lookService.reorder(ids),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['looks'] }),
+  });
+
+  const deleteLookMutation = useMutation({
+    mutationFn: (id: string) => lookService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['looks'] });
+      toast.success('تم حذف الإطلالة بنجاح');
+    },
+  });
+
+  const addLook = async (look: Partial<Look>) => {
+    return await addLookMutation.mutateAsync(look);
+  };
+
+  const updateLook = async (id: string, updates: Partial<Look>) => {
+    return await updateLookMutation.mutateAsync({ id, updates });
+  };
+
+  const deleteLook = async (id: string) => {
+    await deleteLookMutation.mutateAsync(id);
+  };
+
+  const toggleLookStatus = async (id: string) => {
+    return await toggleLookStatusMutation.mutateAsync(id);
+  };
+
+  const reorderLooks = async (ids: string[]) => {
+    await reorderLooksMutation.mutateAsync(ids);
   };
 
   // Stock Inventory Management Handlers
@@ -730,6 +821,8 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         homeSettings,
         banners,
         activeBanners,
+        looks,
+        activeLooks,
         isLoading,
         isProductsLoading,
         isCategoriesLoading,
@@ -737,6 +830,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         isOrdersLoading,
         isCouponsLoading,
         isBannersLoading,
+        isLooksLoading,
         isHomeSettingsLoading,
         addProduct,
         updateProduct,
@@ -764,6 +858,11 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         reorderBanners,
         trackBannerImpression,
         trackBannerClick,
+        addLook,
+        updateLook,
+        deleteLook,
+        toggleLookStatus,
+        reorderLooks,
         decrementStock,
         incrementStock,
         exportData,
