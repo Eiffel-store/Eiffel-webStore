@@ -148,76 +148,87 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const { user } = useAuthStore();
   const isAdminOrStaff = user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_STAFF';
 
-  // 1. React Query: Fetch Products from Backend
+  // 1. React Query: Fetch Products from Backend (Cached for 5 mins, GC 30 mins)
   const { data: serverProducts = [], isLoading: isProductsLoading } = useQuery({
     queryKey: ['products'],
     queryFn: () => productService.getAll().catch(() => []),
-    staleTime: 1000 * 30,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
     retry: 1
   });
 
-  // 2. React Query: Fetch Categories from Backend
+  // 2. React Query: Fetch Categories from Backend (Cached for 15 mins, GC 1 hr)
   const { data: serverCategories = [], isLoading: isCategoriesLoading } = useQuery({
     queryKey: ['categories'],
     queryFn: () => categoryService.getAll().catch(() => []),
-    staleTime: 1000 * 30,
+    staleTime: 1000 * 60 * 15,
+    gcTime: 1000 * 60 * 60,
     retry: 1
   });
-  // 3. React Query: Fetch Settings from Backend
+
+  // 3. React Query: Fetch Settings from Backend (Cached for 15 mins, GC 1 hr)
   const { data: serverSettings, isLoading: isSettingsLoading } = useQuery({
     queryKey: ['settings'],
     queryFn: () => settingsService.getSettings().catch(() => DEFAULT_SETTINGS),
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 60 * 15,
+    gcTime: 1000 * 60 * 60,
     retry: 1
   });
 
-  // 4. React Query: Fetch Stores from Backend
+  // 4. React Query: Fetch Stores / Showrooms from Backend (Cached for 15 mins, GC 1 hr)
   const { data: serverStores = [], isLoading: isStoresLoading } = useQuery({
     queryKey: ['stores'],
     queryFn: () => storeService.getAll().catch(() => []),
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 60 * 15,
+    gcTime: 1000 * 60 * 60,
     retry: 1
   });
 
-  // 5. React Query: Fetch Coupons from Backend
+  // 5. React Query: Fetch Coupons from Backend (Cached for 5 mins)
   const { data: serverCoupons = [], isLoading: isCouponsLoading } = useQuery({
     queryKey: ['coupons'],
     queryFn: () => couponService.getAll().catch(() => []),
-    staleTime: 1000 * 30,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 15,
     retry: 1
   });
 
-  // 6. React Query: Fetch Home Page & Banners Settings
+  // 6. React Query: Fetch Home Page & Banners Settings (Cached for 10 mins, GC 30 mins)
   const { data: serverHomeSettings, isLoading: isHomeSettingsLoading } = useQuery({
     queryKey: ['homeSettings'],
     queryFn: () => homeSettingsService.getHomeSettings().catch(() => DEFAULT_HOME_SETTINGS),
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 30,
     retry: 1
   });
 
-  // 7. React Query: Fetch All Banners & Active Banners for Storefront
+  // 7. React Query: Fetch All Banners (Admin/Staff only) & Active Banners for Storefront
   const { data: serverAllBanners = [], isLoading: isAllBannersLoading } = useQuery({
     queryKey: ['banners', 'all'],
     queryFn: () => bannerService.getAllBanners().catch(() => []),
-    staleTime: 1000 * 30,
-    enabled: isAdminOrStaff,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
+    enabled: Boolean(isAdminOrStaff),
     retry: 1
   });
 
   const { data: serverActiveBanners = [], isLoading: isActiveBannersLoading } = useQuery({
     queryKey: ['banners', 'active'],
     queryFn: () => bannerService.getActiveBanners().catch(() => []),
-    staleTime: 1000 * 30,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
     retry: 1
   });
 
   const isBannersLoading = isActiveBannersLoading || (isAdminOrStaff && isAllBannersLoading);
 
-  // 8. React Query: Fetch Orders from Backend
+  // 8. React Query: Fetch Orders (Admin/Staff Only - Gated to prevent unwanted requests from regular visitors)
   const { data: serverOrders = [], isLoading: isOrdersLoading } = useQuery({
     queryKey: ['orders'],
     queryFn: () => orderService.getAll().catch(() => []),
-    staleTime: 1000 * 15,
+    staleTime: 1000 * 60 * 2,
+    gcTime: 1000 * 60 * 15,
+    enabled: Boolean(isAdminOrStaff),
     retry: 1
   });
 
