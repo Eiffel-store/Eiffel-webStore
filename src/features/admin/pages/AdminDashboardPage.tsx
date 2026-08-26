@@ -4,18 +4,14 @@ import { AdminStatCards } from '../components/dashboard/AdminStatCards';
 import { AdminQuickNav } from '../components/dashboard/AdminQuickNav';
 import { AdminRecentOrders } from '../components/dashboard/AdminRecentOrders';
 import { AdminCatalogPreview } from '../components/dashboard/AdminCatalogPreview';
-import { useStoreData, useLanguage, EiffelLoader } from '@/shared';
+import { useStoreData, useLanguage, AdminTableSkeleton } from '@/shared';
 
 export const AdminDashboardPage: React.FC = () => {
   const { isProductsLoading, isOrdersLoading } = useStoreData();
   const { t } = useLanguage();
 
   if (isProductsLoading && isOrdersLoading) {
-    return (
-      <div className="py-24">
-        <EiffelLoader message={t.adminLoadingDashboard} />
-      </div>
-    );
+    return <AdminTableSkeleton />;
   }
 
   return (

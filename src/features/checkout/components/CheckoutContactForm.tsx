@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import {
   AlertCircle,
   Check,
@@ -19,9 +19,12 @@ import {
   Plus
 } from 'lucide-react';
 import { useLanguage } from '@/shared';
-import { GoogleMapsPickerModal } from './GoogleMapsPickerModal';
 import { locationService, GeocodedAddress } from '@/services/locationService';
 import { Address } from '@/types';
+
+// Lazy-Loaded Google Maps & Coordinates Picker Modal
+const GoogleMapsPickerModal = lazy(() => import('./GoogleMapsPickerModal').then(m => ({ default: m.GoogleMapsPickerModal })));
+
 
 export const EGYPTIAN_GOVERNORATES = [
   'Cairo (القاهرة)',
@@ -606,16 +609,18 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
 
       {/* Google Maps Interactive Picker Modal */}
       {showMapModal && (
-        <GoogleMapsPickerModal
-          isOpen={showMapModal}
-          onClose={() => setShowMapModal(false)}
-          onSelectLocation={(loc) => {
-            handleApplyLocation(loc);
-            setShowMapModal(false);
-          }}
-          initialLat={latitude || 30.0444}
-          initialLng={longitude || 31.2357}
-        />
+        <Suspense fallback={null}>
+          <GoogleMapsPickerModal
+            isOpen={showMapModal}
+            onClose={() => setShowMapModal(false)}
+            onSelectLocation={(loc) => {
+              handleApplyLocation(loc);
+              setShowMapModal(false);
+            }}
+            initialLat={latitude || 30.0444}
+            initialLng={longitude || 31.2357}
+          />
+        </Suspense>
       )}
     </div>
   );

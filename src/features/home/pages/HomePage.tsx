@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { ProductCard, QuickViewModal } from '@/features/products';
+import { ProductCard } from '@/features/products/components/ProductCard';
 import { HeroSection } from '../components/HeroSection';
 import { CategoryGrid } from '../components/CategoryGrid';
 import { PromoEditorial } from '../components/PromoEditorial';
 import { ShopTheLook } from '../components/ShopTheLook';
-import { PromoPopupModal } from '../components/PromoPopupModal';
 import { Product } from '@/types';
-import { useLanguage, useStoreData, EiffelLoader, EmptyState } from '@/shared';
+import { useLanguage, useStoreData, HomePageSkeleton, ProductGridSkeleton, EmptyState } from '@/shared';
+
+// Lazy-Loaded Modals
+const QuickViewModal = lazy(() => import('@/features/products/components/QuickViewModal').then(m => ({ default: m.QuickViewModal })));
+const PromoPopupModal = lazy(() => import('../components/PromoPopupModal').then(m => ({ default: m.PromoPopupModal })));
+
 
 export const HomePage: React.FC = () => {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
@@ -16,11 +20,7 @@ export const HomePage: React.FC = () => {
   const { products, isProductsLoading } = useStoreData();
 
   if (isProductsLoading && products.length === 0) {
-    return (
-      <div className="min-h-[80vh] flex items-center justify-center">
-        <EiffelLoader size="lg" message={t.loadingBespokeCollection} />
-      </div>
-    );
+    return <HomePageSkeleton />;
   }
 
   const newArrivals = products.filter(p => p.isNew || p.category === 'men').slice(0, 4);
@@ -57,7 +57,7 @@ export const HomePage: React.FC = () => {
         </div>
 
         {isProductsLoading ? (
-          <EiffelLoader message={t.loadingLatestReleases} />
+          <ProductGridSkeleton count={4} cols={4} />
         ) : newArrivals.length === 0 ? (
           <EmptyState
             title={t.noNewArrivals}
@@ -80,14 +80,18 @@ export const HomePage: React.FC = () => {
       <ShopTheLook />
 
       {/* 6. PROMOTIONAL POPUP MODAL (CAMPAIGN DRIVEN) */}
-      <PromoPopupModal />
+      <Suspense fallback={null}>
+        <PromoPopupModal />
+      </Suspense>
 
       {/* Quick View Modal */}
       {quickViewProduct && (
-        <QuickViewModal
-          product={quickViewProduct}
-          onClose={() => setQuickViewProduct(null)}
-        />
+        <Suspense fallback={null}>
+          <QuickViewModal
+            product={quickViewProduct}
+            onClose={() => setQuickViewProduct(null)}
+          />
+        </Suspense>
       )}
     </div>
   );

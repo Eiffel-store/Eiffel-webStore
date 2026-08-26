@@ -12,7 +12,7 @@ import {
   Calendar,
   Sparkles
 } from 'lucide-react';
-import { useStoreData, useLanguage, useCurrency, EiffelLoader, EmptyState } from '@/shared';
+import { useStoreData, useLanguage, useCurrency, AdminTableSkeleton, EmptyState } from '@/shared';
 import { AdminReportOverviewTab } from '../components/reports/AdminReportOverviewTab';
 import { AdminReportSalesTab } from '../components/reports/AdminReportSalesTab';
 import { AdminReportProductsTab } from '../components/reports/AdminReportProductsTab';
@@ -161,8 +161,8 @@ export const AdminReportsPage: React.FC = () => {
       </div>
 
       {/* 3. Tab Contents with Dynamic States */}
-      {isLoading ? (
-        <EiffelLoader message={t.adminCalculatingAnalytics} />
+      {isLoading && orders.length === 0 ? (
+        <AdminTableSkeleton rows={5} />
       ) : orders.length === 0 ? (
         <EmptyState
           title={t.adminNoAnalyticsData}

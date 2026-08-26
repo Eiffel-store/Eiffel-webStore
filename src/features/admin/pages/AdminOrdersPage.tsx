@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useStoreData, useLanguage, EiffelLoader, EmptyState, Pagination } from '@/shared';
+import { useStoreData, useLanguage, AdminTableSkeleton, EmptyState, Pagination } from '@/shared';
 import { Order } from '@/types';
 import { AdminOrderFilterBar } from '../components/orders/AdminOrderFilterBar';
 import { AdminOrdersTable } from '../components/orders/AdminOrdersTable';
@@ -76,8 +76,8 @@ export const AdminOrdersPage: React.FC = () => {
       />
 
       {/* Loading / Empty / Table */}
-      {isOrdersLoading ? (
-        <EiffelLoader message={t.loading} />
+      {isOrdersLoading && orders.length === 0 ? (
+        <AdminTableSkeleton rows={5} />
       ) : orders.length === 0 ? (
         <EmptyState
           title={t.adminNoOrdersYet}

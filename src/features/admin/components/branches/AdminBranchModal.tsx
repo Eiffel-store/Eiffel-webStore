@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { MapPin, Crosshair, Sparkles, Loader2, Check } from 'lucide-react';
 import { StoreLocation } from '@/types';
 import { useLanguage, ImageUploadInput } from '@/shared';
-import { GoogleMapsPickerModal } from '@/features/checkout/components/GoogleMapsPickerModal';
 import { locationService, GeocodedAddress } from '@/services/locationService';
+
+// Lazy-Loaded Google Maps Modal
+const GoogleMapsPickerModal = lazy(() => import('@/features/checkout/components/GoogleMapsPickerModal').then(m => ({ default: m.GoogleMapsPickerModal })));
+
 
 interface AdminBranchModalProps {
   isOpen: boolean;
@@ -292,13 +295,15 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
 
       {/* Interactive Google Maps & Egyptian Areas Picker Modal */}
       {showMapPicker && (
-        <GoogleMapsPickerModal
-          isOpen={showMapPicker}
-          onClose={() => setShowMapPicker(false)}
-          onSelectLocation={handleApplyLocation}
-          initialLat={formStore.latitude || 30.7126}
-          initialLng={formStore.longitude || 31.2464}
-        />
+        <Suspense fallback={null}>
+          <GoogleMapsPickerModal
+            isOpen={showMapPicker}
+            onClose={() => setShowMapPicker(false)}
+            onSelectLocation={handleApplyLocation}
+            initialLat={formStore.latitude || 30.7126}
+            initialLng={formStore.longitude || 31.2464}
+          />
+        </Suspense>
       )}
     </>
   );

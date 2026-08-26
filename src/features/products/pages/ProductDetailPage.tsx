@@ -9,7 +9,7 @@ import { ProductReviewsSection } from '../components/ProductReviewsSection';
 import { SizeGuideModal } from '../components/SizeGuideModal';
 import { useCart } from '@/features/cart';
 import { useWishlist } from '@/features/wishlist';
-import { useCurrency, useLanguage, useStoreData, resolveColorImage, EiffelLoader, EmptyState } from '@/shared';
+import { useCurrency, useLanguage, useStoreData, resolveColorImage, ProductDetailPageSkeleton, EmptyState } from '@/shared';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,12 +39,8 @@ export const ProductDetailPage: React.FC = () => {
     }
   }, [id, product]);
 
-  if (isProductsLoading) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center">
-        <EiffelLoader message={t.loading} />
-      </div>
-    );
+  if (isProductsLoading && !product) {
+    return <ProductDetailPageSkeleton />;
   }
 
   if (!product) {

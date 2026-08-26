@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Plus,
@@ -11,12 +11,15 @@ import {
   Maximize2,
   Check
 } from 'lucide-react';
-import { useStoreData, useLanguage, EiffelLoader } from '@/shared';
+import { useStoreData, useLanguage, AdminTableSkeleton } from '@/shared';
 import { Banner, BannerPlacement } from '@/types';
-import { AdminBannerModal } from '../components/banners/AdminBannerModal';
-import { AdminShopTheLookManager } from '../components/home-editor/AdminShopTheLookManager';
 import { AdminBannerStatsCards } from '../components/home-editor/AdminBannerStatsCards';
 import { AdminBannerList } from '../components/home-editor/AdminBannerList';
+
+// Lazy-Loaded Subcomponents & Modals
+const AdminBannerModal = lazy(() => import('../components/banners/AdminBannerModal').then(m => ({ default: m.AdminBannerModal })));
+const AdminShopTheLookManager = lazy(() => import('../components/home-editor/AdminShopTheLookManager').then(m => ({ default: m.AdminShopTheLookManager })));
+
 
 export const AdminHomePageEditor: React.FC = () => {
   const {
@@ -97,7 +100,7 @@ export const AdminHomePageEditor: React.FC = () => {
   if (isBannersLoading && banners.length === 0) {
     return (
       <div className="py-24">
-        <EiffelLoader message={t.loading} />
+        <AdminTableSkeleton />
       </div>
     );
   }
@@ -195,7 +198,9 @@ export const AdminHomePageEditor: React.FC = () => {
 
       {/* Tab Content */}
       {activeTab === 'SHOP_THE_LOOK' ? (
-        <AdminShopTheLookManager />
+        <Suspense fallback={<AdminTableSkeleton />}>
+          <AdminShopTheLookManager />
+        </Suspense>
       ) : (
         <AdminBannerList
           banners={currentTabBanners}
@@ -208,16 +213,20 @@ export const AdminHomePageEditor: React.FC = () => {
       )}
 
       {/* Create / Edit Modal Dialog */}
-      <AdminBannerModal
-        isOpen={isModalOpen}
-        banner={selectedBanner}
-        defaultPlacement={activeTab === 'SHOP_THE_LOOK' ? 'HERO_SLIDER' : activeTab}
-        onClose={() => setIsModalOpen(false)}
-        onSave={async (data) => {
-          await handleSaveBanner(data);
-          setIsModalOpen(false);
-        }}
-      />
+      {isModalOpen && (
+        <Suspense fallback={null}>
+          <AdminBannerModal
+            isOpen={isModalOpen}
+            banner={selectedBanner}
+            defaultPlacement={activeTab === 'SHOP_THE_LOOK' ? 'HERO_SLIDER' : activeTab}
+            onClose={() => setIsModalOpen(false)}
+            onSave={async (data) => {
+              await handleSaveBanner(data);
+              setIsModalOpen(false);
+            }}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };

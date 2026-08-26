@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { useStoreData, useLanguage, EiffelLoader, EmptyState } from '@/shared';
+import { useStoreData, useLanguage, AdminCardGridSkeleton, EmptyState } from '@/shared';
 import { CategoryItem } from '@/types';
 import { AdminCategoryCard } from '../components/categories/AdminCategoryCard';
 import { AdminCategoryModal } from '../components/categories/AdminCategoryModal';
@@ -82,8 +82,8 @@ export const AdminCategoriesPage: React.FC = () => {
       </div>
 
       {/* Loading / Empty / Content */}
-      {isCategoriesLoading ? (
-        <EiffelLoader message={t.loading} />
+      {isCategoriesLoading && categories.length === 0 ? (
+        <AdminCardGridSkeleton count={4} cols={4} />
       ) : categories.length === 0 ? (
         <EmptyState
           title={t.adminCategoriesTitle}

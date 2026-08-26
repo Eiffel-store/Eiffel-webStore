@@ -1,13 +1,16 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, Suspense, lazy } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
-import { QuickViewModal } from '../components/QuickViewModal';
 import { CollectionBanner } from '../components/CollectionBanner';
 import { CollectionFiltersBar, SortOption } from '../components/CollectionFiltersBar';
 import { ActiveFilters } from '../components/ActiveFilters';
 import { FilterDrawer } from '../components/FilterDrawer';
 import { Product } from '@/types';
-import { useLanguage, useStoreData, EiffelLoader, EmptyState, Pagination } from '@/shared';
+import { useLanguage, useStoreData, CollectionsPageSkeleton, ProductGridSkeleton, EmptyState, Pagination } from '@/shared';
+
+// Lazy-Loaded Quick View Modal
+const QuickViewModal = lazy(() => import('../components/QuickViewModal').then(m => ({ default: m.QuickViewModal })));
+
 
 export const CollectionsPage: React.FC = () => {
   const { category = 'men' } = useParams<{ category: string }>();
@@ -27,6 +30,11 @@ export const CollectionsPage: React.FC = () => {
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
+
+  if (isProductsLoading && products.length === 0) {
+    return <CollectionsPageSkeleton />;
+  }
+
 
   // Category Metadata Object
   const currentCategoryObj = categories.find(c => c.id === category) || {
@@ -216,7 +224,7 @@ export const CollectionsPage: React.FC = () => {
 
         {/* Loading State vs Empty State vs Product Cards Grid */}
         {isProductsLoading ? (
-          <EiffelLoader message={isRTL ? `جاري تحميل ${getCategoryTitle()}...` : `Loading ${getCategoryTitle()}...`} />
+          <ProductGridSkeleton count={8} cols={4} />
         ) : filteredProducts.length === 0 ? (
           <EmptyState
             title={hasActiveFilters
@@ -291,10 +299,12 @@ export const CollectionsPage: React.FC = () => {
 
       {/* Quick View Modal */}
       {quickViewProduct && (
-        <QuickViewModal
-          product={quickViewProduct}
-          onClose={() => setQuickViewProduct(null)}
-        />
+        <Suspense fallback={null}>
+          <QuickViewModal
+            product={quickViewProduct}
+            onClose={() => setQuickViewProduct(null)}
+          />
+        </Suspense>
       )}
     </div>
   );

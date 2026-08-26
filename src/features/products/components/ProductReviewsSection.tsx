@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Star,
   CheckCircle2,
@@ -12,7 +13,7 @@ import {
   X
 } from 'lucide-react';
 import { Product, Review, ProductReviewsSummary, CreateReviewInput } from '@/types';
-import { useLanguage, Pagination, EiffelLoader } from '@/shared';
+import { useLanguage, Pagination, Skeleton } from '@/shared';
 import { reviewService } from '@/services/reviewService';
 import toast from 'react-hot-toast';
 
@@ -22,9 +23,7 @@ interface ProductReviewsSectionProps {
 
 export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ product }) => {
   const { isRTL, t } = useLanguage();
-
-  const [summary, setSummary] = useState<ProductReviewsSummary | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const queryClient = useQueryClient();
 
   // Pagination & Filter States
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -41,82 +40,79 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
   const [formTitle, setFormTitle] = useState<string>('');
   const [formComment, setFormComment] = useState<string>('');
 
-  const fetchReviews = useCallback(async () => {
-    if (!product?.id) return;
-    setIsLoading(true);
-    try {
-      const data = await reviewService.getProductReviews(
-        product.id,
-        currentPage,
-        pageSize,
-        selectedRatingFilter
-      );
-      if (data) {
-        setSummary(data);
-      } else {
-        // Fallback default mockup data if backend is offline
-        const fallbackReviews: Review[] = [
-          {
-            id: 'rev-1',
-            productId: product.id,
-            customerName: 'طارق المنشاوي',
-            customerEmail: 'tarek.m@luxury.eg',
-            rating: 5,
-            title: 'خامة فائقة وتطريز متقن للغاية',
-            comment: 'القطعة تحفة فنية، القماش الإيطالي والتقفيل عالي الجودة جداً ومريح في الارتداء. المقاس مضبوط بالملي.',
-            isVerifiedPurchase: true,
-            createdAt: new Date().toISOString()
-          },
-          {
-            id: 'rev-2',
-            productId: product.id,
-            customerName: 'سارة الشريف',
-            customerEmail: 'sarah.elsharif@gmail.com',
-            rating: 5,
-            title: 'فخامة وأناقة تليق بدار إيفل',
-            comment: 'التغليف فاخر وراقي والتوصيل كان سريع جداً في أقل من 48 ساعة. الخامة تستحق كل جنيه.',
-            isVerifiedPurchase: true,
-            createdAt: new Date(Date.now() - 86400000 * 2).toISOString()
-          },
-          {
-            id: 'rev-3',
-            productId: product.id,
-            customerName: 'عمر الفاروق',
-            customerEmail: 'omar.farouk@eiffel-client.com',
-            rating: 4,
-            title: 'تصميم مميز وألوان أنيقة',
-            comment: 'اللون مطابق تماماً للصور على الموقع والماتريال ناعمة وعملية جداً للمناسبات والإطلالات اليومية.',
-            isVerifiedPurchase: true,
-            createdAt: new Date(Date.now() - 86400000 * 5).toISOString()
-          }
-        ];
-
-        setSummary({
-          averageRating: product.rating || 5.0,
-          totalReviews: fallbackReviews.length,
-          recommendationRate: 98,
-          ratingDistribution: { 5: 2, 4: 1, 3: 0, 2: 0, 1: 0 },
-          reviews: {
-            content: fallbackReviews,
-            pageNumber: 1,
-            pageSize: 5,
-            totalElements: fallbackReviews.length,
-            totalPages: 1,
-            isFirst: true,
-            isLast: true
-          }
-        });
+  const { data: summary, isLoading } = useQuery<ProductReviewsSummary | null>({
+    queryKey: ['product-reviews', product?.id, currentPage, pageSize, selectedRatingFilter],
+    queryFn: async () => {
+      if (!product?.id) return null;
+      try {
+        const data = await reviewService.getProductReviews(
+          product.id,
+          currentPage,
+          pageSize,
+          selectedRatingFilter
+        );
+        if (data) return data;
+      } catch (err) {
+        console.error('Error loading reviews:', err);
       }
-    } catch (err) {
-      console.error('Error loading reviews:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [product?.id, currentPage, pageSize, selectedRatingFilter, product?.rating]);
 
-  useEffect(() => {
-    fetchReviews();
-  }, [fetchReviews]);
+      // Fallback default mockup data if backend is offline
+      const fallbackReviews: Review[] = [
+        {
+          id: 'rev-1',
+          productId: product.id,
+          customerName: 'طارق المنشاوي',
+          customerEmail: 'tarek.m@luxury.eg',
+          rating: 5,
+          title: 'خامة فائقة وتطريز متقن للغاية',
+          comment: 'القطعة تحفة فنية، القماش الإيطالي والتقفيل عالي الجودة جداً ومريح في الارتداء. المقاس مضبوط بالملي.',
+          isVerifiedPurchase: true,
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 'rev-2',
+          productId: product.id,
+          customerName: 'سارة الشريف',
+          customerEmail: 'sarah.elsharif@gmail.com',
+          rating: 5,
+          title: 'فخامة وأناقة تليق بدار إيفل',
+          comment: 'التغليف فاخر وراقي والتوصيل كان سريع جداً في أقل من 48 ساعة. الخامة تستحق كل جنيه.',
+          isVerifiedPurchase: true,
+          createdAt: new Date(Date.now() - 86400000 * 2).toISOString()
+        },
+        {
+          id: 'rev-3',
+          productId: product.id,
+          customerName: 'عمر الفاروق',
+          customerEmail: 'omar.farouk@eiffel-client.com',
+          rating: 4,
+          title: 'تصميم مميز وألوان أنيقة',
+          comment: 'اللون مطابق تماماً للصور على الموقع والماتريال ناعمة وعملية جداً للمناسبات والإطلالات اليومية.',
+          isVerifiedPurchase: true,
+          createdAt: new Date(Date.now() - 86400000 * 5).toISOString()
+        }
+      ];
+
+      return {
+        averageRating: product.rating || 5.0,
+        totalReviews: fallbackReviews.length,
+        recommendationRate: 98,
+        ratingDistribution: { 5: 2, 4: 1, 3: 0, 2: 0, 1: 0 },
+        reviews: {
+          content: fallbackReviews,
+          pageNumber: 1,
+          pageSize: 5,
+          totalElements: fallbackReviews.length,
+          totalPages: 1,
+          isFirst: true,
+          isLast: true
+        }
+      };
+    },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
+    enabled: Boolean(product?.id)
+  });
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,7 +144,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
       setFormComment('');
       setFormRating(5);
       setCurrentPage(1);
-      fetchReviews();
+      queryClient.invalidateQueries({ queryKey: ['product-reviews', product.id] });
     } catch (err) {
       toast.error(isRTL ? 'فشل إرسال التقييم' : 'Failed to submit review');
     } finally {
@@ -282,8 +278,22 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
 
       {/* Reviews List & Pagination */}
       {isLoading ? (
-        <div className="py-12">
-          <EiffelLoader message={t.loading} />
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="p-5 bg-zinc-950 border border-zinc-800 rounded-xl space-y-3">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <Skeleton variant="circular" className="w-10 h-10" />
+                  <div className="space-y-1">
+                    <Skeleton className="w-32 h-4 rounded" />
+                    <Skeleton className="w-20 h-3 rounded" />
+                  </div>
+                </div>
+                <Skeleton className="w-20 h-4 rounded" />
+              </div>
+              <Skeleton className="w-full h-10 rounded" />
+            </div>
+          ))}
         </div>
       ) : reviewsList.length === 0 ? (
         <div className="text-center py-12 px-4 bg-zinc-950 border border-zinc-800 rounded-xl">

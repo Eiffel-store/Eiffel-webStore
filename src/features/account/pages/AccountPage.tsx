@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useMyOrders } from '@/hooks/useOrders';
-import { useLanguage, useStoreData, EiffelLoader } from '@/shared';
+import { useLanguage, useStoreData, AccountPageSkeleton } from '@/shared';
 import { CustomerAuthView } from '../components/CustomerAuthView';
 import { AccountHeader } from '../components/AccountHeader';
 import { AccountTabsNav, AccountTabKey } from '../components/AccountTabsNav';
@@ -88,14 +88,10 @@ export const AccountPage: React.FC = () => {
     });
   }, [serverOrders, localStoreOrders, user]);
 
-  const isDataLoading = isAuthLoading || (isAuthenticated && (isInitialSyncing || isProfileLoading || isOrdersLoading));
+  const isDataLoading = isAuthLoading || (isAuthenticated && !user && (isInitialSyncing || isProfileLoading));
 
   if (isDataLoading) {
-    return (
-      <div className="min-h-[75vh] flex items-center justify-center">
-        <EiffelLoader size="lg" message={t.loading} />
-      </div>
-    );
+    return <AccountPageSkeleton />;
   }
 
   if (!isAuthenticated || !user) {

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ShieldCheck,
   UserPlus,
@@ -12,7 +13,7 @@ import {
   Crown,
   Briefcase
 } from 'lucide-react';
-import { useLanguage, EiffelLoader, EmptyState } from '@/shared';
+import { useLanguage, AdminTableSkeleton, EmptyState } from '@/shared';
 import { adminService } from '@/services/adminService';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { AdminAddUserModal } from './AdminAddUserModal';
@@ -21,37 +22,31 @@ import toast from 'react-hot-toast';
 export const AdminTeamTab: React.FC = () => {
   const { t } = useLanguage();
   const { user: currentUser } = useAuthStore();
+  const queryClient = useQueryClient();
 
-  const [users, setUsers] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    data: users = [],
+    isLoading,
+    refetch: fetchUsers
+  } = useQuery<any[]>({
+    queryKey: ['admin', 'team-users'],
+    queryFn: () => adminService.getUsers().catch(() => []),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [roleUpdatingId, setRoleUpdatingId] = useState<string | null>(null);
-
-  const fetchUsers = async () => {
-    setIsLoading(true);
-    try {
-      const data = await adminService.getUsers();
-      // Filter for administrative team (Admin & Staff) or all
-      setUsers(data || []);
-    } catch (err) {
-      console.error('Failed to load team users:', err);
-      toast.error(t.adminTeamLoadFailed);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     setRoleUpdatingId(userId);
     try {
       await adminService.updateUserRole(userId, newRole);
-      setUsers((prev) =>
-        prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
+      queryClient.setQueryData<any[]>(['admin', 'team-users'], (old = []) =>
+        old.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
       );
       toast.success(
         newRole === 'ROLE_ADMIN'
@@ -73,7 +68,9 @@ export const AdminTeamTab: React.FC = () => {
 
     try {
       await adminService.deleteUser(user.id);
-      setUsers((prev) => prev.filter((u) => u.id !== user.id));
+      queryClient.setQueryData<any[]>(['admin', 'team-users'], (old = []) =>
+        old.filter((u) => u.id !== user.id)
+      );
       toast.success(t.adminUserDeletedSuccess);
     } catch (err: any) {
       toast.error(t.adminUserDeleteFailed);
@@ -110,7 +107,7 @@ export const AdminTeamTab: React.FC = () => {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={fetchUsers}
+            onClick={() => fetchUsers()}
             disabled={isLoading}
             className="p-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 rounded text-xs transition-colors cursor-pointer"
             title={t.refresh}
@@ -141,10 +138,8 @@ export const AdminTeamTab: React.FC = () => {
       </div>
 
       {/* Users Table / Grid */}
-      {isLoading ? (
-        <div className="py-16">
-          <EiffelLoader message={t.loading} />
-        </div>
+      {isLoading && users.length === 0 ? (
+        <AdminTableSkeleton rows={4} />
       ) : filteredTeam.length === 0 ? (
         <EmptyState
           icon={ShieldCheck}

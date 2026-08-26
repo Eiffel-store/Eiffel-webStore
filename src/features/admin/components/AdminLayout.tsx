@@ -18,7 +18,7 @@ import {
   BarChart3,
   Users
 } from 'lucide-react';
-import { useAdminAuth } from '@/features/admin';
+import { useAdminAuth } from '../context/AdminAuthContext';
 import { useStoreData } from '@/shared';
 import { useLanguage } from '@/shared';
 

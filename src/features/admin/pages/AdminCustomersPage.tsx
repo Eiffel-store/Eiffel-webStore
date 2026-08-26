@@ -1,6 +1,7 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Users, Crown, RefreshCw } from 'lucide-react';
-import { useStoreData, useLanguage, EiffelLoader, EmptyState } from '@/shared';
+import { useStoreData, useLanguage, AdminTableSkeleton, EmptyState } from '@/shared';
 import toast from 'react-hot-toast';
 import { customerService } from '@/services/customerService';
 import { User } from '@/types';
@@ -16,11 +17,24 @@ export const AdminCustomersPage: React.FC = () => {
   const [activeMainTab, setActiveMainTab] = useState<'customers' | 'team'>('customers');
   const { orders, isOrdersLoading, settings } = useStoreData();
   const { isRTL, t } = useLanguage();
+  const queryClient = useQueryClient();
 
-  const [backendCustomers, setBackendCustomers] = useState<User[]>([]);
-  const [isLoadingCustomers, setIsLoadingCustomers] = useState(true);
+  // 1. Fetch real customer accounts with React Query Cache
+  const {
+    data: backendCustomers = [],
+    isLoading: isLoadingCustomers,
+    refetch: fetchCustomers,
+    isFetching
+  } = useQuery<User[]>({
+    queryKey: ['admin', 'customers'],
+    queryFn: () => customerService.getAllCustomers().catch(() => []),
+    staleTime: 1000 * 60 * 5, // Keep fresh for 5 mins
+    gcTime: 1000 * 60 * 30, // Retain in memory for 30 mins
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
   const [isUpdating, setIsUpdating] = useState(false);
-
   const [searchQuery, setSearchQuery] = useState('');
   const [tierFilter, setTierFilter] = useState<'all' | 'vip' | 'member'>('all');
   const [selectedCustomerForPoints, setSelectedCustomerForPoints] = useState<User | null>(null);
@@ -28,23 +42,6 @@ export const AdminCustomersPage: React.FC = () => {
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-
-  // 1. Fetch real customer accounts from backend MongoDB API
-  const fetchCustomers = async () => {
-    setIsLoadingCustomers(true);
-    try {
-      const data = await customerService.getAllCustomers();
-      setBackendCustomers(data);
-    } catch (err) {
-      console.error('Failed to load customers from backend API:', err);
-    } finally {
-      setIsLoadingCustomers(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
 
   // 2. Synthesize Real Registered Users + Real Order Customers
   const allMergedCustomers = useMemo(() => {
@@ -153,8 +150,8 @@ export const AdminCustomersPage: React.FC = () => {
 
     try {
       await customerService.toggleVip(customer.id, nextVip);
-      setBackendCustomers((prev) =>
-        prev.map((c) => (c.id === customer.id ? { ...c, tier: nextVip ? 'VIP' : 'MEMBER', isVip: nextVip } : c))
+      queryClient.setQueryData<User[]>(['admin', 'customers'], (old = []) =>
+        old.map((c) => (c.id === customer.id ? { ...c, tier: nextVip ? 'VIP' : 'MEMBER', isVip: nextVip } : c))
       );
       toast.success(
         nextVip ? `${t.adminVipUpgradeSuccess} 👑` : t.adminVipRevokeSuccess,
@@ -174,8 +171,8 @@ export const AdminCustomersPage: React.FC = () => {
 
     try {
       await customerService.adjustPoints(selectedCustomerForPoints.id, delta);
-      setBackendCustomers((prev) =>
-        prev.map((c) => {
+      queryClient.setQueryData<User[]>(['admin', 'customers'], (old = []) =>
+        old.map((c) => {
           if (c.id === selectedCustomerForPoints.id) {
             const current = c.tierPoints || 0;
             return { ...c, tierPoints: Math.max(0, current + delta) };
@@ -224,7 +221,7 @@ export const AdminCustomersPage: React.FC = () => {
   const totalPointsInCirculation = allMergedCustomers.reduce((sum, c) => sum + (c.tierPoints || 0), 0);
   const totalCustomerSpend = allMergedCustomers.reduce((sum, c) => sum + (c.totalSpend || 0), 0);
 
-  const isLoading = isLoadingCustomers || isOrdersLoading;
+  const isLoading = (isLoadingCustomers && backendCustomers.length === 0) || (isOrdersLoading && orders.length === 0);
 
   return (
     <div className="space-y-6 animate-fade-in pb-12">
@@ -243,7 +240,7 @@ export const AdminCustomersPage: React.FC = () => {
           {/* Refresh Button */}
           <button
             type="button"
-            onClick={fetchCustomers}
+            onClick={() => fetchCustomers()}
             disabled={isLoading}
             className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors disabled:opacity-50 cursor-pointer"
             title={t.refresh}
@@ -285,16 +282,6 @@ export const AdminCustomersPage: React.FC = () => {
       {/* Main View Router */}
       {activeMainTab === 'team' ? (
         <AdminTeamTab />
-      ) : isLoading ? (
-        <div className="py-20">
-          <EiffelLoader message={t.loading} />
-        </div>
-      ) : allMergedCustomers.length === 0 ? (
-        <EmptyState
-          icon={Users}
-          title={t.adminNoCustomersYet}
-          description={t.adminNoCustomersDesc}
-        />
       ) : (
         <>
           {/* 2. Customer Summary Statistics Cards */}
@@ -322,22 +309,32 @@ export const AdminCustomersPage: React.FC = () => {
             memberCount={allMergedCustomers.length - totalVipCount}
           />
 
-          {/* 4. Customer Table & Pagination */}
-          <CustomerTable
-            customers={paginatedCustomers}
-            totalFilteredCount={filteredCustomers.length}
-            onToggleVip={handleToggleVip}
-            onOpenPointsModal={setSelectedCustomerForPoints}
-            isUpdating={isUpdating}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            pageSize={pageSize}
-            onPageChange={setCurrentPage}
-            onPageSizeChange={(s) => {
-              setPageSize(s);
-              setCurrentPage(1);
-            }}
-          />
+          {/* 4. Customer Table & Pagination (Data Loading Only) */}
+          {isLoading ? (
+            <AdminTableSkeleton rows={5} />
+          ) : allMergedCustomers.length === 0 ? (
+            <EmptyState
+              icon={Users}
+              title={t.adminNoCustomersYet}
+              description={t.adminNoCustomersDesc}
+            />
+          ) : (
+            <CustomerTable
+              customers={paginatedCustomers}
+              totalFilteredCount={filteredCustomers.length}
+              onToggleVip={handleToggleVip}
+              onOpenPointsModal={setSelectedCustomerForPoints}
+              isUpdating={isUpdating}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(s) => {
+                setPageSize(s);
+                setCurrentPage(1);
+              }}
+            />
+          )}
         </>
       )}
 

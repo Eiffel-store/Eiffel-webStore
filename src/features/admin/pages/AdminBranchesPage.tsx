@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { useStoreData, useLanguage, EiffelLoader, EmptyState } from '@/shared';
+import { useStoreData, useLanguage, AdminCardGridSkeleton, EmptyState } from '@/shared';
 import { StoreLocation } from '@/types';
 import { AdminBranchCard } from '../components/branches/AdminBranchCard';
 import { AdminBranchModal } from '../components/branches/AdminBranchModal';
@@ -115,8 +115,8 @@ export const AdminBranchesPage: React.FC = () => {
       </div>
 
       {/* Loading / Empty / Content */}
-      {isStoresLoading ? (
-        <EiffelLoader message={t.loading} />
+      {isStoresLoading && stores.length === 0 ? (
+        <AdminCardGridSkeleton count={4} cols={2} />
       ) : stores.length === 0 ? (
         <EmptyState
           title={t.adminBranches}

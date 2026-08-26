@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import { useStoreData, useLanguage, EiffelLoader, EmptyState, Pagination } from '@/shared';
+import { useStoreData, useLanguage, AdminTableSkeleton, EmptyState, Pagination } from '@/shared';
 import { Product } from '@/types';
 import { AdminProductFilterBar } from '../components/products/AdminProductFilterBar';
 import { AdminProductTable } from '../components/products/AdminProductTable';
@@ -23,31 +23,20 @@ export const AdminProductsPage: React.FC = () => {
   // Filter products
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
-      const q = (searchQuery || '').toLowerCase();
-      const pName = (p.name || (p as any).nameEn || (p as any).nameAr || '').toLowerCase();
-      const pSubtitle = (p.subtitle || '').toLowerCase();
-      const pId = (p.id || '').toLowerCase();
-
-      const matchesSearch =
-        pName.includes(q) ||
-        pSubtitle.includes(q) ||
-        pId.includes(q);
-
-      const matchesCategory =
-        selectedCategory === 'all' ||
-        p.category === selectedCategory ||
-        (selectedCategory === 'offers' && p.originalPrice && p.originalPrice > p.price);
-
-      const matchesStock =
+      const matchSearch =
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.id.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchCategory = selectedCategory === 'all' || p.category === selectedCategory;
+      const matchStock =
         stockFilter === 'all' ||
-        (stockFilter === 'in-stock' && p.inStock) ||
-        (stockFilter === 'out-of-stock' && !p.inStock);
-
-      return matchesSearch && matchesCategory && matchesStock;
+        (stockFilter === 'inStock' && p.inStock) ||
+        (stockFilter === 'outOfStock' && !p.inStock);
+      return matchSearch && matchCategory && matchStock;
     });
   }, [products, searchQuery, selectedCategory, stockFilter]);
 
-  // Reset to page 1 on filter changes
+  // Reset pagination on filter change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory, stockFilter]);
@@ -58,13 +47,13 @@ export const AdminProductsPage: React.FC = () => {
     return filteredProducts.slice(start, start + pageSize);
   }, [filteredProducts, currentPage, pageSize]);
 
-  const handleDelete = (id: string) => {
-    deleteProduct(id);
+  const handleDelete = async (id: string) => {
+    await deleteProduct(id);
     setDeleteConfirmId(null);
   };
 
-  const handleToggleStock = (p: Product) => {
-    updateProduct(p.id, { inStock: !p.inStock });
+  const handleToggleStock = async (product: Product) => {
+    await updateProduct(product.id, { inStock: !product.inStock });
   };
 
   return (
@@ -101,8 +90,8 @@ export const AdminProductsPage: React.FC = () => {
       />
 
       {/* Loading / Empty / Table */}
-      {isProductsLoading ? (
-        <EiffelLoader message={t.loading} />
+      {isProductsLoading && products.length === 0 ? (
+        <AdminTableSkeleton rows={6} />
       ) : products.length === 0 ? (
         <EmptyState
           title={t.adminProductsCatalogTitle}

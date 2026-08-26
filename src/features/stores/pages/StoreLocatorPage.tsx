@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StoreLocation } from '@/types';
-import { useLanguage, useStoreData, EiffelLoader, EmptyState } from '@/shared';
+import { useLanguage, useStoreData, StoreLocatorSkeleton, EmptyState } from '@/shared';
 import { StoreCard } from '../components/StoreCard';
 import { StoreMapCanvas } from '../components/StoreMapCanvas';
 import { AppointmentModal } from '../components/AppointmentModal';
@@ -10,6 +10,10 @@ export const StoreLocatorPage: React.FC = () => {
   const { stores, isStoresLoading } = useStoreData();
   const [selectedStore, setSelectedStore] = useState<StoreLocation>(stores[0] || {} as StoreLocation);
   const [appointmentModalStore, setAppointmentModalStore] = useState<StoreLocation | null>(null);
+
+  if (isStoresLoading && stores.length === 0) {
+    return <StoreLocatorSkeleton />;
+  }
 
   return (
     <div className="min-h-screen bg-background text-on-surface py-12 px-4 sm:px-8 md:px-12">
@@ -30,11 +34,7 @@ export const StoreLocatorPage: React.FC = () => {
         </div>
 
         {/* Loading / Empty / Content */}
-        {isStoresLoading ? (
-          <div className="py-20">
-            <EiffelLoader message={t.loading} />
-          </div>
-        ) : stores.length === 0 ? (
+        {stores.length === 0 ? (
           <EmptyState
             title={t.noPiecesFound}
             description={t.directDeliveryEgyptDesc}

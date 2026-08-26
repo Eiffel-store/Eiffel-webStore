@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { ShoppingBag, Plus, Edit2, Trash2, ArrowUp, ArrowDown, Sparkles, Layers, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Look } from '@/types';
 import { useLanguage, useStoreData } from '@/shared';
-import { AdminLookModal } from './AdminLookModal';
+
+// Lazy-Loaded Lookbook Hotspot Editor Modal
+const AdminLookModal = lazy(() => import('./AdminLookModal').then(m => ({ default: m.AdminLookModal })));
+
 
 export const AdminShopTheLookManager: React.FC = () => {
   const { isRTL, t } = useLanguage();
@@ -263,12 +266,16 @@ export const AdminShopTheLookManager: React.FC = () => {
       )}
 
       {/* Create / Edit Look Modal */}
-      <AdminLookModal
-        isOpen={isModalOpen}
-        look={selectedLook}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveLook}
-      />
+      {isModalOpen && (
+        <Suspense fallback={null}>
+          <AdminLookModal
+            isOpen={isModalOpen}
+            look={selectedLook}
+            onClose={() => setIsModalOpen(false)}
+            onSave={handleSaveLook}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };

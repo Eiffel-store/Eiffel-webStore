@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { useStoreData, useLanguage, EiffelLoader } from '@/shared';
+import { useStoreData, useLanguage, AdminTableSkeleton } from '@/shared';
 import { AdminOffersTable } from '../components/offers/AdminOffersTable';
 import { AdminCouponsManager } from '../components/offers/AdminCouponsManager';
 import { AdminAddOfferModal } from '../components/offers/AdminAddOfferModal';
@@ -18,10 +18,11 @@ export const AdminOffersPage: React.FC = () => {
 
     const originalPrice = baseOriginalPrice || (product.originalPrice && product.originalPrice > product.price ? product.originalPrice : product.price);
 
-    updateProduct(product.id, {
-      originalPrice,
-      price: salePrice
+    updateProduct(productId, {
+      price: salePrice,
+      originalPrice: originalPrice
     });
+    setShowAddOfferModal(false);
   };
 
   const handleRemoveOffer = (productId: string) => {
@@ -56,8 +57,8 @@ export const AdminOffersPage: React.FC = () => {
         </button>
       </div>
 
-      {isProductsLoading ? (
-        <EiffelLoader message={t.loading} />
+      {isProductsLoading && products.length === 0 ? (
+        <AdminTableSkeleton rows={5} />
       ) : (
         <>
           {/* 1. Discounted Products Table */}

@@ -5,6 +5,8 @@ export * from './components/ScrollToTop';
 export * from './components/SocialIcons';
 export * from './components/FloatingContactButtons';
 export * from './components/ImageUploadInput';
+export * from './components/CachedImage';
+export * from './components/skeletons';
 export * from './components/EiffelLoader';
 export * from './components/EmptyState';
 export * from './components/Pagination';
@@ -14,3 +16,5 @@ export * from './context/LanguageContext';
 export * from './context/ThemeContext';
 export * from './context/CurrencyContext';
 export * from './utils/productUtils';
+export * from './utils/imageCache';
+
