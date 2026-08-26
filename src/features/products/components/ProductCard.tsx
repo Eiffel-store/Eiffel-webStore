@@ -4,7 +4,7 @@ import { Heart, Eye, ShoppingBag } from 'lucide-react';
 import { Product } from '@/types';
 import { useWishlist } from '@/features/wishlist';
 import { useCart } from '@/features/cart';
-import { useCurrency, useLanguage, resolveColorImage } from '@/shared';
+import { useCurrency, useLanguage, resolveColorImage, CachedImage } from '@/shared';
 
 interface ProductCardProps {
   product: Product;
@@ -42,13 +42,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
       {/* Visual / Image Container */}
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-850 shadow-sm">
         <Link to={`/product/${product.id}`} className="block w-full h-full">
-          <img
+          <CachedImage
             src={currentImage}
             alt={product.name || 'Eiffel luxury piece'}
+            width={600}
             className="w-full h-full object-cover luxury-image-hover transition-all duration-300"
-            loading="lazy"
           />
         </Link>
+
 
         {/* Badges: New, Sale, Limited */}
         <div className="absolute top-2.5 left-2.5 rtl:left-auto rtl:right-2.5 flex flex-col gap-1 z-10 pointer-events-none">

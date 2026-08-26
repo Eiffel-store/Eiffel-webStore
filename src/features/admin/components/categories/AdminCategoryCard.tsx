@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Edit2, Trash2, ExternalLink } from 'lucide-react';
 import { CategoryItem } from '@/types';
-import { useLanguage } from '@/shared';
+import { useLanguage, CachedImage } from '@/shared';
 
 interface AdminCategoryCardProps {
   category: CategoryItem;
@@ -24,9 +24,10 @@ export const AdminCategoryCard: React.FC<AdminCategoryCardProps> = ({
   return (
     <div className="bg-zinc-950 border border-zinc-800 overflow-hidden shadow-xl flex flex-col justify-between group hover:border-zinc-700 transition-colors">
       <div className="relative aspect-[16/9] overflow-hidden bg-zinc-900">
-        <img
+        <CachedImage
           src={category.image}
-          alt={category.name}
+          alt={category.name || 'Category'}
+          width={600}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />

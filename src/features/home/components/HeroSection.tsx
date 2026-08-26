@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
-import { useLanguage, useStoreData } from '@/shared';
+import { useLanguage, useStoreData, preloadImages } from '@/shared';
 import { Banner } from '@/types';
 
 export const HeroSection: React.FC = () => {
@@ -35,6 +35,14 @@ export const HeroSection: React.FC = () => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const trackedImpressions = useRef<Set<string>>(new Set());
+
+  // Preload all slider images on mount
+  useEffect(() => {
+    const urls = slides
+      .map(s => s.desktopImageUrl || s.mobileImageUrl)
+      .filter((u): u is string => Boolean(u));
+    preloadImages(urls);
+  }, [slides]);
 
   // Keep index within range
   const safeIndex = currentSlideIndex >= slides.length ? 0 : currentSlideIndex;

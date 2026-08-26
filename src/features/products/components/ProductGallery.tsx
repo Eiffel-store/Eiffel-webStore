@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Product } from '@/types';
 import { Heart } from 'lucide-react';
+import { CachedImage } from '@/shared';
 
 export interface ProductGalleryProps {
   product?: Product;
@@ -57,11 +58,14 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
     <div className="lg:col-span-7 flex flex-col gap-4">
       {/* Main Large Image */}
       <div className="relative aspect-[3/4] w-full bg-zinc-950 overflow-hidden shadow-xl border border-surface-container dark:border-zinc-850 group">
-        <img
+        <CachedImage
           src={finalImages[activeIndex] || finalImages[0]}
           alt={displayName}
+          priority
+          width={1000}
           className="w-full h-full object-cover luxury-image-hover transition-all duration-300"
         />
+
 
         {onToggleWishlist && (
           <button
@@ -90,7 +94,12 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
                   : 'border-zinc-800 opacity-60 hover:opacity-100'
               }`}
             >
-              <img src={img} alt={`${displayName} Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+              <CachedImage
+                src={img}
+                alt={`${displayName} Thumbnail ${idx + 1}`}
+                width={200}
+                className="w-full h-full object-cover"
+              />
             </button>
           ))}
         </div>

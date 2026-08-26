@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { ShoppingBag, Sparkles, Check } from 'lucide-react';
-import { useStoreData, useCurrency, useLanguage } from '@/shared';
+import { useStoreData, useCurrency, useLanguage, CachedImage } from '@/shared';
 import { useCart } from '@/features/cart';
-import { Look } from '@/types';
+import { Look, Product } from '@/types';
 
 export const ShopTheLook: React.FC = () => {
   const { products = [], activeLooks = [], homeSettings } = useStoreData();
@@ -35,7 +35,8 @@ export const ShopTheLook: React.FC = () => {
     return null;
   }
 
-  const currentLook = displayLooks[selectedLookIndex] || displayLooks[0];
+  const safeIndex = selectedLookIndex >= displayLooks.length ? 0 : selectedLookIndex;
+  const currentLook = displayLooks[safeIndex] || displayLooks[0];
   const title = isRTL ? (currentLook?.titleAr || t.shopTheLook) : (currentLook?.titleEn || t.shopTheLook);
   const subtitle = isRTL ? (currentLook?.subtitleAr || t.curatedEnsemble) : (currentLook?.subtitleEn || t.curatedEnsemble);
   const mainImage = currentLook?.imageUrl || products?.[0]?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
@@ -57,50 +58,48 @@ export const ShopTheLook: React.FC = () => {
       })
     : (products || []).slice(0, 3);
 
-  const handleAddToCartWithFeedback = (product: any, itemId: string) => {
-    addToCart(product);
-    setAddedItemIds(prev => ({ ...prev, [itemId]: true }));
+  const handleAddToCartWithFeedback = (product: Product, id: string) => {
+    addToCart(product, product.sizes?.[0] || 'M', product.colors?.[0]?.name || 'Standard', 1);
+    setAddedItemIds(prev => ({ ...prev, [id]: true }));
     setTimeout(() => {
-      setAddedItemIds(prev => ({ ...prev, [itemId]: false }));
+      setAddedItemIds(prev => ({ ...prev, [id]: false }));
     }, 1800);
   };
 
   return (
     <section className="py-12 sm:py-20 px-3 sm:px-8 md:px-12 max-w-[1440px] mx-auto w-full">
-      
-      {/* Header & Multi-Look Selector Tabs */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-surface-container dark:border-zinc-800 gap-4">
+      {/* Header & Tabs */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 pb-4 border-b border-surface-container dark:border-zinc-800 gap-4">
         <div>
-          <span className="text-[10px] sm:text-xs font-label-bold text-secondary dark:text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-            <span>{subtitle}</span>
-          </span>
-          <h2 className="font-editorial text-3xl sm:text-5xl text-primary dark:text-white mt-1 transition-all duration-300">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="w-4 h-4 text-purple-400" />
+            <span className="text-xs font-label-bold text-secondary dark:text-zinc-400 uppercase tracking-widest">
+              {subtitle}
+            </span>
+          </div>
+          <h2 className="font-editorial text-3xl sm:text-5xl text-primary dark:text-white uppercase">
             {title}
           </h2>
         </div>
 
-        {/* Dynamic Looks Tabs Switcher (when multiple looks exist) */}
+        {/* Multi-Look Selection Category Tabs */}
         {displayLooks.length > 1 && (
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 max-w-full scrollbar-none">
-            {displayLooks.map((lookItem, idx) => {
-              const isActive = selectedLookIndex === idx;
-              const lookTabName = isRTL
-                ? (lookItem.titleAr || `إطلالة ${idx + 1}`)
-                : (lookItem.titleEn || `Look ${idx + 1}`);
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none max-w-full">
+            {displayLooks.map((look: any, idx: number) => {
+              const isActive = idx === safeIndex;
+              const lookTabName = isRTL ? (look.categoryAr || look.titleAr || `إطلالة ${idx + 1}`) : (look.categoryEn || look.titleEn || `Look ${idx + 1}`);
 
               return (
                 <button
-                  key={lookItem.id || idx}
-                  type="button"
+                  key={look.id || idx}
                   onClick={() => {
                     setSelectedLookIndex(idx);
                     setHighlightedPinIndex(null);
                   }}
-                  className={`px-4 py-2 rounded-full text-xs font-label-bold whitespace-nowrap transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                  className={`px-4 py-2 text-xs font-label-bold tracking-wider uppercase whitespace-nowrap rounded-full transition-all duration-300 flex items-center gap-2 cursor-pointer ${
                     isActive
-                      ? 'bg-primary text-white dark:bg-white dark:text-black shadow-lg scale-105 ring-2 ring-primary/20 dark:ring-white/20'
-                      : 'bg-surface-container dark:bg-zinc-900 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white hover:bg-surface-container-high dark:hover:bg-zinc-800'
+                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/30 scale-105'
+                      : 'bg-surface-container dark:bg-zinc-900 text-secondary dark:text-zinc-400 hover:text-white hover:bg-zinc-800'
                   }`}
                 >
                   <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-purple-400 animate-ping' : 'bg-zinc-500'}`} />
@@ -117,11 +116,12 @@ export const ShopTheLook: React.FC = () => {
         
         {/* Editorial Visual with Numbered Hotspot Pins */}
         <div className="lg:col-span-7 relative aspect-[3/4] sm:aspect-[4/3] lg:aspect-[3/4] bg-zinc-950 overflow-hidden shadow-2xl group rounded-xl border border-surface-container dark:border-zinc-800">
-          <img
+          <CachedImage
             key={currentLook?.id || selectedLookIndex}
             src={mainImage}
             alt={title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 animate-in fade-in zoom-in-95 duration-500"
+            width={1000}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
           <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
@@ -170,9 +170,9 @@ export const ShopTheLook: React.FC = () => {
           </div>
 
           <div className="space-y-3">
-            {lookProducts.map((product, idx) => {
+            {lookProducts.map((product: any, idx: number) => {
               if (!product) return null;
-              const prodImg = product?.images?.[0] || mainImage;
+              const prodImg = product.images?.[0] || mainImage;
               const isPinHighlighted = highlightedPinIndex === idx;
               const isAdded = addedItemIds[product.id || String(idx)];
 
@@ -196,11 +196,14 @@ export const ShopTheLook: React.FC = () => {
                       {idx + 1}
                     </span>
 
-                    <img
-                      src={prodImg}
-                      alt={product.name || 'Product'}
-                      className="w-14 h-18 object-cover bg-zinc-800 rounded-md shrink-0"
-                    />
+                    <div className="w-14 h-18 rounded-md overflow-hidden bg-zinc-800 shrink-0">
+                      <CachedImage
+                        src={prodImg}
+                        alt={product.name || 'Product'}
+                        width={120}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
 
                     <div className="min-w-0 pr-2">
                       <h4 className="font-editorial text-sm font-bold text-primary dark:text-white truncate">
@@ -242,3 +245,5 @@ export const ShopTheLook: React.FC = () => {
     </section>
   );
 };
+
+export default ShopTheLook;

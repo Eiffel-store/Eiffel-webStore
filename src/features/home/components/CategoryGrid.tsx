@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { useStoreData, useLanguage } from '@/shared';
+import { useStoreData, useLanguage, CachedImage } from '@/shared';
 
 export const CategoryGrid: React.FC = () => {
   const { categories } = useStoreData();
@@ -52,9 +52,10 @@ export const CategoryGrid: React.FC = () => {
               to={`/collections/${cat.id}`}
               className="group relative aspect-[3/4] overflow-hidden bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 shadow-sm"
             >
-              <img
+              <CachedImage
                 src={cat.image}
                 alt={info.title}
+                width={500}
                 className="w-full h-full object-cover luxury-image-hover group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300" />
