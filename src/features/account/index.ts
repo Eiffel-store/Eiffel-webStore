@@ -11,4 +11,4 @@ export * from './components/ForgotPasswordModal';
 export * from './components/auth';
 export * from './components/forgot-password';
 export * from './context/AuthContext';
-export * from './pages/AccountPage';
+

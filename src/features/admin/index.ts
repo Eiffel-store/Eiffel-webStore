@@ -1,21 +1,6 @@
-// Layout & Route Protection
-export * from './components/AdminLayout';
+// Route Protection & Context
 export * from './components/AdminProtectedRoute';
 export * from './context/AdminAuthContext';
-
-// Pages
-export * from './pages/AdminLoginPage';
-export * from './pages/AdminDashboardPage';
-export * from './pages/AdminProductsPage';
-export * from './pages/AdminProductFormPage';
-export * from './pages/AdminHomePageEditor';
-export * from './pages/AdminOffersPage';
-export * from './pages/AdminCategoriesPage';
-export * from './pages/AdminBranchesPage';
-export * from './pages/AdminOrdersPage';
-export * from './pages/AdminReportsPage';
-export * from './pages/AdminCustomersPage';
-export * from './pages/AdminSettingsPage';
 
 // Modular Subcomponents
 export * from './components/dashboard/AdminWelcomeBanner';
