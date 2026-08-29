@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Edit2, Trash2, Tag, ShoppingBag, ExternalLink } from 'lucide-react';
 import { Product } from '@/types';
-import { useLanguage, useCurrency, getColorBackgroundStyle } from '@/shared';
+import { useLanguage, useCurrency, useStoreData, getColorBackgroundStyle } from '@/shared';
 
 interface AdminProductTableProps {
   products: Product[];
@@ -15,8 +15,9 @@ export const AdminProductTable: React.FC<AdminProductTableProps> = ({
   onToggleStock,
   onDeletePrompt
 }) => {
-  const { isRTL, t } = useLanguage();
+  const { isRTL, t, language } = useLanguage();
   const { formatPrice } = useCurrency();
+  const { categories } = useStoreData();
 
   if (products.length === 0) {
     return (
@@ -85,16 +86,22 @@ export const AdminProductTable: React.FC<AdminProductTableProps> = ({
 
                   {/* 2. Category */}
                   <td className="py-4 px-4 align-middle text-center">
-                    <div className="inline-flex flex-col items-center">
-                      <span className="font-mono uppercase text-[10px] font-bold text-zinc-300 bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-md tracking-wider whitespace-nowrap">
-                        {product.category}
-                      </span>
-                      {product.subCategory && (
-                        <span className="text-[10px] text-zinc-500 font-medium mt-1 truncate max-w-[120px]">
-                          {product.subCategory}
-                        </span>
-                      )}
-                    </div>
+                    {(() => {
+                      const catObj = categories.find(c => c.id === product.category || c.name === product.category || c.nameEn === product.category);
+                      const catDisplayName = catObj ? (language === 'ar' ? (catObj.name || catObj.nameEn) : (catObj.nameEn || catObj.name)) : product.category;
+                      return (
+                        <div className="inline-flex flex-col items-center">
+                          <span className="font-mono uppercase text-[10px] font-bold text-zinc-300 bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-md tracking-wider whitespace-nowrap">
+                            {catDisplayName}
+                          </span>
+                          {product.subCategory && (
+                            <span className="text-[10px] text-zinc-500 font-medium mt-1 truncate max-w-[120px]">
+                              {product.subCategory}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </td>
 
                   {/* 3. Pricing */}

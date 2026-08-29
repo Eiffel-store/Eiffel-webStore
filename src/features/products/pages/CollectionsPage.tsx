@@ -37,31 +37,70 @@ export const CollectionsPage: React.FC = () => {
 
 
   // Category Metadata Object
-  const currentCategoryObj = categories.find(c => c.id === category) || {
-    id: category,
-    name: category === 'men' ? 'تشكيلة الرجال' : category === 'kids' ? 'أزياء الأطفال' : category === 'accessories' ? 'القطع الجلدية والإكسسوارات' : category.toUpperCase(),
-    nameEn: category === 'men' ? "MEN'S COLLECTION" : category === 'kids' ? "KIDS COLLECTION" : category === 'accessories' ? "TIMEPIECES & ACCESSORIES" : category.toUpperCase(),
-    subtitle: 'قصات معمارية انسيابية وخامات قطن الجيزة الفاخر',
-    subtitleEn: 'Architectural Silhouettes & Precision Tailoring',
-    image: `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`,
-    itemCount: '12 PIECES',
-    subCategories: []
-  };
+  const currentCategoryObj = useMemo(() => {
+    const catLower = category.toLowerCase().trim();
+
+    // 1. Exact ID match
+    let found = categories.find(c => c.id?.toLowerCase() === catLower);
+
+    // 2. Specialized keyword matching for primary collections
+    if (!found && catLower === 'men') {
+      found = categories.find(c =>
+        c.id?.toLowerCase() === 'men' ||
+        c.name?.includes('رجال') ||
+        c.name?.toLowerCase().includes('men') ||
+        c.nameEn?.toLowerCase().includes('men')
+      );
+    } else if (!found && catLower === 'kids') {
+      found = categories.find(c =>
+        c.id?.toLowerCase() === 'kids' ||
+        c.name?.includes('أطفال') ||
+        c.name?.includes('اطفال') ||
+        c.nameEn?.toLowerCase().includes('kid')
+      );
+    } else if (!found && catLower === 'accessories') {
+      found = categories.find(c =>
+        c.id?.toLowerCase() === 'accessories' ||
+        c.name?.includes('إكسسوار') ||
+        c.name?.includes('اكسسوار') ||
+        c.nameEn?.toLowerCase().includes('accessor')
+      );
+    }
+
+    // 3. Match by name or nameEn
+    if (!found) {
+      found = categories.find(c =>
+        c.name?.toLowerCase() === catLower ||
+        c.nameEn?.toLowerCase() === catLower
+      );
+    }
+
+    return found || {
+      id: category,
+      name: category === 'men' ? 'تشكيلة الرجال' : category === 'kids' ? 'أزياء الأطفال' : category === 'accessories' ? 'القطع الجلدية والإكسسوارات' : category.toUpperCase(),
+      nameEn: category === 'men' ? "MEN'S COLLECTION" : category === 'kids' ? "KIDS COLLECTION" : category === 'accessories' ? "TIMEPIECES & ACCESSORIES" : category.toUpperCase(),
+      subtitle: 'قصات معمارية انسيابية وخامات قطن الجيزة الفاخر',
+      subtitleEn: 'Architectural Silhouettes & Precision Tailoring',
+      image: `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`,
+      itemCount: '',
+      subCategories: []
+    };
+  }, [categories, category]);
 
   const getCategoryTitle = () => {
     const cat = category.toLowerCase();
     if (isRTL) {
       if (cat === 'offers') return 'العروض والتخفيضات الحصرية';
-      if (cat === 'men') return 'تشكيلة الرجال';
-      if (cat === 'kids') return 'أزياء الأطفال';
-      if (cat === 'accessories') return 'القطع الجلدية والإكسسوارات';
+      if (cat === 'men') return currentCategoryObj.name || 'تشكيلة الرجال';
+      if (cat === 'kids') return currentCategoryObj.name || 'أزياء الأطفال';
+      if (cat === 'accessories') return currentCategoryObj.name || 'القطع الجلدية والإكسسوارات';
       if (cat === 'new-arrivals') return 'أحدث الإصدارات';
       return currentCategoryObj.name;
     } else {
       if (cat === 'offers') return 'SPECIAL OFFERS & ARCHIVE';
-      if (cat === 'men') return "MEN'S COLLECTION";
-      if (cat === 'kids') return "KIDS COLLECTION";
-      if (cat === 'accessories') return "TIMEPIECES & ACCESSORIES";
+      if (cat === 'men') return currentCategoryObj.nameEn || "MEN'S COLLECTION";
+      if (cat === 'kids') return currentCategoryObj.nameEn || "KIDS COLLECTION";
+      if (cat === 'accessories') return currentCategoryObj.nameEn || "TIMEPIECES & ACCESSORIES";
       if (cat === 'new-arrivals') return "NEW ARRIVALS";
       return currentCategoryObj.nameEn || currentCategoryObj.name;
     }
@@ -71,28 +110,124 @@ export const CollectionsPage: React.FC = () => {
     const cat = category.toLowerCase();
     if (isRTL) {
       if (cat === 'offers') return 'تخفيضات موسمية وباقات أطقم متكاملة بأسعار مميزة للشحن داخل مصر';
-      if (cat === 'men') return 'قصات معمارية انسيابية وخامات قطن الجيزة الفاخر للرجال';
-      if (cat === 'kids') return 'أزياء راقية ومريحة للأولاد والبنات بجودة وخامات تدوم طويلاً';
-      if (cat === 'accessories') return 'ساعات يد ستيل، محافظ، حقائب كروس، وأساور جلدية فاخرة';
+      if (cat === 'men') return currentCategoryObj.subtitle || 'قصات معمارية انسيابية وخامات قطن الجيزة الفاخر للرجال';
+      if (cat === 'kids') return currentCategoryObj.subtitle || 'أزياء راقية ومريحة للأولاد والبنات بجودة وخامات تدوم طويلاً';
+      if (cat === 'accessories') return currentCategoryObj.subtitle || 'ساعات يد ستيل، محافظ، حقائب كروس، وأساور جلدية فاخرة';
       if (cat === 'new-arrivals') return 'أحدث تشكيلات الموسم متوفرة للشحن الفوري لكافة المحافظات';
       return currentCategoryObj.subtitle;
     } else {
       if (cat === 'offers') return 'Seasonal markdowns, bundled sets & archive selections across Egypt';
-      if (cat === 'men') return 'Architectural silhouettes, relaxed fits & premium Egyptian cotton';
-      if (cat === 'kids') return 'Contemporary junior tailoring, varsity knits & premium summer sets';
-      if (cat === 'accessories') return 'Steel chronographs, fine leather goods & handcrafted wristwear';
+      if (cat === 'men') return (currentCategoryObj as any).subtitleEn || 'Architectural silhouettes, relaxed fits & premium Egyptian cotton';
+      if (cat === 'kids') return (currentCategoryObj as any).subtitleEn || 'Contemporary junior tailoring, varsity knits & premium summer sets';
+      if (cat === 'accessories') return (currentCategoryObj as any).subtitleEn || 'Steel chronographs, fine leather goods & handcrafted wristwear';
       if (cat === 'new-arrivals') return 'Latest seasonal releases ready for express nationwide delivery';
       return (currentCategoryObj as any).subtitleEn || 'Architectural Silhouettes & Precision Engineering';
     }
   };
 
+  // Helper to determine if a product belongs to the requested category
+  const doesProductMatchCategory = (p: Product, targetCategory: string): boolean => {
+    const target = targetCategory.toLowerCase().trim();
+    const prodCat = (p.category || '').toLowerCase().trim();
+
+    if (target === 'offers') {
+      return Boolean((p.originalPrice && p.originalPrice > p.price) || p.isBestSeller || p.isNew || prodCat === 'offers');
+    }
+
+    if (target === 'new-arrivals') {
+      return Boolean(p.isNew || prodCat === 'new-arrivals');
+    }
+
+    // Direct match with category ID or target string
+    if (prodCat === target) {
+      return true;
+    }
+
+    // Match with currentCategoryObj properties
+    if (currentCategoryObj && (
+      p.category === currentCategoryObj.id ||
+      prodCat === currentCategoryObj.id?.toLowerCase() ||
+      prodCat === currentCategoryObj.name?.toLowerCase() ||
+      prodCat === currentCategoryObj.nameEn?.toLowerCase()
+    )) {
+      return true;
+    }
+
+    // Lookup the category definition object for the product
+    const prodCategoryDef = categories.find(c =>
+      c.id?.toLowerCase() === prodCat ||
+      c.name?.toLowerCase() === prodCat ||
+      c.nameEn?.toLowerCase() === prodCat
+    );
+
+    // Section-specific smart matching
+    if (target === 'men') {
+      // If product category explicitly matches 'men' or related aliases
+      if (prodCat === 'men' || prodCat === 'mens' || prodCat === 'men-clothing') return true;
+      if (prodCat.includes('رجال') || prodCat.includes('men')) return true;
+
+      // If product category definition is Men
+      if (prodCategoryDef && (
+        prodCategoryDef.id?.toLowerCase() === 'men' ||
+        prodCategoryDef.name?.includes('رجال') ||
+        prodCategoryDef.nameEn?.toLowerCase().includes('men')
+      )) {
+        return true;
+      }
+
+      // If product does not belong to kids or accessories, treat as part of men/general catalog
+      const isKids = prodCat === 'kids' || prodCategoryDef?.name?.includes('أطفال') || prodCategoryDef?.name?.includes('اطفال') || prodCategoryDef?.nameEn?.toLowerCase().includes('kid');
+      const isAccessories = prodCat === 'accessories' || prodCategoryDef?.name?.includes('إكسسوار') || prodCategoryDef?.name?.includes('اكسسوار') || prodCategoryDef?.nameEn?.toLowerCase().includes('accessor');
+
+      // If not kids, it belongs in Men's / General clothing collection
+      return !isKids && !isAccessories;
+    }
+
+    if (target === 'kids') {
+      if (prodCat === 'kids' || prodCat.includes('طفل') || prodCat.includes('أطفال') || prodCat.includes('اطفال') || prodCat.includes('kid')) return true;
+      if (prodCategoryDef && (
+        prodCategoryDef.id?.toLowerCase() === 'kids' ||
+        prodCategoryDef.name?.includes('أطفال') ||
+        prodCategoryDef.name?.includes('اطفال') ||
+        prodCategoryDef.nameEn?.toLowerCase().includes('kid')
+      )) {
+        return true;
+      }
+      return false;
+    }
+
+    if (target === 'accessories') {
+      if (prodCat === 'accessories' || prodCat.includes('إكسسوار') || prodCat.includes('اكسسوار') || prodCat.includes('ساعات') || prodCat.includes('حقائب') || prodCat.includes('access')) return true;
+      if (prodCategoryDef && (
+        prodCategoryDef.id?.toLowerCase() === 'accessories' ||
+        prodCategoryDef.name?.includes('إكسسوار') ||
+        prodCategoryDef.name?.includes('اكسسوار') ||
+        prodCategoryDef.nameEn?.toLowerCase().includes('accessor')
+      )) {
+        return true;
+      }
+      return false;
+    }
+
+    // Generic Custom Category ID/Name match
+    return Boolean(
+      prodCat === target ||
+      (prodCategoryDef && (
+        prodCategoryDef.id?.toLowerCase() === target ||
+        prodCategoryDef.name?.toLowerCase() === target ||
+        prodCategoryDef.nameEn?.toLowerCase() === target
+      ))
+    );
+  };
+
   // Filter options available
   const subCategories = useMemo(() => {
     const subs = products
-      .filter(p => category === 'offers' || category === 'new-arrivals' || p.category === category || (category === 'men' && p.category !== 'kids'))
-      .map(p => p.subCategory);
+      .filter(p => doesProductMatchCategory(p, category))
+      .map(p => p.subCategory)
+      .filter((sub): sub is string => Boolean(sub && sub.trim()));
     return ['All', ...Array.from(new Set(subs))];
-  }, [category, products]);
+  }, [category, products, currentCategoryObj, categories]);
 
   const allSizes = ['All', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '46 (S)', '48 (M)', '50 (L)', '4-5Y', '6-7Y'];
   const allColors = ['All', 'Onyx Noir', 'Chalk White', 'Concrete Gray', 'Carbon Black', 'Ash Grey'];
@@ -101,17 +236,8 @@ export const CollectionsPage: React.FC = () => {
   const filteredProducts = useMemo(() => {
     let list = products.filter(p => {
       // Category Match
-      if (category === 'offers') {
-        if (p.originalPrice) return true;
-        return p.isBestSeller || p.isNew;
-      } else if (category === 'new-arrivals') {
-        if (!p.isNew && p.category !== 'men') return false;
-      } else if (category === 'men') {
-        if (p.category !== 'men' && p.category !== 'accessories') return false;
-      } else if (category === 'kids') {
-        if (p.category !== 'kids') return false;
-      } else if (category === 'accessories') {
-        if (p.category !== 'accessories') return false;
+      if (!doesProductMatchCategory(p, category)) {
+        return false;
       }
 
       // Keyword search if present
@@ -125,8 +251,11 @@ export const CollectionsPage: React.FC = () => {
       }
 
       // SubCategory
-      if (selectedSubCategory !== 'All' && p.subCategory !== selectedSubCategory) {
-        return false;
+      if (selectedSubCategory !== 'All') {
+        const subCatMatch = p.subCategory?.toLowerCase().trim() === selectedSubCategory.toLowerCase().trim();
+        if (!subCatMatch) {
+          return false;
+        }
       }
 
       // Size
@@ -152,7 +281,7 @@ export const CollectionsPage: React.FC = () => {
     }
 
     return list;
-  }, [category, products, searchKeyword, selectedSubCategory, selectedSize, selectedColor, sortBy]);
+  }, [category, products, searchKeyword, selectedSubCategory, selectedSize, selectedColor, sortBy, currentCategoryObj, categories]);
 
   // Reset page on filter changes
   useEffect(() => {
