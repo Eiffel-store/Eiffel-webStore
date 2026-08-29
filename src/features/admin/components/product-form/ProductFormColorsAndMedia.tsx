@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Upload, Loader2, Image as ImageIcon, Check, X, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, Trash2, Upload, Loader2, Image as ImageIcon, Check, X, Sparkles, Palette, Pipette } from 'lucide-react';
 import { ProductColor } from '@/types';
 import { useLanguage } from '@/shared';
 import { uploadService } from '@/services/uploadService';
@@ -36,6 +36,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
   onSizesChange
 }) => {
   const { isRTL, t } = useLanguage();
+  const colorInputRef = useRef<HTMLInputElement>(null);
 
   // New color form state
   const [newColorName, setNewColorName] = useState('');
@@ -239,19 +240,33 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
               {/* Color Header: Swatch + Name + Hex + Delete */}
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <input
-                    type="color"
-                    value={c.hex}
-                    onChange={(e) => handleUpdateColor(idx, { hex: e.target.value })}
-                    className="w-6 h-6 rounded-full border border-zinc-600 cursor-pointer p-0 shrink-0 bg-transparent"
-                    title={t.adminEditColorDegree}
-                  />
+                  <div className="relative shrink-0 flex items-center">
+                    <input
+                      type="color"
+                      value={c.hex.startsWith('#') && c.hex.length === 7 ? c.hex : '#000000'}
+                      onChange={(e) => handleUpdateColor(idx, { hex: e.target.value })}
+                      className="w-7 h-7 rounded-lg border border-zinc-600 cursor-pointer p-0 shrink-0 bg-transparent"
+                      title={t.adminEditColorDegree}
+                    />
+                  </div>
                   <input
                     type="text"
                     value={c.name}
                     onChange={(e) => handleUpdateColor(idx, { name: e.target.value })}
                     placeholder={t.adminColorNamePlaceholder}
                     className="bg-zinc-800/80 border border-zinc-700 px-2 py-1 text-xs text-white rounded font-bold w-full focus:outline-none focus:border-amber-400"
+                  />
+                  <input
+                    type="text"
+                    value={c.hex}
+                    onChange={(e) => {
+                      let val = e.target.value;
+                      if (!val.startsWith('#') && val.length > 0) val = '#' + val;
+                      handleUpdateColor(idx, { hex: val.toUpperCase() });
+                    }}
+                    maxLength={7}
+                    className="w-20 bg-zinc-800/80 border border-zinc-700 px-1 py-1 text-[11px] text-amber-300 font-mono rounded text-center focus:outline-none focus:border-amber-400 uppercase font-bold"
+                    title={t.adminHexCode}
                   />
                 </div>
 
@@ -324,13 +339,26 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
               <Sparkles className="w-4 h-4 text-amber-400" />
               <span>{t.adminAddNewColorWithPhoto}</span>
             </span>
+            <span className="text-[11px] text-zinc-400 font-mono">
+              {t.adminCustomColor}
+            </span>
           </div>
 
-          {/* Quick Presets */}
+          {/* Quick Presets + Custom Color Button */}
           <div>
-            <span className="text-[11px] text-zinc-400 block mb-1.5">
-              {t.adminPopularColorPresets}
-            </span>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[11px] text-zinc-400 block">
+                {t.adminPopularColorPresets}
+              </span>
+              <button
+                type="button"
+                onClick={() => colorInputRef.current?.click()}
+                className="text-[11px] text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer font-medium"
+              >
+                <Palette className="w-3.5 h-3.5" />
+                <span>{t.adminPickCustomColor}</span>
+              </button>
+            </div>
             <div className="flex flex-wrap gap-1.5">
               {POPULAR_COLOR_PRESETS.map((preset, pIdx) => (
                 <button
@@ -342,35 +370,71 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                   }}
                   className="flex items-center gap-1.5 px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-xs text-zinc-200 transition-all cursor-pointer"
                 >
-                  <span className="w-2.5 h-2.5 rounded-full border border-black/30" style={{ backgroundColor: preset.hex }} />
+                  <span className="w-2.5 h-2.5 rounded-full border border-black/30 shrink-0" style={{ backgroundColor: preset.hex }} />
                   <span>{preset.name}</span>
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => colorInputRef.current?.click()}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 rounded text-xs text-amber-300 transition-all cursor-pointer font-bold"
+              >
+                <Palette className="w-3 h-3 text-amber-400" />
+                <span>+ {t.adminCustomColor}</span>
+              </button>
             </div>
           </div>
 
           {/* Inputs Row */}
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-            {/* Color Hex & Name */}
-            <div className="sm:col-span-4 flex items-center gap-2">
-              <input
-                type="color"
-                value={newColorHex}
-                onChange={(e) => setNewColorHex(e.target.value)}
-                className="w-10 h-10 rounded-lg bg-zinc-900 border border-zinc-700 cursor-pointer p-0.5 shrink-0"
-                title="Pick color"
-              />
+            {/* Color Swatch / Picker + Hex + Name */}
+            <div className="sm:col-span-5 flex items-center gap-2">
+              {/* Interactive Color Picker Swatch */}
+              <div
+                onClick={() => colorInputRef.current?.click()}
+                className="relative w-10 h-10 rounded-lg border border-zinc-600 shadow cursor-pointer p-0 shrink-0 flex items-center justify-center group overflow-hidden"
+                style={{ backgroundColor: newColorHex }}
+                title={t.adminPickCustomColor}
+              >
+                <Palette className="w-4 h-4 text-white drop-shadow opacity-70 group-hover:opacity-100 transition-opacity" />
+                <input
+                  ref={colorInputRef}
+                  type="color"
+                  value={newColorHex.startsWith('#') && newColorHex.length === 7 ? newColorHex : '#000000'}
+                  onChange={(e) => setNewColorHex(e.target.value.toUpperCase())}
+                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                />
+              </div>
+
+              {/* Hex Code Input */}
+              <div className="relative w-24 shrink-0">
+                <input
+                  type="text"
+                  value={newColorHex}
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    if (!val.startsWith('#') && val.length > 0) val = '#' + val;
+                    setNewColorHex(val.toUpperCase());
+                  }}
+                  placeholder={t.adminHexPlaceholder}
+                  maxLength={7}
+                  className="w-full bg-zinc-900 border border-zinc-700 px-2 py-2 text-xs text-amber-300 font-mono rounded text-center focus:outline-none focus:border-amber-400 font-bold uppercase"
+                  title={t.adminHexCode}
+                />
+              </div>
+
+              {/* Color Name Input */}
               <input
                 type="text"
                 value={newColorName}
                 onChange={(e) => setNewColorName(e.target.value)}
                 placeholder={t.adminColorNamePlaceholder}
-                className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-bold"
+                className="flex-1 bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-bold"
               />
             </div>
 
             {/* Color Image (Upload from device or URL) */}
-            <div className="sm:col-span-5 flex gap-2">
+            <div className="sm:col-span-4 flex gap-2">
               <label className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 rounded text-xs font-medium cursor-pointer transition-colors ${
                 isUploadingNewColor ? 'opacity-50 pointer-events-none' : ''
               }`}>
@@ -379,7 +443,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                 ) : (
                   <Upload className="w-4 h-4 text-emerald-400" />
                 )}
-                <span>
+                <span className="truncate">
                   {newColorImage
                     ? t.adminColorPhotoUploaded
                     : t.adminUploadColorPhoto}
@@ -398,7 +462,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                 value={newColorImage}
                 onChange={(e) => setNewColorImage(e.target.value)}
                 placeholder={t.adminOrImageUrl}
-                className="w-28 bg-zinc-900 border border-zinc-700 px-2 py-1.5 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-mono"
+                className="w-24 bg-zinc-900 border border-zinc-700 px-2 py-1.5 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-mono"
               />
             </div>
 
@@ -407,7 +471,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
               <button
                 type="button"
                 onClick={handleAddColor}
-                className="w-full py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow"
+                className="w-full py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded transition-colors flex items-center justify-center gap-1 cursor-pointer shadow"
               >
                 <Plus className="w-4 h-4" />
                 <span>{t.adminAddColorAndImage}</span>

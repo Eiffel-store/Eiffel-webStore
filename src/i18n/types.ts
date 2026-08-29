@@ -1108,6 +1108,10 @@ export interface TranslationDictionary {
   adminChangePhoto: string;
   adminClickToBrowseDevice: string;
   adminPopularColorPresets: string;
+  adminCustomColor: string;
+  adminPickCustomColor: string;
+  adminHexCode: string;
+  adminHexPlaceholder: string;
   adminOrImageUrl: string;
   adminExtraGalleryImages: string;
   adminUploadMultiplePhotosFromDevice: string;

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, Trash2, Upload, Loader2, Image as ImageIcon, Check, X } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Plus, Trash2, Upload, Loader2, Image as ImageIcon, Check, X, Palette } from 'lucide-react';
 import { ProductColor } from '@/types';
 import { useLanguage } from '@/shared';
 import { uploadService } from '@/services/uploadService';
@@ -22,6 +22,7 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
   onSizesChange
 }) => {
   const { t } = useLanguage();
+  const colorInputRef = useRef<HTMLInputElement>(null);
   const [newColorName, setNewColorName] = useState('');
   const [newColorHex, setNewColorHex] = useState('#000000');
   const [newColorImage, setNewColorImage] = useState<string>('');
@@ -199,19 +200,44 @@ export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
           </span>
 
           <div className="flex flex-wrap items-center gap-2">
+            {/* Color Swatch & Picker */}
+            <div
+              onClick={() => colorInputRef.current?.click()}
+              className="relative w-9 h-9 rounded border border-zinc-700 shadow cursor-pointer p-0 shrink-0 flex items-center justify-center group overflow-hidden"
+              style={{ backgroundColor: newColorHex }}
+              title={t.adminPickCustomColor}
+            >
+              <Palette className="w-3.5 h-3.5 text-white drop-shadow opacity-70 group-hover:opacity-100 transition-opacity" />
+              <input
+                ref={colorInputRef}
+                type="color"
+                value={newColorHex.startsWith('#') && newColorHex.length === 7 ? newColorHex : '#000000'}
+                onChange={(e) => setNewColorHex(e.target.value.toUpperCase())}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+              />
+            </div>
+
+            {/* Hex Input */}
             <input
-              type="color"
+              type="text"
               value={newColorHex}
-              onChange={(e) => setNewColorHex(e.target.value)}
-              className="w-9 h-9 bg-zinc-900 border border-zinc-700 rounded cursor-pointer p-0.5"
-              title="Pick color"
+              onChange={(e) => {
+                let val = e.target.value;
+                if (!val.startsWith('#') && val.length > 0) val = '#' + val;
+                setNewColorHex(val.toUpperCase());
+              }}
+              placeholder={t.adminHexPlaceholder}
+              maxLength={7}
+              className="w-20 bg-zinc-900 border border-zinc-700 px-1.5 py-2 text-xs text-amber-300 font-mono rounded text-center focus:outline-none focus:border-amber-400 font-bold uppercase"
+              title={t.adminHexCode}
             />
+
             <input
               type="text"
               value={newColorName}
               onChange={(e) => setNewColorName(e.target.value)}
               placeholder={t.adminColorNamePlaceholder}
-              className="flex-1 min-w-[160px] bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400"
+              className="flex-1 min-w-[160px] bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-bold"
             />
 
             {/* Link from uploaded product photos */}
