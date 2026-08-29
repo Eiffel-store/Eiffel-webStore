@@ -9,7 +9,7 @@ import { ProductReviewsSection } from '../components/ProductReviewsSection';
 import { SizeGuideModal } from '../components/SizeGuideModal';
 import { useCart } from '@/features/cart';
 import { useWishlist } from '@/features/wishlist';
-import { useCurrency, useLanguage, useStoreData, resolveColorImage, ProductDetailPageSkeleton, EmptyState } from '@/shared';
+import { useCurrency, useLanguage, useStoreData, resolveColorImage, resolveColorImages, ProductDetailPageSkeleton, EmptyState } from '@/shared';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,34 +23,37 @@ export const ProductDetailPage: React.FC = () => {
   const product = id ? getProductById(id) : products[0];
 
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || 'M');
-  const [selectedColor, setSelectedColor] = useState(product?.colors?.[0]?.name || 'Noir');
+  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedSize, setSelectedSize] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
   const [activeAccordion, setActiveAccordion] = useState<string | null>('details');
-  const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [addedAnimation, setAddedAnimation] = useState(false);
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
 
+  // Initialize selectedColor and selectedSize on product load
   useEffect(() => {
-    window.scrollTo(0, 0);
     if (product) {
-      setSelectedImage(0);
-      setSelectedSize(product.sizes?.[0] || 'M');
-      setSelectedColor(product.colors?.[0]?.name || 'Noir');
+      if (product.colors && product.colors.length > 0 && !selectedColor) {
+        setSelectedColor(product.colors[0].name);
+      }
+      if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+        setSelectedSize(product.sizes[0]);
+      }
     }
-  }, [id, product]);
+  }, [product]);
 
-  if (isProductsLoading && !product) {
+  if (isProductsLoading) {
     return <ProductDetailPageSkeleton />;
   }
 
   if (!product) {
     return (
-      <div className="max-w-4xl mx-auto py-20 px-4">
+      <div className="min-h-[60vh] flex items-center justify-center p-6">
         <EmptyState
-          title={t.noPiecesFound}
-          description={t.noPiecesFoundDesc}
+          title={t.noProductsFound}
+          description={t.noProductsFound}
           actionText={t.exploreCollection}
-          actionLink="/collections/men"
+          onAction={() => navigate('/collections/all')}
         />
       </div>
     );
@@ -61,7 +64,7 @@ export const ProductDetailPage: React.FC = () => {
   const handleAddToCart = () => {
     addToCart(product, selectedSize, selectedColor, quantity);
     setAddedAnimation(true);
-    setTimeout(() => setAddedAnimation(false), 1500);
+    setTimeout(() => setAddedAnimation(false), 2000);
   };
 
   const handleBuyNow = () => {
@@ -100,6 +103,7 @@ export const ProductDetailPage: React.FC = () => {
           <ProductGallery
             product={product}
             activeColorImage={resolveColorImage(product, selectedColor)}
+            colorImages={resolveColorImages(product, selectedColor)}
             selectedImage={selectedImage}
             setSelectedImage={setSelectedImage}
             isSaved={isSaved}

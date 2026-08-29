@@ -1112,6 +1112,12 @@ export interface TranslationDictionary {
   adminPickCustomColor: string;
   adminHexCode: string;
   adminHexPlaceholder: string;
+  adminFrontPhoto: string;
+  adminBackPhoto: string;
+  adminUploadFrontPhoto: string;
+  adminUploadBackPhoto: string;
+  adminFrontPhotoUploaded: string;
+  adminBackPhotoUploaded: string;
   adminOrImageUrl: string;
   adminExtraGalleryImages: string;
   adminUploadMultiplePhotosFromDevice: string;

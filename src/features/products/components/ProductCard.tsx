@@ -26,8 +26,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
   const inWishlist = isInWishlist(product.id);
   const images = (product.images && product.images.length > 0) ? product.images : ['https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop'];
   
-  // Choose displayed image: if user selected/hovered a color that has an image, show it!
-  const currentImage = activeColorImage || (images[isHovered && images.length > 1 ? 1 : 0] || images[0]);
+  // Find currently active or default color object
+  const activeColorObj = activeColorName
+    ? product.colors?.find(c => c.name && c.name.toLowerCase() === activeColorName.toLowerCase())
+    : (product.colors && product.colors.length > 0 ? product.colors[0] : undefined);
+
+  // Front and Back views for luxury card hover
+  const frontView = activeColorImage || activeColorObj?.image || images[0];
+  const backView = activeColorObj?.backImage || (images.length > 1 ? images[1] : frontView);
+
+  // Choose displayed image: hover shows back view, otherwise front view
+  const currentImage = isHovered ? backView : frontView;
 
   return (
     <div

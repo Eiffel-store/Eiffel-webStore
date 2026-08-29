@@ -1,7 +1,9 @@
 export interface ProductColor {
   name: string;
   hex: string;
-  image?: string;
+  image?: string; // Primary / Front view (وش)
+  backImage?: string; // Secondary / Back view (ظهر)
+  images?: string[]; // Additional angle shots for this color
 }
 
 export interface Product {

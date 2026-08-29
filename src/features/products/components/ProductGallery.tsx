@@ -6,6 +6,7 @@ import { CachedImage } from '@/shared';
 export interface ProductGalleryProps {
   product?: Product;
   images?: string[];
+  colorImages?: string[];
   productName?: string;
   activeColorImage?: string;
   selectedImage?: number;
@@ -19,6 +20,7 @@ const FALLBACK_IMG = 'https://images.unsplash.com/photo-1617137984095-74e4e5e361
 export const ProductGallery: React.FC<ProductGalleryProps> = ({
   product,
   images = [],
+  colorImages,
   productName,
   activeColorImage,
   selectedImage: controlledSelected,
@@ -31,7 +33,9 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
   const activeIndex = controlledSelected !== undefined ? controlledSelected : internalSelected;
   const setActiveIndex = setControlledSelected || setInternalSelected;
 
-  const rawImages = (product?.images && product.images.length > 0) ? product.images : (images.length > 0 ? images : [FALLBACK_IMG]);
+  const rawImages = (colorImages && colorImages.length > 0)
+    ? colorImages
+    : ((product?.images && product.images.length > 0) ? product.images : (images.length > 0 ? images : [FALLBACK_IMG]));
   
   // If activeColorImage is provided and not in images list, prepend it
   const allImages = [...rawImages];
@@ -42,15 +46,10 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
   const safeImages = allImages.filter(img => img && img.trim() !== '');
   const finalImages = safeImages.length > 0 ? safeImages : [FALLBACK_IMG];
 
-  // Whenever activeColorImage changes, switch the active image to that color's image
+  // Whenever colorImages changes or activeColorImage changes, switch the active image to index 0 (front view)
   useEffect(() => {
-    if (activeColorImage && activeColorImage.trim() !== '') {
-      const idx = finalImages.indexOf(activeColorImage);
-      if (idx !== -1) {
-        setActiveIndex(idx);
-      }
-    }
-  }, [activeColorImage]);
+    setActiveIndex(0);
+  }, [activeColorImage, colorImages?.join(',')]);
 
   const displayName = productName || product?.name || 'Product';
 

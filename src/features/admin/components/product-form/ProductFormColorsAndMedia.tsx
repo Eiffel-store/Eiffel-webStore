@@ -38,26 +38,41 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
   const { isRTL, t } = useLanguage();
   const colorInputRef = useRef<HTMLInputElement>(null);
 
-  // New color form state
+  // New color form state (Front & Back Views)
   const [newColorName, setNewColorName] = useState('');
   const [newColorHex, setNewColorHex] = useState('#000000');
-  const [newColorImage, setNewColorImage] = useState('');
-  const [isUploadingNewColor, setIsUploadingNewColor] = useState(false);
+  const [newColorImage, setNewColorImage] = useState(''); // Front View (وش)
+  const [newColorBackImage, setNewColorBackImage] = useState(''); // Back View (ظهر)
+  const [isUploadingNewColorFront, setIsUploadingNewColorFront] = useState(false);
+  const [isUploadingNewColorBack, setIsUploadingNewColorBack] = useState(false);
 
   // Extra non-color gallery images state
   const [extraUrlInput, setExtraUrlInput] = useState('');
   const [isUploadingExtra, setIsUploadingExtra] = useState(false);
 
-  // Sync all color images + extra images into product images automatically
+  // Sync all color images (front & back & additional) + extra images into product images automatically
   const syncTotalImages = (currentColors: ProductColor[], currentExtraImages: string[]) => {
-    const colorImgs = currentColors.map(c => c.image).filter((img): img is string => !!img && img.trim() !== '');
+    const colorImgs: string[] = [];
+    currentColors.forEach(c => {
+      if (c.image && c.image.trim() !== '') colorImgs.push(c.image.trim());
+      if (c.backImage && c.backImage.trim() !== '') colorImgs.push(c.backImage.trim());
+      if (c.images && c.images.length > 0) {
+        c.images.forEach(img => {
+          if (img && img.trim() !== '') colorImgs.push(img.trim());
+        });
+      }
+    });
     const validExtras = currentExtraImages.filter(img => img && img.trim() !== '' && !colorImgs.includes(img));
     const merged = Array.from(new Set([...colorImgs, ...validExtras]));
     onImagesChange(merged.length > 0 ? merged : ['']);
   };
 
   // Upload image for a specific color index (or for the new color being created)
-  const handleColorImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetIndex?: number) => {
+  const handleColorImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    targetIndex?: number,
+    isBack: boolean = false
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -68,7 +83,10 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
         const url = res?.fileUrl;
         if (url) {
           const updatedColors = [...colors];
-          updatedColors[targetIndex] = { ...updatedColors[targetIndex], image: url };
+          updatedColors[targetIndex] = {
+            ...updatedColors[targetIndex],
+            [isBack ? 'backImage' : 'image']: url
+          };
           onColorsChange(updatedColors);
           syncTotalImages(updatedColors, images);
           return;
@@ -79,7 +97,10 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
         reader.onloadend = () => {
           if (typeof reader.result === 'string') {
             const updatedColors = [...colors];
-            updatedColors[targetIndex] = { ...updatedColors[targetIndex], image: reader.result as string };
+            updatedColors[targetIndex] = {
+              ...updatedColors[targetIndex],
+              [isBack ? 'backImage' : 'image']: reader.result as string
+            };
             onColorsChange(updatedColors);
             syncTotalImages(updatedColors, images);
           }
@@ -90,11 +111,13 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
       }
     } else {
       // Upload for new color
-      setIsUploadingNewColor(true);
+      if (isBack) setIsUploadingNewColorBack(true);
+      else setIsUploadingNewColorFront(true);
       try {
         const res = await uploadService.uploadImage(file);
         if (res?.fileUrl) {
-          setNewColorImage(res.fileUrl);
+          if (isBack) setNewColorBackImage(res.fileUrl);
+          else setNewColorImage(res.fileUrl);
           return;
         }
         throw new Error('No URL returned');
@@ -102,18 +125,20 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
         const reader = new FileReader();
         reader.onloadend = () => {
           if (typeof reader.result === 'string') {
-            setNewColorImage(reader.result as string);
+            if (isBack) setNewColorBackImage(reader.result as string);
+            else setNewColorImage(reader.result as string);
           }
         };
         reader.readAsDataURL(file);
       } finally {
-        setIsUploadingNewColor(false);
+        if (isBack) setIsUploadingNewColorBack(false);
+        else setIsUploadingNewColorFront(false);
         e.target.value = '';
       }
     }
   };
 
-  // Add new color with its linked image
+  // Add new color with its linked front and back images
   const handleAddColor = () => {
     if (!newColorName.trim()) {
       alert(t.adminEnterColorName);
@@ -125,7 +150,8 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
       {
         name: newColorName.trim(),
         hex: newColorHex,
-        image: newColorImage.trim() || undefined
+        image: newColorImage.trim() || undefined,
+        backImage: newColorBackImage.trim() || undefined
       }
     ];
 
@@ -136,6 +162,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
     setNewColorName('');
     setNewColorHex('#000000');
     setNewColorImage('');
+    setNewColorBackImage('');
   };
 
   // Remove a color
@@ -234,7 +261,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
             <div
               key={idx}
               className={`p-4 bg-zinc-900/90 border rounded-xl space-y-3 transition-all ${
-                c.image ? 'border-zinc-700' : 'border-amber-500/40 bg-amber-500/5'
+                c.image || c.backImage ? 'border-zinc-700' : 'border-amber-500/40 bg-amber-500/5'
               }`}
             >
               {/* Color Header: Swatch + Name + Hex + Delete */}
@@ -280,67 +307,121 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                 </button>
               </div>
 
-              {/* Color Image Preview / Upload Box */}
-              <div className="relative aspect-[4/3] bg-zinc-950 rounded-lg overflow-hidden border border-zinc-800 group flex items-center justify-center">
-                {c.image ? (
-                  <>
-                    <img
-                      src={c.image}
-                      alt={c.name}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
-                      <label className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs rounded flex items-center gap-1.5 cursor-pointer shadow">
-                        <Upload className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>{t.adminChangePhoto}</span>
+              {/* Dual Photo Slots: Front (وش) & Back (ظهر) */}
+              <div className="grid grid-cols-2 gap-2">
+                {/* 1. Front View (وش) */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-[10px] text-zinc-400 px-1">
+                    <span className="font-bold text-amber-400">{t.adminFrontPhoto}</span>
+                  </div>
+                  <div className="relative aspect-[3/4] bg-zinc-950 rounded-lg overflow-hidden border border-zinc-800 group flex items-center justify-center">
+                    {c.image ? (
+                      <>
+                        <img
+                          src={c.image}
+                          alt={`${c.name} Front`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 p-1">
+                          <label className="p-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded cursor-pointer shadow" title={t.adminChangePhoto}>
+                            <Upload className="w-3.5 h-3.5 text-emerald-400" />
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleColorImageUpload(e, idx, false)}
+                              className="hidden"
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateColor(idx, { image: undefined })}
+                            className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded shadow cursor-pointer"
+                            title={t.adminRemovePhoto}
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <label className="flex flex-col items-center justify-center gap-1 p-2 text-center cursor-pointer w-full h-full hover:bg-zinc-900/60 transition-colors">
+                        <Upload className="w-5 h-5 text-amber-400" />
+                        <span className="text-[10px] font-bold text-zinc-300">
+                          {t.adminUploadFrontPhoto}
+                        </span>
                         <input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => handleColorImageUpload(e, idx)}
+                          onChange={(e) => handleColorImageUpload(e, idx, false)}
                           className="hidden"
                         />
                       </label>
-                      <button
-                        type="button"
-                        onClick={() => handleUpdateColor(idx, { image: undefined })}
-                        className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded shadow cursor-pointer"
-                        title={t.adminRemovePhoto}
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <label className="flex flex-col items-center justify-center gap-1.5 p-4 text-center cursor-pointer w-full h-full hover:bg-zinc-900/60 transition-colors">
-                    <Upload className="w-6 h-6 text-amber-400" />
-                    <span className="text-xs font-bold text-zinc-200">
-                      {t.adminUploadColorPhoto} ({c.name || ''})
-                    </span>
-                    <span className="text-[10px] text-zinc-500 font-mono">
-                      {t.adminClickToBrowseDevice}
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleColorImageUpload(e, idx)}
-                      className="hidden"
-                    />
-                  </label>
-                )}
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. Back View (ظهر) */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-[10px] text-zinc-400 px-1">
+                    <span className="font-bold text-zinc-300">{t.adminBackPhoto}</span>
+                  </div>
+                  <div className="relative aspect-[3/4] bg-zinc-950 rounded-lg overflow-hidden border border-zinc-800 group flex items-center justify-center">
+                    {c.backImage ? (
+                      <>
+                        <img
+                          src={c.backImage}
+                          alt={`${c.name} Back`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 p-1">
+                          <label className="p-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded cursor-pointer shadow" title={t.adminChangePhoto}>
+                            <Upload className="w-3.5 h-3.5 text-emerald-400" />
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleColorImageUpload(e, idx, true)}
+                              className="hidden"
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateColor(idx, { backImage: undefined })}
+                            className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded shadow cursor-pointer"
+                            title={t.adminRemovePhoto}
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <label className="flex flex-col items-center justify-center gap-1 p-2 text-center cursor-pointer w-full h-full hover:bg-zinc-900/60 transition-colors">
+                        <Upload className="w-5 h-5 text-zinc-400 group-hover:text-amber-400" />
+                        <span className="text-[10px] font-bold text-zinc-300">
+                          {t.adminUploadBackPhoto}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleColorImageUpload(e, idx, true)}
+                          className="hidden"
+                        />
+                      </label>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* 2. Add New Color Variant with its Image */}
+        {/* 2. Add New Color Variant with Front & Back Images */}
         <div className="p-5 bg-zinc-900/60 border border-dashed border-zinc-700 rounded-xl space-y-4 mt-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-white flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-amber-400" />
               <span>{t.adminAddNewColorWithPhoto}</span>
             </span>
-            <span className="text-[11px] text-zinc-400 font-mono">
-              {t.adminCustomColor}
+            <span className="text-[11px] text-amber-400 font-mono font-medium">
+              ({t.adminFrontPhoto} + {t.adminBackPhoto})
             </span>
           </div>
 
@@ -385,114 +466,181 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
             </div>
           </div>
 
-          {/* Inputs Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-            {/* Color Swatch / Picker + Hex + Name */}
-            <div className="sm:col-span-5 flex items-center gap-2">
-              {/* Interactive Color Picker Swatch */}
-              <div
-                onClick={() => colorInputRef.current?.click()}
-                className="relative w-10 h-10 rounded-lg border border-zinc-600 shadow cursor-pointer p-0 shrink-0 flex items-center justify-center group overflow-hidden"
-                style={{ backgroundColor: newColorHex }}
-                title={t.adminPickCustomColor}
-              >
-                <Palette className="w-4 h-4 text-white drop-shadow opacity-70 group-hover:opacity-100 transition-opacity" />
-                <input
-                  ref={colorInputRef}
-                  type="color"
-                  value={newColorHex.startsWith('#') && newColorHex.length === 7 ? newColorHex : '#000000'}
-                  onChange={(e) => setNewColorHex(e.target.value.toUpperCase())}
-                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                />
-              </div>
+          {/* Row 1: Swatch / Picker + Hex Code + Color Name */}
+          <div className="flex flex-col sm:flex-row gap-3 items-center">
+            {/* Interactive Color Picker Swatch */}
+            <div
+              onClick={() => colorInputRef.current?.click()}
+              className="relative w-10 h-10 rounded-lg border border-zinc-600 shadow cursor-pointer p-0 shrink-0 flex items-center justify-center group overflow-hidden"
+              style={{ backgroundColor: newColorHex }}
+              title={t.adminPickCustomColor}
+            >
+              <Palette className="w-4 h-4 text-white drop-shadow opacity-70 group-hover:opacity-100 transition-opacity" />
+              <input
+                ref={colorInputRef}
+                type="color"
+                value={newColorHex.startsWith('#') && newColorHex.length === 7 ? newColorHex : '#000000'}
+                onChange={(e) => setNewColorHex(e.target.value.toUpperCase())}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+              />
+            </div>
 
-              {/* Hex Code Input */}
-              <div className="relative w-24 shrink-0">
-                <input
-                  type="text"
-                  value={newColorHex}
-                  onChange={(e) => {
-                    let val = e.target.value;
-                    if (!val.startsWith('#') && val.length > 0) val = '#' + val;
-                    setNewColorHex(val.toUpperCase());
-                  }}
-                  placeholder={t.adminHexPlaceholder}
-                  maxLength={7}
-                  className="w-full bg-zinc-900 border border-zinc-700 px-2 py-2 text-xs text-amber-300 font-mono rounded text-center focus:outline-none focus:border-amber-400 font-bold uppercase"
-                  title={t.adminHexCode}
-                />
-              </div>
-
-              {/* Color Name Input */}
+            {/* Hex Code Input */}
+            <div className="relative w-full sm:w-28 shrink-0">
               <input
                 type="text"
-                value={newColorName}
-                onChange={(e) => setNewColorName(e.target.value)}
-                placeholder={t.adminColorNamePlaceholder}
-                className="flex-1 bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-bold"
+                value={newColorHex}
+                onChange={(e) => {
+                  let val = e.target.value;
+                  if (!val.startsWith('#') && val.length > 0) val = '#' + val;
+                  setNewColorHex(val.toUpperCase());
+                }}
+                placeholder={t.adminHexPlaceholder}
+                maxLength={7}
+                className="w-full bg-zinc-900 border border-zinc-700 px-2 py-2 text-xs text-amber-300 font-mono rounded text-center focus:outline-none focus:border-amber-400 font-bold uppercase"
+                title={t.adminHexCode}
               />
             </div>
 
-            {/* Color Image (Upload from device or URL) */}
-            <div className="sm:col-span-4 flex gap-2">
-              <label className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 rounded text-xs font-medium cursor-pointer transition-colors ${
-                isUploadingNewColor ? 'opacity-50 pointer-events-none' : ''
-              }`}>
-                {isUploadingNewColor ? (
-                  <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
-                ) : (
-                  <Upload className="w-4 h-4 text-emerald-400" />
-                )}
-                <span className="truncate">
-                  {newColorImage
-                    ? t.adminColorPhotoUploaded
-                    : t.adminUploadColorPhoto}
+            {/* Color Name Input */}
+            <input
+              type="text"
+              value={newColorName}
+              onChange={(e) => setNewColorName(e.target.value)}
+              placeholder={t.adminColorNamePlaceholder}
+              className="w-full sm:flex-1 bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-bold"
+            />
+          </div>
+
+          {/* Row 2: Dual Image Upload: Front (وش) and Back (ظهر) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            {/* Front Image Box */}
+            <div className="p-3 bg-zinc-950/70 border border-zinc-800 rounded-lg space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-amber-400 flex items-center gap-1">
+                  <span>1.</span>
+                  <span>{t.adminFrontPhoto}</span>
                 </span>
+                {newColorImage && (
+                  <span className="text-[10px] text-emerald-400 font-mono">
+                    {t.adminFrontPhotoUploaded}
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <label className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 rounded text-xs font-medium cursor-pointer transition-colors ${
+                  isUploadingNewColorFront ? 'opacity-50 pointer-events-none' : ''
+                }`}>
+                  {isUploadingNewColorFront ? (
+                    <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
+                  ) : (
+                    <Upload className="w-4 h-4 text-emerald-400" />
+                  )}
+                  <span className="truncate">
+                    {newColorImage ? t.adminChangePhoto : t.adminUploadFrontPhoto}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={isUploadingNewColorFront}
+                    onChange={(e) => handleColorImageUpload(e, undefined, false)}
+                    className="hidden"
+                  />
+                </label>
                 <input
-                  type="file"
-                  accept="image/*"
-                  disabled={isUploadingNewColor}
-                  onChange={(e) => handleColorImageUpload(e)}
-                  className="hidden"
+                  type="url"
+                  value={newColorImage}
+                  onChange={(e) => setNewColorImage(e.target.value)}
+                  placeholder={t.adminOrImageUrl}
+                  className="w-28 bg-zinc-900 border border-zinc-700 px-2 py-1.5 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-mono"
                 />
-              </label>
-
-              <input
-                type="url"
-                value={newColorImage}
-                onChange={(e) => setNewColorImage(e.target.value)}
-                placeholder={t.adminOrImageUrl}
-                className="w-24 bg-zinc-900 border border-zinc-700 px-2 py-1.5 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-mono"
-              />
+              </div>
             </div>
 
-            {/* Add Button */}
-            <div className="sm:col-span-3">
-              <button
-                type="button"
-                onClick={handleAddColor}
-                className="w-full py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded transition-colors flex items-center justify-center gap-1 cursor-pointer shadow"
-              >
-                <Plus className="w-4 h-4" />
-                <span>{t.adminAddColorAndImage}</span>
-              </button>
+            {/* Back Image Box */}
+            <div className="p-3 bg-zinc-950/70 border border-zinc-800 rounded-lg space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-zinc-300 flex items-center gap-1">
+                  <span>2.</span>
+                  <span>{t.adminBackPhoto}</span>
+                </span>
+                {newColorBackImage && (
+                  <span className="text-[10px] text-emerald-400 font-mono">
+                    {t.adminBackPhotoUploaded}
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <label className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 rounded text-xs font-medium cursor-pointer transition-colors ${
+                  isUploadingNewColorBack ? 'opacity-50 pointer-events-none' : ''
+                }`}>
+                  {isUploadingNewColorBack ? (
+                    <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
+                  ) : (
+                    <Upload className="w-4 h-4 text-zinc-400" />
+                  )}
+                  <span className="truncate">
+                    {newColorBackImage ? t.adminChangePhoto : t.adminUploadBackPhoto}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={isUploadingNewColorBack}
+                    onChange={(e) => handleColorImageUpload(e, undefined, true)}
+                    className="hidden"
+                  />
+                </label>
+                <input
+                  type="url"
+                  value={newColorBackImage}
+                  onChange={(e) => setNewColorBackImage(e.target.value)}
+                  placeholder={t.adminOrImageUrl}
+                  className="w-28 bg-zinc-900 border border-zinc-700 px-2 py-1.5 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-mono"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Live Preview of the new color being added */}
-          {newColorImage && (
-            <div className="flex items-center gap-2 p-2 bg-zinc-950 rounded border border-emerald-800 text-[11px] text-emerald-400 font-mono">
-              <img src={newColorImage} alt="Preview" className="w-8 h-8 rounded object-cover border border-emerald-500" />
-              <span>{t.adminColorPhotoReadyTip}</span>
-              <button
-                type="button"
-                onClick={() => setNewColorImage('')}
-                className="text-red-400 hover:underline text-[10px] ml-auto rtl:ml-0 rtl:mr-auto cursor-pointer"
-              >
-                {t.cancel}
-              </button>
-            </div>
-          )}
+          {/* Row 3: Previews + Add Button */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+            {/* Live Dual Preview */}
+            {(newColorImage || newColorBackImage) ? (
+              <div className="flex items-center gap-3 p-2 bg-zinc-950 rounded border border-emerald-800 text-xs text-emerald-400">
+                {newColorImage && (
+                  <div className="flex items-center gap-1.5">
+                    <img src={newColorImage} alt="Front" className="w-9 h-9 rounded object-cover border border-amber-500" />
+                    <span className="text-[10px] font-mono">{t.adminFrontPhoto}</span>
+                    <button type="button" onClick={() => setNewColorImage('')} className="text-red-400 hover:text-red-300">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+                {newColorBackImage && (
+                  <div className="flex items-center gap-1.5 border-l border-zinc-800 rtl:border-l-0 rtl:border-r pl-2 rtl:pl-0 rtl:pr-2">
+                    <img src={newColorBackImage} alt="Back" className="w-9 h-9 rounded object-cover border border-zinc-500" />
+                    <span className="text-[10px] font-mono">{t.adminBackPhoto}</span>
+                    <button type="button" onClick={() => setNewColorBackImage('')} className="text-red-400 hover:text-red-300">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-[11px] text-zinc-500 font-mono">
+                {t.adminAttachColorImageTip}
+              </div>
+            )}
+
+            {/* Add Button */}
+            <button
+              type="button"
+              onClick={handleAddColor}
+              className="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{t.adminAddColorAndImage}</span>
+            </button>
+          </div>
         </div>
       </div>
 
