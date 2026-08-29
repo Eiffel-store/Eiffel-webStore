@@ -528,6 +528,18 @@ export interface TranslationDictionary {
   adminHeaderReports: string;
   adminHeaderCustomers: string;
   adminHeaderSettings: string;
+  adminReviews: string;
+  adminHeaderReviews: string;
+  adminTotalReviewsStat: string;
+  adminAverageRatingStat: string;
+  adminPendingReviews: string;
+  adminApprovedReviews: string;
+  adminRejectedReviews: string;
+  adminDeleteReviewConfirm: string;
+  adminReviewDeletedSuccess: string;
+  adminReviewStatusUpdated: string;
+  adminApproveReview: string;
+  adminRejectReview: string;
 
   // Admin Portal - Dashboard & Overview
   adminStorefrontOperating: string;

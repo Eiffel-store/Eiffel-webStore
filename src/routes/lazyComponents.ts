@@ -47,6 +47,10 @@ export const AdminReportsPage = lazy(() =>
   import('@/features/admin/pages/AdminReportsPage').then(m => ({ default: m.AdminReportsPage }))
 );
 
+export const AdminReviewsPage = lazy(() =>
+  import('@/features/admin/pages/AdminReviewsPage').then(m => ({ default: m.AdminReviewsPage }))
+);
+
 export const AdminCustomersPage = lazy(() =>
   import('@/features/admin/pages/AdminCustomersPage').then(m => ({ default: m.AdminCustomersPage }))
 );

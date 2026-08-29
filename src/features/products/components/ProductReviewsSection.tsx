@@ -56,61 +56,24 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
         console.error('Error loading reviews:', err);
       }
 
-      // Fallback default mockup data if backend is offline
-      const fallbackReviews: Review[] = [
-        {
-          id: 'rev-1',
-          productId: product.id,
-          customerName: 'طارق المنشاوي',
-          customerEmail: 'tarek.m@luxury.eg',
-          rating: 5,
-          title: 'خامة فائقة وتطريز متقن للغاية',
-          comment: 'القطعة تحفة فنية، القماش الإيطالي والتقفيل عالي الجودة جداً ومريح في الارتداء. المقاس مضبوط بالملي.',
-          isVerifiedPurchase: true,
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 'rev-2',
-          productId: product.id,
-          customerName: 'سارة الشريف',
-          customerEmail: 'sarah.elsharif@gmail.com',
-          rating: 5,
-          title: 'فخامة وأناقة تليق بدار إيفل',
-          comment: 'التغليف فاخر وراقي والتوصيل كان سريع جداً في أقل من 48 ساعة. الخامة تستحق كل جنيه.',
-          isVerifiedPurchase: true,
-          createdAt: new Date(Date.now() - 86400000 * 2).toISOString()
-        },
-        {
-          id: 'rev-3',
-          productId: product.id,
-          customerName: 'عمر الفاروق',
-          customerEmail: 'omar.farouk@eiffel-client.com',
-          rating: 4,
-          title: 'تصميم مميز وألوان أنيقة',
-          comment: 'اللون مطابق تماماً للصور على الموقع والماتريال ناعمة وعملية جداً للمناسبات والإطلالات اليومية.',
-          isVerifiedPurchase: true,
-          createdAt: new Date(Date.now() - 86400000 * 5).toISOString()
-        }
-      ];
-
       return {
         averageRating: product.rating || 5.0,
-        totalReviews: fallbackReviews.length,
-        recommendationRate: 98,
-        ratingDistribution: { 5: 2, 4: 1, 3: 0, 2: 0, 1: 0 },
+        totalReviews: 0,
+        recommendationRate: 100,
+        ratingDistribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
         reviews: {
-          content: fallbackReviews,
+          content: [],
           pageNumber: 1,
           pageSize: 5,
-          totalElements: fallbackReviews.length,
+          totalElements: 0,
           totalPages: 1,
           isFirst: true,
           isLast: true
         }
       };
     },
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 30,
+    staleTime: 1000 * 30, // 30s fresh
+    gcTime: 1000 * 60 * 10,
     enabled: Boolean(product?.id)
   });
 
@@ -144,9 +107,15 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
       setFormComment('');
       setFormRating(5);
       setCurrentPage(1);
-      queryClient.invalidateQueries({ queryKey: ['product-reviews', product.id] });
+      
+      // Invalidate review queries & product caches so new rating is immediately reflected
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['product-reviews', product.id] }),
+        queryClient.invalidateQueries({ queryKey: ['product', product.id] }),
+        queryClient.invalidateQueries({ queryKey: ['products'] })
+      ]);
     } catch (err) {
-      toast.error(isRTL ? 'فشل إرسال التقييم' : 'Failed to submit review');
+      toast.error(isRTL ? 'فشل إرسال التقييم، يرجى المحاولة لاحقاً' : 'Failed to submit review');
     } finally {
       setIsSubmitting(false);
     }
@@ -161,7 +130,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
   const totalElements = summary?.reviews?.totalElements || 0;
 
   return (
-    <section className="mt-16 sm:mt-24 pt-8 sm:pt-12 border-t border-surface-container dark:border-zinc-800">
+    <section id="product-reviews-section" className="mt-16 sm:mt-24 pt-8 sm:pt-12 border-t border-surface-container dark:border-zinc-800 scroll-mt-24">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
         <div>

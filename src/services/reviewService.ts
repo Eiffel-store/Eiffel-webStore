@@ -54,5 +54,52 @@ export const reviewService = {
       console.error('Failed to fetch admin reviews:', err);
       return null;
     }
+  },
+
+  // Get admin reviews statistics
+  getReviewsStats: async (): Promise<{
+    totalReviews: number;
+    approvedCount: number;
+    pendingCount: number;
+    rejectedCount: number;
+    averageRating: number;
+  } | null> => {
+    try {
+      const response = await apiClient.get<ApiResponse<{
+        totalReviews: number;
+        approvedCount: number;
+        pendingCount: number;
+        rejectedCount: number;
+        averageRating: number;
+      }>>('/admin/reviews/stats');
+      return response.data?.data || null;
+    } catch (err) {
+      console.error('Failed to fetch reviews stats:', err);
+      return null;
+    }
+  },
+
+  // Update review status (APPROVED / PENDING / REJECTED)
+  updateReviewStatus: async (id: string, status: string): Promise<Review | null> => {
+    try {
+      const response = await apiClient.patch<ApiResponse<Review>>(
+        `/admin/reviews/${id}/status?status=${status}`
+      );
+      return response.data?.data || null;
+    } catch (err) {
+      console.error('Failed to update review status:', err);
+      throw err;
+    }
+  },
+
+  // Permanently delete a review
+  deleteReview: async (id: string): Promise<boolean> => {
+    try {
+      await apiClient.delete<ApiResponse<void>>(`/admin/reviews/${id}`);
+      return true;
+    } catch (err) {
+      console.error('Failed to delete review:', err);
+      throw err;
+    }
   }
 };

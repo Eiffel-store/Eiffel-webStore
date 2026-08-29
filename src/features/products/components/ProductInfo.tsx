@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Check, ArrowRight, Ruler, Truck, RotateCcw, ShieldCheck, AlertCircle, Sparkles } from 'lucide-react';
+import { ShoppingBag, Check, ArrowRight, Ruler, Truck, RotateCcw, ShieldCheck, AlertCircle, Sparkles, Star } from 'lucide-react';
 import { Product } from '@/types';
 import { useCurrency, useLanguage } from '@/shared';
 
@@ -65,6 +65,26 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
             {product.subtitle}
           </p>
         )}
+
+        {/* Live Rating & Reviews Jump Link */}
+        <div className="mt-2.5 flex items-center gap-2">
+          <a
+            href="#product-reviews-section"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('product-reviews-section')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition-all text-xs font-mono group cursor-pointer"
+          >
+            <div className="flex items-center gap-1 text-amber-400">
+              <Star className="w-3.5 h-3.5 fill-amber-400" />
+              <span className="font-bold text-amber-300">{(product.rating || 5.0).toFixed(1)}</span>
+            </div>
+            <span className="text-zinc-500 dark:text-zinc-400 text-[11px] group-hover:text-amber-300 transition-colors">
+              ({product.reviewCount || 0} {t.reviews})
+            </span>
+          </a>
+        </div>
       </div>
 
       {/* Pricing Strip */}

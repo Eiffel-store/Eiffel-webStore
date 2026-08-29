@@ -513,6 +513,18 @@ export const en: TranslationDictionary = {
   adminHeaderReports: "Reports & Financial Analytics",
   adminHeaderCustomers: "Customers, Loyalty Points & VIP",
   adminHeaderSettings: "Store Settings & Backup",
+  adminReviews: "Reviews & Ratings",
+  adminHeaderReviews: "Customer Reviews Moderation",
+  adminTotalReviewsStat: "Total Reviews",
+  adminAverageRatingStat: "Average Rating",
+  adminPendingReviews: "Pending Moderation",
+  adminApprovedReviews: "Approved Reviews",
+  adminRejectedReviews: "Rejected Reviews",
+  adminDeleteReviewConfirm: "Are you sure you want to permanently delete this review?",
+  adminReviewDeletedSuccess: "Review deleted successfully",
+  adminReviewStatusUpdated: "Review status updated successfully",
+  adminApproveReview: "Approve Review",
+  adminRejectReview: "Reject Review",
 
   // Admin Portal - Dashboard & Overview
   adminStorefrontOperating: "Storefront Live & Operating",

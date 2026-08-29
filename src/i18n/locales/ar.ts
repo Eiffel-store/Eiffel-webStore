@@ -528,6 +528,18 @@ export const ar: TranslationDictionary = {
   adminHeaderReports: "مركز التقارير والتحليلات المالية",
   adminHeaderCustomers: "إدارة العملاء ونقاط الولاء وعضوية VIP",
   adminHeaderSettings: "إعدادات المتجر والنسخ الاحتياطي",
+  adminReviews: "التقييمات والمراجعات",
+  adminHeaderReviews: "إدارة مراجعات وتقييمات العملاء",
+  adminTotalReviewsStat: "إجمالي التقييمات",
+  adminAverageRatingStat: "متوسط التقييم العام",
+  adminPendingReviews: "بانتظار المراجعة",
+  adminApprovedReviews: "تقييمات معتمدة",
+  adminRejectedReviews: "تقييمات مرفوضة",
+  adminDeleteReviewConfirm: "هل أنت متأكد من حذف هذا التقييم نهائياً؟",
+  adminReviewDeletedSuccess: "تم حذف التقييم بنجاح",
+  adminReviewStatusUpdated: "تم تحديث حالة التقييم بنجاح",
+  adminApproveReview: "اعتماد التقييم",
+  adminRejectReview: "رفض التقييم",
 
   // Admin Portal - Dashboard & Overview
   adminStorefrontOperating: "المتجر متصل ويعمل بنجاح",

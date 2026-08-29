@@ -16,7 +16,8 @@ import {
   ShieldCheck,
   LayoutTemplate,
   BarChart3,
-  Users
+  Users,
+  Star
 } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useStoreData } from '@/shared';
@@ -40,6 +41,7 @@ export const AdminLayout: React.FC = () => {
     { label: t.adminCategories, href: '/admin/categories', icon: Grid },
     { label: t.adminBranches, href: '/admin/branches', icon: MapPin },
     { label: t.adminOrders, href: '/admin/orders', icon: Package, badge: pendingOrdersCount ? `${pendingOrdersCount}` : undefined, badgeColor: 'bg-amber-500' },
+    { label: t.adminReviews, href: '/admin/reviews', icon: Star },
     { label: t.adminReports, href: '/admin/reports', icon: BarChart3 },
     { label: t.adminCustomers, href: '/admin/customers', icon: Users },
     { label: t.adminSettings, href: '/admin/settings', icon: Settings }
@@ -218,6 +220,7 @@ export const AdminLayout: React.FC = () => {
               {location.pathname === '/admin/categories' && t.adminHeaderCategories}
               {location.pathname === '/admin/branches' && t.adminHeaderBranches}
               {location.pathname === '/admin/orders' && t.adminHeaderOrders}
+              {location.pathname === '/admin/reviews' && t.adminHeaderReviews}
               {location.pathname === '/admin/reports' && t.adminHeaderReports}
               {location.pathname === '/admin/customers' && t.adminHeaderCustomers}
               {location.pathname === '/admin/settings' && t.adminHeaderSettings}
