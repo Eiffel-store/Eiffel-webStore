@@ -34,8 +34,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Dynamic Navigation Links: Generated directly from active categories in backend
-  const navLinks: NavLinkItem[] = useMemo(() => {
+  // Desktop Direct Links (Displayed beside "التشكيلات والأقسام ▾")
+  const desktopLinks: NavLinkItem[] = useMemo(() => {
+    return [
+      { label: language === 'ar' ? 'أحدث الإصدارات' : 'NEW ARRIVALS', href: '/collections/new-arrivals' },
+      { label: t.navCollection04, href: '/collections/offers', isSpecial: true },
+      { label: t.navStores, href: '/stores' },
+    ];
+  }, [language, t]);
+
+  // Full Mobile Links
+  const mobileLinks: NavLinkItem[] = useMemo(() => {
     const dynamicCats: NavLinkItem[] = categories.map((cat) => ({
       label: language === 'ar' ? (cat.name || cat.nameEn) : (cat.nameEn || cat.name),
       href: `/collections/${cat.id}`,
@@ -56,7 +65,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
 
       {/* Main Sticky Header */}
       <header
-        className={`sticky top-0 z-40 w-full bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-surface-container dark:border-zinc-850 transition-all duration-200 ${
+        className={`sticky top-0 z-50 w-full bg-white dark:bg-zinc-950 border-b border-surface-container dark:border-zinc-850 transition-all duration-200 ${
           isScrolled ? 'h-[64px] sm:h-[70px] shadow-sm' : 'h-[68px] sm:h-[80px]'
         }`}
       >
@@ -79,8 +88,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
               <Logo size="md" />
             </Link>
 
-            {/* Desktop Navigation Links (Option 1: Direct Dynamic Links) */}
-            <NavDesktopLinks links={navLinks} />
+            {/* Desktop Navigation Links + Mega Menu */}
+            <NavDesktopLinks links={desktopLinks} />
           </div>
 
           {/* Right / End: Search, Wishlist, Theme, Account, Cart */}
@@ -92,7 +101,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
       <NavMobileDrawer
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
-        links={navLinks}
+        links={mobileLinks}
       />
     </>
   );
