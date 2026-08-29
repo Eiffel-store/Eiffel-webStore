@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { X, LogOut } from 'lucide-react';
+import { X, LogOut, ChevronDown, Sparkles, Layers } from 'lucide-react';
 import { Logo } from '../Logo';
-import { useLanguage } from '@/shared';
+import { useLanguage, useStoreData } from '@/shared';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { NavLinkItem } from './NavDesktopLinks';
 
@@ -17,14 +17,16 @@ export const NavMobileDrawer: React.FC<NavMobileDrawerProps> = ({
   onClose,
   links,
 }) => {
-  const { t } = useLanguage();
+  const { isRTL, language, t } = useLanguage();
+  const { categories } = useStoreData();
   const { user, isAuthenticated, role, logout } = useAuthStore();
+  const [collectionsExpanded, setCollectionsExpanded] = useState(true);
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 lg:hidden bg-black/60 backdrop-blur-sm">
-      <div className="fixed inset-y-0 left-0 rtl:left-auto rtl:right-0 w-4/5 max-w-sm bg-white dark:bg-zinc-950 p-6 shadow-2xl flex flex-col justify-between">
+      <div className="fixed inset-y-0 left-0 rtl:left-auto rtl:right-0 w-4/5 max-w-sm bg-white dark:bg-zinc-950 p-6 shadow-2xl flex flex-col justify-between overflow-y-auto">
         <div>
           {/* Header */}
           <div className="flex items-center justify-between pb-6 border-b border-surface-container dark:border-zinc-800">
@@ -59,21 +61,68 @@ export const NavMobileDrawer: React.FC<NavMobileDrawerProps> = ({
               <Link
                 to="/account"
                 onClick={onClose}
-                className="block text-center py-2 bg-primary text-white dark:bg-white dark:text-black text-xs font-bold uppercase tracking-wider"
+                className="block text-center py-2 bg-primary text-white dark:bg-white dark:text-black text-xs font-bold uppercase tracking-wider rounded"
               >
                 {t.signIn} / {t.register}
               </Link>
             )}
           </div>
 
-          {/* Mobile Links */}
-          <div className="py-6 space-y-4">
+          {/* Mobile Links & Dynamic Categories Accordion */}
+          <div className="py-4 space-y-3">
+            {/* Collections Expandable Accordion */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setCollectionsExpanded(!collectionsExpanded)}
+                className="w-full flex items-center justify-between py-2 text-base font-editorial font-bold text-primary dark:text-white hover:opacity-70 cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-amber-400" />
+                  <span>{language === 'ar' ? 'التشكيلات والأقسام' : 'COLLECTIONS'}</span>
+                </div>
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-200 ${
+                    collectionsExpanded ? 'rotate-180 text-amber-400' : 'text-zinc-500'
+                  }`}
+                />
+              </button>
+
+              {collectionsExpanded && (
+                <div className="mt-1 mr-4 rtl:mr-4 ltr:ml-4 space-y-2 py-2 border-r-2 rtl:border-r-2 ltr:border-l-2 border-surface-container dark:border-zinc-800 pr-3 rtl:pr-3 ltr:pl-3">
+                  {categories.map((cat) => {
+                    const catName = language === 'ar' ? (cat.name || cat.nameEn) : (cat.nameEn || cat.name);
+                    return (
+                      <Link
+                        key={cat.id}
+                        to={`/collections/${cat.id}`}
+                        onClick={onClose}
+                        className="block text-xs font-mono text-secondary dark:text-zinc-300 hover:text-amber-500 dark:hover:text-amber-400 py-1"
+                      >
+                        • {catName}
+                      </Link>
+                    );
+                  })}
+                  <Link
+                    to="/collections/new-arrivals"
+                    onClick={onClose}
+                    className="block text-xs font-mono text-amber-400 py-1 font-bold"
+                  >
+                    ✨ {language === 'ar' ? 'أحدث الإصدارات' : 'New Arrivals'}
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Direct Links */}
             {links.map((link) => (
               <Link
                 key={link.label}
                 to={link.href}
                 onClick={onClose}
-                className="block text-base font-editorial font-bold text-primary dark:text-white hover:opacity-70"
+                className={`block text-base font-editorial font-bold hover:opacity-70 py-1 ${
+                  link.isSpecial ? 'text-amber-500 dark:text-amber-400' : 'text-primary dark:text-white'
+                }`}
               >
                 {link.label}
               </Link>
@@ -83,7 +132,7 @@ export const NavMobileDrawer: React.FC<NavMobileDrawerProps> = ({
               <Link
                 to="/admin"
                 onClick={onClose}
-                className="block text-sm font-bold text-amber-400 hover:underline pt-2 border-t border-zinc-800"
+                className="block text-sm font-bold text-amber-400 hover:underline pt-3 border-t border-surface-container dark:border-zinc-800"
               >
                 🛡️ {t.adminPanel}
               </Link>

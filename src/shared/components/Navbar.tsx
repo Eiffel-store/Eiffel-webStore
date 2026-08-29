@@ -16,7 +16,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
@@ -34,10 +34,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   }, [location.pathname]);
 
   const navLinks: NavLinkItem[] = [
-    { label: t.navMen, href: '/collections/men' },
-    { label: t.navKids, href: '/collections/kids' },
-    { label: t.navAccessories, href: '/collections/accessories' },
-    { label: t.navCollection04, href: '/collections/offers' },
+    { label: language === 'ar' ? 'أحدث الإصدارات' : 'NEW ARRIVALS', href: '/collections/new-arrivals' },
+    { label: t.navCollection04, href: '/collections/offers', isSpecial: true },
     { label: t.navStores, href: '/stores' },
   ];
 
