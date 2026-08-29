@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { useLanguage, useStoreData } from '@/shared';
@@ -8,6 +8,7 @@ import {
   NavDesktopLinks,
   NavActionButtons,
   NavMobileDrawer,
+  NavMegaMenu,
   NavLinkItem,
 } from './navigation';
 
@@ -19,8 +20,21 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   const { t, language } = useLanguage();
   const { categories } = useStoreData();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [megaMenuOpen, setMegaMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const megaMenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleOpenMegaMenu = () => {
+    if (megaMenuTimeoutRef.current) clearTimeout(megaMenuTimeoutRef.current);
+    setMegaMenuOpen(true);
+  };
+
+  const handleCloseMegaMenu = () => {
+    megaMenuTimeoutRef.current = setTimeout(() => {
+      setMegaMenuOpen(false);
+    }, 250);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,6 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   }, []);
 
   useEffect(() => {
+    setMegaMenuOpen(false);
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
@@ -65,13 +80,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
 
       {/* Main Sticky Header */}
       <header
-        className={`sticky top-0 z-50 w-full bg-white dark:bg-zinc-950 border-b border-surface-container dark:border-zinc-850 transition-all duration-200 ${
+        onMouseLeave={handleCloseMegaMenu}
+        className={`sticky top-0 z-50 w-full relative bg-white dark:bg-zinc-950 border-b border-surface-container dark:border-zinc-850 transition-all duration-200 ${
           isScrolled ? 'h-[64px] sm:h-[70px] shadow-sm' : 'h-[68px] sm:h-[80px]'
         }`}
       >
         <div className="max-w-[1440px] mx-auto h-full px-3 sm:px-8 md:px-12 flex items-center justify-between">
           {/* Left / Start: Mobile Menu Button & Brand Links */}
-          <div className="flex items-center gap-3 sm:gap-8">
+          <div className="flex items-center gap-3 sm:gap-8 h-full">
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="lg:hidden p-1.5 -ml-1.5 rtl:-ml-0 rtl:-mr-1.5 text-primary dark:text-white hover:opacity-70 transition-opacity cursor-pointer"
@@ -88,13 +104,26 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
               <Logo size="md" />
             </Link>
 
-            {/* Desktop Navigation Links + Mega Menu */}
-            <NavDesktopLinks links={desktopLinks} />
+            {/* Desktop Navigation Links */}
+            <NavDesktopLinks
+              links={desktopLinks}
+              isMegaMenuOpen={megaMenuOpen}
+              onOpenMegaMenu={handleOpenMegaMenu}
+              onToggleMegaMenu={() => setMegaMenuOpen(!megaMenuOpen)}
+            />
           </div>
 
           {/* Right / End: Search, Wishlist, Theme, Account, Cart */}
           <NavActionButtons onOpenSearch={onOpenSearch} />
         </div>
+
+        {/* Solid Mega Menu Mounted Exactly Below Header Bottom Edge */}
+        <NavMegaMenu
+          isOpen={megaMenuOpen}
+          onClose={() => setMegaMenuOpen(false)}
+          onMouseEnter={handleOpenMegaMenu}
+          onMouseLeave={handleCloseMegaMenu}
+        />
       </header>
 
       {/* Mobile Slide-Out Drawer Menu */}
