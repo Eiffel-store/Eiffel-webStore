@@ -2,6 +2,7 @@ import React from 'react';
 import { ShoppingBag, Check, ArrowRight, Ruler, Truck, RotateCcw, ShieldCheck, AlertCircle, Sparkles, Star } from 'lucide-react';
 import { Product } from '@/types';
 import { useCurrency, useLanguage } from '@/shared';
+import { getColorBackgroundStyle } from '@/shared/utils/productUtils';
 
 interface ProductInfoProps {
   product: Product;
@@ -110,21 +111,17 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
             <button
               key={c.name}
               onClick={() => setSelectedColor(c.name)}
-              className={`flex items-center gap-2 px-3 py-1.5 border transition-all text-xs ${
+              className={`flex items-center gap-2 px-3 py-1.5 border transition-all text-xs cursor-pointer ${
                 selectedColor === c.name
-                  ? 'border-primary dark:border-white bg-surface-container-low dark:bg-zinc-800 text-primary dark:text-white shadow-sm'
+                  ? 'border-primary dark:border-white bg-surface-container-low dark:bg-zinc-800 text-primary dark:text-white shadow-sm ring-1 ring-primary/20'
                   : 'border-surface-container dark:border-zinc-800 text-secondary dark:text-zinc-400 hover:border-primary'
               }`}
             >
-              {c.image ? (
-                <img src={c.image} alt={c.name} className="w-4 h-4 rounded-full object-cover border border-black/20 shadow-sm" />
-              ) : (
-                <span
-                  className="w-3.5 h-3.5 rounded-full border border-black/20"
-                  style={{ backgroundColor: c.hex }}
-                />
-              )}
-              <span className="capitalize">{c.name}</span>
+              <span
+                className="w-3.5 h-3.5 rounded-full border border-black/20 shrink-0 shadow-xs"
+                style={getColorBackgroundStyle(c)}
+              />
+              <span className="capitalize font-medium">{c.name}</span>
             </button>
           ))}
         </div>

@@ -9,7 +9,7 @@ import { ProductReviewsSection } from '../components/ProductReviewsSection';
 import { SizeGuideModal } from '../components/SizeGuideModal';
 import { useCart } from '@/features/cart';
 import { useWishlist } from '@/features/wishlist';
-import { useCurrency, useLanguage, useStoreData, resolveColorImage, resolveColorImages, ProductDetailPageSkeleton, EmptyState } from '@/shared';
+import { useCurrency, useLanguage, useStoreData, resolveColorImage, resolveColorImages, getColorImageIndex, ProductDetailPageSkeleton, EmptyState } from '@/shared';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -106,6 +106,9 @@ export const ProductDetailPage: React.FC = () => {
             colorImages={resolveColorImages(product, selectedColor)}
             selectedImage={selectedImage}
             setSelectedImage={setSelectedImage}
+            onColorChange={(newColor) => {
+              setSelectedColor(newColor);
+            }}
             isSaved={isSaved}
             onToggleWishlist={() => toggleWishlist(product)}
           />
@@ -115,7 +118,11 @@ export const ProductDetailPage: React.FC = () => {
             <ProductInfo
               product={product}
               selectedColor={selectedColor}
-              setSelectedColor={setSelectedColor}
+              setSelectedColor={(newColor) => {
+                setSelectedColor(newColor);
+                const targetIdx = getColorImageIndex(product, newColor);
+                setSelectedImage(targetIdx);
+              }}
               selectedSize={selectedSize}
               setSelectedSize={setSelectedSize}
               quantity={quantity}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Star,
@@ -17,12 +18,13 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { reviewService } from '@/services/reviewService';
-import { useLanguage, Pagination, Skeleton } from '@/shared';
+import { useLanguage, useStoreData, Pagination, Skeleton } from '@/shared';
 import { Review, PageResponse } from '@/types';
 import toast from 'react-hot-toast';
 
 export const AdminReviewsPage: React.FC = () => {
   const { isRTL, t } = useLanguage();
+  const { getProductById } = useStoreData();
   const queryClient = useQueryClient();
 
   const [page, setPage] = useState<number>(1);
@@ -81,10 +83,10 @@ export const AdminReviewsPage: React.FC = () => {
     }
   });
 
-  const allReviews = pagedData?.content || [];
+  const allReviews: Review[] = pagedData?.content || [];
 
   // Client-side filtering for search, rating, and status
-  const filteredReviews = allReviews.filter((rev) => {
+  const filteredReviews: Review[] = allReviews.filter((rev: Review) => {
     const matchesSearch =
       !searchTerm.trim() ||
       rev.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -292,34 +294,52 @@ export const AdminReviewsPage: React.FC = () => {
           </div>
         ) : (
           <div className="divide-y divide-zinc-850">
-            {filteredReviews.map((rev) => {
+            {filteredReviews.map((rev: Review) => {
               const currentStatus = rev.status || 'APPROVED';
+              const product = rev.productId ? getProductById(rev.productId) : null;
+              const formattedDate = new Date(rev.createdAt).toLocaleDateString(
+                isRTL ? 'ar-EG' : 'en-US',
+                { year: 'numeric', month: 'short', day: 'numeric' }
+              );
+
               return (
                 <div
                   key={rev.id}
-                  className="p-4 sm:p-5 hover:bg-zinc-900/40 transition-colors flex flex-col md:flex-row md:items-start justify-between gap-4"
+                  className="p-5 sm:p-6 hover:bg-zinc-900/30 transition-colors flex flex-col gap-3.5"
                 >
-                  {/* Left: Customer Info & Content */}
-                  <div className="flex items-start gap-3.5 flex-1 min-w-0">
-                    {/* User Avatar Initial */}
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500/20 to-zinc-800 border border-amber-500/30 text-amber-400 font-bold flex items-center justify-center text-sm shrink-0">
-                      {rev.customerName ? rev.customerName.slice(0, 1).toUpperCase() : 'U'}
+                  {/* 1. Header Bar: User profile on one side, Status + Actions on other */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-850/80">
+                    {/* User info */}
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500/20 to-zinc-800 border border-amber-500/30 text-amber-400 font-bold flex items-center justify-center text-sm shrink-0 shadow-sm">
+                        {rev.customerName ? rev.customerName.slice(0, 1).toUpperCase() : 'U'}
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-sm text-white">
+                            {rev.customerName}
+                          </span>
+                          {rev.isVerifiedPurchase && (
+                            <span className="inline-flex items-center gap-1 text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                              <CheckCircle2 className="w-2.5 h-2.5" />
+                              <span>{t.verifiedBuyer}</span>
+                            </span>
+                          )}
+                        </div>
+                        {rev.customerEmail && (
+                          <div className="text-[11px] font-mono text-zinc-500 mt-0.5">
+                            {rev.customerEmail}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="space-y-1.5 flex-1 min-w-0">
-                      {/* Name + Stars + Verified Badge + Date */}
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-sm text-white">
-                          {rev.customerName}
-                        </span>
-                        {rev.customerEmail && (
-                          <span className="text-[11px] font-mono text-zinc-500">
-                            &lt;{rev.customerEmail}&gt;
-                          </span>
-                        )}
-
-                        <div className="flex items-center gap-0.5 ml-2 rtl:ml-0 rtl:mr-2">
+                    {/* Meta Controls (Stars + Date + Status + Delete) */}
+                    <div className="flex items-center gap-3 self-start sm:self-center flex-wrap">
+                      {/* Star Rating Badge */}
+                      <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-lg">
+                        <div className="flex items-center gap-0.5">
                           {[1, 2, 3, 4, 5].map((s) => (
                             <Star
                               key={s}
@@ -331,88 +351,97 @@ export const AdminReviewsPage: React.FC = () => {
                             />
                           ))}
                         </div>
-
-                        {rev.isVerifiedPurchase && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                            <CheckCircle2 className="w-3 h-3" />
-                            <span>{t.verifiedBuyer}</span>
-                          </span>
-                        )}
-
-                        <span className="text-[10px] font-mono text-zinc-500 flex items-center gap-1 ml-auto rtl:ml-0 rtl:mr-auto">
-                          <Calendar className="w-3 h-3" />
-                          <span>
-                            {new Date(rev.createdAt).toLocaleDateString(
-                              isRTL ? 'ar-EG' : 'en-US',
-                              { year: 'numeric', month: 'short', day: 'numeric' }
-                            )}
-                          </span>
+                        <span className="text-[11px] font-mono font-bold text-amber-400">
+                          {rev.rating}.0
                         </span>
                       </div>
 
-                      {/* Review Title */}
-                      {rev.title && (
-                        <h4 className="text-xs font-bold text-amber-300">
-                          {rev.title}
-                        </h4>
-                      )}
+                      {/* Date */}
+                      <div className="text-[11px] font-mono text-zinc-500 flex items-center gap-1 whitespace-nowrap">
+                        <Calendar className="w-3.5 h-3.5 text-zinc-600" />
+                        <span>{formattedDate}</span>
+                      </div>
 
-                      {/* Review Comment */}
-                      <p className="text-xs text-zinc-300 leading-relaxed font-light">
-                        {rev.comment}
-                      </p>
+                      {/* Status Dropdown */}
+                      <select
+                        value={currentStatus}
+                        onChange={(e) =>
+                          updateStatusMutation.mutate({
+                            id: rev.id,
+                            status: e.target.value
+                          })
+                        }
+                        className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg border cursor-pointer focus:outline-none transition-all shadow-xs ${
+                          currentStatus === 'APPROVED'
+                            ? 'bg-emerald-950/80 border-emerald-700/80 text-emerald-300'
+                            : currentStatus === 'PENDING'
+                            ? 'bg-amber-950/80 border-amber-700/80 text-amber-300'
+                            : 'bg-red-950/80 border-red-700/80 text-red-300'
+                        }`}
+                      >
+                        <option value="APPROVED" className="bg-zinc-900 text-emerald-400">
+                          {t.adminApprovedReviews}
+                        </option>
+                        <option value="PENDING" className="bg-zinc-900 text-amber-400">
+                          {t.adminPendingReviews}
+                        </option>
+                        <option value="REJECTED" className="bg-zinc-900 text-red-400">
+                          {t.adminRejectedReviews}
+                        </option>
+                      </select>
 
-                      {/* Product Reference */}
-                      {rev.productId && (
-                        <div className="pt-1 flex items-center gap-2">
-                          <span className="text-[10px] font-mono text-zinc-500">
-                            {isRTL ? 'معرف المنتج:' : 'Product ID:'} {rev.productId}
-                          </span>
-                        </div>
-                      )}
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        onClick={() => setReviewToDelete(rev)}
+                        className="p-1.5 bg-zinc-900 hover:bg-red-950/60 text-zinc-500 hover:text-red-400 border border-zinc-800 hover:border-red-800 rounded-lg transition-colors cursor-pointer"
+                        title={isRTL ? 'حذف التقييم نهائياً' : 'Delete review'}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
 
-                  {/* Right: Actions & Status */}
-                  <div className="flex items-center gap-2 self-end md:self-center shrink-0">
-                    {/* Status Switcher */}
-                    <select
-                      value={currentStatus}
-                      onChange={(e) =>
-                        updateStatusMutation.mutate({
-                          id: rev.id,
-                          status: e.target.value
-                        })
-                      }
-                      className={`text-xs font-mono font-bold px-2.5 py-1.5 rounded border cursor-pointer focus:outline-none transition-colors ${
-                        currentStatus === 'APPROVED'
-                          ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300'
-                          : currentStatus === 'PENDING'
-                          ? 'bg-amber-950/60 border-amber-800 text-amber-300'
-                          : 'bg-red-950/60 border-red-800 text-red-300'
-                      }`}
-                    >
-                      <option value="APPROVED" className="bg-zinc-900 text-emerald-400">
-                        {t.adminApprovedReviews}
-                      </option>
-                      <option value="PENDING" className="bg-zinc-900 text-amber-400">
-                        {t.adminPendingReviews}
-                      </option>
-                      <option value="REJECTED" className="bg-zinc-900 text-red-400">
-                        {t.adminRejectedReviews}
-                      </option>
-                    </select>
-
-                    {/* Delete Button */}
-                    <button
-                      type="button"
-                      onClick={() => setReviewToDelete(rev)}
-                      className="p-1.5 text-zinc-400 hover:text-red-400 hover:bg-red-950/50 rounded transition-colors cursor-pointer"
-                      title={isRTL ? 'حذف التقييم نهائياً' : 'Delete review'}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                  {/* 2. Review Content */}
+                  <div className="space-y-1.5 pr-2 rtl:pr-2 ltr:pl-2 border-r-2 rtl:border-r-2 ltr:border-l-2 border-amber-500/30">
+                    {rev.title && (
+                      <h4 className="text-sm font-bold text-amber-300 tracking-tight">
+                        {rev.title}
+                      </h4>
+                    )}
+                    <p className="text-xs text-zinc-300 leading-relaxed font-normal">
+                      {rev.comment}
+                    </p>
                   </div>
+
+                  {/* 3. Attached Product Mini-Banner */}
+                  {rev.productId && (
+                    <div className="pt-1">
+                      <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-zinc-900/80 border border-zinc-800 max-w-full">
+                        {product?.images?.[0] ? (
+                          <img
+                            src={product.images[0]}
+                            alt={product.name}
+                            className="w-7 h-9 object-cover rounded bg-zinc-950 border border-zinc-800 shrink-0"
+                          />
+                        ) : null}
+                        <div className="min-w-0 flex-1">
+                          <span className="text-[11px] font-bold text-zinc-300 truncate block">
+                            {product?.name || (isRTL ? 'منتج رقم:' : 'Product:') + ' ' + rev.productId}
+                          </span>
+                        </div>
+                        <Link
+                          to={`/product/${rev.productId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] font-mono text-amber-400 hover:underline flex items-center gap-1 shrink-0 ml-2 rtl:ml-0 rtl:mr-2"
+                        >
+                          <span>{isRTL ? 'معاينة' : 'View'}</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </Link>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}

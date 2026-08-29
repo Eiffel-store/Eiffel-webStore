@@ -3,7 +3,7 @@ import { X, ShoppingBag, Heart } from 'lucide-react';
 import { Product } from '@/types';
 import { useCart } from '@/features/cart';
 import { useWishlist } from '@/features/wishlist';
-import { useCurrency, resolveColorImage } from '@/shared';
+import { useCurrency, resolveColorImage, getColorBackgroundStyle } from '@/shared';
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -95,7 +95,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
                       }
                     }}
                     className={`w-6 h-6 rounded-full border-2 cursor-pointer transition-transform hover:scale-110 ${activeColor === c.name ? 'border-primary dark:border-white ring-2 ring-primary' : 'border-zinc-700'}`}
-                    style={{ backgroundColor: c.hex }}
+                    style={getColorBackgroundStyle(c)}
                     title={c.name}
                   />
                 ))}

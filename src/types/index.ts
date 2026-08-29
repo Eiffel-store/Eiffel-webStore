@@ -1,6 +1,7 @@
 export interface ProductColor {
   name: string;
   hex: string;
+  secondaryHex?: string; // Optional Secondary Color for Two-Tone (لون ثانوي)
   image?: string; // Primary / Front view (وش)
   backImage?: string; // Secondary / Back view (ظهر)
   images?: string[]; // Additional angle shots for this color

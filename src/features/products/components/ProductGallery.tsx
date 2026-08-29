@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Product } from '@/types';
 import { Heart } from 'lucide-react';
-import { CachedImage } from '@/shared';
+import { CachedImage, resolveColorByImage } from '@/shared';
 
 export interface ProductGalleryProps {
   product?: Product;
@@ -11,6 +11,7 @@ export interface ProductGalleryProps {
   activeColorImage?: string;
   selectedImage?: number;
   setSelectedImage?: (idx: number) => void;
+  onColorChange?: (colorName: string) => void;
   isSaved?: boolean;
   onToggleWishlist?: () => void;
 }
@@ -25,6 +26,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
   activeColorImage,
   selectedImage: controlledSelected,
   setSelectedImage: setControlledSelected,
+  onColorChange,
   isSaved = false,
   onToggleWishlist
 }) => {
@@ -36,7 +38,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
   const rawImages = (colorImages && colorImages.length > 0)
     ? colorImages
     : ((product?.images && product.images.length > 0) ? product.images : (images.length > 0 ? images : [FALLBACK_IMG]));
-  
+
   // If activeColorImage is provided and not in images list, prepend it
   const allImages = [...rawImages];
   if (activeColorImage && activeColorImage.trim() !== '' && !allImages.includes(activeColorImage)) {
@@ -46,10 +48,15 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
   const safeImages = allImages.filter(img => img && img.trim() !== '');
   const finalImages = safeImages.length > 0 ? safeImages : [FALLBACK_IMG];
 
-  // Whenever colorImages changes or activeColorImage changes, switch the active image to index 0 (front view)
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [activeColorImage, colorImages?.join(',')]);
+  const handleThumbnailClick = (img: string, idx: number) => {
+    setActiveIndex(idx);
+    if (product && onColorChange) {
+      const matchedColor = resolveColorByImage(product, img);
+      if (matchedColor) {
+        onColorChange(matchedColor);
+      }
+    }
+  };
 
   const displayName = productName || product?.name || 'Product';
 
@@ -64,7 +71,6 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
           width={1000}
           className="w-full h-full object-cover luxury-image-hover transition-all duration-300"
         />
-
 
         {onToggleWishlist && (
           <button
@@ -86,7 +92,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
           {finalImages.map((img, idx) => (
             <button
               key={idx}
-              onClick={() => setActiveIndex(idx)}
+              onClick={() => handleThumbnailClick(img, idx)}
               className={`relative aspect-[3/4] overflow-hidden bg-zinc-900 border transition-all cursor-pointer ${
                 activeIndex === idx
                   ? 'border-primary dark:border-white ring-2 ring-primary dark:ring-white'

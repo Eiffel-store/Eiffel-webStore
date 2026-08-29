@@ -488,6 +488,10 @@ export const ar: TranslationDictionary = {
   reviewComment: "تفاصيل تجربتك ورأيك",
   submitReview: "إرسال التقييم",
   submittingReview: "جاري الإرسال...",
+  loginToReviewTitle: "تسجيل الدخول مطلوب لكتابة تقييم",
+  loginToReviewDesc: "حرصاً على مصداقية التقييمات وتوثيق تجارب الشراء الحقيقية، يرجى تسجيل الدخول إلى حسابك أولاً لتتمكن من تقييم هذا المنتج.",
+  signInNow: "تسجيل الدخول إلى حسابي",
+  postingAs: "التقييم بواسطة العميل:",
   
   // Pagination
   showingResults: "عرض النتائج",
@@ -1130,6 +1134,12 @@ export const ar: TranslationDictionary = {
   adminUploadBackPhoto: "رفع صورة الظهر",
   adminFrontPhotoUploaded: "تم رفع الوش ✓",
   adminBackPhotoUploaded: "تم رفع الظهر ✓",
+  adminSingleColor: "لون أحادي",
+  adminTwoToneColor: "لون ثنائي (Two-Tone)",
+  adminPrimaryColor: "اللون الأساسي",
+  adminSecondaryColor: "اللون الثانوي",
+  adminTwoTonePresets: "توليفات ألوان ثنائية مميزة",
+  adminTwoToneTip: "دمج لونين في قطعة واحدة مع دائرة مقسومة 50/50",
   adminOrImageUrl: "أو رابط صورة",
   adminExtraGalleryImages: "صور إضافية لمعرض المنتج (Gallery)",
   adminUploadMultiplePhotosFromDevice: "رفع صور متعددة من الجهاز",

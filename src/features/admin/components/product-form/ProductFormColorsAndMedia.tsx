@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Trash2, Upload, Loader2, Image as ImageIcon, Check, X, Sparkles, Palette, Pipette } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Plus, Trash2, Upload, Loader2, Image as ImageIcon, Check, X, Sparkles, Palette } from 'lucide-react';
 import { ProductColor } from '@/types';
 import { useLanguage } from '@/shared';
 import { uploadService } from '@/services/uploadService';
+import { getColorBackgroundStyle } from '@/shared/utils/productUtils';
 
 interface ProductFormColorsAndMediaProps {
   colors: ProductColor[];
@@ -27,6 +28,15 @@ const POPULAR_COLOR_PRESETS = [
   { name: 'نبيتي (Burgundy)', hex: '#581825' },
 ];
 
+const POPULAR_TWOTONE_PRESETS = [
+  { name: 'كحلي × بيج', hex: '#111827', secondaryHex: '#d4b996' },
+  { name: 'أسود × أبيض', hex: '#000000', secondaryHex: '#FFFFFF' },
+  { name: 'زيتي × جملي', hex: '#37412a', secondaryHex: '#c19a6b' },
+  { name: 'رمادي × أسود', hex: '#4b5563', secondaryHex: '#000000' },
+  { name: 'نبيتي × بيج', hex: '#581825', secondaryHex: '#d4b996' },
+  { name: 'بني × جملي', hex: '#582f0e', secondaryHex: '#c19a6b' },
+];
+
 export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps> = ({
   colors,
   images,
@@ -37,14 +47,18 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
 }) => {
   const { isRTL, t } = useLanguage();
   const colorInputRef = useRef<HTMLInputElement>(null);
+  const secondaryColorInputRef = useRef<HTMLInputElement>(null);
 
-  // New color form state (Front & Back Views)
+  // New color form state (Single vs Two-Tone)
+  const [isTwoTone, setIsTwoTone] = useState(false);
   const [newColorName, setNewColorName] = useState('');
   const [newColorHex, setNewColorHex] = useState('#000000');
+  const [newColorSecondaryHex, setNewColorSecondaryHex] = useState('#d4b996');
   const [newColorImage, setNewColorImage] = useState(''); // Front View (وش)
   const [newColorBackImage, setNewColorBackImage] = useState(''); // Back View (ظهر)
   const [isUploadingNewColorFront, setIsUploadingNewColorFront] = useState(false);
   const [isUploadingNewColorBack, setIsUploadingNewColorBack] = useState(false);
+  const [uploadingCard, setUploadingCard] = useState<{ index: number; isBack: boolean } | null>(null);
 
   // Extra non-color gallery images state
   const [extraUrlInput, setExtraUrlInput] = useState('');
@@ -78,6 +92,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
 
     if (targetIndex !== undefined) {
       // Direct upload into existing color card
+      setUploadingCard({ index: targetIndex, isBack });
       try {
         const res = await uploadService.uploadImage(file);
         const url = res?.fileUrl;
@@ -107,6 +122,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
         };
         reader.readAsDataURL(file);
       } finally {
+        setUploadingCard(null);
         e.target.value = '';
       }
     } else {
@@ -138,7 +154,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
     }
   };
 
-  // Add new color with its linked front and back images
+  // Add new color with its linked front and back images (Single or Two-Tone)
   const handleAddColor = () => {
     if (!newColorName.trim()) {
       alert(t.adminEnterColorName);
@@ -150,6 +166,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
       {
         name: newColorName.trim(),
         hex: newColorHex,
+        secondaryHex: isTwoTone ? (newColorSecondaryHex.trim() || undefined) : undefined,
         image: newColorImage.trim() || undefined,
         backImage: newColorBackImage.trim() || undefined
       }
@@ -161,6 +178,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
     // Reset inputs
     setNewColorName('');
     setNewColorHex('#000000');
+    setNewColorSecondaryHex('#d4b996');
     setNewColorImage('');
     setNewColorBackImage('');
   };
@@ -216,7 +234,6 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
   };
 
   const handleRemoveExtraImage = (imgUrl: string) => {
-    // If this image was on a color, remove it from that color too
     const updatedColors = colors.map(c => c.image === imgUrl ? { ...c, image: undefined } : c);
     onColorsChange(updatedColors);
     const updatedImages = images.filter(img => img !== imgUrl);
@@ -264,47 +281,109 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                 c.image || c.backImage ? 'border-zinc-700' : 'border-amber-500/40 bg-amber-500/5'
               }`}
             >
-              {/* Color Header: Swatch + Name + Hex + Delete */}
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <div className="relative shrink-0 flex items-center">
+              {/* Color Header: Swatches + Name + Hex Codes + Delete */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    {/* Primary Color Picker */}
+                    <div className="relative shrink-0 flex items-center" title={t.adminPrimaryColor}>
+                      <input
+                        type="color"
+                        value={c.hex.startsWith('#') && c.hex.length === 7 ? c.hex : '#000000'}
+                        onChange={(e) => handleUpdateColor(idx, { hex: e.target.value })}
+                        className="w-7 h-7 rounded-lg border border-zinc-600 cursor-pointer p-0 shrink-0 bg-transparent"
+                      />
+                    </div>
+
+                    {/* Secondary Color Picker if Two-Tone */}
+                    {c.secondaryHex ? (
+                      <div className="relative shrink-0 flex items-center" title={t.adminSecondaryColor}>
+                        <input
+                          type="color"
+                          value={c.secondaryHex.startsWith('#') && c.secondaryHex.length === 7 ? c.secondaryHex : '#FFFFFF'}
+                          onChange={(e) => handleUpdateColor(idx, { secondaryHex: e.target.value })}
+                          className="w-7 h-7 rounded-lg border border-amber-500/80 cursor-pointer p-0 shrink-0 bg-transparent"
+                        />
+                      </div>
+                    ) : null}
+
+                    {/* Mini Swatch Indicator */}
+                    <div
+                      className="w-6 h-6 rounded-full border border-zinc-600 shrink-0 shadow-sm"
+                      style={getColorBackgroundStyle(c)}
+                      title={c.secondaryHex ? `${c.name} (Two-Tone)` : c.name}
+                    />
+
                     <input
-                      type="color"
-                      value={c.hex.startsWith('#') && c.hex.length === 7 ? c.hex : '#000000'}
-                      onChange={(e) => handleUpdateColor(idx, { hex: e.target.value })}
-                      className="w-7 h-7 rounded-lg border border-zinc-600 cursor-pointer p-0 shrink-0 bg-transparent"
-                      title={t.adminEditColorDegree}
+                      type="text"
+                      value={c.name}
+                      onChange={(e) => handleUpdateColor(idx, { name: e.target.value })}
+                      placeholder={t.adminColorNamePlaceholder}
+                      className="bg-zinc-800/80 border border-zinc-700 px-2 py-1 text-xs text-white rounded font-bold w-full focus:outline-none focus:border-amber-400"
                     />
                   </div>
-                  <input
-                    type="text"
-                    value={c.name}
-                    onChange={(e) => handleUpdateColor(idx, { name: e.target.value })}
-                    placeholder={t.adminColorNamePlaceholder}
-                    className="bg-zinc-800/80 border border-zinc-700 px-2 py-1 text-xs text-white rounded font-bold w-full focus:outline-none focus:border-amber-400"
-                  />
-                  <input
-                    type="text"
-                    value={c.hex}
-                    onChange={(e) => {
-                      let val = e.target.value;
-                      if (!val.startsWith('#') && val.length > 0) val = '#' + val;
-                      handleUpdateColor(idx, { hex: val.toUpperCase() });
-                    }}
-                    maxLength={7}
-                    className="w-20 bg-zinc-800/80 border border-zinc-700 px-1 py-1 text-[11px] text-amber-300 font-mono rounded text-center focus:outline-none focus:border-amber-400 uppercase font-bold"
-                    title={t.adminHexCode}
-                  />
+
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveColor(idx)}
+                    className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-950/50 rounded transition-colors cursor-pointer shrink-0"
+                    title={t.adminDeleteColor}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => handleRemoveColor(idx)}
-                  className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-950/50 rounded transition-colors cursor-pointer shrink-0"
-                  title={t.adminDeleteColor}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {/* Hex Code Bar + Two-Tone Toggle on Existing Card */}
+                <div className="flex items-center gap-1.5 text-[10px] flex-wrap">
+                  <div className="flex items-center gap-1 bg-zinc-950/60 border border-zinc-800 px-1.5 py-0.5 rounded">
+                    <span className="text-zinc-500 font-mono text-[9px]">1:</span>
+                    <input
+                      type="text"
+                      value={c.hex}
+                      onChange={(e) => {
+                        let val = e.target.value;
+                        if (!val.startsWith('#') && val.length > 0) val = '#' + val;
+                        handleUpdateColor(idx, { hex: val.toUpperCase() });
+                      }}
+                      maxLength={7}
+                      className="w-16 bg-transparent text-amber-300 font-mono rounded text-center focus:outline-none uppercase font-bold"
+                    />
+                  </div>
+
+                  {c.secondaryHex ? (
+                    <div className="flex items-center gap-1 bg-zinc-950/60 border border-amber-500/40 px-1.5 py-0.5 rounded">
+                      <span className="text-amber-400 font-mono text-[9px]">2:</span>
+                      <input
+                        type="text"
+                        value={c.secondaryHex}
+                        onChange={(e) => {
+                          let val = e.target.value;
+                          if (!val.startsWith('#') && val.length > 0) val = '#' + val;
+                          handleUpdateColor(idx, { secondaryHex: val.toUpperCase() });
+                        }}
+                        maxLength={7}
+                        className="w-16 bg-transparent text-amber-400 font-mono rounded text-center focus:outline-none uppercase font-bold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateColor(idx, { secondaryHex: undefined })}
+                        className="text-zinc-500 hover:text-red-400 ml-0.5"
+                        title="إلغاء اللون الثانوي"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateColor(idx, { secondaryHex: '#d4b996' })}
+                      className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-1 px-2 py-0.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded cursor-pointer transition-colors"
+                    >
+                      <Plus className="w-2.5 h-2.5" />
+                      <span>+ {t.adminSecondaryColor}</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Dual Photo Slots: Front (وش) & Back (ظهر) */}
@@ -312,10 +391,18 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                 {/* 1. Front View (وش) */}
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-[10px] text-zinc-400 px-1">
-                    <span className="font-bold text-amber-400">{t.adminFrontPhoto}</span>
+                    <span className="font-bold text-zinc-300">{t.adminFrontPhoto}</span>
+                    {c.image && (
+                      <span className="text-[9px] font-mono text-emerald-400">✓ {isRTL ? 'تم الرفع' : 'Uploaded'}</span>
+                    )}
                   </div>
                   <div className="relative aspect-[3/4] bg-zinc-950 rounded-lg overflow-hidden border border-zinc-800 group flex items-center justify-center">
-                    {c.image ? (
+                    {uploadingCard?.index === idx && !uploadingCard.isBack ? (
+                      <div className="flex flex-col items-center justify-center gap-1 p-2 text-center">
+                        <Loader2 className="w-5 h-5 text-amber-400 animate-spin" />
+                        <span className="text-[9px] font-mono text-zinc-400">{isRTL ? 'جاري الرفع...' : 'Uploading...'}</span>
+                      </div>
+                    ) : c.image ? (
                       <>
                         <img
                           src={c.image}
@@ -324,7 +411,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                         />
                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 p-1">
                           <label className="p-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded cursor-pointer shadow" title={t.adminChangePhoto}>
-                            <Upload className="w-3.5 h-3.5 text-emerald-400" />
+                            <Upload className="w-3.5 h-3.5 text-amber-400" />
                             <input
                               type="file"
                               accept="image/*"
@@ -363,9 +450,17 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-[10px] text-zinc-400 px-1">
                     <span className="font-bold text-zinc-300">{t.adminBackPhoto}</span>
+                    {c.backImage && (
+                      <span className="text-[9px] font-mono text-emerald-400">✓ {isRTL ? 'تم الرفع' : 'Uploaded'}</span>
+                    )}
                   </div>
                   <div className="relative aspect-[3/4] bg-zinc-950 rounded-lg overflow-hidden border border-zinc-800 group flex items-center justify-center">
-                    {c.backImage ? (
+                    {uploadingCard?.index === idx && uploadingCard.isBack ? (
+                      <div className="flex flex-col items-center justify-center gap-1 p-2 text-center">
+                        <Loader2 className="w-5 h-5 text-amber-400 animate-spin" />
+                        <span className="text-[9px] font-mono text-zinc-400">{isRTL ? 'جاري الرفع...' : 'Uploading...'}</span>
+                      </div>
+                    ) : c.backImage ? (
                       <>
                         <img
                           src={c.backImage}
@@ -374,7 +469,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                         />
                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 p-1">
                           <label className="p-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded cursor-pointer shadow" title={t.adminChangePhoto}>
-                            <Upload className="w-3.5 h-3.5 text-emerald-400" />
+                            <Upload className="w-3.5 h-3.5 text-amber-400" />
                             <input
                               type="file"
                               accept="image/*"
@@ -415,78 +510,123 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
 
         {/* 2. Add New Color Variant with Front & Back Images */}
         <div className="p-5 bg-zinc-900/60 border border-dashed border-zinc-700 rounded-xl space-y-4 mt-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <span className="text-xs font-bold text-white flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-amber-400" />
               <span>{t.adminAddNewColorWithPhoto}</span>
             </span>
-            <span className="text-[11px] text-amber-400 font-mono font-medium">
-              ({t.adminFrontPhoto} + {t.adminBackPhoto})
-            </span>
+
+            {/* Mode Switch: Single Color vs Two-Tone Color */}
+            <div className="flex items-center gap-1 p-1 bg-zinc-950 border border-zinc-800 rounded-lg">
+              <button
+                type="button"
+                onClick={() => setIsTwoTone(false)}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                  !isTwoTone
+                    ? 'bg-amber-500 text-black shadow-sm'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <span className="w-2.5 h-2.5 rounded-full bg-current" />
+                <span>{t.adminSingleColor}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsTwoTone(true)}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                  isTwoTone
+                    ? 'bg-amber-500 text-black shadow-sm'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <span
+                  className="w-2.5 h-2.5 rounded-full border border-black/30"
+                  style={{
+                    background: 'linear-gradient(135deg, #111827 50%, #d4b996 50%)'
+                  }}
+                />
+                <span>{t.adminTwoToneColor}</span>
+              </button>
+            </div>
           </div>
 
-          {/* Quick Presets + Custom Color Button */}
+          {/* Quick Presets based on Mode */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[11px] text-zinc-400 block">
-                {t.adminPopularColorPresets}
+                {isTwoTone ? t.adminTwoTonePresets : t.adminPopularColorPresets}
               </span>
-              <button
-                type="button"
-                onClick={() => colorInputRef.current?.click()}
-                className="text-[11px] text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer font-medium"
-              >
-                <Palette className="w-3.5 h-3.5" />
-                <span>{t.adminPickCustomColor}</span>
-              </button>
+              <span className="text-[10px] text-amber-400 font-mono">
+                {isTwoTone ? t.adminTwoToneTip : `(${t.adminFrontPhoto} + ${t.adminBackPhoto})`}
+              </span>
             </div>
+
             <div className="flex flex-wrap gap-1.5">
-              {POPULAR_COLOR_PRESETS.map((preset, pIdx) => (
-                <button
-                  key={pIdx}
-                  type="button"
-                  onClick={() => {
-                    setNewColorName(preset.name.split(' ')[0]);
-                    setNewColorHex(preset.hex);
-                  }}
-                  className="flex items-center gap-1.5 px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-xs text-zinc-200 transition-all cursor-pointer"
-                >
-                  <span className="w-2.5 h-2.5 rounded-full border border-black/30 shrink-0" style={{ backgroundColor: preset.hex }} />
-                  <span>{preset.name}</span>
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => colorInputRef.current?.click()}
-                className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 rounded text-xs text-amber-300 transition-all cursor-pointer font-bold"
-              >
-                <Palette className="w-3 h-3 text-amber-400" />
-                <span>+ {t.adminCustomColor}</span>
-              </button>
+              {isTwoTone ? (
+                POPULAR_TWOTONE_PRESETS.map((preset, pIdx) => (
+                  <button
+                    key={pIdx}
+                    type="button"
+                    onClick={() => {
+                      setNewColorName(preset.name);
+                      setNewColorHex(preset.hex);
+                      setNewColorSecondaryHex(preset.secondaryHex);
+                    }}
+                    className="flex items-center gap-1.5 px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-xs text-zinc-200 transition-all cursor-pointer"
+                  >
+                    <span
+                      className="w-3 h-3 rounded-full border border-black/30 shrink-0"
+                      style={getColorBackgroundStyle(preset)}
+                    />
+                    <span>{preset.name}</span>
+                  </button>
+                ))
+              ) : (
+                POPULAR_COLOR_PRESETS.map((preset, pIdx) => (
+                  <button
+                    key={pIdx}
+                    type="button"
+                    onClick={() => {
+                      setNewColorName(preset.name.split(' ')[0]);
+                      setNewColorHex(preset.hex);
+                    }}
+                    className="flex items-center gap-1.5 px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-xs text-zinc-200 transition-all cursor-pointer"
+                  >
+                    <span className="w-2.5 h-2.5 rounded-full border border-black/30 shrink-0" style={{ backgroundColor: preset.hex }} />
+                    <span>{preset.name}</span>
+                  </button>
+                ))
+              )}
             </div>
           </div>
 
-          {/* Row 1: Swatch / Picker + Hex Code + Color Name */}
-          <div className="flex flex-col sm:flex-row gap-3 items-center">
-            {/* Interactive Color Picker Swatch */}
+          {/* Row 1: Swatch / Pickers + Hex Codes + Color Name */}
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+            {/* Live Interactive Color Preview Swatch */}
             <div
-              onClick={() => colorInputRef.current?.click()}
-              className="relative w-10 h-10 rounded-lg border border-zinc-600 shadow cursor-pointer p-0 shrink-0 flex items-center justify-center group overflow-hidden"
-              style={{ backgroundColor: newColorHex }}
-              title={t.adminPickCustomColor}
-            >
-              <Palette className="w-4 h-4 text-white drop-shadow opacity-70 group-hover:opacity-100 transition-opacity" />
-              <input
-                ref={colorInputRef}
-                type="color"
-                value={newColorHex.startsWith('#') && newColorHex.length === 7 ? newColorHex : '#000000'}
-                onChange={(e) => setNewColorHex(e.target.value.toUpperCase())}
-                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-              />
-            </div>
+              className="relative w-12 h-10 rounded-lg border border-zinc-600 shadow shrink-0 flex items-center justify-center overflow-hidden"
+              style={getColorBackgroundStyle({ hex: newColorHex, secondaryHex: isTwoTone ? newColorSecondaryHex : undefined })}
+              title={isTwoTone ? 'معاينة اللون الثنائي' : 'معاينة اللون'}
+            />
 
-            {/* Hex Code Input */}
-            <div className="relative w-full sm:w-28 shrink-0">
+            {/* Primary Color Picker & Hex */}
+            <div className="flex items-center gap-1.5 bg-zinc-950 p-1.5 rounded-lg border border-zinc-800 shrink-0">
+              <span className="text-[10px] font-bold text-zinc-400 pl-1">{isTwoTone ? '1:' : ''}</span>
+              <div
+                onClick={() => colorInputRef.current?.click()}
+                className="w-7 h-7 rounded border border-zinc-700 cursor-pointer shrink-0 relative overflow-hidden flex items-center justify-center"
+                style={{ backgroundColor: newColorHex }}
+                title={t.adminPrimaryColor}
+              >
+                <Palette className="w-3.5 h-3.5 text-white drop-shadow opacity-70" />
+                <input
+                  ref={colorInputRef}
+                  type="color"
+                  value={newColorHex.startsWith('#') && newColorHex.length === 7 ? newColorHex : '#000000'}
+                  onChange={(e) => setNewColorHex(e.target.value.toUpperCase())}
+                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                />
+              </div>
               <input
                 type="text"
                 value={newColorHex}
@@ -495,20 +635,53 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                   if (!val.startsWith('#') && val.length > 0) val = '#' + val;
                   setNewColorHex(val.toUpperCase());
                 }}
-                placeholder={t.adminHexPlaceholder}
                 maxLength={7}
-                className="w-full bg-zinc-900 border border-zinc-700 px-2 py-2 text-xs text-amber-300 font-mono rounded text-center focus:outline-none focus:border-amber-400 font-bold uppercase"
-                title={t.adminHexCode}
+                className="w-20 bg-zinc-900 border border-zinc-800 px-1.5 py-1 text-xs text-amber-300 font-mono rounded text-center focus:outline-none uppercase font-bold"
+                placeholder="#000000"
               />
             </div>
+
+            {/* Secondary Color Picker & Hex (If Two-Tone) */}
+            {isTwoTone && (
+              <div className="flex items-center gap-1.5 bg-zinc-950 p-1.5 rounded-lg border border-amber-500/40 shrink-0 animate-fade-in">
+                <span className="text-[10px] font-bold text-amber-400 pl-1">2:</span>
+                <div
+                  onClick={() => secondaryColorInputRef.current?.click()}
+                  className="w-7 h-7 rounded border border-amber-500/80 cursor-pointer shrink-0 relative overflow-hidden flex items-center justify-center"
+                  style={{ backgroundColor: newColorSecondaryHex }}
+                  title={t.adminSecondaryColor}
+                >
+                  <Palette className="w-3.5 h-3.5 text-white drop-shadow opacity-70" />
+                  <input
+                    ref={secondaryColorInputRef}
+                    type="color"
+                    value={newColorSecondaryHex.startsWith('#') && newColorSecondaryHex.length === 7 ? newColorSecondaryHex : '#FFFFFF'}
+                    onChange={(e) => setNewColorSecondaryHex(e.target.value.toUpperCase())}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={newColorSecondaryHex}
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    if (!val.startsWith('#') && val.length > 0) val = '#' + val;
+                    setNewColorSecondaryHex(val.toUpperCase());
+                  }}
+                  maxLength={7}
+                  className="w-20 bg-zinc-900 border border-zinc-800 px-1.5 py-1 text-xs text-amber-400 font-mono rounded text-center focus:outline-none uppercase font-bold"
+                  placeholder="#FFFFFF"
+                />
+              </div>
+            )}
 
             {/* Color Name Input */}
             <input
               type="text"
               value={newColorName}
               onChange={(e) => setNewColorName(e.target.value)}
-              placeholder={t.adminColorNamePlaceholder}
-              className="w-full sm:flex-1 bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-bold"
+              placeholder={isTwoTone ? 'اسم اللون الثنائي (مثلاً: كحلي × بيج)' : t.adminColorNamePlaceholder}
+              className="flex-1 bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400 font-bold"
             />
           </div>
 
@@ -703,7 +876,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                     <span
                       className="absolute bottom-1 left-1 rtl:left-auto rtl:right-1 text-[8px] font-bold text-white px-1 py-0.2 rounded shadow backdrop-blur-sm bg-black/80 flex items-center gap-1"
                     >
-                      <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ backgroundColor: matchedColor.hex }} />
+                      <span className="w-2 h-2 rounded-full inline-block border border-black/30" style={getColorBackgroundStyle(matchedColor)} />
                       <span className="truncate max-w-[50px]">{matchedColor.name}</span>
                     </span>
                   )}

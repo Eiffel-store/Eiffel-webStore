@@ -53,13 +53,10 @@ export const CachedImage: React.FC<CachedImageProps> = ({
   };
 
   const handleError = () => {
-    if (currentSrc !== fallbackSrc) {
-      setCurrentSrc(fallbackSrc);
-      setHasError(false);
-    } else {
-      setHasError(true);
-      setIsLoaded(true);
-    }
+    // If the image fails due to network outage or offline state,
+    // show the subtle branded placeholder instead of swapping to a random Unsplash model photo
+    setHasError(true);
+    setIsLoaded(true);
   };
 
   return (

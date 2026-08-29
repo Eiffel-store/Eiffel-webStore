@@ -34,53 +34,113 @@ export const resolveColorImage = (
 };
 
 /**
- * Resolves the full gallery list for a given product and selected color.
- * Prioritizes the color's Front view, Back view, and specific color angles,
- * followed by any remaining general product images.
+ * Returns a stable, fixed list of all images for a product without dynamic reshuffling.
+ * Preserves the exact sequence so thumbnail order remains constant when switching colors.
  */
-export const resolveColorImages = (
-  product?: Product | null,
-  colorName?: string | null
+export const getAllProductImages = (
+  product?: Product | null
 ): string[] => {
   if (!product) return [FALLBACK_IMG];
 
-  const validGeneralImages = (product.images || []).filter(img => img && img.trim() !== '');
+  const gathered: string[] = [];
 
-  if (!colorName || !product.colors || product.colors.length === 0) {
-    return validGeneralImages.length > 0 ? validGeneralImages : [FALLBACK_IMG];
+  // 1. Gather all color images in their fixed order (Front, Back, and Angles)
+  if (product.colors && product.colors.length > 0) {
+    product.colors.forEach(c => {
+      if (c.image && c.image.trim() !== '' && !gathered.includes(c.image.trim())) {
+        gathered.push(c.image.trim());
+      }
+      if (c.backImage && c.backImage.trim() !== '' && !gathered.includes(c.backImage.trim())) {
+        gathered.push(c.backImage.trim());
+      }
+      if (c.images && c.images.length > 0) {
+        c.images.forEach(img => {
+          if (img && img.trim() !== '' && !gathered.includes(img.trim())) {
+            gathered.push(img.trim());
+          }
+        });
+      }
+    });
   }
 
+  // 2. Gather general product images
+  if (product.images && product.images.length > 0) {
+    product.images.forEach(img => {
+      if (img && img.trim() !== '' && !gathered.includes(img.trim())) {
+        gathered.push(img.trim());
+      }
+    });
+  }
+
+  return gathered.length > 0 ? gathered : [FALLBACK_IMG];
+};
+
+/**
+ * Finds the index of a specific color's front image in the stable product image list.
+ */
+export const getColorImageIndex = (
+  product?: Product | null,
+  colorName?: string | null,
+  allImages?: string[]
+): number => {
+  if (!product || !colorName || !product.colors) return 0;
   const cleanTarget = colorName.trim().toLowerCase();
   const colorObj = product.colors.find(
     c => c.name && c.name.trim().toLowerCase() === cleanTarget
   );
+  if (!colorObj) return 0;
 
-  if (colorObj) {
-    const colorSpecificImages: string[] = [];
-    if (colorObj.image && colorObj.image.trim() !== '') {
-      colorSpecificImages.push(colorObj.image.trim());
-    }
-    if (colorObj.backImage && colorObj.backImage.trim() !== '') {
-      colorSpecificImages.push(colorObj.backImage.trim());
-    }
-    if (colorObj.images && colorObj.images.length > 0) {
-      colorObj.images.forEach(img => {
-        if (img && img.trim() !== '' && !colorSpecificImages.includes(img.trim())) {
-          colorSpecificImages.push(img.trim());
-        }
-      });
-    }
+  const targetUrl = colorObj.image || colorObj.backImage;
+  if (!targetUrl) return 0;
 
-    if (colorSpecificImages.length > 0) {
-      // Append any general images that aren't already included
-      const merged = [
-        ...colorSpecificImages,
-        ...validGeneralImages.filter(img => !colorSpecificImages.includes(img))
-      ];
-      return merged;
-    }
-  }
-
-  return validGeneralImages.length > 0 ? validGeneralImages : [FALLBACK_IMG];
+  const imagesList = allImages && allImages.length > 0 ? allImages : getAllProductImages(product);
+  const foundIndex = imagesList.indexOf(targetUrl.trim());
+  return foundIndex !== -1 ? foundIndex : 0;
 };
 
+/**
+ * Resolves the full gallery list for a given product and selected color.
+ */
+export const resolveColorImages = (
+  product?: Product | null,
+  _colorName?: string | null
+): string[] => {
+  return getAllProductImages(product);
+};
+
+/**
+ * Resolves CSS style for color swatches, supporting single solid hex and two-tone 50/50 split gradients.
+ */
+export const getColorBackgroundStyle = (
+  color?: { hex?: string; secondaryHex?: string } | null
+): React.CSSProperties => {
+  if (!color || !color.hex) return { backgroundColor: '#000000' };
+
+  if (color.secondaryHex && color.secondaryHex.trim() !== '') {
+    return {
+      background: `linear-gradient(135deg, ${color.hex.trim()} 50%, ${color.secondaryHex.trim()} 50%)`
+    };
+  }
+
+  return {
+    backgroundColor: color.hex
+  };
+};
+
+/**
+ * Detects and returns the matching ProductColor name when given an image URL.
+ */
+export const resolveColorByImage = (
+  product?: Product | null,
+  imageUrl?: string | null
+): string | null => {
+  if (!product || !imageUrl || !product.colors || product.colors.length === 0) return null;
+  const cleanUrl = imageUrl.trim();
+
+  for (const c of product.colors) {
+    if (c.image && c.image.trim() === cleanUrl) return c.name;
+    if (c.backImage && c.backImage.trim() === cleanUrl) return c.name;
+    if (c.images && c.images.some(img => img && img.trim() === cleanUrl)) return c.name;
+  }
+  return null;
+};

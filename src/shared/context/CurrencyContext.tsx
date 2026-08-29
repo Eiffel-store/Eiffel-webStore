@@ -43,10 +43,13 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const formatPrice = (amount: number): string => {
     const converted = convertPrice(amount);
-    const formattedNumber = new Intl.NumberFormat('en-US').format(converted);
+    const formattedNumber = new Intl.NumberFormat('en-US', {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 0,
+    }).format(converted);
     const isArabic = typeof document !== 'undefined' && document.documentElement.getAttribute('dir') === 'rtl';
     const symbol = isArabic ? 'ج.م' : 'EGP';
-    return `${formattedNumber} ${symbol}`;
+    return `${formattedNumber}\u00A0${symbol}`;
   };
 
   return (

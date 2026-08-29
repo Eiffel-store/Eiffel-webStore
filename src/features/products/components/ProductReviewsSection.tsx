@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Star,
@@ -10,11 +11,14 @@ import {
   Award,
   Calendar,
   User,
-  X
+  X,
+  Lock,
+  LogIn
 } from 'lucide-react';
 import { Product, Review, ProductReviewsSummary, CreateReviewInput } from '@/types';
 import { useLanguage, Pagination, Skeleton } from '@/shared';
 import { reviewService } from '@/services/reviewService';
+import { useAuthStore } from '@/stores/useAuthStore';
 import toast from 'react-hot-toast';
 
 interface ProductReviewsSectionProps {
@@ -23,6 +27,8 @@ interface ProductReviewsSectionProps {
 
 export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ product }) => {
   const { isRTL, t } = useLanguage();
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuthStore();
   const queryClient = useQueryClient();
 
   // Pagination & Filter States
@@ -79,17 +85,25 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formName.trim() || !formComment.trim()) {
-      toast.error(isRTL ? 'يرجى إدخال الاسم والتعليق' : 'Please provide your name and review');
+    if (!isAuthenticated) {
+      toast.error(t.loginToReviewTitle);
       return;
     }
+
+    if (!formComment.trim()) {
+      toast.error(isRTL ? 'يرجى كتابة تفاصيل تجربتك ورأيك' : 'Please provide your review details');
+      return;
+    }
+
+    const customerName = user?.name?.trim() || user?.email?.split('@')[0] || formName.trim() || 'عميل إيفل';
+    const customerEmail = user?.email?.trim() || formEmail.trim() || undefined;
 
     setIsSubmitting(true);
     try {
       const input: CreateReviewInput = {
         rating: formRating,
-        customerName: formName.trim(),
-        customerEmail: formEmail.trim() || undefined,
+        customerName: customerName,
+        customerEmail: customerEmail,
         title: formTitle.trim() || undefined,
         comment: formComment.trim()
       };
@@ -394,122 +408,152 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
               </button>
             </div>
 
-            <form onSubmit={handleSubmitReview} className="space-y-4">
-              {/* Interactive Star Rating Selector */}
-              <div>
-                <label className="block text-xs font-mono text-zinc-400 mb-2">
-                  {t.overallRating}
-                </label>
-                <div className="flex items-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => {
-                    const isFilled = (formHoverRating || formRating) >= star;
-                    return (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => setFormRating(star)}
-                        onMouseEnter={() => setFormHoverRating(star)}
-                        onMouseLeave={() => setFormHoverRating(0)}
-                        className="p-1 text-2xl transition-transform hover:scale-110 cursor-pointer"
-                      >
-                        <Star
-                          className={`w-7 h-7 ${
-                            isFilled
-                              ? 'fill-amber-400 text-amber-400'
-                              : 'fill-zinc-800 text-zinc-700'
-                          }`}
-                        />
-                      </button>
-                    );
-                  })}
-                  <span className="text-xs font-mono font-bold text-amber-400 ml-2 rtl:mr-2">
-                    {formRating} / 5 {t.reviews}
-                  </span>
+            {!isAuthenticated ? (
+              <div className="py-6 px-2 text-center space-y-5 animate-fade-in">
+                <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 mx-auto flex items-center justify-center shadow-lg shadow-amber-500/10">
+                  <Lock className="w-8 h-8" />
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="text-base font-bold text-white">
+                    {t.loginToReviewTitle}
+                  </h4>
+                  <p className="text-xs text-zinc-400 max-w-md mx-auto leading-relaxed">
+                    {t.loginToReviewDesc}
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      navigate('/account');
+                    }}
+                    className="w-full sm:w-auto px-6 py-2.5 bg-amber-400 hover:bg-amber-300 text-black font-label-bold text-xs uppercase tracking-wider rounded-lg shadow-lg shadow-amber-400/20 flex items-center justify-center gap-2 cursor-pointer transition-all"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span>{t.signInNow}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="w-full sm:w-auto px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-mono rounded-lg border border-zinc-700 cursor-pointer transition-colors"
+                  >
+                    {t.cancel}
+                  </button>
                 </div>
               </div>
+            ) : (
+              <form onSubmit={handleSubmitReview} className="space-y-4">
+                {/* Logged in User Profile Info Card */}
+                <div className="flex items-center gap-3 p-3.5 bg-zinc-900/90 border border-amber-500/20 rounded-xl">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-black font-bold flex items-center justify-center text-sm shrink-0 shadow-md">
+                    {user?.name ? user.name.slice(0, 1).toUpperCase() : 'U'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-xs text-white truncate">
+                        {user?.name || user?.email?.split('@')[0]}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>{t.verifiedBuyer}</span>
+                      </span>
+                    </div>
+                    <p className="text-[11px] font-mono text-zinc-400 truncate">
+                      {user?.email}
+                    </p>
+                  </div>
+                </div>
 
-              {/* Name and Email */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Interactive Star Rating Selector */}
+                <div>
+                  <label className="block text-xs font-mono text-zinc-400 mb-2">
+                    {t.overallRating}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => {
+                      const isFilled = (formHoverRating || formRating) >= star;
+                      return (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setFormRating(star)}
+                          onMouseEnter={() => setFormHoverRating(star)}
+                          onMouseLeave={() => setFormHoverRating(0)}
+                          className="p-1 text-2xl transition-transform hover:scale-110 cursor-pointer"
+                        >
+                          <Star
+                            className={`w-7 h-7 ${
+                              isFilled
+                                ? 'fill-amber-400 text-amber-400'
+                                : 'fill-zinc-800 text-zinc-700'
+                            }`}
+                          />
+                        </button>
+                      );
+                    })}
+                    <span className="text-xs font-mono font-bold text-amber-400 ml-2 rtl:mr-2">
+                      {formRating} / 5 {t.reviews}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Review Title */}
                 <div>
                   <label className="block text-xs font-mono text-zinc-400 mb-1">
-                    {t.yourName} *:
+                    {t.reviewTitle}:
                   </label>
                   <input
                     type="text"
-                    required
-                    value={formName}
-                    onChange={(e) => setFormName(e.target.value)}
-                    placeholder={isRTL ? 'مثال: محمد علي' : 'e.g. Alexander Vance'}
+                    value={formTitle}
+                    onChange={(e) => setFormTitle(e.target.value)}
+                    placeholder={isRTL ? 'مثال: خامة فائقة وتطريز متقن' : 'e.g. Exquisite fabric & fit'}
                     className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-white focus:outline-none focus:border-amber-400"
                   />
                 </div>
 
+                {/* Review Comment */}
                 <div>
                   <label className="block text-xs font-mono text-zinc-400 mb-1">
-                    {t.emailLabel}:
+                    {t.reviewComment} *:
                   </label>
-                  <input
-                    type="email"
-                    value={formEmail}
-                    onChange={(e) => setFormEmail(e.target.value)}
-                    placeholder="client@eiffel.com"
-                    className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-white focus:outline-none focus:border-amber-400"
+                  <textarea
+                    required
+                    rows={4}
+                    value={formComment}
+                    onChange={(e) => setFormComment(e.target.value)}
+                    placeholder={
+                      isRTL
+                        ? 'شاركنا رأيك في جودة القماش، المقاس، تفاصيل الخياطة وسرعة التوصيل...'
+                        : 'Share your thoughts on the craftsmanship, fit, fabric quality and delivery...'
+                    }
+                    className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-white focus:outline-none focus:border-amber-400 resize-none"
                   />
                 </div>
-              </div>
 
-              {/* Review Title */}
-              <div>
-                <label className="block text-xs font-mono text-zinc-400 mb-1">
-                  {t.reviewTitle}:
-                </label>
-                <input
-                  type="text"
-                  value={formTitle}
-                  onChange={(e) => setFormTitle(e.target.value)}
-                  placeholder={isRTL ? 'مثال: خامة فائقة وتطريز متقن' : 'e.g. Exquisite fabric & fit'}
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-white focus:outline-none focus:border-amber-400"
-                />
-              </div>
+                {/* Actions */}
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-800">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white cursor-pointer"
+                  >
+                    {t.cancel}
+                  </button>
 
-              {/* Review Comment */}
-              <div>
-                <label className="block text-xs font-mono text-zinc-400 mb-1">
-                  {t.reviewComment} *:
-                </label>
-                <textarea
-                  required
-                  rows={4}
-                  value={formComment}
-                  onChange={(e) => setFormComment(e.target.value)}
-                  placeholder={
-                    isRTL
-                      ? 'شاركنا رأيك في جودة القماش، المقاس، تفاصيل الخياطة وسرعة التوصيل...'
-                      : 'Share your thoughts on the craftsmanship, fit, fabric quality and delivery...'
-                  }
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-white focus:outline-none focus:border-amber-400 resize-none"
-                />
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-800">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white cursor-pointer"
-                >
-                  {t.cancel}
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-5 py-2 rounded bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs shadow-lg shadow-amber-400/20 transition-colors disabled:opacity-50 cursor-pointer"
-                >
-                  {isSubmitting ? t.submittingReview : t.submitReview}
-                </button>
-              </div>
-            </form>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="px-5 py-2 rounded bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs shadow-lg shadow-amber-400/20 transition-colors disabled:opacity-50 cursor-pointer"
+                  >
+                    {isSubmitting ? t.submittingReview : t.submitReview}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

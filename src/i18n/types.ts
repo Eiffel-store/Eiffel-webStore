@@ -488,6 +488,10 @@ export interface TranslationDictionary {
   reviewComment: string;
   submitReview: string;
   submittingReview: string;
+  loginToReviewTitle: string;
+  loginToReviewDesc: string;
+  signInNow: string;
+  postingAs: string;
   
   // Pagination
   showingResults: string;
@@ -1130,6 +1134,12 @@ export interface TranslationDictionary {
   adminUploadBackPhoto: string;
   adminFrontPhotoUploaded: string;
   adminBackPhotoUploaded: string;
+  adminSingleColor: string;
+  adminTwoToneColor: string;
+  adminPrimaryColor: string;
+  adminSecondaryColor: string;
+  adminTwoTonePresets: string;
+  adminTwoToneTip: string;
   adminOrImageUrl: string;
   adminExtraGalleryImages: string;
   adminUploadMultiplePhotosFromDevice: string;

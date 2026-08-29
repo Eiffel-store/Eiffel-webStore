@@ -4,7 +4,7 @@ import { Heart, Eye, ShoppingBag } from 'lucide-react';
 import { Product } from '@/types';
 import { useWishlist } from '@/features/wishlist';
 import { useCart } from '@/features/cart';
-import { useCurrency, useLanguage, resolveColorImage, CachedImage } from '@/shared';
+import { useCurrency, useLanguage, resolveColorImage, CachedImage, getColorBackgroundStyle } from '@/shared';
 
 interface ProductCardProps {
   product: Product;
@@ -155,7 +155,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
                   className={`w-3.5 h-3.5 rounded-full border transition-transform hover:scale-125 cursor-pointer ${
                     activeColorName === c.name ? 'ring-2 ring-amber-400 scale-110 border-white' : 'border-zinc-700'
                   }`}
-                  style={{ backgroundColor: c.hex }}
+                  style={getColorBackgroundStyle(c)}
                 />
               ))}
               {product.colors.length > 5 && (

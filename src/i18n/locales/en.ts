@@ -473,6 +473,10 @@ export const en: TranslationDictionary = {
   reviewComment: "Your Detailed Experience",
   submitReview: "Submit Review",
   submittingReview: "Submitting...",
+  loginToReviewTitle: "Sign In Required to Post Reviews",
+  loginToReviewDesc: "To ensure genuine customer feedback and maintain trusted verified reviews, please sign in to your account first.",
+  signInNow: "Sign In to Account",
+  postingAs: "Posting review as:",
   
   // Pagination
   showingResults: "Showing Results",
@@ -1115,6 +1119,12 @@ export const en: TranslationDictionary = {
   adminUploadBackPhoto: "Upload Back View",
   adminFrontPhotoUploaded: "Front View Uploaded ✓",
   adminBackPhotoUploaded: "Back View Uploaded ✓",
+  adminSingleColor: "Single Color",
+  adminTwoToneColor: "Two-Tone (Dual Color)",
+  adminPrimaryColor: "Primary Color",
+  adminSecondaryColor: "Secondary Color",
+  adminTwoTonePresets: "Popular Two-Tone Colorways",
+  adminTwoToneTip: "Blend two colors into one garment with a 50/50 split swatch",
   adminOrImageUrl: "Or Image URL",
   adminExtraGalleryImages: "Additional Gallery Images",
   adminUploadMultiplePhotosFromDevice: "Upload Multiple Photos from Device",
