@@ -45,40 +45,40 @@ export const NavMegaMenu: React.FC<NavMegaMenuProps> = ({
 
   return (
     <>
-      {/* 1. Dimming Backdrop to completely separate menu from the page underneath */}
+      {/* 1. Dimming Backdrop */}
       <div
         className="fixed inset-0 top-[68px] sm:top-[80px] bg-black/60 backdrop-blur-xs z-40 transition-opacity duration-300 pointer-events-auto"
         onClick={onClose}
       />
 
-      {/* 2. Solid, High-Contrast Mega Menu Container (100% Opaque Solid Background) */}
+      {/* 2. Floating Luxury Mega Menu Card with distinct margin and rounded borders */}
       <div
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        className="absolute top-full left-0 right-0 w-full bg-white dark:bg-[#0c0c0e] border-b border-zinc-200 dark:border-zinc-800 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+        className="absolute top-[calc(100%+8px)] left-0 right-0 w-full max-w-[1400px] mx-auto px-3 sm:px-6 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
       >
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 py-8">
-          <div className="grid grid-cols-12 gap-8 items-start">
-            {/* Categories & Subcategories Columns (Cols 1-8) */}
+        <div className="bg-white dark:bg-[#0e0e11] border border-zinc-200 dark:border-zinc-800/90 rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,0.6)] p-6 sm:p-8">
+          <div className="grid grid-cols-12 gap-6 sm:gap-8 items-start">
+            {/* Categories & Subcategories (Cols 1-8) */}
             <div className="col-span-12 lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8">
               {categories.map((cat) => {
                 const catTitle = language === 'ar' ? (cat.name || cat.nameEn) : (cat.nameEn || cat.name);
                 const subCats = getCategorySubcategories(cat);
 
                 return (
-                  <div key={cat.id} className="space-y-3">
+                  <div key={cat.id} className="space-y-3 bg-zinc-50 dark:bg-zinc-900/40 p-3.5 rounded-xl border border-zinc-150 dark:border-zinc-800/60">
                     {/* Category Title Header */}
                     <Link
                       to={`/collections/${cat.id}`}
                       onClick={onClose}
-                      className="group inline-flex items-center gap-1.5 text-xs font-bold font-editorial uppercase tracking-wider text-zinc-900 dark:text-white hover:text-amber-500 dark:hover:text-amber-400 transition-colors pb-2 border-b border-zinc-200 dark:border-zinc-800 w-full"
+                      className="group inline-flex items-center justify-between gap-1.5 text-xs font-bold font-editorial uppercase tracking-wider text-zinc-900 dark:text-white hover:text-amber-500 dark:hover:text-amber-400 transition-colors pb-1.5 border-b border-zinc-200 dark:border-zinc-800 w-full"
                     >
                       <span className="truncate">{catTitle}</span>
-                      <ChevronRight className={`w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0 ${isRTL ? 'rotate-180 group-hover:-translate-x-0.5' : ''}`} />
+                      <ChevronRight className={`w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0 ${isRTL ? 'rotate-180 group-hover:-translate-x-0.5' : ''}`} />
                     </Link>
 
                     {/* Subcategories */}
-                    <ul className="space-y-2 text-xs font-mono">
+                    <ul className="space-y-1.5 text-xs font-mono">
                       <li>
                         <Link
                           to={`/collections/${cat.id}`}
@@ -105,12 +105,12 @@ export const NavMegaMenu: React.FC<NavMegaMenuProps> = ({
                 );
               })}
 
-              {/* Curated Quick Links */}
-              <div className="space-y-3">
-                <div className="text-xs font-bold font-editorial uppercase tracking-wider text-zinc-900 dark:text-white pb-2 border-b border-zinc-200 dark:border-zinc-800">
+              {/* Curated Highlights */}
+              <div className="space-y-3 bg-zinc-50 dark:bg-zinc-900/40 p-3.5 rounded-xl border border-zinc-150 dark:border-zinc-800/60">
+                <div className="text-xs font-bold font-editorial uppercase tracking-wider text-zinc-900 dark:text-white pb-1.5 border-b border-zinc-200 dark:border-zinc-800">
                   {isRTL ? 'تنسيقات ومجموعات' : 'CURATED HIGHLIGHTS'}
                 </div>
-                <ul className="space-y-2.5 text-xs font-mono">
+                <ul className="space-y-2 text-xs font-mono">
                   <li>
                     <Link
                       to="/collections/new-arrivals"
@@ -145,12 +145,12 @@ export const NavMegaMenu: React.FC<NavMegaMenuProps> = ({
               </div>
             </div>
 
-            {/* Featured Visual Editorial Card (Cols 9-12) */}
-            <div className="col-span-12 lg:col-span-4 pl-0 rtl:pl-0 rtl:pr-0 lg:rtl:pr-8 lg:ltr:pl-8 lg:border-l rtl:lg:border-r rtl:lg:border-l-0 border-zinc-200 dark:border-zinc-800">
+            {/* Featured Visual Card (Cols 9-12) */}
+            <div className="col-span-12 lg:col-span-4 pl-0 rtl:pl-0 rtl:pr-0 lg:rtl:pr-6 lg:ltr:pl-6 lg:border-l rtl:lg:border-r rtl:lg:border-l-0 border-zinc-200 dark:border-zinc-800/80">
               <Link
                 to={`/collections/${featuredCategory.id}`}
                 onClick={onClose}
-                className="group relative block aspect-[16/10] overflow-hidden rounded-lg bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-md"
+                className="group relative block aspect-[16/10] overflow-hidden rounded-xl bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-md"
               >
                 <CachedImage
                   src={featuredCategory.image}
