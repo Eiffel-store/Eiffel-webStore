@@ -8,35 +8,54 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000,
+  timeout: 20000,
 });
+
+// Helper to safely set Authorization header across all Axios / AxiosHeaders instances
+const setAuthHeader = (config: InternalAxiosRequestConfig, token: string) => {
+  if (!config.headers) {
+    config.headers = new axios.AxiosHeaders();
+  }
+  if (typeof config.headers.set === 'function') {
+    config.headers.set('Authorization', `Bearer ${token}`);
+  } else {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+};
 
 // Request Interceptor: Automatically attach JWT Bearer token
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    let token = localStorage.getItem('token') || localStorage.getItem('eiffel_auth_token') || sessionStorage.getItem('token');
-    
-    if (!token) {
-      const storedAuth = localStorage.getItem('eiffel-auth-storage');
-      if (storedAuth) {
-        try {
-          const parsed = JSON.parse(storedAuth);
-          token = parsed?.state?.token;
-        } catch (e) {
-          console.error('Failed to parse auth storage token', e);
+    // If Authorization header is already set (e.g., from retry with fresh token), keep it
+    const existingAuth = typeof config.headers?.get === 'function'
+      ? config.headers.get('Authorization')
+      : config.headers?.['Authorization'];
+
+    if (!existingAuth) {
+      let token = localStorage.getItem('token') || localStorage.getItem('eiffel_auth_token') || sessionStorage.getItem('token');
+
+      if (!token) {
+        const storedAuth = localStorage.getItem('eiffel-auth-storage');
+        if (storedAuth) {
+          try {
+            const parsed = JSON.parse(storedAuth);
+            token = parsed?.state?.token;
+          } catch (e) {
+            console.error('Failed to parse auth storage token', e);
+          }
         }
       }
-    }
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      if (token && token !== 'undefined' && token !== 'null') {
+        setAuthHeader(config, token);
+      }
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Token Refresh Queue Management
+// Token Refresh State & Concurrency Queue
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (value?: any) => void;
@@ -44,47 +63,58 @@ let failedQueue: Array<{
   request: InternalAxiosRequestConfig;
 }> = [];
 
-const isPublicCatalogRequest = (request?: InternalAxiosRequestConfig): boolean => {
-  if (!request) return false;
-  const isGet = request.method?.toUpperCase() === 'GET';
-  const url = request.url || '';
-  return isGet &&
-         !url.includes('/auth/me') &&
-         !url.includes('/orders/my-orders') &&
-         !url.includes('/admin/');
-};
-
 const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach(({ resolve, reject, request }) => {
     if (error) {
-      if (isPublicCatalogRequest(request)) {
-        delete request.headers.Authorization;
-        resolve(axios(request));
-      } else {
-        reject(error);
-      }
+      reject(error);
     } else if (token) {
-      request.headers.Authorization = `Bearer ${token}`;
+      setAuthHeader(request, token);
       resolve(apiClient(request));
     }
   });
   failedQueue = [];
 };
 
+// Helper to retrieve refresh token from localStorage or Zustand store
+const getStoredRefreshToken = (): string | null => {
+  let refreshToken = localStorage.getItem('refreshToken');
+  if (!refreshToken || refreshToken === 'undefined' || refreshToken === 'null') {
+    const storedAuth = localStorage.getItem('eiffel-auth-storage');
+    if (storedAuth) {
+      try {
+        const parsed = JSON.parse(storedAuth);
+        refreshToken = parsed?.state?.refreshToken;
+      } catch (e) {
+        console.error('Failed to parse refreshToken from storage', e);
+      }
+    }
+  }
+  return refreshToken && refreshToken !== 'undefined' && refreshToken !== 'null' ? refreshToken : null;
+};
+
 // Response Interceptor: Seamless Auto-Refresh & Retry on 401
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<{ message?: string }>) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
 
-    // Ignore refresh loop for auth login, register, and refresh endpoints
-    const isAuthEndpoint = originalRequest?.url?.includes('/auth/login') ||
-                           originalRequest?.url?.includes('/auth/register') ||
-                           originalRequest?.url?.includes('/auth/refresh');
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
 
-    if (error.response?.status === 401 && !originalRequest?._retry && !isAuthEndpoint) {
+    const requestUrl = originalRequest.url || '';
+    const isAuthEndpoint =
+      requestUrl.includes('/auth/login') ||
+      requestUrl.includes('/auth/register') ||
+      requestUrl.includes('/auth/refresh') ||
+      requestUrl.includes('/auth/verify-account') ||
+      requestUrl.includes('/auth/verify-otp') ||
+      requestUrl.includes('/auth/reset-password');
+
+    // If 401 received on a non-auth endpoint and hasn't been retried yet
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
-        // Queue the request until refreshing finishes
+        // Enqueue this request while refreshing is in progress
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject, request: originalRequest });
         });
@@ -93,39 +123,26 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      // Extract refreshToken from localStorage / zustand
-      let refreshToken = localStorage.getItem('refreshToken');
-      if (!refreshToken) {
-        const storedAuth = localStorage.getItem('eiffel-auth-storage');
-        if (storedAuth) {
-          try {
-            const parsed = JSON.parse(storedAuth);
-            refreshToken = parsed?.state?.refreshToken;
-          } catch (e) {
-            console.error('Failed to parse refreshToken from storage', e);
-          }
-        }
-      }
+      const refreshToken = getStoredRefreshToken();
 
       if (!refreshToken) {
         isRefreshing = false;
         useAuthStore.getState().logout();
         processQueue(error, null);
-
-        if (isPublicCatalogRequest(originalRequest)) {
-          delete originalRequest.headers.Authorization;
-          return axios(originalRequest);
-        }
-
         const message = error.response?.data?.message || 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً';
         return Promise.reject(new Error(message));
       }
 
       try {
-        // Call backend /auth/refresh directly using raw axios to avoid interceptor recursion
-        const refreshResponse = await axios.post(`${BASE_URL}/auth/refresh`, {
-          refreshToken,
-        });
+        // Send refresh token request directly via raw axios to bypass interceptors
+        const refreshResponse = await axios.post(
+          `${BASE_URL}/auth/refresh`,
+          { refreshToken },
+          {
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 10000,
+          }
+        );
 
         const authData = refreshResponse.data?.data;
         const newAccessToken = authData?.accessToken || authData?.token;
@@ -135,26 +152,21 @@ apiClient.interceptors.response.use(
           throw new Error('No access token returned from refresh endpoint');
         }
 
-        // Update tokens in Zustand & localStorage
-        useAuthStore.getState().setTokens(newAccessToken, newRefreshToken);
+        // Save fresh tokens in storage and Zustand state
         localStorage.setItem('token', newAccessToken);
         localStorage.setItem('refreshToken', newRefreshToken);
+        useAuthStore.getState().setTokens(newAccessToken, newRefreshToken);
 
-        // Resume all queued requests
+        // Resume and retry all queued requests with the new access token
         processQueue(null, newAccessToken);
 
-        // Replay original request with new token
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        // Retry the original request with the fresh token
+        setAuthHeader(originalRequest, newAccessToken);
         return apiClient(originalRequest);
       } catch (refreshErr) {
+        // Refresh token is expired or invalid -> log out and reject queue
         useAuthStore.getState().logout();
         processQueue(refreshErr, null);
-
-        if (isPublicCatalogRequest(originalRequest)) {
-          delete originalRequest.headers.Authorization;
-          return axios(originalRequest);
-        }
-
         return Promise.reject(refreshErr);
       } finally {
         isRefreshing = false;
