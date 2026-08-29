@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { X, LogOut, ChevronDown, Sparkles, Layers } from 'lucide-react';
+import { X, LogOut, Sparkles } from 'lucide-react';
 import { Logo } from '../Logo';
-import { useLanguage, useStoreData } from '@/shared';
+import { useLanguage } from '@/shared';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { NavLinkItem } from './NavDesktopLinks';
 
@@ -17,10 +17,8 @@ export const NavMobileDrawer: React.FC<NavMobileDrawerProps> = ({
   onClose,
   links,
 }) => {
-  const { isRTL, language, t } = useLanguage();
-  const { categories } = useStoreData();
+  const { t } = useLanguage();
   const { user, isAuthenticated, role, logout } = useAuthStore();
-  const [collectionsExpanded, setCollectionsExpanded] = useState(true);
 
   if (!isOpen) return null;
 
@@ -68,63 +66,21 @@ export const NavMobileDrawer: React.FC<NavMobileDrawerProps> = ({
             )}
           </div>
 
-          {/* Mobile Links & Dynamic Categories Accordion */}
-          <div className="py-4 space-y-3">
-            {/* Collections Expandable Accordion */}
-            <div>
-              <button
-                type="button"
-                onClick={() => setCollectionsExpanded(!collectionsExpanded)}
-                className="w-full flex items-center justify-between py-2 text-base font-editorial font-bold text-primary dark:text-white hover:opacity-70 cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-amber-400" />
-                  <span>{language === 'ar' ? 'التشكيلات والأقسام' : 'COLLECTIONS'}</span>
-                </div>
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform duration-200 ${
-                    collectionsExpanded ? 'rotate-180 text-amber-400' : 'text-zinc-500'
-                  }`}
-                />
-              </button>
-
-              {collectionsExpanded && (
-                <div className="mt-1 mr-4 rtl:mr-4 ltr:ml-4 space-y-2 py-2 border-r-2 rtl:border-r-2 ltr:border-l-2 border-surface-container dark:border-zinc-800 pr-3 rtl:pr-3 ltr:pl-3">
-                  {categories.map((cat) => {
-                    const catName = language === 'ar' ? (cat.name || cat.nameEn) : (cat.nameEn || cat.name);
-                    return (
-                      <Link
-                        key={cat.id}
-                        to={`/collections/${cat.id}`}
-                        onClick={onClose}
-                        className="block text-xs font-mono text-secondary dark:text-zinc-300 hover:text-amber-500 dark:hover:text-amber-400 py-1"
-                      >
-                        • {catName}
-                      </Link>
-                    );
-                  })}
-                  <Link
-                    to="/collections/new-arrivals"
-                    onClick={onClose}
-                    className="block text-xs font-mono text-amber-400 py-1 font-bold"
-                  >
-                    ✨ {language === 'ar' ? 'أحدث الإصدارات' : 'New Arrivals'}
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Direct Links */}
+          {/* Mobile Direct Links */}
+          <div className="py-6 space-y-3">
             {links.map((link) => (
               <Link
-                key={link.label}
+                key={link.href + link.label}
                 to={link.href}
                 onClick={onClose}
-                className={`block text-base font-editorial font-bold hover:opacity-70 py-1 ${
+                className={`block text-base font-editorial font-bold hover:opacity-70 py-1.5 border-b border-surface-container-low dark:border-zinc-900 ${
                   link.isSpecial ? 'text-amber-500 dark:text-amber-400' : 'text-primary dark:text-white'
                 }`}
               >
-                {link.label}
+                <div className="flex items-center gap-2">
+                  {link.isSpecial && <Sparkles className="w-4 h-4 text-amber-400" />}
+                  <span>{link.label}</span>
+                </div>
               </Link>
             ))}
 
@@ -132,7 +88,7 @@ export const NavMobileDrawer: React.FC<NavMobileDrawerProps> = ({
               <Link
                 to="/admin"
                 onClick={onClose}
-                className="block text-sm font-bold text-amber-400 hover:underline pt-3 border-t border-surface-container dark:border-zinc-800"
+                className="block text-sm font-bold text-amber-400 hover:underline pt-3 mt-2 border-t border-surface-container dark:border-zinc-800"
               >
                 🛡️ {t.adminPanel}
               </Link>

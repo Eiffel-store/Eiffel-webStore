@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu } from 'lucide-react';
-import { useLanguage } from '@/shared';
+import { useLanguage, useStoreData } from '@/shared';
 import { Logo } from './Logo';
 import {
   NavTopAnnouncement,
@@ -17,6 +17,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   const { t, language } = useLanguage();
+  const { categories } = useStoreData();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
@@ -33,11 +34,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const navLinks: NavLinkItem[] = [
-    { label: language === 'ar' ? 'أحدث الإصدارات' : 'NEW ARRIVALS', href: '/collections/new-arrivals' },
-    { label: t.navCollection04, href: '/collections/offers', isSpecial: true },
-    { label: t.navStores, href: '/stores' },
-  ];
+  // Dynamic Navigation Links: Generated directly from active categories in backend
+  const navLinks: NavLinkItem[] = useMemo(() => {
+    const dynamicCats: NavLinkItem[] = categories.map((cat) => ({
+      label: language === 'ar' ? (cat.name || cat.nameEn) : (cat.nameEn || cat.name),
+      href: `/collections/${cat.id}`,
+    }));
+
+    return [
+      ...dynamicCats,
+      { label: language === 'ar' ? 'أحدث الإصدارات' : 'NEW ARRIVALS', href: '/collections/new-arrivals' },
+      { label: t.navCollection04, href: '/collections/offers', isSpecial: true },
+      { label: t.navStores, href: '/stores' },
+    ];
+  }, [categories, language, t]);
 
   return (
     <>
@@ -69,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
               <Logo size="md" />
             </Link>
 
-            {/* Desktop Navigation Links */}
+            {/* Desktop Navigation Links (Option 1: Direct Dynamic Links) */}
             <NavDesktopLinks links={navLinks} />
           </div>
 
