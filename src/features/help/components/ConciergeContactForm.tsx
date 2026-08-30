@@ -1,126 +1,87 @@
-import React, { useState } from 'react';
-import { Send, Check, MessageSquare } from 'lucide-react';
-import { useLanguage, FacebookIcon, WhatsAppIcon } from '@/shared';
+import React from 'react';
+import { Phone, Clock, ShieldCheck, MapPin } from 'lucide-react';
+import { useLanguage, useStoreData, FacebookIcon, WhatsAppIcon } from '@/shared';
 
-interface ConciergeContactFormProps {
-  onOpenLiveChat: () => void;
-}
+export const ConciergeContactForm: React.FC = () => {
+  const { language, t } = useLanguage();
+  const { settings } = useStoreData();
+  const isAr = language === 'ar';
 
-export const ConciergeContactForm: React.FC<ConciergeContactFormProps> = ({
-  onOpenLiveChat,
-}) => {
-  const { t, isRTL } = useLanguage();
-  const [contactSubmitted, setContactSubmitted] = useState(false);
-  const [contactMessage, setContactMessage] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-
-  // Social links
-  const facebookUrl = 'https://www.facebook.com/profile.php?id=100093268017929';
-  const whatsappUrl = 'https://wa.me/'; // User can replace with actual WhatsApp number e.g. https://wa.me/201000000000
-
-  const handleContactSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setContactSubmitted(true);
-    setTimeout(() => {
-      setContactSubmitted(false);
-      setContactMessage('');
-      setContactEmail('');
-    }, 3000);
-  };
+  // Dynamic social & contact links from store settings
+  const rawWhatsapp = settings?.whatsappNumber?.replace(/[^0-9]/g, '') || '201000000000';
+  const whatsappUrl = `https://wa.me/${rawWhatsapp}`;
+  const facebookUrl = settings?.facebookUrl || 'https://www.facebook.com/profile.php?id=100093268017929';
+  const phoneNumber = settings?.phone || '+20 100 000 0000';
 
   return (
     <div className="lg:col-span-5 space-y-6">
       <div className="p-6 sm:p-8 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 space-y-6">
         <div>
-          <span className="text-[10px] font-mono text-secondary uppercase">24/7 PRIVATE CLIENT SERVICE</span>
-          <h3 className="font-editorial text-2xl sm:text-3xl text-primary dark:text-white mt-0.5">
-            {t.contactConciergeTitle}
+          <span className="text-[10px] font-mono text-secondary uppercase tracking-widest">
+            {isAr ? 'خدمة العملاء الخاصة 24/7' : '24/7 PRIVATE CLIENT SERVICE'}
+          </span>
+          <h3 className="font-editorial text-2xl sm:text-3xl text-primary dark:text-white mt-1">
+            {t.contactConciergeTitle || (isAr ? 'تواصل مع خدمة العملاء والواتساب' : 'Direct Concierge & WhatsApp')}
           </h3>
-          <p className="text-xs text-secondary dark:text-zinc-400 font-light mt-1">
-            {t.contactConciergeDesc}
+          <p className="text-xs text-secondary dark:text-zinc-400 font-light mt-1.5 leading-relaxed">
+            {t.contactConciergeDesc || (isAr ? 'فريقنا جاهز للرد الفوري على استفساراتكم حول المقاسات، الطلبات، والشحن في أي وقت.' : 'Our dedicated luxury client advisors are ready to assist with sizing, styling, and order inquiries.')}
           </p>
         </div>
 
         {/* Quick Social Contact Buttons */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
           <a
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 py-3 px-4 bg-[#25D366] text-white font-label-bold text-xs uppercase tracking-wider hover:bg-[#20ba5a] transition-colors shadow-sm"
+            className="flex items-center justify-center gap-2.5 py-3.5 px-4 bg-[#25D366] text-white font-label-bold text-xs uppercase tracking-wider hover:bg-[#20ba5a] transition-all duration-200 shadow-sm"
           >
             <WhatsAppIcon className="w-4 h-4 fill-current" />
-            <span>{t.whatsapp}</span>
+            <span>{t.whatsapp || 'واتساب'}</span>
           </a>
 
           <a
             href={facebookUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 py-3 px-4 bg-[#1877F2] text-white font-label-bold text-xs uppercase tracking-wider hover:bg-[#166fe5] transition-colors shadow-sm"
+            className="flex items-center justify-center gap-2.5 py-3.5 px-4 bg-[#1877F2] text-white font-label-bold text-xs uppercase tracking-wider hover:bg-[#166fe5] transition-all duration-200 shadow-sm"
           >
             <FacebookIcon className="w-4 h-4 fill-current" />
-            <span>{t.facebook}</span>
+            <span>{t.facebook || 'فيسبوك'}</span>
           </a>
         </div>
 
-        {contactSubmitted ? (
-          <div className="p-6 bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container text-center space-y-2 animate-fade-in">
-            <div className="w-10 h-10 rounded-full bg-green-100 text-green-700 mx-auto flex items-center justify-center">
-              <Check className="w-5 h-5" />
+        {/* Store Highlights & Info */}
+        <div className="pt-4 border-t border-surface-container dark:border-zinc-800 space-y-4">
+          <div className="flex items-start gap-3 text-xs text-secondary dark:text-zinc-300">
+            <Clock className="w-4 h-4 text-primary dark:text-white shrink-0 mt-0.5" />
+            <div>
+              <span className="font-semibold block text-primary dark:text-white">
+                {isAr ? 'ساعات العمل والمساعدة:' : 'Support Availability:'}
+              </span>
+              <span>{isAr ? 'يومياً من 10:00 صباحاً حتى 11:00 مساءً' : 'Daily 10:00 AM – 11:00 PM (GMT+2)'}</span>
             </div>
-            <h4 className="font-editorial text-xl text-primary dark:text-white">{t.inquiryReceived}</h4>
-            <p className="text-xs text-secondary font-light">
-              {t.inquiryReceivedDesc}
-            </p>
           </div>
-        ) : (
-          <form onSubmit={handleContactSubmit} className="space-y-4">
-            <div>
-              <label className="block text-[10px] font-label-bold text-secondary uppercase mb-1">
-                {t.emailLabel}
-              </label>
-              <input
-                type="email"
-                required
-                value={contactEmail}
-                onChange={(e) => setContactEmail(e.target.value)}
-                placeholder="client@eiffel-store.com"
-                className="w-full bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-700 p-3 text-xs text-primary dark:text-white font-mono focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-[10px] font-label-bold text-secondary uppercase mb-1">
-                {t.messageLabel}
-              </label>
-              <textarea
-                rows={4}
-                required
-                value={contactMessage}
-                onChange={(e) => setContactMessage(e.target.value)}
-                placeholder={t.conciergeMessagePlaceholder}
-                className="w-full bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-700 p-3 text-xs text-primary dark:text-white focus:outline-none"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full py-4 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
-            >
-              <Send className={`w-3.5 h-3.5 ${isRTL ? 'rotate-180' : ''}`} />
-              <span>{t.transmitInquiry}</span>
-            </button>
-          </form>
-        )}
 
-        {/* Live Chat Trigger */}
-        <div className="pt-4 border-t border-surface-container dark:border-zinc-800">
-          <button
-            onClick={onOpenLiveChat}
-            className="w-full py-3.5 border border-primary dark:border-white font-label-bold text-xs tracking-widest uppercase text-primary dark:text-white hover:bg-primary hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors flex items-center justify-center gap-2"
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span>{t.startLiveChatAction}</span>
-          </button>
+          <div className="flex items-start gap-3 text-xs text-secondary dark:text-zinc-300">
+            <ShieldCheck className="w-4 h-4 text-primary dark:text-white shrink-0 mt-0.5" />
+            <div>
+              <span className="font-semibold block text-primary dark:text-white">
+                {isAr ? 'ضمان إيفل الفاخر:' : 'Authenticity & Guarantee:'}
+              </span>
+              <span>{isAr ? 'منتجات أصلية 100% مع خيار المعاينة قبل الاستلام' : '100% authentic garments with doorstep inspection'}</span>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 text-xs text-secondary dark:text-zinc-300">
+            <MapPin className="w-4 h-4 text-primary dark:text-white shrink-0 mt-0.5" />
+            <div>
+              <span className="font-semibold block text-primary dark:text-white">
+                {isAr ? 'فروعنا في مصر:' : 'Flagship Boutiques:'}
+              </span>
+              <span>{isAr ? 'زفتى - شارع الجيش | نهطاي - بجوار كوبري المشاة' : 'Zefta - El Geish St | Nehtay - Pedestrian Bridge'}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
