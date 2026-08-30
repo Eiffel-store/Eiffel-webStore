@@ -130,8 +130,8 @@ export const CollectionsPage: React.FC = () => {
     const target = targetCategory.toLowerCase().trim();
     const prodCat = (p.category || '').toLowerCase().trim();
 
-    if (target === 'offers') {
-      return Boolean((p.originalPrice && p.originalPrice > p.price) || p.isBestSeller || p.isNew || prodCat === 'offers');
+    if (target === 'offers' || target === 'sale') {
+      return Boolean((p.originalPrice && p.originalPrice > p.price) || prodCat === 'offers' || prodCat === 'sale');
     }
 
     if (target === 'new-arrivals') {
