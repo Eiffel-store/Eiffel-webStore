@@ -16,7 +16,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
@@ -33,36 +33,36 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Core Static Navigation Links (Instant Zero-Delay Rendering)
+  // Core Static Navigation Links (Linked to i18n Dictionary)
   const navLinks: NavLinkItem[] = useMemo(() => {
     return [
       {
-        label: language === 'ar' ? 'أزياء الرجال' : 'MEN COLLECTION',
+        label: t.navMen,
         href: '/collections/men',
       },
       {
-        label: language === 'ar' ? 'أزياء الأطفال' : 'KIDS COLLECTION',
+        label: t.navKids,
         href: '/collections/kids',
       },
       {
-        label: language === 'ar' ? 'الإكسسوارات' : 'ACCESSORIES',
+        label: t.navAccessories,
         href: '/collections/accessories',
       },
       {
-        label: language === 'ar' ? 'الأحذية الفاخرة' : 'SHOES & FOOTWEAR',
+        label: t.navShoes,
         href: '/collections/shoes',
       },
       {
-        label: language === 'ar' ? (t.navCollection04 || 'العروض') : 'OFFERS',
+        label: t.navOffers || t.navCollection04,
         href: '/collections/offers',
         isSpecial: true,
       },
       {
-        label: language === 'ar' ? (t.navStores || 'فروعنا') : 'OUR BRANCHES',
+        label: t.navStores,
         href: '/stores',
       },
     ];
-  }, [language, t]);
+  }, [t]);
 
   return (
     <>

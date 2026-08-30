@@ -45,10 +45,12 @@ export const en: TranslationDictionary = {
   topBannerLocations: "GHARBIA • ZEFTA • NAHTAY",
   help: "HELP & SUPPORT",
   atelier: "OUR BRANCHES",
-  
-  navMen: "MEN",
-  navKids: "KIDS",
+  // Navigation
+  navMen: "MEN COLLECTION",
+  navKids: "KIDS COLLECTION",
   navAccessories: "ACCESSORIES",
+  navShoes: "SHOES & FOOTWEAR",
+  navOffers: "OFFERS",
   navCollection04: "OFFERS",
   navJournal: "THE JOURNAL",
   navStores: "OUR BRANCHES",

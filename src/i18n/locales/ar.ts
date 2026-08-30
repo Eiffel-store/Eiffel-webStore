@@ -49,9 +49,11 @@ export const ar: TranslationDictionary = {
   atelier: "فروعنا",
   
   // Navigation
-  navMen: "الرجال",
-  navKids: "الأطفال",
+  navMen: "أزياء الرجال",
+  navKids: "أزياء الأطفال",
   navAccessories: "الإكسسوارات",
+  navShoes: "الأحذية الفاخرة",
+  navOffers: "العروض",
   navCollection04: "العروض",
   navJournal: "المجلة",
   navStores: "فروعنا",

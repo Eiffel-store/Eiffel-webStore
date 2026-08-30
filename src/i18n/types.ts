@@ -52,6 +52,8 @@ export interface TranslationDictionary {
   navMen: string;
   navKids: string;
   navAccessories: string;
+  navShoes: string;
+  navOffers: string;
   navCollection04: string;
   navJournal: string;
   navStores: string;
