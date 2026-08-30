@@ -17,7 +17,8 @@ import {
   LayoutTemplate,
   BarChart3,
   Users,
-  Star
+  Star,
+  RefreshCw
 } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useStoreData } from '@/shared';
@@ -41,6 +42,7 @@ export const AdminLayout: React.FC = () => {
     { label: t.adminCategories, href: '/admin/categories', icon: Grid },
     { label: t.adminBranches, href: '/admin/branches', icon: MapPin },
     { label: t.adminOrders, href: '/admin/orders', icon: Package, badge: pendingOrdersCount ? `${pendingOrdersCount}` : undefined, badgeColor: 'bg-amber-500' },
+    { label: isRTL ? 'طلبات الاستبدال' : 'Exchanges', href: '/admin/exchanges', icon: RefreshCw },
     { label: t.adminReviews, href: '/admin/reviews', icon: Star },
     { label: t.adminReports, href: '/admin/reports', icon: BarChart3 },
     { label: t.adminCustomers, href: '/admin/customers', icon: Users },

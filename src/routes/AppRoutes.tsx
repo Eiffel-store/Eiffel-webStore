@@ -20,6 +20,7 @@ import {
   AdminCategoriesPage,
   AdminBranchesPage,
   AdminOrdersPage,
+  AdminExchangesPage,
   AdminReviewsPage,
   AdminReportsPage,
   AdminCustomersPage,
@@ -84,6 +85,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ onOpenSearch }) => {
           <Route path="categories" element={<AdminCategoriesPage />} />
           <Route path="branches" element={<AdminBranchesPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="exchanges" element={<AdminExchangesPage />} />
           <Route path="reviews" element={<AdminReviewsPage />} />
           <Route path="reports" element={<AdminReportsPage />} />
           <Route path="customers" element={<AdminCustomersPage />} />

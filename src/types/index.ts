@@ -372,3 +372,32 @@ export interface CreateReviewInput {
   comment: string;
 }
 
+export type ExchangeType = 'EXCHANGE_SIZE' | 'EXCHANGE_COLOR' | 'DEFECT' | 'RETURN_REFUND';
+export type ExchangeStatus = 'PENDING' | 'APPROVED' | 'IN_TRANSIT' | 'COMPLETED' | 'REJECTED';
+
+export interface ExchangeRequest {
+  id: string;
+  orderId: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  productId: string;
+  productName: string;
+  productImage?: string;
+  originalSize?: string;
+  originalColor?: string;
+  requestedSize?: string;
+  requestedColor?: string;
+  requestType: ExchangeType;
+  reason: string;
+  customerNotes?: string;
+  proofImageUrl?: string;
+  pickupAddress?: string;
+  pickupCity?: string;
+  status: ExchangeStatus;
+  adminNotes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+
