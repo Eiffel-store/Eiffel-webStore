@@ -60,7 +60,6 @@ export const useBackupData = ({
 
   const resetAllToDefault = () => {
     localStorage.removeItem('eiffel_home_settings');
-    localStorage.removeItem('eiffel_categories');
     queryClient.invalidateQueries();
   };
 

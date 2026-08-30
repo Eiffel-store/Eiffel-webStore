@@ -5,7 +5,6 @@ import {
   StoreDataContextType,
   DEFAULT_SETTINGS,
   DEFAULT_HOME_SETTINGS,
-  STATIC_CATEGORIES,
   useProductsData,
   useCategoriesData,
   useStoresData,
@@ -18,7 +17,7 @@ import {
 } from './store';
 
 // Re-export defaults and types for backward compatibility
-export { DEFAULT_SETTINGS, DEFAULT_HOME_SETTINGS, STATIC_CATEGORIES };
+export { DEFAULT_SETTINGS, DEFAULT_HOME_SETTINGS };
 export type { StoreDataContextType };
 
 export const StoreDataContext = createContext<StoreDataContextType | undefined>(undefined);
@@ -46,7 +45,7 @@ export const StoreDataProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     addCategory,
     updateCategory,
     deleteCategory
-  } = useCategoriesData();
+  } = useCategoriesData(queryClient);
 
   const {
     stores,
