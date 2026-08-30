@@ -1,17 +1,17 @@
 import React from 'react';
-import { Phone, Clock, ShieldCheck, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Clock, ShieldCheck, MapPin } from 'lucide-react';
 import { useLanguage, useStoreData, FacebookIcon, WhatsAppIcon } from '@/shared';
 
 export const ConciergeContactForm: React.FC = () => {
   const { language, t } = useLanguage();
-  const { settings } = useStoreData();
+  const { settings, stores } = useStoreData();
   const isAr = language === 'ar';
 
   // Dynamic social & contact links from store settings
   const rawWhatsapp = settings?.whatsappNumber?.replace(/[^0-9]/g, '') || '201000000000';
   const whatsappUrl = `https://wa.me/${rawWhatsapp}`;
   const facebookUrl = settings?.facebookUrl || 'https://www.facebook.com/profile.php?id=100093268017929';
-  const phoneNumber = settings?.phone || '+20 100 000 0000';
 
   return (
     <div className="lg:col-span-5 space-y-6">
@@ -73,13 +73,37 @@ export const ConciergeContactForm: React.FC = () => {
             </div>
           </div>
 
+          {/* Dynamic Flagship Branches from Backend */}
           <div className="flex items-start gap-3 text-xs text-secondary dark:text-zinc-300">
             <MapPin className="w-4 h-4 text-primary dark:text-white shrink-0 mt-0.5" />
-            <div>
-              <span className="font-semibold block text-primary dark:text-white">
-                {isAr ? 'فروعنا في مصر:' : 'Flagship Boutiques:'}
-              </span>
-              <span>{isAr ? 'زفتى - شارع الجيش | نهطاي - بجوار كوبري المشاة' : 'Zefta - El Geish St | Nehtay - Pedestrian Bridge'}</span>
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold block text-primary dark:text-white">
+                  {isAr ? 'فروعنا في مصر:' : 'Flagship Boutiques:'}
+                </span>
+                <Link to="/stores" className="text-[10px] text-primary dark:text-white underline hover:opacity-80 font-mono">
+                  {isAr ? 'عرض على الخريطة' : 'View on Map'}
+                </Link>
+              </div>
+
+              {stores && stores.length > 0 ? (
+                <div className="mt-1.5 space-y-1.5">
+                  {stores.map((store) => (
+                    <div key={store.id} className="text-[11px] leading-snug">
+                      <span className="text-primary dark:text-white font-medium">
+                        {isAr ? store.name : (store.nameEn || store.name)}
+                      </span>
+                      {(store.address || store.addressEn) && (
+                        <span className="text-zinc-400"> - {isAr ? store.address : (store.addressEn || store.address)}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-[11px] text-zinc-400 block mt-0.5">
+                  {isAr ? 'زفتى - شارع الجيش | نهطاي - بجوار كوبري المشاة' : 'Zefta - El Geish St | Nehtay - Pedestrian Bridge'}
+                </span>
+              )}
             </div>
           </div>
         </div>

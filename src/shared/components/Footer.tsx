@@ -6,8 +6,9 @@ import { Logo } from './Logo';
 import { FacebookIcon, WhatsAppIcon } from './SocialIcons';
 
 export const Footer: React.FC = () => {
-  const { t } = useLanguage();
-  const { settings } = useStoreData();
+  const { language, t } = useLanguage();
+  const { settings, stores } = useStoreData();
+  const isAr = language === 'ar';
 
   // Dynamic social & contact links from store settings
   const rawWhatsapp = settings?.whatsappNumber?.replace(/[^0-9]/g, '') || '201009326801';
@@ -99,7 +100,7 @@ export const Footer: React.FC = () => {
 
           {/* Nav Columns */}
           <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8">
-            {/* Collections Column (Reflecting all 5 core collections from Navbar) */}
+            {/* Collections Column */}
             <div>
               <h4 className="font-label-bold text-xs tracking-widest uppercase text-zinc-200 mb-3 sm:mb-4 pb-2 border-b border-zinc-800">
                 {t.footerCollections}
@@ -126,27 +127,49 @@ export const Footer: React.FC = () => {
               </ul>
             </div>
 
-            {/* Flagship Branches Column */}
+            {/* Dynamic Flagship Branches Column from Backend */}
             <div className="col-span-2 sm:col-span-1">
-              <h4 className="font-label-bold text-xs tracking-widest uppercase text-zinc-200 mb-3 sm:mb-4 pb-2 border-b border-zinc-800">
-                {t.footerMaisons}
+              <h4 className="font-label-bold text-xs tracking-widest uppercase text-zinc-200 mb-3 sm:mb-4 pb-2 border-b border-zinc-800 flex items-center justify-between">
+                <span>{t.footerMaisons}</span>
+                <Link to="/stores" className="text-[10px] text-zinc-400 hover:text-white lowercase font-mono">
+                  {t.navStores} ↗
+                </Link>
               </h4>
-              <ul className="space-y-2 text-xs text-zinc-400 font-light">
-                <li>
-                  <Link to="/stores" className="hover:text-white transition-colors">
-                    {t.footerZiftaBranch}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/stores" className="hover:text-white transition-colors">
-                    {t.footerNahtayBranch}
-                  </Link>
-                </li>
-                <li>
-                  <span className="text-zinc-500 text-[11px]">
-                    {t.footerGharbiaEgypt}
-                  </span>
-                </li>
+              <ul className="space-y-2.5 text-xs text-zinc-400 font-light">
+                {stores && stores.length > 0 ? (
+                  stores.slice(0, 4).map((store) => {
+                    const storeName = isAr ? store.name : (store.nameEn || store.name);
+                    const storeAddress = isAr ? store.address : (store.addressEn || store.address);
+                    return (
+                      <li key={store.id}>
+                        <Link to="/stores" className="hover:text-white transition-colors block group">
+                          <span className="block text-zinc-300 group-hover:text-white font-medium">{storeName}</span>
+                          {storeAddress && (
+                            <span className="block text-[11px] text-zinc-500 line-clamp-1">{storeAddress}</span>
+                          )}
+                        </Link>
+                      </li>
+                    );
+                  })
+                ) : (
+                  <>
+                    <li>
+                      <Link to="/stores" className="hover:text-white transition-colors">
+                        {t.footerZiftaBranch}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/stores" className="hover:text-white transition-colors">
+                        {t.footerNahtayBranch}
+                      </Link>
+                    </li>
+                    <li>
+                      <span className="text-zinc-500 text-[11px]">
+                        {t.footerGharbiaEgypt}
+                      </span>
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
           </div>
