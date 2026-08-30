@@ -5,7 +5,6 @@ import { useStoreData, useLanguage } from '@/shared';
 import { AdminContactSettingsForm } from '../components/settings/AdminContactSettingsForm';
 import { AdminAnnouncementSettingsForm } from '../components/settings/AdminAnnouncementSettingsForm';
 import { AdminLoyaltyVIPSettingsForm } from '../components/settings/AdminLoyaltyVIPSettingsForm';
-import { AdminSecuritySettingsForm } from '../components/settings/AdminSecuritySettingsForm';
 import { AdminDataBackupCard } from '../components/settings/AdminDataBackupCard';
 
 export const AdminSettingsPage: React.FC = () => {
@@ -58,7 +57,7 @@ export const AdminSettingsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Section 1 & 2: Store Contact, Social Channels & Announcement Form */}
+      {/* Section 1, 2, 3: Store Contact, Social Channels & Announcement Form */}
       <form onSubmit={handleSaveSettings} className="bg-zinc-950 border border-zinc-800 p-6 space-y-6 shadow-xl">
         <AdminContactSettingsForm
           settings={formSettings}
@@ -86,10 +85,7 @@ export const AdminSettingsPage: React.FC = () => {
         </div>
       </form>
 
-      {/* Section 3: Admin Security & Master PIN */}
-      <AdminSecuritySettingsForm />
-
-      {/* Section 4: JSON Backup, Restore & Factory Reset */}
+      {/* JSON Backup, Restore & Factory Reset */}
       <AdminDataBackupCard
         onSuccess={(msg) => {
           setSuccessMessage(msg);
