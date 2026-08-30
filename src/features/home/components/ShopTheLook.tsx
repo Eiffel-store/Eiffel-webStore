@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { ShoppingBag, Sparkles, Check } from 'lucide-react';
 import { useStoreData, useCurrency, useLanguage, CachedImage } from '@/shared';
 import { useCart } from '@/features/cart';
-import { Look, Product } from '@/types';
+import { Product } from '@/types';
 
 export const ShopTheLook: React.FC = () => {
-  const { products = [], activeLooks = [], homeSettings } = useStoreData();
+  const { products = [], activeLooks = [] } = useStoreData();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
   const { t, isRTL } = useLanguage();
@@ -14,36 +14,18 @@ export const ShopTheLook: React.FC = () => {
   const [highlightedPinIndex, setHighlightedPinIndex] = useState<number | null>(null);
   const [addedItemIds, setAddedItemIds] = useState<Record<string, boolean>>({});
 
-  // Fallback look from homeSettings ONLY if an image URL is explicitly defined
-  const fallbackLook: Partial<Look> | null = homeSettings?.shopTheLook?.imageUrl ? {
-    id: 'legacy-home-look',
-    titleAr: homeSettings.shopTheLook.titleAr || t.shopTheLook,
-    titleEn: homeSettings.shopTheLook.titleEn || t.shopTheLook,
-    subtitleAr: homeSettings.shopTheLook.subtitleAr || t.curatedEnsemble,
-    subtitleEn: homeSettings.shopTheLook.subtitleEn || t.curatedEnsemble,
-    imageUrl: homeSettings.shopTheLook.imageUrl,
-    hotspots: homeSettings.shopTheLook.hotspots || [],
-    category: 'men'
-  } : null;
-
-  const displayLooks: Partial<Look>[] = activeLooks.length > 0
-    ? activeLooks
-    : (fallbackLook ? [fallbackLook] : []);
-
-  // If no active looks exist in database or settings, do NOT render this section at all!
-  if (displayLooks.length === 0) {
+  // If no active looks exist in database, do NOT render this section at all!
+  if (!activeLooks || activeLooks.length === 0) {
     return null;
   }
 
-  const safeIndex = selectedLookIndex >= displayLooks.length ? 0 : selectedLookIndex;
-  const currentLook = displayLooks[safeIndex];
-  if (!currentLook) return null;
+  const safeIndex = selectedLookIndex >= activeLooks.length ? 0 : selectedLookIndex;
+  const currentLook = activeLooks[safeIndex];
+  if (!currentLook || !currentLook.imageUrl) return null;
 
   const title = isRTL ? (currentLook.titleAr || t.shopTheLook) : (currentLook.titleEn || t.shopTheLook);
   const subtitle = isRTL ? (currentLook.subtitleAr || t.curatedEnsemble) : (currentLook.subtitleEn || t.curatedEnsemble);
-  const mainImage = currentLook.imageUrl || '';
-
-  if (!mainImage) return null;
+  const mainImage = currentLook.imageUrl;
 
   const hotspots = currentLook.hotspots || [];
   const lookProducts = hotspots.length > 0
@@ -87,9 +69,9 @@ export const ShopTheLook: React.FC = () => {
         </div>
 
         {/* Multi-Look Selection Category Tabs */}
-        {displayLooks.length > 1 && (
+        {activeLooks.length > 1 && (
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none max-w-full">
-            {displayLooks.map((look: any, idx: number) => {
+            {activeLooks.map((look: any, idx: number) => {
               const isActive = idx === safeIndex;
               const lookTabName = isRTL ? (look.categoryAr || look.titleAr || `إطلالة ${idx + 1}`) : (look.categoryEn || look.titleEn || `Look ${idx + 1}`);
 
