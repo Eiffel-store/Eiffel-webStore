@@ -34,19 +34,36 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // First 4 backend categories + Offers + Stores as direct navbar links
+  // Core Static Navigation Links (Instant Zero-Delay Rendering)
   const navLinks: NavLinkItem[] = useMemo(() => {
-    const top4Categories: NavLinkItem[] = categories.slice(0, 4).map((cat) => ({
-      label: language === 'ar' ? (cat.name || cat.nameEn) : (cat.nameEn || cat.name),
-      href: `/collections/${cat.id}`,
-    }));
-
     return [
-      ...top4Categories,
-      { label: t.navCollection04, href: '/collections/offers', isSpecial: true },
-      { label: t.navStores, href: '/stores' },
+      {
+        label: language === 'ar' ? 'أزياء الرجال' : 'MEN COLLECTION',
+        href: '/collections/men',
+      },
+      {
+        label: language === 'ar' ? 'أزياء الأطفال' : 'KIDS COLLECTION',
+        href: '/collections/kids',
+      },
+      {
+        label: language === 'ar' ? 'الإكسسوارات' : 'ACCESSORIES',
+        href: '/collections/accessories',
+      },
+      {
+        label: language === 'ar' ? 'الأحذية الفاخرة' : 'SHOES & FOOTWEAR',
+        href: '/collections/shoes',
+      },
+      {
+        label: language === 'ar' ? (t.navCollection04 || 'العروض') : 'OFFERS',
+        href: '/collections/offers',
+        isSpecial: true,
+      },
+      {
+        label: language === 'ar' ? (t.navStores || 'فروعنا') : 'OUR BRANCHES',
+        href: '/stores',
+      },
     ];
-  }, [categories, language, t]);
+  }, [language, t]);
 
   return (
     <>
