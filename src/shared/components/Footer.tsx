@@ -9,6 +9,7 @@ export const Footer: React.FC = () => {
   const { language, t } = useLanguage();
   const { settings, stores } = useStoreData();
   const isAr = language === 'ar';
+  const hasBranches = stores && stores.length > 0;
 
   // Dynamic social & contact links from store settings
   const rawWhatsapp = settings?.whatsappNumber?.replace(/[^0-9]/g, '') || '201009326801';
@@ -98,8 +99,8 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Nav Columns */}
-          <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8">
+          {/* Nav Columns: Responsive 2 or 3 columns depending on whether branches exist */}
+          <div className={`md:col-span-7 grid ${hasBranches ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-2'} gap-6 sm:gap-8`}>
             {/* Collections Column */}
             <div>
               <h4 className="font-label-bold text-xs tracking-widest uppercase text-zinc-200 mb-3 sm:mb-4 pb-2 border-b border-zinc-800">
@@ -127,17 +128,17 @@ export const Footer: React.FC = () => {
               </ul>
             </div>
 
-            {/* Dynamic Flagship Branches Column from Backend */}
-            <div className="col-span-2 sm:col-span-1">
-              <h4 className="font-label-bold text-xs tracking-widest uppercase text-zinc-200 mb-3 sm:mb-4 pb-2 border-b border-zinc-800 flex items-center justify-between">
-                <span>{t.footerMaisons}</span>
-                <Link to="/stores" className="text-[10px] text-zinc-400 hover:text-white lowercase font-mono">
-                  {t.navStores} ↗
-                </Link>
-              </h4>
-              <ul className="space-y-2.5 text-xs text-zinc-400 font-light">
-                {stores && stores.length > 0 ? (
-                  stores.slice(0, 4).map((store) => {
+            {/* Dynamic Flagship Branches Column (Only displayed if stores exist in the database) */}
+            {hasBranches && (
+              <div className="col-span-2 sm:col-span-1 animate-fade-in">
+                <h4 className="font-label-bold text-xs tracking-widest uppercase text-zinc-200 mb-3 sm:mb-4 pb-2 border-b border-zinc-800 flex items-center justify-between">
+                  <span>{t.footerMaisons}</span>
+                  <Link to="/stores" className="text-[10px] text-zinc-400 hover:text-white lowercase font-mono">
+                    {t.navStores} ↗
+                  </Link>
+                </h4>
+                <ul className="space-y-2.5 text-xs text-zinc-400 font-light">
+                  {stores.slice(0, 4).map((store) => {
                     const storeName = isAr ? store.name : (store.nameEn || store.name);
                     const storeAddress = isAr ? store.address : (store.addressEn || store.address);
                     return (
@@ -150,28 +151,10 @@ export const Footer: React.FC = () => {
                         </Link>
                       </li>
                     );
-                  })
-                ) : (
-                  <>
-                    <li>
-                      <Link to="/stores" className="hover:text-white transition-colors">
-                        {t.footerZiftaBranch}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/stores" className="hover:text-white transition-colors">
-                        {t.footerNahtayBranch}
-                      </Link>
-                    </li>
-                    <li>
-                      <span className="text-zinc-500 text-[11px]">
-                        {t.footerGharbiaEgypt}
-                      </span>
-                    </li>
-                  </>
-                )}
-              </ul>
-            </div>
+                  })}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
 

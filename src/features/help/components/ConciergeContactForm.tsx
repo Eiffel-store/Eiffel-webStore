@@ -73,20 +73,20 @@ export const ConciergeContactForm: React.FC = () => {
             </div>
           </div>
 
-          {/* Dynamic Flagship Branches from Backend */}
-          <div className="flex items-start gap-3 text-xs text-secondary dark:text-zinc-300">
-            <MapPin className="w-4 h-4 text-primary dark:text-white shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <span className="font-semibold block text-primary dark:text-white">
-                  {isAr ? 'فروعنا في مصر:' : 'Flagship Boutiques:'}
-                </span>
-                <Link to="/stores" className="text-[10px] text-primary dark:text-white underline hover:opacity-80 font-mono">
-                  {isAr ? 'عرض على الخريطة' : 'View on Map'}
-                </Link>
-              </div>
+          {/* Dynamic Flagship Branches from Backend (Only render if branches exist in database) */}
+          {stores && stores.length > 0 && (
+            <div className="flex items-start gap-3 text-xs text-secondary dark:text-zinc-300 animate-fade-in">
+              <MapPin className="w-4 h-4 text-primary dark:text-white shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold block text-primary dark:text-white">
+                    {isAr ? 'فروعنا في مصر:' : 'Flagship Boutiques:'}
+                  </span>
+                  <Link to="/stores" className="text-[10px] text-primary dark:text-white underline hover:opacity-80 font-mono">
+                    {isAr ? 'عرض على الخريطة' : 'View on Map'}
+                  </Link>
+                </div>
 
-              {stores && stores.length > 0 ? (
                 <div className="mt-1.5 space-y-1.5">
                   {stores.map((store) => (
                     <div key={store.id} className="text-[11px] leading-snug">
@@ -99,13 +99,9 @@ export const ConciergeContactForm: React.FC = () => {
                     </div>
                   ))}
                 </div>
-              ) : (
-                <span className="text-[11px] text-zinc-400 block mt-0.5">
-                  {isAr ? 'زفتى - شارع الجيش | نهطاي - بجوار كوبري المشاة' : 'Zefta - El Geish St | Nehtay - Pedestrian Bridge'}
-                </span>
-              )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
