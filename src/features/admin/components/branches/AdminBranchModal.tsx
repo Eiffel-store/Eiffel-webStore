@@ -25,7 +25,7 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
   setFormStore,
   onSave
 }) => {
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
 
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [isGpsLoading, setIsGpsLoading] = useState(false);
@@ -180,10 +180,9 @@ export const AdminBranchModal: React.FC<AdminBranchModalProps> = ({
                   onChange={(e) => setFormStore({ ...formStore, type: e.target.value as any })}
                   className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white rounded focus:outline-none focus:border-amber-400"
                 >
-                  <option value="Flagship">Flagship (رئيسي)</option>
-                  <option value="Boutique">Boutique (فرع)</option>
-                  <option value="Atelier">Atelier (أتيليه)</option>
-                  <option value="Studio">Studio (استوديو)</option>
+                  <option value="Flagship">{isRTL ? 'فرع رئيسي (Flagship)' : 'Flagship (Main Store)'}</option>
+                  <option value="Boutique">{isRTL ? 'فرع متجر / محل بيع (Boutique)' : 'Boutique (Retail Branch)'}</option>
+                  <option value="Outlet">{isRTL ? 'فرع أوتلت / تخفيضات (Outlet)' : 'Outlet (Discount Store)'}</option>
                 </select>
               </div>
             </div>

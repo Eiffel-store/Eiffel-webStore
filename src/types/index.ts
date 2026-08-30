@@ -79,7 +79,7 @@ export interface StoreLocation {
   hoursEn?: string;
   phone: string;
   email: string;
-  type: 'Flagship' | 'Atelier' | 'Boutique' | 'Studio';
+  type: 'Flagship' | 'Boutique' | 'Outlet';
   coordinates: { x: number; y: number };
   latitude?: number;
   longitude?: number;
