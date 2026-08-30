@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu } from 'lucide-react';
-import { useLanguage, useStoreData } from '@/shared';
+import { useLanguage } from '@/shared';
 import { Logo } from './Logo';
 import {
   NavTopAnnouncement,
@@ -17,7 +17,6 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   const { t, language } = useLanguage();
-  const { categories } = useStoreData();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
