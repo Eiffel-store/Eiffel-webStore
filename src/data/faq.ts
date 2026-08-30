@@ -1,72 +1,100 @@
 export interface FAQItem {
-  q: string;
-  a: string;
+  qEn: string;
+  qAr: string;
+  aEn: string;
+  aAr: string;
+  q?: string;
+  a?: string;
 }
 
 export interface FAQCategory {
   id: string;
-  title: string;
+  titleEn: string;
+  titleAr: string;
+  title?: string;
   questions: FAQItem[];
 }
 
 export const FAQ_CATEGORIES: FAQCategory[] = [
   {
     id: 'orders',
-    title: 'SHIPPING & DELIVERY ACROSS EGYPT',
+    titleEn: 'SHIPPING & DELIVERY ACROSS EGYPT',
+    titleAr: 'الطلبات والشحن والتوصيل',
     questions: [
       {
-        q: 'What are the delivery timeframes across Egypt?',
-        a: 'We provide complimentary Express Courier delivery for all orders over 3,000 EGP. Orders in Greater Cairo (Zamalek, New Cairo, Sheikh Zayed, Maadi, Heliopolis) and Giza are delivered within 24–48 hours. Orders to Alexandria, the Delta, and coastal destinations (El Gouna, Hurghada, North Coast) arrive within 2–3 business days.'
+        qEn: 'What are the delivery timeframes across Egypt?',
+        qAr: 'ما هي مواعيد ومدة توصيل الطلبات داخل مصر؟',
+        aEn: 'We provide complimentary Express Courier delivery for all orders over 1,500 EGP. Orders in Greater Cairo and Giza are delivered within 24–48 hours. Orders to Alexandria, the Delta, and other governorates arrive within 2–3 business days.',
+        aAr: 'نوفر خدمة التوصيل السريع لجميع المحافظات مع شحن مجاني للطلبات بقيمة 1,500 جنيه أو أكثر. يتم التوصيل داخل القاهرة الكبرى والجيزة خلال 24 إلى 48 ساعة، ومحافظات الإسكندرية والدلتا وباقي الجمهورية خلال 2 إلى 3 أيام عمل.'
       },
       {
-        q: 'What payment methods are supported for my order?',
-        a: 'We accept Cash on Delivery (COD) across all Egyptian governorates. You pay directly in cash to the courier upon delivery and inspecting your order.'
+        qEn: 'What payment methods are supported for my order?',
+        qAr: 'ما هي طرق الدفع المتاحة لإتمام الطلب؟',
+        aEn: 'We accept Cash on Delivery (COD) across all Egyptian governorates. You can also pay via electronic payment, credit/debit cards, and InstaPay.',
+        aAr: 'نقبل الدفع عند الاستلام (COD) في جميع محافظات مصر، بالإضافة إلى الدفع الإلكتروني والبطاقات البنكية وخدمة انستاباي (InstaPay).'
       },
       {
-        q: 'Can I inspect and try on the pieces before accepting the courier delivery?',
-        a: 'Yes, our VIP White Glove delivery service allows you to inspect the garment in the presence of our courier representative to ensure optimal sizing and quality.'
+        qEn: 'Can I inspect and try on the pieces before accepting the courier delivery?',
+        qAr: 'هل يمكنني معاينة المنتجات والتأكد من المقاس عند استلام الشحنة؟',
+        aEn: 'Yes, our courier service allows you to inspect the pieces upon delivery to ensure optimal sizing and premium luxury quality before finalizing payment.',
+        aAr: 'نعم بكل تأكيد، تتيح لك خدمة التوصيل معاينة القطع والتأكد من جودتها ومقاسها بحضور مندوب التوصيل قبل إتمام السداد.'
       }
     ]
   },
   {
     id: 'returns',
-    title: 'RETURNS & EXCHANGES IN EGYPT',
+    titleEn: 'RETURNS & EXCHANGES IN EGYPT',
+    titleAr: 'الإرجاع والاستبدال',
     questions: [
       {
-        q: 'What is your return and size exchange policy in Egypt?',
-        a: 'In accordance with Egyptian consumer protection regulations, we offer a 14-day doorstep exchange and return policy. Our dedicated courier will collect the unworn piece directly from your residence in Cairo, Alexandria, or other governorates with complimentary return shipping.'
+        qEn: 'What is your return and size exchange policy in Egypt?',
+        qAr: 'ما هي سياسة الاسترجاع واستبدال المقاسات؟',
+        aEn: 'In accordance with Egyptian consumer protection regulations, we offer a 14-day doorstep exchange and return policy. Our dedicated courier will collect the unworn piece in its original condition from your residence.',
+        aAr: 'وفقاً لقانون حماية المستهلك المصري، نوفر سياسة استبدال واسترجاع مرنة خلال 14 يوماً من تاريخ الاستلام، حيث يصلك المندوب حتى باب منزلك لاستلام القطعة بحالتها الأصلية.'
       },
       {
-        q: 'Can I exchange or return my online order at your Cairo or Alexandria boutiques?',
-        a: 'Yes. You can bring your order confirmation to our flagship boutiques in Zamalek (14 Abou El Feda St) or 5A Waterway New Cairo for instant sizing exchange or atelier alterations.'
+        qEn: 'Can I exchange or return my online order at your branches?',
+        qAr: 'هل يمكنني استبدال أو إرجاع طلبي الإلكتروني من خلال فروع إيفل؟',
+        aEn: 'Yes. You can visit any of our official branches with your order confirmation/invoice for instant sizing exchange or return.',
+        aAr: 'نعم، يمكنك زيارة أي فرع من فروعنا الرسمية مع إظهار رقم الطلب أو الفاتورة لإتمام الاستبدال الفوري للمقاس أو استرجاع المنتج.'
       }
     ]
   },
   {
     id: 'sizing',
-    title: 'SIZING & BESPOKE ATELIER TAILORING',
+    titleEn: 'SIZING & FIT GUIDE',
+    titleAr: 'المقاسات ودليل الجسم',
     questions: [
       {
-        q: 'How do EIFFEL sizes fit?',
-        a: 'Our silhouettes feature modern architectural boxy cuts and structured tailoring. We recommend choosing your standard size for the intended runway silhouette, or one size down for a classic tailored fit.'
+        qEn: 'How do EIFFEL sizes fit?',
+        qAr: 'كيف أختار المقاس المناسب لمنتجات إيفل؟',
+        aEn: 'Our silhouettes feature modern tailored cuts and structured fits. We recommend choosing your standard size for the intended elegant fit, or consulting our interactive size guide on each product page.',
+        aAr: 'تتميز تشكيلاتنا بقصات إيطالية عصرية متقنة. ننصح باختيار مقاسك المعتاد للحصول على المظهر الأنيق المثالي، أو مراجعة دليل المقاسات التفاعلي الموجود بصفحة كل منتج.'
       },
       {
-        q: 'Do you offer custom tailoring in Egypt?',
-        a: 'Yes. Complimentary bespoke sleeve and hem adjustments are provided with every tailored trench, overcoat, and wool trouser purchase at our Zamalek and New Cairo atelier suites.'
+        qEn: 'Do you offer tailoring alterations or custom adjustments?',
+        qAr: 'هل تقدمون خدمة تعديل أو ضبط المقاسات؟',
+        aEn: 'Yes, we provide complimentary minor tailoring adjustments at our official branches to ensure a flawless bespoke fit.',
+        aAr: 'نعم، نقدم خدمة ضبط وتعديل المقاسات البسيطة في فروعنا لضمان ملاءمة القطعة التامة لمقاسك ومظهرك.'
       }
     ]
   },
   {
     id: 'craft',
-    title: 'EGYPTIAN GIZA COTTON & TEXTILE HERITAGE',
+    titleEn: 'FABRICS & CRAFTSMANSHIP',
+    titleAr: 'الخياطة والأقمشة الفاخرة',
     questions: [
       {
-        q: 'What materials are used in EIFFEL collections?',
-        a: 'We combine authentic extra-long staple Egyptian Giza Cotton (Giza 86 / 45) with Japanese 700GSM loopwheel knitting and Italian virgin wools. Our heavyweight combed cotton jerseys provide unmatched density, breathability, and structural longevity.'
+        qEn: 'What materials are used in EIFFEL collections?',
+        qAr: 'ما هي الخامات والأقمشة المستخدمة في مجموعات إيفل؟',
+        aEn: 'We craft our collections using premium Egyptian Giza cotton, Italian virgin wool, and luxury fabric blends, ensuring exceptional breathability, comfort, and longevity.',
+        aAr: 'نصنع تشكيلاتنا باستخدام أجود أنواع القطن المصري طويل التيلة (جيزة)، وأصواف الفيرجن الإيطالية، والأقمشة المعالجة الفاخرة لضمان أقصى درجات الراحة والمتانة.'
       },
       {
-        q: 'Where are the garments designed and assembled?',
-        a: 'Our designs are conceptualized in Paris and finished in specialized luxury ateliers across Cairo, Wakayama, and Florence with strict quality standards.'
+        qEn: 'How should I care for and maintain my garments?',
+        qAr: 'كيف أحافظ على القطع والملابس عند الغسيل؟',
+        aEn: 'We recommend dry cleaning for formal suits and coats, and gentle cold washing for luxury cotton shirts, knitwear, and polo shirts.',
+        aAr: 'ننصح بالتنظيف الجاف (Dry Clean) للبدل والمعاطف والقطع الصوفية، والغسيل اللطيف بالماء البارد للقمصان والتيشرتات القطنية للحفاظ على النسيج والألوان.'
       }
     ]
   }

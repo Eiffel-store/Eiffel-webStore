@@ -11,14 +11,15 @@ export const FaqCategoriesNav: React.FC<FaqCategoriesNavProps> = ({
   activeCategory,
   onSelectCategory,
 }) => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
+  const isAr = language === 'ar';
 
   const getCategoryTitle = (cat: FAQCategory) => {
     if (cat.id === 'orders') return t.faqOrdersDelivery;
     if (cat.id === 'returns') return t.faqReturnsExchange;
     if (cat.id === 'sizing') return t.faqSizingGuide;
-    if (cat.id === 'craftsmanship') return t.faqCraftsmanshipFabrics;
-    return cat.title;
+    if (cat.id === 'craft' || cat.id === 'craftsmanship') return t.faqCraftsmanshipFabrics;
+    return isAr ? (cat.titleAr || cat.title) : (cat.titleEn || cat.title);
   };
 
   return (

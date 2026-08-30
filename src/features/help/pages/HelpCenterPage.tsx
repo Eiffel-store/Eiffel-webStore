@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
 import { FAQ_CATEGORIES } from '@/data/faq';
 import { useLanguage } from '@/shared';
 import { FaqCategoriesNav } from '../components/FaqCategoriesNav';
@@ -35,16 +34,7 @@ export const HelpCenterPage: React.FC = () => {
             {t.helpCenterDesc}
           </p>
 
-          <div className="pt-4 relative max-w-xl mx-auto">
-            <Search className="w-5 h-5 text-secondary absolute left-4 rtl:left-auto rtl:right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t.searchFaqPlaceholder}
-              className="w-full bg-surface-container-lowest dark:bg-zinc-900 border border-surface-container dark:border-zinc-700 pl-12 pr-4 rtl:pl-4 rtl:pr-12 py-3.5 text-xs text-primary dark:text-white font-mono uppercase focus:outline-none focus:border-primary"
-            />
-          </div>
+        
         </div>
 
         {/* Main Categories Navigation */}
@@ -68,10 +58,7 @@ export const HelpCenterPage: React.FC = () => {
       </div>
 
       {/* Simulated Live Chat Modal */}
-      <LiveChatModal
-        isOpen={showLiveChat}
-        onClose={() => setShowLiveChat(false)}
-      />
+      
     </div>
   );
 };

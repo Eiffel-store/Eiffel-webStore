@@ -14,14 +14,15 @@ export const FaqAccordionList: React.FC<FaqAccordionListProps> = ({
   openAccordions,
   onToggleAccordion,
 }) => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
+  const isAr = language === 'ar';
 
   const getCategoryTitle = () => {
     if (category.id === 'orders') return t.faqOrdersDelivery;
     if (category.id === 'returns') return t.faqReturnsExchange;
     if (category.id === 'sizing') return t.faqSizingGuide;
-    if (category.id === 'craftsmanship') return t.faqCraftsmanshipFabrics;
-    return category.title;
+    if (category.id === 'craft' || category.id === 'craftsmanship') return t.faqCraftsmanshipFabrics;
+    return isAr ? (category.titleAr || category.title) : (category.titleEn || category.title);
   };
 
   return (
@@ -34,14 +35,17 @@ export const FaqAccordionList: React.FC<FaqAccordionListProps> = ({
         {category.questions.map((item: FAQItem, idx: number) => {
           const key = `${category.id}-${idx}`;
           const isOpen = !!openAccordions[key];
+          const questionText = isAr ? (item.qAr || item.q) : (item.qEn || item.q);
+          const answerText = isAr ? (item.aAr || item.a) : (item.aEn || item.a);
+
           return (
             <div key={idx} className="py-4">
               <button
                 onClick={() => onToggleAccordion(key)}
                 className="w-full flex justify-between items-center text-left rtl:text-right gap-4 group"
               >
-                <span className="font-editorial text-xl text-primary dark:text-white group-hover:underline">
-                  {item.q}
+                <span className="font-editorial text-lg sm:text-xl text-primary dark:text-white group-hover:underline">
+                  {questionText}
                 </span>
                 {isOpen ? (
                   <ChevronUp className="w-4 h-4 shrink-0 text-primary dark:text-white" />
@@ -50,8 +54,8 @@ export const FaqAccordionList: React.FC<FaqAccordionListProps> = ({
                 )}
               </button>
               {isOpen && (
-                <p className="text-xs text-secondary dark:text-zinc-300 font-light leading-relaxed pt-3 animate-fade-in">
-                  {item.a}
+                <p className="text-xs sm:text-sm text-secondary dark:text-zinc-300 font-light leading-relaxed pt-3 animate-fade-in">
+                  {answerText}
                 </p>
               )}
             </div>
