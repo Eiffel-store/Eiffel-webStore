@@ -9,4 +9,5 @@ export * from './components/CollectionFiltersBar';
 export * from './components/ActiveFilters';
 export * from './components/FilterDrawer';
 export * from './components/ProductReviewsSection';
+export * from './constants';
 

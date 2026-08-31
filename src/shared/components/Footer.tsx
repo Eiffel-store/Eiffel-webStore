@@ -72,7 +72,7 @@ export const Footer: React.FC = () => {
               <Logo size="lg" className="text-white" />
             </Link>
             <p className="text-xs text-zinc-400 leading-relaxed max-w-md font-light">
-              {t.footerManifesto}
+              {settings?.tagline || t.footerManifesto}
             </p>
 
             {/* Direct Social Media Links */}
@@ -161,7 +161,7 @@ export const Footer: React.FC = () => {
         {/* Bottom Legal / Copyright Strip */}
         <div className="max-w-[1440px] mx-auto pt-8 sm:pt-12 mt-8 sm:mt-12 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-[11px] sm:text-xs text-zinc-500 font-mono text-center sm:text-left rtl:sm:text-right">
           <div>
-            © {new Date().getFullYear()} EIFFEL. {t.footerCopyright}
+            © {new Date().getFullYear()} {settings?.storeName || 'EIFFEL'}. {t.footerCopyright}
           </div>
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
             <Link to="/help" className="hover:text-zinc-300">{t.privacyPolicy}</Link>

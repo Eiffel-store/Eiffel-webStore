@@ -6,29 +6,29 @@ import { Banner } from '@/types';
 
 export const HeroSection: React.FC = () => {
   const { t, isRTL } = useLanguage();
-  const { homeSettings, activeBanners = [], trackBannerImpression, trackBannerClick } = useStoreData();
+  const { settings, activeBanners = [], isBannersLoading, trackBannerImpression, trackBannerClick } = useStoreData();
 
   // 1. Get active Hero Slider banners from dynamic campaigns
   const heroBanners = activeBanners.filter(b => b.placement === 'HERO_SLIDER' && b.isActive !== false);
 
-  // Fallback slide if no dynamic banners in DB
+  // Fallback slide if no dynamic banners exist in database after load
   const fallbackSlide: Banner = {
     id: 'fallback-hero',
     placement: 'HERO_SLIDER',
-    tagEn: homeSettings?.hero?.tagEn || t.heroSeason,
-    tagAr: homeSettings?.hero?.tagAr || t.heroSeason,
-    titleEn: homeSettings?.hero?.titleEn || t.heroTitle,
-    titleAr: homeSettings?.hero?.titleAr || t.heroTitle,
-    subtitleEn: homeSettings?.hero?.subtitleEn || t.heroSubtitle,
-    subtitleAr: homeSettings?.hero?.subtitleAr || t.heroSubtitle,
-    buttonTextEn: homeSettings?.hero?.buttonTextEn || t.exploreCollection,
-    buttonTextAr: homeSettings?.hero?.buttonTextAr || t.exploreCollection,
-    buttonLink: homeSettings?.hero?.buttonLink || '/collections/men',
-    secondaryButtonTextEn: homeSettings?.hero?.secondaryButtonTextEn || t.viewLookbook,
-    secondaryButtonTextAr: homeSettings?.hero?.secondaryButtonTextAr || t.viewLookbook,
-    secondaryButtonLink: homeSettings?.hero?.secondaryButtonLink || '/collections/new-arrivals',
-    desktopImageUrl: homeSettings?.hero?.imageUrl || `${import.meta.env.BASE_URL}images/products/eiffel-outfit-flatlay.jpg`,
-    mobileImageUrl: homeSettings?.hero?.imageUrl || `${import.meta.env.BASE_URL}images/products/eiffel-outfit-flatlay.jpg`,
+    tagEn: settings?.hero?.tagEn || t.heroSeason,
+    tagAr: settings?.hero?.tagAr || t.heroSeason,
+    titleEn: settings?.hero?.titleEn || t.heroTitle,
+    titleAr: settings?.hero?.titleAr || t.heroTitle,
+    subtitleEn: settings?.hero?.subtitleEn || t.heroSubtitle,
+    subtitleAr: settings?.hero?.subtitleAr || t.heroSubtitle,
+    buttonTextEn: settings?.hero?.buttonTextEn || t.exploreCollection,
+    buttonTextAr: settings?.hero?.buttonTextAr || t.exploreCollection,
+    buttonLink: settings?.hero?.buttonLink || '/collections/men',
+    secondaryButtonTextEn: settings?.hero?.secondaryButtonTextEn || t.viewLookbook,
+    secondaryButtonTextAr: settings?.hero?.secondaryButtonTextAr || t.viewLookbook,
+    secondaryButtonLink: settings?.hero?.secondaryButtonLink || '/collections/new-arrivals',
+    desktopImageUrl: settings?.hero?.desktopImageUrl || settings?.hero?.imageUrl || `${import.meta.env.BASE_URL}images/products/eiffel-outfit-flatlay.jpg`,
+    mobileImageUrl: settings?.hero?.mobileImageUrl || settings?.hero?.imageUrl || `${import.meta.env.BASE_URL}images/products/eiffel-outfit-flatlay.jpg`,
   };
 
   const slides: Banner[] = heroBanners.length > 0 ? heroBanners : [fallbackSlide];
@@ -80,6 +80,22 @@ export const HeroSection: React.FC = () => {
       trackBannerClick(currentSlide.id);
     }
   };
+
+  // Prevent flash/flicker of two heroes while initial banners are loading
+  if (isBannersLoading && activeBanners.length === 0) {
+    return (
+      <section className="relative w-full min-h-[82vh] sm:min-h-[88vh] flex items-center justify-center overflow-hidden bg-zinc-950 text-white select-none">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/70 animate-pulse" />
+        <div className="relative z-20 max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 py-12 sm:py-20 w-full flex flex-col justify-end min-h-[82vh] sm:min-h-[88vh]">
+          <div className="max-w-3xl space-y-4">
+            <div className="w-32 h-6 bg-zinc-900 border border-zinc-800 rounded animate-pulse" />
+            <div className="w-3/4 sm:w-2/3 h-14 sm:h-20 bg-zinc-900 border border-zinc-800 rounded animate-pulse" />
+            <div className="w-1/2 h-5 bg-zinc-900/80 rounded animate-pulse" />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   const tag = isRTL ? (currentSlide.tagAr || t.heroSeason) : (currentSlide.tagEn || t.heroSeason);
   const title = isRTL ? (currentSlide.titleAr || t.heroTitle) : (currentSlide.titleEn || t.heroTitle);
@@ -144,14 +160,14 @@ export const HeroSection: React.FC = () => {
           </div>
 
           <h1
-            key={`title-${safeIndex}`}
+            key={`title-${currentSlide.id || safeIndex}`}
             className="font-editorial text-4xl sm:text-7xl md:text-8xl lg:text-9xl leading-[1.0] sm:leading-[0.95] tracking-tight text-white uppercase drop-shadow-sm animate-fade-in"
           >
             {title}
           </h1>
 
           <p
-            key={`sub-${safeIndex}`}
+            key={`sub-${currentSlide.id || safeIndex}`}
             className="font-inter text-xs sm:text-base md:text-lg text-zinc-300 mt-4 sm:mt-6 max-w-xl leading-relaxed font-light animate-fade-in"
           >
             {subtitle}

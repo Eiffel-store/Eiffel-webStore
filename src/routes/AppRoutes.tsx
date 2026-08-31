@@ -98,6 +98,8 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ onOpenSearch }) => {
         <Route element={<StorefrontLayout onOpenSearch={onOpenSearch} />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/collections/:category" element={<CollectionsPage />} />
+          <Route path="/offers" element={<Navigate to="/collections/offers" replace />} />
+          <Route path="/sale" element={<Navigate to="/collections/offers" replace />} />
           <Route path="/product/:id" element={<ProductDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />

@@ -5,8 +5,8 @@ import { useLanguage } from '@/shared';
 interface CollectionBannerProps {
   category: string;
   title: string;
-  subtitle: string;
-  image: string;
+  subtitle?: string;
+  image?: string;
 }
 
 export const CollectionBanner: React.FC<CollectionBannerProps> = ({
@@ -16,6 +16,8 @@ export const CollectionBanner: React.FC<CollectionBannerProps> = ({
   image,
 }) => {
   const { isRTL } = useLanguage();
+  const defaultFallbackImage = `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`;
+  const bannerSrc = image && image.trim() !== '' ? image : defaultFallbackImage;
 
   const getBreadcrumbCategory = () => {
     const cat = category.toLowerCase();
@@ -23,25 +25,32 @@ export const CollectionBanner: React.FC<CollectionBannerProps> = ({
       if (cat === 'men') return 'الرجال';
       if (cat === 'kids') return 'الأطفال';
       if (cat === 'accessories') return 'الإكسسوارات';
+      if (cat === 'shoes' || cat === 'shoes-&-footwear') return 'الأحذية';
       if (cat === 'offers') return 'العروض';
       if (cat === 'new-arrivals') return 'أحدث الإصدارات';
-      return category;
+      return title || category;
     } else {
       if (cat === 'men') return 'MEN';
       if (cat === 'kids') return 'KIDS';
       if (cat === 'accessories') return 'ACCESSORIES';
+      if (cat === 'shoes' || cat === 'shoes-&-footwear') return 'SHOES';
       if (cat === 'offers') return 'OFFERS';
       if (cat === 'new-arrivals') return 'NEW ARRIVALS';
-      return category.toUpperCase();
+      return (title || category).toUpperCase();
     }
   };
+
+  const isDuplicateSubtitle = subtitle && subtitle.toLowerCase().trim() === title.toLowerCase().trim();
 
   return (
     <section className="relative h-64 sm:h-80 md:h-96 w-full bg-zinc-950 flex items-end overflow-hidden border-b border-surface-container dark:border-zinc-800">
       <img
-        src={image}
+        src={bannerSrc}
         alt={title}
-        className="absolute inset-0 w-full h-full object-cover object-center opacity-45"
+        onError={(e) => {
+          e.currentTarget.src = defaultFallbackImage;
+        }}
+        className="absolute inset-0 w-full h-full object-cover object-center opacity-45 transition-opacity duration-700"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
@@ -57,9 +66,11 @@ export const CollectionBanner: React.FC<CollectionBannerProps> = ({
         <h1 className="font-editorial text-4xl sm:text-6xl md:text-7xl text-white tracking-tight uppercase">
           {title}
         </h1>
-        <p className="text-xs sm:text-sm text-zinc-300 max-w-xl font-light mt-1 leading-relaxed">
-          {subtitle}
-        </p>
+        {subtitle && !isDuplicateSubtitle && (
+          <p className="text-xs sm:text-sm text-zinc-300 max-w-xl font-light mt-1 leading-relaxed">
+            {subtitle}
+          </p>
+        )}
       </div>
     </section>
   );

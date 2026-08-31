@@ -17,7 +17,7 @@ const PromoPopupModal = lazy(() => import('../components/PromoPopupModal').then(
 export const HomePage: React.FC = () => {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const { t, isRTL } = useLanguage();
-  const { products, isProductsLoading } = useStoreData();
+  const { products, settings, isProductsLoading } = useStoreData();
 
   if (isProductsLoading && products.length === 0) {
     return <HomePageSkeleton />;
@@ -28,56 +28,58 @@ export const HomePage: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* 1. HERO SECTION */}
-      <HeroSection />
+      {settings.showHero !== false && <HeroSection />}
 
       {/* 2. CATEGORY ARCHIVES GRID */}
-      <CategoryGrid />
+      {settings.showCategories !== false && <CategoryGrid />}
 
       {/* 3. PROMOTIONAL EDITORIAL SPLIT */}
-      <PromoEditorial />
+      {settings.showPromoBanner !== false && <PromoEditorial />}
 
       {/* 4. NEW ARRIVALS GRID */}
-      <section className="py-20 px-4 sm:px-8 md:px-12 max-w-[1440px] mx-auto w-full">
-        <div className="flex justify-between items-end mb-10 pb-4 border-b border-surface-container dark:border-zinc-800">
-          <div>
-            <span className="text-xs font-label-bold text-secondary dark:text-zinc-400 uppercase tracking-widest">
-              {t.newArrivalsSubtitle}
-            </span>
-            <h2 className="font-editorial text-4xl sm:text-5xl text-primary dark:text-white mt-1">
-              {t.newArrivalsTitle}
-            </h2>
+      {settings.showFeaturedProducts !== false && (
+        <section className="py-20 px-4 sm:px-8 md:px-12 max-w-[1440px] mx-auto w-full">
+          <div className="flex justify-between items-end mb-10 pb-4 border-b border-surface-container dark:border-zinc-800">
+            <div>
+              <span className="text-xs font-label-bold text-secondary dark:text-zinc-400 uppercase tracking-widest">
+                {t.newArrivalsSubtitle}
+              </span>
+              <h2 className="font-editorial text-4xl sm:text-5xl text-primary dark:text-white mt-1">
+                {t.newArrivalsTitle}
+              </h2>
+            </div>
+            <Link
+              to="/collections/new-arrivals"
+              className="font-label-bold text-xs tracking-widest text-primary dark:text-white hover:underline flex items-center gap-1 uppercase"
+            >
+              <span>{t.viewAll} ({products.length})</span>
+              <ArrowRight className={`w-3.5 h-3.5 ${isRTL ? 'rotate-180' : ''}`} />
+            </Link>
           </div>
-          <Link
-            to="/collections/new-arrivals"
-            className="font-label-bold text-xs tracking-widest text-primary dark:text-white hover:underline flex items-center gap-1 uppercase"
-          >
-            <span>{t.viewAll} ({products.length})</span>
-            <ArrowRight className={`w-3.5 h-3.5 ${isRTL ? 'rotate-180' : ''}`} />
-          </Link>
-        </div>
 
-        {isProductsLoading ? (
-          <ProductGridSkeleton count={4} cols={4} />
-        ) : newArrivals.length === 0 ? (
-          <EmptyState
-            title={t.noNewArrivals}
-            description={t.newArrivalsComingSoon}
-          />
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {newArrivals.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onQuickView={(p) => setQuickViewProduct(p)}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+          {isProductsLoading ? (
+            <ProductGridSkeleton count={4} cols={4} />
+          ) : newArrivals.length === 0 ? (
+            <EmptyState
+              title={t.noNewArrivals}
+              description={t.newArrivalsComingSoon}
+            />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {newArrivals.map((product, index) => (
+                <ProductCard
+                  key={`${product.id}-${index}`}
+                  product={product}
+                  onQuickView={(p) => setQuickViewProduct(p)}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* 5. SHOP THE LOOK INTERACTIVE HOTSPOTS */}
-      <ShopTheLook />
+      {settings.showShopTheLook !== false && <ShopTheLook />}
 
       {/* 6. PROMOTIONAL POPUP MODAL (CAMPAIGN DRIVEN) */}
       <Suspense fallback={null}>

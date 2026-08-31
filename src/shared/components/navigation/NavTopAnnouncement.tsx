@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 export const NavTopAnnouncement: React.FC = () => {
   const { language, isRTL, t } = useLanguage();
   const { role } = useAuthStore();
-  const { activeBanners = [] } = useStoreData();
+  const { activeBanners = [], settings } = useStoreData();
   const [copiedCode, setCopiedCode] = useState(false);
 
   const announcementBanner = activeBanners.find(
@@ -16,15 +16,17 @@ export const NavTopAnnouncement: React.FC = () => {
   );
 
   const announcementTitle = announcementBanner
-    ? language === 'ar'
-      ? announcementBanner.titleAr || announcementBanner.titleEn
-      : announcementBanner.titleEn || announcementBanner.titleAr
-    : t.topBannerPromo;
+    ? (language === 'ar'
+        ? announcementBanner.titleAr || announcementBanner.titleEn
+        : announcementBanner.titleEn || announcementBanner.titleAr)
+    : (language === 'ar'
+        ? settings?.announcementTextAr || t.topBannerPromo
+        : settings?.announcementTextEn || t.topBannerPromo);
 
   const announcementSub = announcementBanner
-    ? language === 'ar'
-      ? announcementBanner.subtitleAr || announcementBanner.subtitleEn
-      : announcementBanner.subtitleEn || announcementBanner.subtitleAr
+    ? (language === 'ar'
+        ? announcementBanner.subtitleAr || announcementBanner.subtitleEn
+        : announcementBanner.subtitleEn || announcementBanner.subtitleAr)
     : t.topBannerLocations;
 
   const promoCode = announcementBanner?.discountCode || 'EIFFEL10';

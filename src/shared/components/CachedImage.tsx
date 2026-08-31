@@ -83,8 +83,8 @@ export const CachedImage: React.FC<CachedImageProps> = ({
           alt={alt || 'Eiffel luxury garment'}
           loading={priority ? 'eager' : (loading || 'lazy')}
           decoding={decoding}
-          // @ts-ignore fetchPriority is valid in modern browsers
-          fetchpriority={priority ? 'high' : 'auto'}
+          // @ts-ignore fetchPriority is valid in modern React/browsers
+          fetchPriority={priority ? 'high' : 'auto'}
           onLoad={handleLoad}
           onError={handleError}
           className={`${className} transition-opacity duration-500 ease-out ${

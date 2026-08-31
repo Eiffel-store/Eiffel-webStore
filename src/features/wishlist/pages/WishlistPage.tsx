@@ -55,9 +55,9 @@ export const WishlistPage: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-            {wishlist.map((product) => (
+            {wishlist.map((product, index) => (
               <div
-                key={product.id}
+                key={`${product.id}-${index}`}
                 className="group relative flex flex-col bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-800"
               >
                 <div className="relative aspect-[4/5] overflow-hidden bg-surface-container-low dark:bg-zinc-900">

@@ -9,32 +9,7 @@ interface AdminShopLookFormProps {
   onChange: (look: ShopTheLookSettings) => void;
 }
 
-const LOOKBOOK_PRESETS = [
-  {
-    labelAr: '👔 طقم كاجوال شيك للعمل والخروج (Smart Casual)',
-    titleAr: 'تسوق الطقم كامل',
-    titleEn: 'SHOP THE COMPLETE LOOK',
-    subtitleAr: 'طقم متناسق وأنيق للعمل والخروجات اليومية بخامات قطنية مريحة وتلبيس مضبوط',
-    subtitleEn: 'Curated ready-to-wear ensemble featuring versatile styling & premium comfortable fabrics',
-    collectionLink: '/collections/men'
-  },
-  {
-    labelAr: '❄️ طقم شتوي كاجوال دافئ (Winter Casual)',
-    titleAr: 'طقم الشتاء الأنيق',
-    titleEn: 'WINTER CASUAL LOOK',
-    subtitleAr: 'جاكت شتوي شيك مع بنطلون جينز وسويت شيرت مريح لمظهر عصري أنيق',
-    subtitleEn: 'Modern winter jacket paired with relaxed denim and comfortable essentials',
-    collectionLink: '/collections/new-arrivals'
-  }
-];
-
-const COLLECTION_OPTIONS = [
-  { labelAr: '👔 تشكيلة الرجال (Men)', labelEn: 'Men Collection', path: '/collections/men' },
-  { labelAr: '✨ وصول جديد (New Arrivals)', labelEn: 'New Arrivals', path: '/collections/new-arrivals' },
-  { labelAr: '🏷️ التخفيضات (Offers & Sale)', labelEn: 'Offers & Sale', path: '/collections/offers' },
-  { labelAr: '👶 تشكيلة الأطفال (Kids)', labelEn: 'Kids Collection', path: '/collections/kids' },
-  { labelAr: '💼 الإكسسوارات (Accessories)', labelEn: 'Accessories', path: '/collections/accessories' }
-];
+import { LOOKBOOK_PRESETS, COLLECTION_OPTIONS } from '../../constants';
 
 export const AdminShopLookForm: React.FC<AdminShopLookFormProps> = ({
   shopLook,

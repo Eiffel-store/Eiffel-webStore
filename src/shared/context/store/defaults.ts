@@ -11,15 +11,21 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   announcementTextEn: '',
   currency: 'EGP',
   freeShippingThreshold: 1500,
-  adminPin: '',
   vipRequiredOrders: 3,
   vipRequiredPoints: 500,
   vipDiscountPercentage: 10,
   loyaltyCashbackRate: 0.05,
-  vipFreeShipping: true
-};
+  vipFreeShipping: true,
 
-export const DEFAULT_HOME_SETTINGS: HomePageSettings = {
+  // Home Page Section Visibility Toggles
+  showHero: true,
+  showCategories: true,
+  showFeaturedProducts: true,
+  showPromoBanner: true,
+  showShopTheLook: true,
+  showAnnouncementBar: true,
+
+  // Home Page CMS Content
   hero: {
     tagEn: '',
     tagAr: '',
@@ -60,3 +66,4 @@ export const DEFAULT_HOME_SETTINGS: HomePageSettings = {
   }
 };
 
+export const DEFAULT_HOME_SETTINGS: HomePageSettings = DEFAULT_SETTINGS;

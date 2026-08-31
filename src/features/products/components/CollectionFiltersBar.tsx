@@ -30,15 +30,15 @@ export const CollectionFiltersBar: React.FC<CollectionFiltersBarProps> = ({
   const { t } = useLanguage();
 
   return (
-    <section className="sticky top-[64px] sm:top-[80px] z-30 bg-surface-container-lowest/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-surface-container dark:border-zinc-800 py-2.5 sm:py-3.5 px-3 sm:px-8 md:px-12 transition-all shadow-sm">
-      <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-4">
-        {/* Subcategory Pills - Horizontal scroll */}
-        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 max-w-full scrollbar-none">
+    <section className="sticky top-[64px] sm:top-[72px] z-30 bg-surface-container-lowest/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-surface-container dark:border-zinc-800 py-3 sm:py-3.5 transition-all shadow-sm">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 w-full flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+        {/* Left: Subcategory Pills - perfectly aligned to the exact same left guide line */}
+        <div className="flex items-center gap-2 overflow-x-auto py-0.5 max-w-full scrollbar-none">
           {subCategories.map((sub) => (
             <button
               key={sub}
               onClick={() => setSelectedSubCategory(sub)}
-              className={`px-3 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-label-bold tracking-wider uppercase whitespace-nowrap transition-all border shrink-0 ${
+              className={`px-3.5 py-1.5 text-xs font-label-bold tracking-wider uppercase whitespace-nowrap transition-all border shrink-0 cursor-pointer ${
                 selectedSubCategory === sub
                   ? 'bg-primary text-white dark:bg-white dark:text-black border-primary dark:border-white shadow-sm'
                   : 'border-surface-container dark:border-zinc-800 text-secondary dark:text-zinc-400 hover:border-primary bg-surface-container-low/50 dark:bg-zinc-900/50'
@@ -49,12 +49,12 @@ export const CollectionFiltersBar: React.FC<CollectionFiltersBarProps> = ({
           ))}
         </div>
 
-        {/* Controls Bar */}
-        <div className="flex items-center justify-between md:justify-end gap-2 sm:gap-3 w-full md:w-auto pt-1 md:pt-0 border-t md:border-t-0 border-surface-container/50 dark:border-zinc-850">
+        {/* Right: Filter & Sort Controls */}
+        <div className="flex items-center justify-between md:justify-end gap-2 sm:gap-3 w-full md:w-auto pt-2 md:pt-0 border-t md:border-t-0 border-surface-container/50 dark:border-zinc-850">
           {/* Filter Toggle */}
           <button
             onClick={onOpenFilterDrawer}
-            className="flex-1 md:flex-none flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 border border-surface-container dark:border-zinc-800 hover:border-primary text-[11px] sm:text-xs font-label-bold tracking-wider uppercase text-primary dark:text-white transition-colors bg-surface-container-lowest dark:bg-zinc-950"
+            className="flex-1 md:flex-none flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 py-1.5 border border-surface-container dark:border-zinc-800 hover:border-primary text-xs font-label-bold tracking-wider uppercase text-primary dark:text-white transition-colors bg-surface-container-lowest dark:bg-zinc-950 shrink-0 cursor-pointer"
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
             <span>{t.filters}</span>
@@ -64,11 +64,11 @@ export const CollectionFiltersBar: React.FC<CollectionFiltersBarProps> = ({
           </button>
 
           {/* Sort Dropdown */}
-          <div className="relative flex-1 md:flex-none">
+          <div className="relative flex-1 md:flex-none shrink-0">
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="w-full appearance-none bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-800 text-[11px] sm:text-xs font-label-bold tracking-wider px-2.5 sm:px-3 py-1.5 pr-7 rtl:pr-2.5 rtl:pl-7 uppercase text-primary dark:text-white focus:outline-none cursor-pointer"
+              className="w-full appearance-none bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-800 text-xs font-label-bold tracking-wider px-3 py-1.5 pr-7 rtl:pr-3 rtl:pl-7 uppercase text-primary dark:text-white focus:outline-none cursor-pointer"
             >
               <option value="featured">{t.sortFeatured}</option>
               <option value="price-low">{t.sortPriceLow}</option>
@@ -79,17 +79,17 @@ export const CollectionFiltersBar: React.FC<CollectionFiltersBarProps> = ({
           </div>
 
           {/* Mobile Grid Layout Switcher (1 vs 2 cols) */}
-          <div className="flex sm:hidden items-center border border-surface-container dark:border-zinc-800 bg-surface-container-lowest dark:bg-zinc-950">
+          <div className="flex sm:hidden items-center border border-surface-container dark:border-zinc-800 bg-surface-container-lowest dark:bg-zinc-950 shrink-0">
             <button
               onClick={() => setGridCols(1)}
-              className={`p-1.5 ${gridCols === 1 ? 'bg-surface-container-high dark:bg-zinc-800 text-primary dark:text-white' : 'text-secondary'}`}
+              className={`p-1.5 cursor-pointer ${gridCols === 1 ? 'bg-surface-container-high dark:bg-zinc-800 text-primary dark:text-white' : 'text-secondary'}`}
               title="1 Column"
             >
               <Square className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setGridCols(2)}
-              className={`p-1.5 ${gridCols === 2 ? 'bg-surface-container-high dark:bg-zinc-800 text-primary dark:text-white' : 'text-secondary'}`}
+              className={`p-1.5 cursor-pointer ${gridCols === 2 ? 'bg-surface-container-high dark:bg-zinc-800 text-primary dark:text-white' : 'text-secondary'}`}
               title="2 Columns"
             >
               <LayoutGrid className="w-3.5 h-3.5" />
@@ -97,17 +97,17 @@ export const CollectionFiltersBar: React.FC<CollectionFiltersBarProps> = ({
           </div>
 
           {/* Desktop Grid Layout Switcher (2 vs 4 cols) */}
-          <div className="hidden sm:flex items-center border border-surface-container dark:border-zinc-800 bg-surface-container-lowest dark:bg-zinc-950">
+          <div className="hidden sm:flex items-center border border-surface-container dark:border-zinc-800 bg-surface-container-lowest dark:bg-zinc-950 shrink-0">
             <button
               onClick={() => setGridCols(2)}
-              className={`p-1.5 ${gridCols === 2 ? 'bg-surface-container-high dark:bg-zinc-800 text-primary dark:text-white' : 'text-secondary'}`}
+              className={`p-1.5 cursor-pointer ${gridCols === 2 ? 'bg-surface-container-high dark:bg-zinc-800 text-primary dark:text-white' : 'text-secondary'}`}
               title="2 Columns"
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
             <button
               onClick={() => setGridCols(4)}
-              className={`p-1.5 ${gridCols === 4 ? 'bg-surface-container-high dark:bg-zinc-800 text-primary dark:text-white' : 'text-secondary'}`}
+              className={`p-1.5 cursor-pointer ${gridCols === 4 ? 'bg-surface-container-high dark:bg-zinc-800 text-primary dark:text-white' : 'text-secondary'}`}
               title="4 Columns"
             >
               <Grid3X3 className="w-4 h-4" />

@@ -58,6 +58,8 @@ export interface CategoryItem {
   subCategories: string[];
 }
 
+export type Category = CategoryItem;
+
 export interface Coupon {
   id: string;
   code: string;
@@ -153,13 +155,28 @@ export interface StoreSettings {
   announcementTextEn: string;
   currency: string;
   freeShippingThreshold: number;
-  adminPin: string;
   vipRequiredOrders?: number;
   vipRequiredPoints?: number;
   vipDiscountPercentage?: number;
   loyaltyCashbackRate?: number;
   vipFreeShipping?: boolean;
+
+  // Home Page Section Visibility Toggles
+  showHero?: boolean;
+  showCategories?: boolean;
+  showFeaturedProducts?: boolean;
+  showPromoBanner?: boolean;
+  showShopTheLook?: boolean;
+  showAnnouncementBar?: boolean;
+
+  // Home Page CMS Content
+  hero?: HeroBannerSettings;
+  promoEditorial?: PromoBannerSettings;
+  promoBanner?: PromoBannerSettings;
+  shopTheLook?: ShopTheLookSettings;
 }
+
+export type HomePageSettings = StoreSettings;
 
 export interface User {
   id?: string | number;
@@ -283,12 +300,6 @@ export interface ShopTheLookSettings {
   imageUrl: string;
   collectionLink: string;
   hotspots: LookbookHotspot[];
-}
-
-export interface HomePageSettings {
-  hero: HeroBannerSettings;
-  promoEditorial: PromoBannerSettings;
-  shopTheLook: ShopTheLookSettings;
 }
 
 export type BannerPlacement = 

@@ -12,7 +12,7 @@ interface ProductFormVariantsProps {
   onSizesChange: (sizes: string[]) => void;
 }
 
-const AVAILABLE_SIZES = ['S', 'M', 'L', 'XL', '2XL', '3XL', '39', '40', '41', '42', '43', '44', '45', 'One Size'];
+import { AVAILABLE_SIZES } from '../../constants';
 
 export const ProductFormVariants: React.FC<ProductFormVariantsProps> = ({
   colors,

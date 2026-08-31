@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { X, LogOut, Sparkles } from 'lucide-react';
 import { Logo } from '../Logo';
-import { useLanguage } from '@/shared';
+import { useLanguage, useStoreData } from '@/shared';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { NavLinkItem } from './NavDesktopLinks';
 
@@ -18,6 +18,7 @@ export const NavMobileDrawer: React.FC<NavMobileDrawerProps> = ({
   links,
 }) => {
   const { t } = useLanguage();
+  const { settings } = useStoreData();
   const { user, isAuthenticated, role, logout } = useAuthStore();
 
   if (!isOpen) return null;
@@ -28,7 +29,12 @@ export const NavMobileDrawer: React.FC<NavMobileDrawerProps> = ({
         <div>
           {/* Header */}
           <div className="flex items-center justify-between pb-6 border-b border-surface-container dark:border-zinc-800">
-            <Logo size="sm" />
+            <div className="flex items-center gap-2.5">
+              <Logo size="sm" />
+              <span className="font-editorial text-sm font-bold tracking-widest text-primary dark:text-white uppercase">
+                {settings?.storeName || 'EIFFEL'}
+              </span>
+            </div>
             <button
               onClick={onClose}
               className="p-2 text-secondary hover:text-primary dark:text-zinc-400 dark:hover:text-white cursor-pointer"

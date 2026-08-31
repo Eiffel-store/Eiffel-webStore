@@ -16,15 +16,10 @@ vi.mock('../services/authService', () => ({
       tierPoints: 50,
     })),
     register: vi.fn(async (data: any) => ({
-      token: 'mock-reg-token',
-      accessToken: 'mock-reg-token',
-      refreshToken: 'mock-reg-refresh-token',
-      id: '2',
-      name: data.name,
+      success: true,
+      requiresActivation: true,
       email: data.email,
-      role: 'ROLE_CUSTOMER',
-      tier: 'MEMBER',
-      tierPoints: 50,
+      message: 'Account created successfully',
     })),
     getProfile: vi.fn(async () => null),
   }
@@ -76,7 +71,7 @@ describe('Authentication & Access Control', () => {
     expect(useAuthStore.getState().role).toBe('ROLE_CUSTOMER');
   });
 
-  it('registers new user correctly with 50 initial loyalty points', async () => {
+  it('registers new user correctly with activation requirement', async () => {
     const store = useAuthStore.getState();
     const result = await store.register({
       name: 'Youssef Mansour',
@@ -86,9 +81,8 @@ describe('Authentication & Access Control', () => {
     });
 
     expect(result.email).toBe('youssef@example.com');
-    expect(useAuthStore.getState().isAuthenticated).toBe(true);
-    expect(useAuthStore.getState().user?.name).toBe('Youssef Mansour');
-    expect(useAuthStore.getState().user?.tierPoints).toBe(50);
+    expect(result.requiresActivation).toBe(true);
+    expect(result.success).toBe(true);
   });
 
   it('updates loyalty points balance properly', () => {

@@ -16,7 +16,7 @@ export const NavDesktopLinks: React.FC<NavDesktopLinksProps> = ({ links }) => {
   const location = useLocation();
 
   return (
-    <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
+    <nav className="hidden lg:flex items-center gap-4 xl:gap-6 2xl:gap-7">
       {links.map((link) => {
         const isActive = location.pathname === link.href;
         return (

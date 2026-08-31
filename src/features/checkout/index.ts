@@ -4,3 +4,4 @@ export * from './components/CheckoutPaymentSelector';
 export * from './components/CheckoutOrderSummary';
 export * from './components/OrderConfirmation';
 export * from './pages/CheckoutPage';
+export * from './constants';

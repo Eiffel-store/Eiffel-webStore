@@ -5,6 +5,7 @@ import { useStoreData, useLanguage } from '@/shared';
 import { AdminContactSettingsForm } from '../components/settings/AdminContactSettingsForm';
 import { AdminAnnouncementSettingsForm } from '../components/settings/AdminAnnouncementSettingsForm';
 import { AdminLoyaltyVIPSettingsForm } from '../components/settings/AdminLoyaltyVIPSettingsForm';
+import { AdminHomePageSectionsForm } from '../components/settings/AdminHomePageSectionsForm';
 import { AdminDataBackupCard } from '../components/settings/AdminDataBackupCard';
 
 export const AdminSettingsPage: React.FC = () => {
@@ -70,6 +71,11 @@ export const AdminSettingsPage: React.FC = () => {
         />
 
         <AdminLoyaltyVIPSettingsForm
+          settings={formSettings}
+          onChange={(updates) => setFormSettings(prev => ({ ...prev, ...updates }))}
+        />
+
+        <AdminHomePageSectionsForm
           settings={formSettings}
           onChange={(updates) => setFormSettings(prev => ({ ...prev, ...updates }))}
         />
