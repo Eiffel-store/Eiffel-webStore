@@ -146,14 +146,14 @@ export const HeroSection: React.FC = () => {
 
       {/* Hero Editorial Content */}
       <div className="relative z-20 max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 py-12 sm:py-20 w-full flex flex-col justify-end min-h-[82vh] sm:min-h-[88vh]">
-        <div className="max-w-3xl">
-          <div className="flex items-center gap-2 mb-3 sm:mb-4">
-            <span className="inline-flex items-center gap-1.5 bg-white text-black font-label-bold text-[10px] sm:text-xs tracking-widest px-2.5 sm:px-3 py-1 uppercase shadow-md animate-fade-in">
-              <Sparkles className="w-3 h-3 text-amber-500" />
+        <div className="max-w-4xl xl:max-w-5xl">
+          <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
+            <span className="inline-flex items-center gap-1.5 bg-white text-black font-bold text-[11px] sm:text-xs tracking-wider px-3 py-1 rounded-full uppercase shadow-md animate-fade-in">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>{tag}</span>
             </span>
             {currentSlide.discountCode && (
-              <span className="hidden sm:inline-block bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono px-2 py-0.5 uppercase tracking-wider">
+              <span className="hidden sm:inline-block bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-mono px-2.5 py-0.5 rounded-full uppercase tracking-wider font-bold">
                 CODE: {currentSlide.discountCode}
               </span>
             )}
@@ -161,14 +161,18 @@ export const HeroSection: React.FC = () => {
 
           <h1
             key={`title-${currentSlide.id || safeIndex}`}
-            className="font-editorial text-4xl sm:text-7xl md:text-8xl lg:text-9xl leading-[1.0] sm:leading-[0.95] tracking-tight text-white uppercase drop-shadow-sm animate-fade-in"
+            className={`text-white drop-shadow-md animate-fade-in ${
+              isRTL
+                ? 'font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl leading-snug sm:leading-[1.18] tracking-normal'
+                : 'font-editorial font-bold text-4xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight uppercase'
+            }`}
           >
             {title}
           </h1>
 
           <p
             key={`sub-${currentSlide.id || safeIndex}`}
-            className="font-inter text-xs sm:text-base md:text-lg text-zinc-300 mt-4 sm:mt-6 max-w-xl leading-relaxed font-light animate-fade-in"
+            className="text-xs sm:text-base md:text-lg text-zinc-200 mt-4 sm:mt-5 max-w-2xl leading-relaxed font-light drop-shadow animate-fade-in"
           >
             {subtitle}
           </p>
@@ -177,7 +181,7 @@ export const HeroSection: React.FC = () => {
             <Link
               to={buttonLink}
               onClick={handleCtaClick}
-              className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-white text-black font-label-bold text-xs tracking-widest uppercase hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 shadow-lg group cursor-pointer"
+              className="w-full sm:w-auto px-7 sm:px-9 py-3.5 sm:py-4 bg-white text-black font-bold text-xs tracking-widest uppercase hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 shadow-xl group cursor-pointer rounded-sm"
             >
               <span>{buttonText}</span>
               <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${isRTL ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
@@ -187,7 +191,7 @@ export const HeroSection: React.FC = () => {
               <Link
                 to={secondaryButtonLink}
                 onClick={handleCtaClick}
-                className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-transparent border border-white text-white font-label-bold text-xs tracking-widest uppercase hover:bg-white hover:text-black transition-all text-center cursor-pointer"
+                className="w-full sm:w-auto px-7 sm:px-9 py-3.5 sm:py-4 bg-black/40 backdrop-blur-md border border-white/40 text-white font-bold text-xs tracking-widest uppercase hover:bg-white hover:text-black transition-all text-center cursor-pointer rounded-sm"
               >
                 {secondaryButtonText}
               </Link>
