@@ -32,7 +32,7 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
   care,
   onChange
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   // Helper to toggle a line in string array
   const toggleArrayItem = (currentList: string[], itemText: string, fieldName: 'details' | 'care') => {
@@ -80,11 +80,11 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
               <button
                 key={tmpl.id}
                 type="button"
-                onClick={() => onChange({ description: isRTL ? tmpl.textAr : tmpl.textEn })}
+                onClick={() => onChange({ description: tmpl.text })}
                 title={t.adminClickToApplyTemplate}
                 className="px-2 py-0.5 bg-zinc-900 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-300 border border-zinc-700 hover:border-amber-500/40 text-[10px] rounded transition-all cursor-pointer"
               >
-                {isRTL ? tmpl.nameAr : tmpl.nameEn}
+                {tmpl.name}
               </button>
             ))}
           </div>
@@ -116,8 +116,7 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
 
           {/* Quick Composition Chips */}
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {FABRIC_COMPOSITION_PRESETS.map((preset, idx) => {
-              const text = isRTL ? preset.ar : preset.en;
+            {FABRIC_COMPOSITION_PRESETS.map((text, idx) => {
               const isSelected = composition.trim().toLowerCase() === text.trim().toLowerCase();
               return (
                 <button
@@ -153,8 +152,7 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
 
           {/* Quick Fit Chips */}
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {FIT_SILHOUETTE_PRESETS.map((preset, idx) => {
-              const text = isRTL ? preset.ar : preset.en;
+            {FIT_SILHOUETTE_PRESETS.map((text, idx) => {
               const isSelected = fit.trim().toLowerCase() === text.trim().toLowerCase();
               return (
                 <button
@@ -199,8 +197,7 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
 
           {/* Quick Feature Highlight Multi-Select Chips */}
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {FEATURE_HIGHLIGHT_PRESETS.map((preset, idx) => {
-              const text = isRTL ? preset.ar : preset.en;
+            {FEATURE_HIGHLIGHT_PRESETS.map((text, idx) => {
               const active = isItemActive(details, text);
               return (
                 <button
@@ -244,8 +241,7 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
 
           {/* Quick Care Multi-Select Chips */}
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {CARE_INSTRUCTION_PRESETS.map((preset, idx) => {
-              const text = isRTL ? preset.ar : preset.en;
+            {CARE_INSTRUCTION_PRESETS.map((text, idx) => {
               const active = isItemActive(care, text);
               return (
                 <button
