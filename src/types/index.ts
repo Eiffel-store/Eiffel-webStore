@@ -247,6 +247,8 @@ export interface HeroBannerSettings {
   secondaryButtonTextAr: string;
   secondaryButtonLink: string;
   imageUrl: string;
+  desktopImageUrl?: string;
+  mobileImageUrl?: string;
 }
 
 export interface PromoBannerSettings {

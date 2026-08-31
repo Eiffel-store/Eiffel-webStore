@@ -1045,7 +1045,6 @@ export const en: TranslationDictionary = {
   adminLoyaltyVipSettings: "3. Loyalty Program & VIP Tier System",
   adminLoyaltyVipSettingsDesc: "Control auto-upgrade thresholds, cashback rates, and exclusive discounts for elite clients.",
   adminRequiredOrdersVip: "Completed Orders for VIP Upgrade",
-  adminQuickPresets: "Quick Presets:",
   adminVipAutoUpgradeOrdersDesc: "Customers who reach this number of delivered orders are automatically promoted to VIP.",
   adminOrMinPointsBalance: "Or Min Points Balance of",
   adminVipAutoUpgradePointsDesc: "Customers who accumulate this points balance become eligible for automatic upgrade.",

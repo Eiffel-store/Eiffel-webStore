@@ -1054,10 +1054,12 @@ export interface TranslationDictionary {
   adminAnnouncementSection: string;
   adminFreeShippingThresholdEgp: string;
   adminStoreDisplayName: string;
+  adminStoreTagline: string;
+  adminStoreTaglineTip: string;
+  adminStoreCurrency: string;
   adminLoyaltyVipSettings: string;
   adminLoyaltyVipSettingsDesc: string;
   adminRequiredOrdersVip: string;
-  adminQuickPresets: string;
   adminVipAutoUpgradeOrdersDesc: string;
   adminOrMinPointsBalance: string;
   adminVipAutoUpgradePointsDesc: string;

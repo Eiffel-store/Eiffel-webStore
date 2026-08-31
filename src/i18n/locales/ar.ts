@@ -1060,7 +1060,6 @@ export const ar: TranslationDictionary = {
   adminLoyaltyVipSettings: "3. برنامج الولاء ونظام عضوية الـ VIP",
   adminLoyaltyVipSettingsDesc: "تحكم بقواعد الترقية التلقائية ونسب الكاش باك والخصومات الحصرية الممنوحة لعملاء النخبة.",
   adminRequiredOrdersVip: "عدد الطلبات المكتملة للترقية إلى VIP",
-  adminQuickPresets: "خيارات جاهزة سريعة:",
   adminVipAutoUpgradeOrdersDesc: "العميل الذي يكمل هذا العدد من الطلبات المسلمة تتم ترقيته تلقائياً لرتبة VIP.",
   adminOrMinPointsBalance: "أو رصيد نقاط لا يقل عن",
   adminVipAutoUpgradePointsDesc: "العميل الذي يجمع هذا الرصيد من النقاط يصبح مؤهلاً للترقية التلقائية.",
