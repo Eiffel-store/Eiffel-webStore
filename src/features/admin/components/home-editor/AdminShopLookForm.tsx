@@ -11,19 +11,19 @@ interface AdminShopLookFormProps {
 
 const LOOKBOOK_PRESETS = [
   {
-    labelAr: '👔 تنسيق إطلالة الرجل العصري (Modern Ensemble)',
-    titleAr: 'تسوق الإطلالة الكاملة',
+    labelAr: '👔 طقم كاجوال شيك للعمل والخروج (Smart Casual)',
+    titleAr: 'تسوق الطقم كامل',
     titleEn: 'SHOP THE COMPLETE LOOK',
-    subtitleAr: 'تنسيق متناسق متكامل للرجل العصري بمزيج فاخر من الصوف والكشمير',
-    subtitleEn: 'Curated Ensemble for the Modern Man engineered with brutalist discipline',
+    subtitleAr: 'طقم متناسق وأنيق للعمل والخروجات اليومية بخامات قطنية مريحة وتلبيس مضبوط',
+    subtitleEn: 'Curated ready-to-wear ensemble featuring versatile styling & premium comfortable fabrics',
     collectionLink: '/collections/men'
   },
   {
-    labelAr: '❄️ إطلالة الشتاء الملكية (Winter Royal)',
-    titleAr: 'إطلالة الشتاء الأنيقة',
-    titleEn: 'WINTER ROYAL LOOK',
-    subtitleAr: 'أرقى معاطف الكشمير مع بنطال تيلورد وحذاء تشيلسي إيطالي',
-    subtitleEn: 'Handcrafted double-faced cashmere overcoat styled with bespoke trousers',
+    labelAr: '❄️ طقم شتوي كاجوال دافئ (Winter Casual)',
+    titleAr: 'طقم الشتاء الأنيق',
+    titleEn: 'WINTER CASUAL LOOK',
+    subtitleAr: 'جاكت شتوي شيك مع بنطلون جينز وسويت شيرت مريح لمظهر عصري أنيق',
+    subtitleEn: 'Modern winter jacket paired with relaxed denim and comfortable essentials',
     collectionLink: '/collections/new-arrivals'
   }
 ];

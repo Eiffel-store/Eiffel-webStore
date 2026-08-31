@@ -63,38 +63,38 @@ export const FAQ_CATEGORIES: FAQCategory[] = [
   {
     id: 'sizing',
     titleEn: 'SIZING & FIT GUIDE',
-    titleAr: 'المقاسات ودليل الجسم',
+    titleAr: 'المقاسات ودليل التلبيس',
     questions: [
       {
         qEn: 'How do EIFFEL sizes fit?',
         qAr: 'كيف أختار المقاس المناسب لمنتجات إيفل؟',
-        aEn: 'Our silhouettes feature modern tailored cuts and structured fits. We recommend choosing your standard size for the intended elegant fit, or consulting our interactive size guide on each product page.',
-        aAr: 'تتميز تشكيلاتنا بقصات إيطالية عصرية متقنة. ننصح باختيار مقاسك المعتاد للحصول على المظهر الأنيق المثالي، أو مراجعة دليل المقاسات التفاعلي الموجود بصفحة كل منتج.'
+        aEn: 'Our clothing features accurate, modern regular and relaxed fits. We recommend choosing your usual size, or checking the size guide on each product page.',
+        aAr: 'تتميز ملابسنا بمقاسات وتلبيس مصري قياسي مظبوط ومريح. ننصح باختيار مقاسك المعتاد، أو مراجعة جدول المقاسات التوضيحي الموجود بصفحة كل منتج.'
       },
       {
-        qEn: 'Do you offer tailoring alterations or custom adjustments?',
-        qAr: 'هل تقدمون خدمة تعديل أو ضبط المقاسات؟',
-        aEn: 'Yes, we provide complimentary minor tailoring adjustments at our official branches to ensure a flawless bespoke fit.',
-        aAr: 'نعم، نقدم خدمة ضبط وتعديل المقاسات البسيطة في فروعنا لضمان ملاءمة القطعة التامة لمقاسك ومظهرك.'
+        qEn: 'Can I try on the sizes before paying?',
+        qAr: 'هل يمكنني معاينة وتجربة المقاس عند استلام الطلب؟',
+        aEn: 'Yes! Our delivery service allows you to inspect the items upon delivery. You can also visit our branches in Zefta and Nahtay to try them on.',
+        aAr: 'نعم بكل تأكيد! يمكنك معاينة وتجربة المقاس والتأكد من جودة القماش مع مندوب الشحن قبل دفع أي مبلغ، أو تشريفنا بزيارة فروعنا في زفتى ونهطاي.'
       }
     ]
   },
   {
     id: 'craft',
-    titleEn: 'FABRICS & CRAFTSMANSHIP',
-    titleAr: 'الخياطة والأقمشة الفاخرة',
+    titleEn: 'FABRICS & QUALITY',
+    titleAr: 'جودة الخامات والملابس',
     questions: [
       {
-        qEn: 'What materials are used in EIFFEL collections?',
-        qAr: 'ما هي الخامات والأقمشة المستخدمة في مجموعات إيفل؟',
-        aEn: 'We craft our collections using premium Egyptian Giza cotton, Italian virgin wool, and luxury fabric blends, ensuring exceptional breathability, comfort, and longevity.',
-        aAr: 'نصنع تشكيلاتنا باستخدام أجود أنواع القطن المصري طويل التيلة (جيزة)، وأصواف الفيرجن الإيطالية، والأقمشة المعالجة الفاخرة لضمان أقصى درجات الراحة والمتانة.'
+        qEn: 'What materials and fabrics are available at EIFFEL?',
+        qAr: 'ما هي الخامات والأقمشة المتوفرة في متجر إيفل؟',
+        aEn: 'We carefully select all our ready-to-wear apparel from trusted manufacturers using high-grade Egyptian cotton and comfortable durable fabrics that hold up wash after wash.',
+        aAr: 'نختار جميع ملابسنا الجاهزة بعناية فائقة من أجود الخامات والأقطان المصرية والأقمشة المريحة وعالية الجودة التي تحافظ على رونقها وألوانها مع الاستخدام والغسيل المتكرر.'
       },
       {
-        qEn: 'How should I care for and maintain my garments?',
-        qAr: 'كيف أحافظ على القطع والملابس عند الغسيل؟',
-        aEn: 'We recommend dry cleaning for formal suits and coats, and gentle cold washing for luxury cotton shirts, knitwear, and polo shirts.',
-        aAr: 'ننصح بالتنظيف الجاف (Dry Clean) للبدل والمعاطف والقطع الصوفية، والغسيل اللطيف بالماء البارد للقمصان والتيشرتات القطنية للحفاظ على النسيج والألوان.'
+        qEn: 'How should I care for and wash my garments?',
+        qAr: 'كيف أحافظ على الملابس عند الغسيل؟',
+        aEn: 'We recommend gentle washing with cold water and following the care instructions on each garment label to maintain colors and fabric softness.',
+        aAr: 'ننصح بالغسيل المعتدل بالماء الفاتر أو البارد، واتباع إرشادات الغسيل الموضحة على تيكت كل قطعة للحفاظ على نعومة القماش وثبات الألوان.'
       }
     ]
   }

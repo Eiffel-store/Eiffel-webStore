@@ -127,7 +127,7 @@ export const AdminPromoBannerForm: React.FC<AdminPromoBannerFormProps> = ({
             required
             value={promo.titleAr}
             onChange={(e) => onChange({ ...promo, titleAr: e.target.value })}
-            placeholder="مثال: قميص إيفل المعماري الثقيل"
+            placeholder="مثال: قميص أوفر سايز كاجوال"
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-white"
           />
         </div>

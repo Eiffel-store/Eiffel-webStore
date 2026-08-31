@@ -102,8 +102,8 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
 
             <p className="text-[11px] text-secondary dark:text-zinc-400 font-light leading-relaxed">
               {isRTL
-                ? 'يتم تقديم القهوة والمشروبات الترحيبية الفاخرة وقياسات الأتيليه الخاصة خلال جميع جلسات المقاس.'
-                : 'Complimentary champagne, espresso, and bespoke measurements provided during all atelier fittings.'}
+                ? 'أهلاً بك في فروعنا، فريقنا يسعد بمساعدتك في اختيار وتجربة وتنسيق أنسب المقاسات والملابس بكل راحة.'
+                : 'Welcome to our branches. Our store team is delighted to assist you in trying on and selecting the perfect sizes.'}
             </p>
 
             <div className="flex gap-3 pt-2">

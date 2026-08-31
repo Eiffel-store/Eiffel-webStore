@@ -78,9 +78,9 @@ export const CollectionsPage: React.FC = () => {
     return found || {
       id: category,
       name: category === 'men' ? 'تشكيلة الرجال' : category === 'kids' ? 'أزياء الأطفال' : category === 'accessories' ? 'القطع الجلدية والإكسسوارات' : category.toUpperCase(),
-      nameEn: category === 'men' ? "MEN'S COLLECTION" : category === 'kids' ? "KIDS COLLECTION" : category === 'accessories' ? "TIMEPIECES & ACCESSORIES" : category.toUpperCase(),
-      subtitle: 'قصات معمارية انسيابية وخامات قطن الجيزة الفاخر',
-      subtitleEn: 'Architectural Silhouettes & Precision Tailoring',
+      nameEn: category === 'men' ? "MEN'S COLLECTION" : category === 'kids' ? "KIDS COLLECTION" : category === 'accessories' ? "ACCESSORIES" : category.toUpperCase(),
+      subtitle: 'أحدث تشكيلات الملابس الرجالية الجاهزة بخامات ممتازة وتلبيس مضبوط',
+      subtitleEn: 'Modern Ready-to-Wear Menswear with Premium Fabrics & Sharp Fits',
       image: `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`,
       itemCount: '',
       subCategories: []
@@ -97,10 +97,10 @@ export const CollectionsPage: React.FC = () => {
       if (cat === 'new-arrivals') return 'أحدث الإصدارات';
       return currentCategoryObj.name;
     } else {
-      if (cat === 'offers') return 'SPECIAL OFFERS & ARCHIVE';
+      if (cat === 'offers') return 'SPECIAL OFFERS & DEALS';
       if (cat === 'men') return currentCategoryObj.nameEn || "MEN'S COLLECTION";
       if (cat === 'kids') return currentCategoryObj.nameEn || "KIDS COLLECTION";
-      if (cat === 'accessories') return currentCategoryObj.nameEn || "TIMEPIECES & ACCESSORIES";
+      if (cat === 'accessories') return currentCategoryObj.nameEn || "ACCESSORIES";
       if (cat === 'new-arrivals') return "NEW ARRIVALS";
       return currentCategoryObj.nameEn || currentCategoryObj.name;
     }
@@ -110,18 +110,18 @@ export const CollectionsPage: React.FC = () => {
     const cat = category.toLowerCase();
     if (isRTL) {
       if (cat === 'offers') return 'تخفيضات موسمية وباقات أطقم متكاملة بأسعار مميزة للشحن داخل مصر';
-      if (cat === 'men') return currentCategoryObj.subtitle || 'قصات معمارية انسيابية وخامات قطن الجيزة الفاخر للرجال';
+      if (cat === 'men') return currentCategoryObj.subtitle || 'أحدث تشكيلات الملابس الرجالية الجاهزة بخامات ممتازة وتلبيس مضبوط';
       if (cat === 'kids') return currentCategoryObj.subtitle || 'أزياء راقية ومريحة للأولاد والبنات بجودة وخامات تدوم طويلاً';
       if (cat === 'accessories') return currentCategoryObj.subtitle || 'ساعات يد ستيل، محافظ، حقائب كروس، وأساور جلدية فاخرة';
       if (cat === 'new-arrivals') return 'أحدث تشكيلات الموسم متوفرة للشحن الفوري لكافة المحافظات';
       return currentCategoryObj.subtitle;
     } else {
-      if (cat === 'offers') return 'Seasonal markdowns, bundled sets & archive selections across Egypt';
-      if (cat === 'men') return (currentCategoryObj as any).subtitleEn || 'Architectural silhouettes, relaxed fits & premium Egyptian cotton';
-      if (cat === 'kids') return (currentCategoryObj as any).subtitleEn || 'Contemporary junior tailoring, varsity knits & premium summer sets';
-      if (cat === 'accessories') return (currentCategoryObj as any).subtitleEn || 'Steel chronographs, fine leather goods & handcrafted wristwear';
+      if (cat === 'offers') return 'Seasonal markdowns, bundled sets & special deals across Egypt';
+      if (cat === 'men') return (currentCategoryObj as any).subtitleEn || 'Modern ready-to-wear silhouettes, comfortable fits & premium fabrics';
+      if (cat === 'kids') return (currentCategoryObj as any).subtitleEn || 'Comfortable junior clothing, soft knits & versatile sets';
+      if (cat === 'accessories') return (currentCategoryObj as any).subtitleEn || 'Steel watches, fine leather wallets, cross bags & accessories';
       if (cat === 'new-arrivals') return 'Latest seasonal releases ready for express nationwide delivery';
-      return (currentCategoryObj as any).subtitleEn || 'Architectural Silhouettes & Precision Engineering';
+      return (currentCategoryObj as any).subtitleEn || 'Modern Ready-to-Wear Apparel';
     }
   };
 
@@ -361,7 +361,7 @@ export const CollectionsPage: React.FC = () => {
               : (isRTL ? `لا توجد منتجات مضافة في قسم ${getCategoryTitle()} حالياً` : `No products currently available in ${getCategoryTitle()}`)}
             description={hasActiveFilters
               ? t.noPiecesFoundDesc
-              : (isRTL ? 'يتم تحضير وإضافة أحدث تشكيلات وإصدارات هذا القسم في المشغل قريباً. تفضل باستكشاف تشكيلة الرجال أو العروض المتاحة.' : 'New pieces are being crafted. Explore our active collections.')}
+              : (isRTL ? 'يتم تحضير وإضافة أحدث الموديلات والتشكيلات الجديدة لهذا القسم قريباً. تفضل باستكشاف تشكيلة الرجال أو العروض المتاحة.' : 'New pieces are being added soon. Explore our active collections.')}
             actionText={hasActiveFilters ? t.resetFilters : (category !== 'men' ? (isRTL ? 'استكشف تشكيلة الرجال' : "Explore Men's Collection") : (isRTL ? 'العودة للرئيسية' : 'Back to Home'))}
             onAction={hasActiveFilters ? clearFilters : undefined}
             actionLink={!hasActiveFilters ? (category !== 'men' ? '/collections/men' : '/') : undefined}

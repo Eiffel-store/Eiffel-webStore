@@ -138,7 +138,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
             required
             value={hero.titleAr}
             onChange={(e) => onChange({ ...hero, titleAr: e.target.value })}
-            placeholder="مثال: الهيبة المعمارية الفاخرة"
+            placeholder="مثال: أحدث صيحات الملابس الرجالية"
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-white"
           />
         </div>
@@ -153,7 +153,7 @@ export const AdminHeroBannerForm: React.FC<AdminHeroBannerFormProps> = ({
             required
             value={hero.titleEn}
             onChange={(e) => onChange({ ...hero, titleEn: e.target.value })}
-            placeholder="e.g. ARCHITECTURAL FORM"
+            placeholder="e.g. CONTEMPORARY READY-TO-WEAR"
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-white font-mono"
           />
         </div>
