@@ -1150,6 +1150,10 @@ export interface TranslationDictionary {
   adminFullDescription: string;
   adminFabricComposition: string;
   adminCutAndFit: string;
+  adminQuickPresets: string;
+  adminQuickTemplates: string;
+  adminClickToApplyTemplate: string;
+  adminClickToAddBullet: string;
   adminBranchAddressAutofilledNotice: string;
   adminBranchAutodetect: string;
   adminOneClickAutofill: string;
