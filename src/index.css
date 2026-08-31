@@ -52,10 +52,20 @@
 }
 
 /* ==========================================================================
-   GLOBAL ARABIC (RTL) TYPOGRAPHY ENFORCEMENT -> CAIRO FONT
+   GLOBAL ARABIC (RTL) TYPOGRAPHY ENFORCEMENT -> CAIRO LUXURY FONT
    ========================================================================== */
 [dir="rtl"],
 [dir="rtl"] body,
+[dir="rtl"] *:not(.font-mono):not(code):not(pre) {
+  font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6,
 [dir="rtl"] p,
 [dir="rtl"] span,
 [dir="rtl"] a,
@@ -63,27 +73,8 @@
 [dir="rtl"] input,
 [dir="rtl"] select,
 [dir="rtl"] textarea,
-[dir="rtl"] label,
-[dir="rtl"] h1,
-[dir="rtl"] h2,
-[dir="rtl"] h3,
-[dir="rtl"] h4,
-[dir="rtl"] h5,
-[dir="rtl"] h6,
-[dir="rtl"] div,
-[dir="rtl"] .font-editorial,
-[dir="rtl"] .font-label-bold,
-[dir="rtl"] .font-label-sm,
-[dir="rtl"] .font-body-md,
-[dir="rtl"] .font-body-lg,
-[dir="rtl"] .font-inter,
-[dir="rtl"] .font-headline-md,
-[dir="rtl"] .font-headline-lg,
-[dir="rtl"] .font-display-xl,
-[dir="rtl"] .font-display-lg,
-[dir="rtl"] .font-bebas,
-[dir="rtl"] .font-sans {
-  font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+[dir="rtl"] label {
+  letter-spacing: 0 !important;
 }
 
 /* Preserve monospaced numbers & tracking IDs */
