@@ -11,33 +11,21 @@ export const HeroSection: React.FC = () => {
   // 1. Get active Hero Slider banners from dynamic campaigns
   const heroBanners = activeBanners.filter(b => b.placement === 'HERO_SLIDER' && b.isActive !== false);
 
-  // Fallback slide if no dynamic banners exist in database after load
-  const fallbackSlide: Banner = {
-    id: 'fallback-hero',
-    placement: 'HERO_SLIDER',
-    tagEn: settings?.hero?.tagEn || t.heroSeason,
-    tagAr: settings?.hero?.tagAr || t.heroSeason,
-    titleEn: settings?.hero?.titleEn || t.heroTitle,
-    titleAr: settings?.hero?.titleAr || t.heroTitle,
-    subtitleEn: settings?.hero?.subtitleEn || t.heroSubtitle,
-    subtitleAr: settings?.hero?.subtitleAr || t.heroSubtitle,
-    buttonTextEn: settings?.hero?.buttonTextEn || t.exploreCollection,
-    buttonTextAr: settings?.hero?.buttonTextAr || t.exploreCollection,
-    buttonLink: settings?.hero?.buttonLink || '/collections/men',
-    secondaryButtonTextEn: settings?.hero?.secondaryButtonTextEn || t.viewLookbook,
-    secondaryButtonTextAr: settings?.hero?.secondaryButtonTextAr || t.viewLookbook,
-    secondaryButtonLink: settings?.hero?.secondaryButtonLink || '/collections/new-arrivals',
-    desktopImageUrl: settings?.hero?.desktopImageUrl || settings?.hero?.imageUrl || `${import.meta.env.BASE_URL}images/products/eiffel-outfit-flatlay.jpg`,
-    mobileImageUrl: settings?.hero?.mobileImageUrl || settings?.hero?.imageUrl || `${import.meta.env.BASE_URL}images/products/eiffel-outfit-flatlay.jpg`,
-  };
-
-  const slides: Banner[] = heroBanners.length > 0 ? heroBanners : [fallbackSlide];
+  const slides: Banner[] = heroBanners;
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const trackedImpressions = useRef<Set<string>>(new Set());
 
+  // Slider Autoplay & Interval configuration
+  const isAutoPlay = settings?.heroAutoPlay !== false;
+  const intervalSeconds = settings?.heroSliderIntervalSeconds && settings.heroSliderIntervalSeconds >= 2
+    ? settings.heroSliderIntervalSeconds
+    : 5;
+  const intervalMs = intervalSeconds * 1000;
+
   // Preload all slider images on mount
   useEffect(() => {
+    if (slides.length === 0) return;
     const urls = slides
       .map(s => s.desktopImageUrl || s.mobileImageUrl)
       .filter((u): u is string => Boolean(u));
@@ -46,26 +34,26 @@ export const HeroSection: React.FC = () => {
 
   // Keep index within range
   const safeIndex = currentSlideIndex >= slides.length ? 0 : currentSlideIndex;
-  const currentSlide = slides[safeIndex] || fallbackSlide;
+  const currentSlide = slides[safeIndex];
 
   // Track impression for current slide
   useEffect(() => {
-    if (currentSlide?.id && !trackedImpressions.current.has(currentSlide.id) && currentSlide.id !== 'fallback-hero') {
+    if (currentSlide?.id && !trackedImpressions.current.has(currentSlide.id)) {
       trackBannerImpression(currentSlide.id);
       trackedImpressions.current.add(currentSlide.id);
     }
   }, [currentSlide, trackBannerImpression]);
 
-  // Autoplay timer
+  // Dynamic Autoplay timer based on customized interval
   useEffect(() => {
-    if (slides.length <= 1 || isPaused) return;
+    if (slides.length <= 1 || isPaused || !isAutoPlay) return;
 
     const interval = setInterval(() => {
       setCurrentSlideIndex(prev => (prev + 1) % slides.length);
-    }, 6500);
+    }, intervalMs);
 
     return () => clearInterval(interval);
-  }, [slides.length, isPaused]);
+  }, [slides.length, isPaused, isAutoPlay, intervalMs]);
 
   const handlePrev = () => {
     setCurrentSlideIndex(prev => (prev - 1 + slides.length) % slides.length);
@@ -97,16 +85,21 @@ export const HeroSection: React.FC = () => {
     );
   }
 
-  const tag = isRTL ? (currentSlide.tagAr || t.heroSeason) : (currentSlide.tagEn || t.heroSeason);
-  const title = isRTL ? (currentSlide.titleAr || t.heroTitle) : (currentSlide.titleEn || t.heroTitle);
-  const subtitle = isRTL ? (currentSlide.subtitleAr || t.heroSubtitle) : (currentSlide.subtitleEn || t.heroSubtitle);
-  const buttonText = isRTL ? (currentSlide.buttonTextAr || t.exploreCollection) : (currentSlide.buttonTextEn || t.exploreCollection);
-  const buttonLink = currentSlide.buttonLink || '/collections/men';
-  const secondaryButtonText = isRTL ? (currentSlide.secondaryButtonTextAr || t.viewLookbook) : (currentSlide.secondaryButtonTextEn || t.viewLookbook);
-  const secondaryButtonLink = currentSlide.secondaryButtonLink || '/collections/new-arrivals';
+  // If no banners exist, do not render hero section at all
+  if (heroBanners.length === 0) {
+    return null;
+  }
 
-  const desktopImg = currentSlide.desktopImageUrl || currentSlide.mobileImageUrl || `${import.meta.env.BASE_URL}images/products/eiffel-outfit-flatlay.jpg`;
-  const mobileImg = currentSlide.mobileImageUrl || desktopImg;
+  const tag = isRTL ? (currentSlide?.tagAr || t.heroSeason) : (currentSlide?.tagEn || t.heroSeason);
+  const title = isRTL ? (currentSlide?.titleAr || t.heroTitle) : (currentSlide?.titleEn || t.heroTitle);
+  const subtitle = isRTL ? (currentSlide?.subtitleAr || t.heroSubtitle) : (currentSlide?.subtitleEn || t.heroSubtitle);
+  const buttonText = isRTL ? (currentSlide?.buttonTextAr || t.exploreCollection) : (currentSlide?.buttonTextEn || t.exploreCollection);
+  const buttonLink = currentSlide?.buttonLink || '/collections/men';
+  const secondaryButtonText = isRTL ? (currentSlide?.secondaryButtonTextAr || t.viewLookbook) : (currentSlide?.secondaryButtonTextEn || t.viewLookbook);
+  const secondaryButtonLink = currentSlide?.secondaryButtonLink || '/collections/new-arrivals';
+
+  const desktopImg = currentSlide?.desktopImageUrl || currentSlide?.mobileImageUrl || '';
+  const mobileImg = currentSlide?.mobileImageUrl || desktopImg;
 
   return (
     <section

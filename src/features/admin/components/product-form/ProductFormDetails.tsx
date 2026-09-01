@@ -1,12 +1,19 @@
-import React from 'react';
-import { Sparkles, Layers, Scissors, CheckCircle2, ShieldAlert } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  Sparkles,
+  Layers,
+  Scissors,
+  CheckCircle2,
+  ShieldAlert,
+  Shirt,
+  Footprints,
+  Briefcase,
+  Watch
+} from 'lucide-react';
 import { useLanguage } from '@/shared';
 import {
-  FABRIC_COMPOSITION_PRESETS,
-  FIT_SILHOUETTE_PRESETS,
-  FEATURE_HIGHLIGHT_PRESETS,
-  CARE_INSTRUCTION_PRESETS,
-  DESCRIPTION_TEMPLATES
+  CATEGORY_PRESET_BUNDLES,
+  PresetCategory
 } from '../../constants';
 
 interface ProductFormDetailsProps {
@@ -15,6 +22,8 @@ interface ProductFormDetailsProps {
   fit: string;
   details: string[];
   care: string[];
+  category?: string;
+  subCategory?: string;
   onChange: (updates: {
     description?: string;
     composition?: string;
@@ -30,9 +39,37 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
   fit,
   details,
   care,
+  category,
+  subCategory,
   onChange
 }) => {
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
+
+  // Helper to guess default category preset based on product subcategory/category
+  const detectPresetCategory = (): PresetCategory => {
+    const combined = `${category || ''} ${subCategory || ''}`.toLowerCase();
+    if (combined.includes('shoe') || combined.includes('sneaker') || combined.includes('حذاء') || combined.includes('كوتشي') || combined.includes('سنيكرز') || combined.includes('سلايدز') || combined.includes('بوت')) {
+      return 'shoes';
+    }
+    if (combined.includes('bag') || combined.includes('backpack') || combined.includes('شنط') || combined.includes('حقائب') || combined.includes('دفل') || combined.includes('كروس')) {
+      return 'bags';
+    }
+    if (combined.includes('accessor') || combined.includes('cap') || combined.includes('hat') || combined.includes('belt') || combined.includes('wallet') || combined.includes('sunglass') || combined.includes('حزام') || combined.includes('كاب') || combined.includes('محفظة') || combined.includes('نظار')) {
+      return 'accessories';
+    }
+    return 'clothing';
+  };
+
+  const [activeCategory, setActiveCategory] = useState<PresetCategory>(detectPresetCategory());
+
+  useEffect(() => {
+    const detected = detectPresetCategory();
+    if (detected !== 'clothing') {
+      setActiveCategory(detected);
+    }
+  }, [category, subCategory]);
+
+  const bundle = CATEGORY_PRESET_BUNDLES[activeCategory] || CATEGORY_PRESET_BUNDLES.clothing;
 
   // Helper to toggle a line in string array
   const toggleArrayItem = (currentList: string[], itemText: string, fieldName: 'details' | 'care') => {
@@ -53,16 +90,49 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
     return currentList.some(i => i.trim().toLowerCase() === trimmed);
   };
 
+  const categoryTabs: Array<{ id: PresetCategory; labelAr: string; labelEn: string; icon: React.ComponentType<{ className?: string }> }> = [
+    { id: 'clothing', labelAr: '👕 ملابس', labelEn: '👕 Clothing', icon: Shirt },
+    { id: 'shoes', labelAr: '👟 أحذية وكوتشيات', labelEn: '👟 Shoes & Sneakers', icon: Footprints },
+    { id: 'bags', labelAr: '🎒 شنط وحقائب', labelEn: '🎒 Bags & Backpacks', icon: Briefcase },
+    { id: 'accessories', labelAr: '🕶️ إكسسوارات وجلديات', labelEn: '🕶️ Accessories', icon: Watch }
+  ];
+
   return (
     <div className="bg-zinc-950 border border-zinc-800 p-6 space-y-6 shadow-xl rounded-sm">
-      <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
-        <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2">
-          <Layers className="w-4 h-4 text-amber-400" />
-          <span>{t.adminDetailsAndCareSection}</span>
-        </h2>
-        <span className="text-[10px] font-mono text-zinc-500 uppercase">
-          {t.adminQuickPresets}
-        </span>
+      {/* Header & Category Switcher */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-800">
+        <div>
+          <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2">
+            <Layers className="w-4 h-4 text-amber-400" />
+            <span>{t.adminDetailsAndCareSection}</span>
+          </h2>
+          <p className="text-[11px] text-zinc-400 mt-0.5">
+            {isRTL
+              ? 'اختر نوع المنتج لعرض الخامات والمواصفات والقوالب المناسبة له بنقرة واحدة.'
+              : 'Select product type to load relevant materials, fits, and feature presets.'}
+          </p>
+        </div>
+
+        {/* Category Preset Switcher Pills */}
+        <div className="flex items-center gap-1.5 flex-wrap bg-zinc-900/80 p-1 border border-zinc-800 rounded-lg">
+          {categoryTabs.map((tab) => {
+            const isSelected = activeCategory === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveCategory(tab.id)}
+                className={`px-3 py-1.5 rounded text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'bg-amber-500 text-black font-bold shadow-md'
+                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                }`}
+              >
+                <span>{isRTL ? tab.labelAr : tab.labelEn}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* 1. Detailed Description with Quick Templates */}
@@ -76,13 +146,13 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
               <Sparkles className="w-3 h-3" />
               <span>{t.adminQuickTemplates}:</span>
             </span>
-            {DESCRIPTION_TEMPLATES.map((tmpl) => (
+            {bundle.templates.map((tmpl) => (
               <button
                 key={tmpl.id}
                 type="button"
                 onClick={() => onChange({ description: tmpl.text })}
                 title={t.adminClickToApplyTemplate}
-                className="px-2 py-0.5 bg-zinc-900 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-300 border border-zinc-700 hover:border-amber-500/40 text-[10px] rounded transition-all cursor-pointer"
+                className="px-2.5 py-0.5 bg-zinc-900 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-300 border border-zinc-700 hover:border-amber-500/40 text-[11px] rounded transition-all cursor-pointer"
               >
                 {tmpl.name}
               </button>
@@ -94,7 +164,7 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
           rows={3}
           value={description}
           onChange={(e) => onChange({ description: e.target.value })}
-          placeholder="Architectural garment description..."
+          placeholder={isRTL ? "اكتب وصفاً واضحاً ومميزاً للقطعة ومميزاتها وتفاصيلها..." : "Write a clear, attractive description of the product..."}
           className="w-full bg-zinc-900 border border-zinc-700 p-3 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-400 rounded-sm transition-colors"
         />
       </div>
@@ -104,19 +174,33 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
         {/* Fabric & Material Composition */}
         <div className="space-y-2">
           <label className="block text-xs text-zinc-300 font-bold">
-            {t.adminFabricComposition}
+            {activeCategory === 'shoes'
+              ? (isRTL ? 'خامة الحذاء والنعل' : 'Shoe & Sole Material')
+              : activeCategory === 'bags'
+              ? (isRTL ? 'خامة الشنطة والبطانة' : 'Bag & Lining Material')
+              : activeCategory === 'accessories'
+              ? (isRTL ? 'الخامة والمكونات' : 'Accessory Material')
+              : t.adminFabricComposition}
           </label>
           <input
             type="text"
             value={composition}
             onChange={(e) => onChange({ composition: e.target.value })}
-            placeholder="100% Egyptian Cotton (280 GSM)"
+            placeholder={
+              activeCategory === 'shoes'
+                ? (isRTL ? 'مثال: جلد طبيعي 100% / نعل رابر ممتص للصدمات' : 'e.g. Genuine Leather / Anti-slip Rubber Sole')
+                : activeCategory === 'bags'
+                ? (isRTL ? 'مثال: قماش وتربروف مقاوم للماء / جلد فاخر' : 'e.g. Water-resistant Oxford / Premium Leather')
+                : activeCategory === 'accessories'
+                ? (isRTL ? 'مثال: جلد طبيعي 100% / إبزيم ستانلس ستيل' : 'e.g. 100% Genuine Leather / Stainless Steel')
+                : (isRTL ? 'مثال: 100% قطن طبيعي مريح' : 'e.g. 100% Pure Cotton')
+            }
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-400 rounded-sm transition-colors"
           />
 
           {/* Quick Composition Chips */}
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {FABRIC_COMPOSITION_PRESETS.map((text, idx) => {
+            {bundle.fabrics.map((text, idx) => {
               const isSelected = composition.trim().toLowerCase() === text.trim().toLowerCase();
               return (
                 <button
@@ -136,23 +220,39 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
           </div>
         </div>
 
-        {/* Fit & Silhouette */}
+        {/* Fit & Silhouette / Model */}
         <div className="space-y-2">
           <label className="block text-xs text-zinc-300 font-bold flex items-center gap-1.5">
             <Scissors className="w-3.5 h-3.5 text-zinc-400" />
-            <span>{t.adminCutAndFit}</span>
+            <span>
+              {activeCategory === 'shoes'
+                ? (isRTL ? 'موديل ونوع الحذاء' : 'Shoe Model & Style')
+                : activeCategory === 'bags'
+                ? (isRTL ? 'نوع وتصميم الشنطة' : 'Bag Style & Shape')
+                : activeCategory === 'accessories'
+                ? (isRTL ? 'الموديل والمقاس' : 'Model & Fit')
+                : t.adminCutAndFit}
+            </span>
           </label>
           <input
             type="text"
             value={fit}
             onChange={(e) => onChange({ fit: e.target.value })}
-            placeholder="Relaxed Drop-Shoulder Boxy Fit"
+            placeholder={
+              activeCategory === 'shoes'
+                ? (isRTL ? 'مثال: سنيكرز كاجوال رياضي / كوتشي لو-توب' : 'e.g. Casual Sport Sneakers')
+                : activeCategory === 'bags'
+                ? (isRTL ? 'مثال: شنطة كروس بدي عملية / شنطة ظهر لابتوب' : 'e.g. Crossbody Bag / Laptop Backpack')
+                : activeCategory === 'accessories'
+                ? (isRTL ? 'مثال: كاب بيسبول قابل للتعديل / حزام جلد كلاسيكي' : 'e.g. Adjustable Baseball Cap')
+                : (isRTL ? 'مثال: أوفر سايز واسع ومريح' : 'e.g. Oversized Fit')
+            }
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-400 rounded-sm transition-colors"
           />
 
           {/* Quick Fit Chips */}
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {FIT_SILHOUETTE_PRESETS.map((text, idx) => {
+            {bundle.fits.map((text, idx) => {
               const isSelected = fit.trim().toLowerCase() === text.trim().toLowerCase();
               return (
                 <button
@@ -191,13 +291,19 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
             rows={4}
             value={details.join('\n')}
             onChange={(e) => onChange({ details: e.target.value.split('\n').filter(Boolean) })}
-            placeholder={`100% Heavyweight Cotton\nMade in Egypt\nPrecision Stitching`}
+            placeholder={
+              activeCategory === 'shoes'
+                ? (isRTL ? "نعل ممتص للصدمات\nفرش طبي مريح\nخامة مسامية تسمح بالتهوية" : "Shock-absorbing sole\nMemory foam insole\nBreathable mesh")
+                : activeCategory === 'bags'
+                ? (isRTL ? "جيوب متعددة للتنظيم\nمقاومة لرذاذ الماء\nحزام مبطن مريح" : "Multi-compartment storage\nWater-resistant fabric\nPadded strap")
+                : (isRTL ? "خامة قطنية ناعمة ومريحة\nثبات عالي للألوان ومقاوم للبهتان\nتقفيل وخياطة مزدوجة متينة" : "100% Pure Soft Cotton\nFade-resistant color\nReinforced stitching")
+            }
             className="w-full bg-zinc-900 border border-zinc-700 p-3 text-xs text-white font-mono placeholder:text-zinc-500 focus:outline-none focus:border-amber-400 rounded-sm"
           />
 
           {/* Quick Feature Highlight Multi-Select Chips */}
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {FEATURE_HIGHLIGHT_PRESETS.map((text, idx) => {
+            {bundle.features.map((text, idx) => {
               const active = isItemActive(details, text);
               return (
                 <button
@@ -219,12 +325,16 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
           </div>
         </div>
 
-        {/* Care & Washing Instructions */}
+        {/* Care & Maintenance Instructions */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-xs text-zinc-300 font-bold flex items-center gap-1.5">
               <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-              <span>{t.adminCareInstructions}</span>
+              <span>
+                {activeCategory === 'shoes' || activeCategory === 'bags'
+                  ? (isRTL ? 'إرشادات العناية والتنظيف' : 'Care & Cleaning')
+                  : t.adminCareInstructions}
+              </span>
             </label>
             <span className="text-[10px] font-mono text-zinc-500">
               {care.length} {t.adminPiecesCount || 'items'}
@@ -235,13 +345,17 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
             rows={4}
             value={care.join('\n')}
             onChange={(e) => onChange({ care: e.target.value.split('\n').filter(Boolean) })}
-            placeholder={`Machine wash cold\nDo not bleach\nIron inside-out`}
+            placeholder={
+              activeCategory === 'shoes'
+                ? (isRTL ? "تنظيف بقطعة قماش مبللة أو فرشاة ناعمة\nتجنب الغسيل في الغسالة الأوتوماتيك\nتجفيف هوائي بعيداً عن الشمس" : "Wipe clean with damp cloth\nDo not machine wash\nAir dry away from heat")
+                : (isRTL ? "غسيل في الغسالة بماء بارد 30° مئوية\nقلب القطعة على الظهر قبل الغسيل\nالكي على ظهر القطعة وبحرارة متوسطة" : "Machine wash cold\nDo not bleach\nIron inside-out")
+            }
             className="w-full bg-zinc-900 border border-zinc-700 p-3 text-xs text-white font-mono placeholder:text-zinc-500 focus:outline-none focus:border-amber-400 rounded-sm"
           />
 
           {/* Quick Care Multi-Select Chips */}
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {CARE_INSTRUCTION_PRESETS.map((text, idx) => {
+            {bundle.care.map((text, idx) => {
               const active = isItemActive(care, text);
               return (
                 <button

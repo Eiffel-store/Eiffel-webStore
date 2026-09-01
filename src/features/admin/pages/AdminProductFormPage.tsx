@@ -174,6 +174,8 @@ export const AdminProductFormPage: React.FC = () => {
           fit={formData.fit || ''}
           details={formData.details || []}
           care={formData.care || []}
+          category={formData.category}
+          subCategory={formData.subCategory}
           onChange={(updates) => setFormData(prev => ({ ...prev, ...updates }))}
         />
 

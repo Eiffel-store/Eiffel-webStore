@@ -174,6 +174,10 @@ export interface StoreSettings {
   promoEditorial?: PromoBannerSettings;
   promoBanner?: PromoBannerSettings;
   shopTheLook?: ShopTheLookSettings;
+
+  // Hero Slider Auto-Transition Controls
+  heroSliderIntervalSeconds?: number;
+  heroAutoPlay?: boolean;
 }
 
 export type HomePageSettings = StoreSettings;

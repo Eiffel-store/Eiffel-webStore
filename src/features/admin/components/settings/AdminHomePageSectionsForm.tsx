@@ -125,6 +125,71 @@ export const AdminHomePageSectionsForm: React.FC<AdminHomePageSectionsFormProps>
           );
         })}
       </div>
+
+      {/* Hero Slider Transition Interval & AutoPlay Controls */}
+      <div className="mt-5 p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800">
+          <div>
+            <span className="text-xs font-bold text-white block">
+              {isRTL ? '⏱️ مدة تبديل بنرات الهيرو التلقائي' : '⏱️ Hero Slider Auto-Transition Speed'}
+            </span>
+            <span className="text-[11px] text-zinc-400 block mt-0.5">
+              {isRTL
+                ? 'حدد عدد الثواني التي يستغرقها كل بنر قبل الانتقال تلقائياً للبنر التالي.'
+                : 'Configure how many seconds each banner stays before sliding to the next.'}
+            </span>
+          </div>
+
+          <label className="flex items-center gap-2 cursor-pointer select-none self-start sm:self-auto">
+            <span className="text-xs text-zinc-300 font-mono">
+              {isRTL ? 'التبديل التلقائي' : 'Auto Play'}
+            </span>
+            <input
+              type="checkbox"
+              checked={settings.heroAutoPlay !== false}
+              onChange={(e) => onChange({ heroAutoPlay: e.target.checked })}
+              className="accent-amber-500 w-4 h-4 cursor-pointer"
+            />
+          </label>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          {[3, 5, 7, 10, 15].map((sec) => {
+            const isSelected = (settings.heroSliderIntervalSeconds || 5) === sec;
+            return (
+              <button
+                key={sec}
+                type="button"
+                onClick={() => onChange({ heroSliderIntervalSeconds: sec })}
+                className={`px-3 py-1.5 rounded text-xs font-mono transition-all cursor-pointer ${
+                  isSelected
+                    ? 'bg-amber-500 text-black font-bold shadow-md'
+                    : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white'
+                }`}
+              >
+                {sec} {isRTL ? 'ثوانٍ' : 'sec'}{sec === 5 ? (isRTL ? ' (افتراضي)' : ' (default)') : ''}
+              </button>
+            );
+          })}
+
+          <div className="flex items-center gap-2 ml-auto rtl:ml-0 rtl:mr-auto">
+            <span className="text-xs text-zinc-400 font-mono">
+              {isRTL ? 'تخصيص:' : 'Custom:'}
+            </span>
+            <input
+              type="number"
+              min={2}
+              max={30}
+              value={settings.heroSliderIntervalSeconds || 5}
+              onChange={(e) => onChange({ heroSliderIntervalSeconds: Math.max(2, Math.min(30, parseInt(e.target.value) || 5)) })}
+              className="w-16 bg-zinc-950 border border-zinc-700 px-2 py-1 text-xs text-white text-center font-mono rounded focus:border-amber-500 focus:outline-none"
+            />
+            <span className="text-xs text-zinc-400 font-mono">
+              {isRTL ? 'ثانية' : 's'}
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -63,7 +63,9 @@ export const DEFAULT_SETTINGS: StoreSettings = {
     imageUrl: '',
     collectionLink: '/collections/men',
     hotspots: []
-  }
+  },
+  heroSliderIntervalSeconds: 5,
+  heroAutoPlay: true
 };
 
 export const DEFAULT_HOME_SETTINGS: HomePageSettings = DEFAULT_SETTINGS;

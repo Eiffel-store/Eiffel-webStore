@@ -39,7 +39,8 @@ export const useSettingsData = (queryClient: QueryClient) => {
   });
 
   const updateSettings = (updates: Partial<StoreSettings>) => {
-    updateSettingsMutation.mutate(updates);
+    const payload = { ...settings, ...updates };
+    updateSettingsMutation.mutate(payload);
   };
 
   const updateHomeSettings = (updates: Partial<StoreSettings>) => {

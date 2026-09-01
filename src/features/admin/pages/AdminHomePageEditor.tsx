@@ -9,7 +9,8 @@ import {
   Layers,
   MessageSquare,
   Maximize2,
-  Check
+  Check,
+  Clock
 } from 'lucide-react';
 import { useStoreData, useLanguage, AdminTableSkeleton } from '@/shared';
 import { Banner, BannerPlacement } from '@/types';
@@ -23,6 +24,8 @@ const AdminShopTheLookManager = lazy(() => import('../components/home-editor/Adm
 
 export const AdminHomePageEditor: React.FC = () => {
   const {
+    settings,
+    updateSettings,
     banners = [],
     looks = [],
     addBanner,
@@ -202,14 +205,93 @@ export const AdminHomePageEditor: React.FC = () => {
           <AdminShopTheLookManager />
         </Suspense>
       ) : (
-        <AdminBannerList
-          banners={currentTabBanners}
-          onOpenCreate={handleOpenCreate}
-          onOpenEdit={handleOpenEdit}
-          onToggleStatus={handleToggle}
-          onDelete={handleDeleteBanner}
-          onMove={handleMove}
-        />
+        <div className="space-y-4">
+          {/* Quick Hero Slider Settings Bar */}
+          {activeTab === 'HERO_SLIDER' && (
+            <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg animate-fade-in">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                  <Clock className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-white block">
+                    {isRTL ? 'مدة تبديل السلايدر التلقائي' : 'Hero Slider Auto-Transition Speed'}
+                  </span>
+                  <span className="text-[11px] text-zinc-400 block mt-0.5">
+                    {isRTL
+                      ? 'حدد سرعة الانتقال بين البنرات عند وجود أكثر من بنر نشط.'
+                      : 'Configure transition duration when multiple active banners exist.'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="flex items-center gap-2 cursor-pointer select-none px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded text-xs text-zinc-300 font-mono hover:border-zinc-700">
+                  <span>{isRTL ? 'تفعيل التبديل' : 'Auto Play'}</span>
+                  <input
+                    type="checkbox"
+                    checked={settings?.heroAutoPlay !== false}
+                    onChange={(e) => {
+                      updateSettings({ heroAutoPlay: e.target.checked });
+                      showSuccess(isRTL ? 'تم حفظ إعدادات السلايدر' : 'Slider settings updated');
+                    }}
+                    className="accent-amber-500 w-3.5 h-3.5 cursor-pointer"
+                  />
+                </label>
+
+                {[3, 5, 7, 10].map((sec) => {
+                  const isSelected = (settings?.heroSliderIntervalSeconds || 5) === sec;
+                  return (
+                    <button
+                      key={sec}
+                      type="button"
+                      onClick={() => {
+                        updateSettings({ heroSliderIntervalSeconds: sec });
+                        showSuccess(isRTL ? `تم ضبط السرعة إلى ${sec} ثوانٍ` : `Speed set to ${sec}s`);
+                      }}
+                      className={`px-3 py-1.5 rounded text-xs font-mono transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-amber-500 text-black font-bold shadow-md'
+                          : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white'
+                      }`}
+                    >
+                      {sec} {isRTL ? 'ثوانٍ' : 's'}
+                    </button>
+                  );
+                })}
+
+                <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 px-2 py-1 rounded">
+                  <span className="text-[11px] text-zinc-400 font-mono">
+                    {isRTL ? 'مخصص:' : 'Custom:'}
+                  </span>
+                  <input
+                    type="number"
+                    min={2}
+                    max={30}
+                    value={settings?.heroSliderIntervalSeconds || 5}
+                    onChange={(e) => {
+                      const val = Math.max(2, Math.min(30, parseInt(e.target.value) || 5));
+                      updateSettings({ heroSliderIntervalSeconds: val });
+                    }}
+                    className="w-12 bg-zinc-950 border border-zinc-700 px-1 py-0.5 text-xs text-white text-center font-mono rounded focus:border-amber-500 focus:outline-none"
+                  />
+                  <span className="text-[11px] text-zinc-400 font-mono">
+                    {isRTL ? 'ث' : 's'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <AdminBannerList
+            banners={currentTabBanners}
+            onOpenCreate={handleOpenCreate}
+            onOpenEdit={handleOpenEdit}
+            onToggleStatus={handleToggle}
+            onDelete={handleDeleteBanner}
+            onMove={handleMove}
+          />
+        </div>
       )}
 
       {/* Create / Edit Modal Dialog */}
