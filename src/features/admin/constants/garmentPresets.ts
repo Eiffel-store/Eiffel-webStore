@@ -28,12 +28,13 @@ export const CATEGORY_PRESET_BUNDLES: Record<PresetCategory, CategoryPresetBundl
       '100% قطن طبيعي مريح (100% Pure Cotton)',
       'قطن سنغل جيرسي ناعم (Single Jersey Cotton)',
       'قطن مع ليكرا مرن (Cotton Lycra Blend)',
+      'أكسفورد وبوبلين فاخر للقمصان (Oxford & Poplin Cotton)',
+      'كتان صيفي خفيف وبارد (Summer Linen Blend)',
       'ميلتون قطني مبطن دافئ (Fleece-Lined Heavyweight)',
       'ميلتون سنغل خفيف (Lightweight Cotton Fleece)',
       'جينز عالي الجودة مع ليكرا (Stretch Denim)',
       'جبردين قطني متين وعملي (Cotton Gabardine)',
       'بيكيه قطني للبولو (Cotton Piqué)',
-      'كتان صيفي خفيف وبارد (Summer Linen Blend)',
       'قماش وتربروف مقاوم للماء والرياح (Waterproof & Windproof)',
       'بوليستر رياضي معالج سريع الجفاف (Quick-Dry Performance)'
     ],
@@ -41,6 +42,7 @@ export const CATEGORY_PRESET_BUNDLES: Record<PresetCategory, CategoryPresetBundl
       'أوفر سايز واسع وعصري (Oversized Fit)',
       'ريجولار مريح ومناسب للجميع (Regular Classic Fit)',
       'سليم فيت مجسم أنيق (Slim Tailored Fit)',
+      'قميص أوفر شيرت مريح (Overshirt Relaxed Fit)',
       'دروب شولدر بأكتاف ساقطة (Drop Shoulder Relaxed)',
       'كارغو بقصة عصرية وجيوب (Cargo Fit)',
       'قصة مستقيمة مريحة (Straight Leg Fit)',
@@ -51,6 +53,8 @@ export const CATEGORY_PRESET_BUNDLES: Record<PresetCategory, CategoryPresetBundl
       'قماش مرن يمنحك راحة وسهولة في الحركة',
       'ثبات عالي للألوان ومقاوم للبهتان بعد الغسيل',
       'معالج ضد الانكماش للحفاظ على المقاس الأصلي',
+      'أزرار متينة مع تقفيل ياقة وأساور فائق الجودة',
+      'سهل الكي ومقاوم للتجاعيد (Easy Care)',
       'طباعة / تطريز عالي الجودة ومقاوم للتلف',
       'تقفيل وخياطة مزدوجة متينة لتحمل الاستخدام',
       'بطانة داخلية ناعمة تمنحك الدفء',
@@ -72,6 +76,16 @@ export const CATEGORY_PRESET_BUNDLES: Record<PresetCategory, CategoryPresetBundl
         id: 'tshirt_casual',
         name: 'تيشرت / بولو كاجوال',
         text: 'تيشرت كاجوال عصري مصنوع من خامة قطنية عالية الجودة، يتميز بملمس ناعم ومريح طوال اليوم مع قصة مريحة مناسبة لجميع إطلالاتك اليومية.\n\nA comfortable everyday casual t-shirt crafted from premium soft cotton, featuring a modern fit and versatile style for your daily outfits.'
+      },
+      {
+        id: 'shirt_casual',
+        name: 'قميص كاجوال / أوفر شيرت',
+        text: 'قميص كاجوال أنيق مصنوع من خامة قطنية مريحة وخفيفة، يتميز بقصة متناسقة وتقفيل متقن يمنحك إطلالة شيك تناسب العمل والخروجات اليومية والتنسيق المفتوح فوق التيشرت.\n\nA stylish casual button-down shirt crafted from breathable soft cotton, offering a versatile tailored look ideal for daily wear, work, or open-front layering.'
+      },
+      {
+        id: 'shirt_linen',
+        name: 'قميص كتان صيفي',
+        text: 'قميص كتان صيفي خفيف وبارد، يتميز بملمس طبيعي ناعم وقصة مريحة تمنحك إطلالة صيفية شيك وجذابة في الأجواء الحارة.\n\nA lightweight breathable summer linen shirt with a relaxed silhouette and natural texture, perfect for staying cool and elegant in warm weather.'
       },
       {
         id: 'hoodie_winter',
