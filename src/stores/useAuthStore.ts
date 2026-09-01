@@ -20,6 +20,7 @@ interface AuthState {
   setUser: (user: User, token: string, refreshToken?: string) => void;
   setTokens: (token: string, refreshToken?: string) => void;
   fetchProfile: () => Promise<void>;
+  refreshSession: () => Promise<boolean>;
   updateUserPoints: (delta: number) => void;
   clearError: () => void;
 }
@@ -184,6 +185,38 @@ export const useAuthStore = create<AuthState>()(
         }));
       },
 
+      refreshSession: async (): Promise<boolean> => {
+        let refreshToken = get().refreshToken || localStorage.getItem('refreshToken');
+        if (!refreshToken || refreshToken === 'undefined' || refreshToken === 'null') {
+          const storedAuth = localStorage.getItem('eiffel-auth-storage');
+          if (storedAuth) {
+            try {
+              const parsed = JSON.parse(storedAuth);
+              refreshToken = parsed?.state?.refreshToken;
+            } catch {}
+          }
+        }
+
+        if (!refreshToken || refreshToken === 'undefined' || refreshToken === 'null') {
+          return false;
+        }
+
+        try {
+          const data = await authService.refreshToken(refreshToken);
+          const newAccessToken = data?.accessToken || data?.token;
+          const newRefreshToken = data?.refreshToken || refreshToken;
+
+          if (newAccessToken) {
+            get().setTokens(newAccessToken, newRefreshToken);
+            return true;
+          }
+          return false;
+        } catch (err) {
+          console.warn('Silent token refresh failed:', err);
+          return false;
+        }
+      },
+
       fetchProfile: async () => {
         const storedToken = localStorage.getItem('token') || localStorage.getItem('eiffel_auth_token');
         if (!storedToken) {
@@ -229,12 +262,13 @@ export const useAuthStore = create<AuthState>()(
               role: (rawUser.role || data.role || 'ROLE_CUSTOMER') as any,
               isAuthenticated: true,
             }));
-          } else {
-            get().logout();
           }
         } catch {
-          // If server rejects (401 / 403 / 404 / user deleted from DB), log out immediately
-          get().logout();
+          // If profile fetch fails, attempt a silent token refresh first before logging out
+          const refreshed = await get().refreshSession();
+          if (!refreshed) {
+            get().logout();
+          }
         } finally {
           set({ isProfileLoading: false });
         }

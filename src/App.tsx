@@ -2,6 +2,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useSilentTokenRefresh } from '@/hooks/useSilentTokenRefresh';
 import { ScrollToTop } from '@/shared';
 import { AppProviders } from '@/providers';
 import { AppRoutes, SearchModal } from '@/routes';
@@ -9,6 +10,9 @@ import { AppRoutes, SearchModal } from '@/routes';
 export const App: React.FC = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const { token, isAuthenticated, fetchProfile } = useAuthStore();
+
+  // Proactive silent token refresh to keep session alive securely while working
+  useSilentTokenRefresh();
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token') || localStorage.getItem('eiffel_auth_token');
