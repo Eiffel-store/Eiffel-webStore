@@ -58,7 +58,7 @@ export const AdminLoginPage: React.FC = () => {
       <div className="absolute top-6 left-6 rtl:left-auto rtl:right-6">
         <Link
           to="/"
-          className="flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors"
+          className="flex items-center gap-2 text-xs font-medium text-zinc-400 hover:text-white transition-colors"
         >
           {isRTL ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
           <span>{t.adminLiveStorefront}</span>
@@ -74,7 +74,7 @@ export const AdminLoginPage: React.FC = () => {
           <h1 className="font-editorial text-2xl sm:text-3xl font-bold tracking-widest text-white uppercase">
             EIFFEL CONTROL
           </h1>
-          <p className="text-xs text-zinc-400 mt-2 font-mono">
+          <p className="text-xs text-zinc-400 mt-2">
             {t.adminLoginSubtitle}
           </p>
         </div>

@@ -20,7 +20,7 @@ export const AdminStatCards: React.FC = () => {
       {/* Total Products */}
       <div className="bg-zinc-950 border border-zinc-800 p-5 shadow-lg relative overflow-hidden group hover:border-zinc-700 transition-colors">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+          <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
             {t.adminTotalProducts}
           </span>
           <div className="p-2 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded">
@@ -29,12 +29,12 @@ export const AdminStatCards: React.FC = () => {
         </div>
         <div className="mt-3 flex items-baseline gap-3">
           <span className="text-3xl font-editorial font-bold text-white">{totalProducts}</span>
-          <span className="text-xs text-emerald-400 font-mono">
+          <span className="text-xs text-emerald-400">
             {inStockProducts} {t.adminInStock}
           </span>
         </div>
         {outOfStockProducts > 0 && (
-          <div className="mt-2 text-[11px] text-amber-400 flex items-center gap-1 font-mono">
+          <div className="mt-2 text-[11px] text-amber-400 flex items-center gap-1">
             <AlertTriangle className="w-3 h-3" />
             <span>{outOfStockProducts} {t.adminOutOfStock}</span>
           </div>
@@ -48,7 +48,7 @@ export const AdminStatCards: React.FC = () => {
       {/* Active Offers */}
       <div className="bg-zinc-950 border border-zinc-800 p-5 shadow-lg relative overflow-hidden group hover:border-zinc-700 transition-colors">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+          <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
             {t.adminActiveOffers}
           </span>
           <div className="p-2 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded">
@@ -57,11 +57,11 @@ export const AdminStatCards: React.FC = () => {
         </div>
         <div className="mt-3 flex items-baseline gap-3">
           <span className="text-3xl font-editorial font-bold text-white">{offersCount}</span>
-          <span className="text-xs text-amber-400 font-mono">
+          <span className="text-xs text-amber-400">
             {coupons.filter(c => c.isActive).length} {t.adminActiveCoupons}
           </span>
         </div>
-        <p className="mt-2 text-[11px] text-zinc-500 font-mono">
+        <p className="mt-2 text-[11px] text-zinc-500">
           {t.adminOffersSection}
         </p>
         <Link to="/admin/offers" className="mt-3 block text-[11px] text-zinc-400 hover:text-white flex items-center gap-1">
@@ -73,7 +73,7 @@ export const AdminStatCards: React.FC = () => {
       {/* Branches */}
       <div className="bg-zinc-950 border border-zinc-800 p-5 shadow-lg relative overflow-hidden group hover:border-zinc-700 transition-colors">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+          <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
             {t.adminStoreBranches}
           </span>
           <div className="p-2 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded">
@@ -82,11 +82,11 @@ export const AdminStatCards: React.FC = () => {
         </div>
         <div className="mt-3 flex items-baseline gap-3">
           <span className="text-3xl font-editorial font-bold text-white">{stores.length}</span>
-          <span className="text-xs text-zinc-400 font-mono">
+          <span className="text-xs text-zinc-400">
             {stores.map(s => s.name.split('—')[1] || s.city).join(', ')}
           </span>
         </div>
-        <p className="mt-2 text-[11px] text-zinc-500 font-mono">
+        <p className="mt-2 text-[11px] text-zinc-500">
           {t.adminGharbiaBranches}
         </p>
         <Link to="/admin/branches" className="mt-3 block text-[11px] text-zinc-400 hover:text-white flex items-center gap-1">
@@ -98,7 +98,7 @@ export const AdminStatCards: React.FC = () => {
       {/* Orders & Revenue */}
       <div className="bg-zinc-950 border border-zinc-800 p-5 shadow-lg relative overflow-hidden group hover:border-zinc-700 transition-colors">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+          <span className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
             {t.adminOrders}
           </span>
           <div className="p-2 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded">

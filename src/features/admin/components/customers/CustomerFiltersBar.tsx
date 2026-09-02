@@ -33,7 +33,7 @@ export const CustomerFiltersBar: React.FC<CustomerFiltersBarProps> = ({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={t.adminSearchCustomerPlaceholder}
-          className="w-full pl-9 pr-3 rtl:pl-3 rtl:pr-9 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400"
+          className="w-full pl-9 pr-3 rtl:pl-3 rtl:pr-9 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-400"
         />
       </div>
 
@@ -42,7 +42,7 @@ export const CustomerFiltersBar: React.FC<CustomerFiltersBarProps> = ({
         <button
           type="button"
           onClick={() => onTierFilterChange('all')}
-          className={`px-3 py-1.5 rounded text-xs font-mono transition-all cursor-pointer ${
+          className={`px-3 py-1.5 rounded text-xs font-medium transition-all cursor-pointer ${
             tierFilter === 'all' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
           }`}
         >
@@ -52,7 +52,7 @@ export const CustomerFiltersBar: React.FC<CustomerFiltersBarProps> = ({
         <button
           type="button"
           onClick={() => onTierFilterChange('vip')}
-          className={`px-3 py-1.5 rounded text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
+          className={`px-3 py-1.5 rounded text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
             tierFilter === 'vip' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
           }`}
         >
@@ -63,7 +63,7 @@ export const CustomerFiltersBar: React.FC<CustomerFiltersBarProps> = ({
         <button
           type="button"
           onClick={() => onTierFilterChange('member')}
-          className={`px-3 py-1.5 rounded text-xs font-mono transition-all cursor-pointer ${
+          className={`px-3 py-1.5 rounded text-xs font-medium transition-all cursor-pointer ${
             tierFilter === 'member' ? 'bg-amber-400 text-black font-bold' : 'text-zinc-400 hover:text-white'
           }`}
         >

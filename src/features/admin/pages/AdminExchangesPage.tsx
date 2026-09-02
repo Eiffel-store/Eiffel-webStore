@@ -34,7 +34,7 @@ export const AdminExchangesPage: React.FC = () => {
   const [actionModalOpen, setActionModalOpen] = useState<boolean>(false);
 
   // Fetch all exchange requests
-  const { data: requests = [], isLoading, refetch } = useQuery({
+  const { data: requests = [], isLoading, refetch } = useQuery<ExchangeRequest[]>({
     queryKey: ['admin-exchanges'],
     queryFn: () => exchangeService.getAll(),
   });
@@ -73,7 +73,7 @@ export const AdminExchangesPage: React.FC = () => {
   };
 
   // Filter & search
-  const filteredRequests = requests.filter((req) => {
+  const filteredRequests: ExchangeRequest[] = requests.filter((req: ExchangeRequest) => {
     const matchesStatus = statusFilter === 'ALL' || req.status === statusFilter;
     const term = searchTerm.toLowerCase().trim();
     const matchesSearch =
@@ -89,11 +89,11 @@ export const AdminExchangesPage: React.FC = () => {
 
   const counts = {
     all: requests.length,
-    pending: requests.filter((r) => r.status === 'PENDING').length,
-    approved: requests.filter((r) => r.status === 'APPROVED').length,
-    inTransit: requests.filter((r) => r.status === 'IN_TRANSIT').length,
-    completed: requests.filter((r) => r.status === 'COMPLETED').length,
-    rejected: requests.filter((r) => r.status === 'REJECTED').length,
+    pending: requests.filter((r: ExchangeRequest) => r.status === 'PENDING').length,
+    approved: requests.filter((r: ExchangeRequest) => r.status === 'APPROVED').length,
+    inTransit: requests.filter((r: ExchangeRequest) => r.status === 'IN_TRANSIT').length,
+    completed: requests.filter((r: ExchangeRequest) => r.status === 'COMPLETED').length,
+    rejected: requests.filter((r: ExchangeRequest) => r.status === 'REJECTED').length,
   };
 
   const getStatusBadge = (status: ExchangeStatus) => {
@@ -141,15 +141,15 @@ export const AdminExchangesPage: React.FC = () => {
   const getTypeBadge = (type: string) => {
     switch (type) {
       case 'EXCHANGE_SIZE':
-        return <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 text-[10px] font-mono">{isRTL ? 'استبدال مقاس' : 'Size Exchange'}</span>;
+        return <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 text-[10px] font-medium">{isRTL ? 'استبدال مقاس' : 'Size Exchange'}</span>;
       case 'EXCHANGE_COLOR':
-        return <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 text-[10px] font-mono">{isRTL ? 'استبدال لون' : 'Color Exchange'}</span>;
+        return <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 text-[10px] font-medium">{isRTL ? 'استبدال لون' : 'Color Exchange'}</span>;
       case 'DEFECT':
-        return <span className="px-2 py-0.5 rounded bg-red-950/60 text-red-300 border border-red-800/40 text-[10px] font-mono">{isRTL ? 'عيب صناعة' : 'Defect'}</span>;
+        return <span className="px-2 py-0.5 rounded bg-red-950/60 text-red-300 border border-red-800/40 text-[10px] font-medium">{isRTL ? 'عيب صناعة' : 'Defect'}</span>;
       case 'RETURN_REFUND':
-        return <span className="px-2 py-0.5 rounded bg-amber-950/60 text-amber-300 border border-amber-800/40 text-[10px] font-mono">{isRTL ? 'إرجاع واسترداد' : 'Return & Refund'}</span>;
+        return <span className="px-2 py-0.5 rounded bg-amber-950/60 text-amber-300 border border-amber-800/40 text-[10px] font-medium">{isRTL ? 'إرجاع واسترداد' : 'Return & Refund'}</span>;
       default:
-        return <span className="text-[10px] font-mono">{type}</span>;
+        return <span className="text-[10px] font-medium">{type}</span>;
     }
   };
 
@@ -164,14 +164,14 @@ export const AdminExchangesPage: React.FC = () => {
               {isRTL ? 'إدارة طلبات الاستبدال والاسترجاع' : 'Exchanges & Returns Manager'}
             </h1>
           </div>
-          <p className="text-xs font-mono text-zinc-400">
+          <p className="text-xs text-zinc-400">
             {isRTL ? 'متابعة وفحص طلبات استبدال المقاسات والألوان وإرجاع الطلبات' : 'Manage customer size/color exchanges and return requests'}
           </p>
         </div>
 
         <button
           onClick={() => refetch()}
-          className="self-start sm:self-auto px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-white rounded-lg text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
+          className="self-start sm:self-auto px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           <span>{isRTL ? 'تحديث البيانات' : 'Refresh'}</span>
@@ -201,7 +201,7 @@ export const AdminExchangesPage: React.FC = () => {
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono text-zinc-400">{isRTL ? tab.labelAr : tab.labelEn}</span>
+                <span className="text-[11px] font-medium text-zinc-400">{isRTL ? tab.labelAr : tab.labelEn}</span>
                 <span className={`text-base font-mono font-bold ${tab.color}`}>{tab.count}</span>
               </div>
             </button>
@@ -243,7 +243,7 @@ export const AdminExchangesPage: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredRequests.map((req) => (
+          {filteredRequests.map((req: ExchangeRequest) => (
             <div
               key={req.id}
               className="bg-zinc-950 border border-zinc-800 hover:border-zinc-700 rounded-xl p-4 sm:p-6 space-y-4 transition-all shadow-md"

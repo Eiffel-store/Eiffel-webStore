@@ -26,7 +26,7 @@ export const AdminBranchCard: React.FC<AdminBranchCardProps> = ({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute top-3 right-3">
-          <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded ${
+          <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded ${
             store.active !== false
               ? 'bg-emerald-500/90 text-white'
               : 'bg-zinc-800/90 text-zinc-400 border border-zinc-700'
@@ -35,10 +35,10 @@ export const AdminBranchCard: React.FC<AdminBranchCardProps> = ({
           </span>
         </div>
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-          <span className="px-2 py-0.5 bg-black/70 backdrop-blur-md border border-white/20 text-white font-mono text-[10px] uppercase font-bold">
+          <span className="px-2 py-0.5 bg-black/70 backdrop-blur-md border border-white/20 text-white text-[10px] uppercase font-bold">
             {store.city}
           </span>
-          <span className="text-[10px] font-mono text-zinc-300 bg-black/60 px-2 py-0.5">
+          <span className="text-[10px] text-zinc-300 bg-black/60 px-2 py-0.5">
             {store.type}
           </span>
         </div>

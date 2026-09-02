@@ -129,7 +129,7 @@ export const AdminHomePageEditor: React.FC = () => {
             to="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700 rounded text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700 rounded text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <span>{t.adminLiveStorefront}</span>
             <ExternalLink className="w-3.5 h-3.5" />
@@ -181,7 +181,7 @@ export const AdminHomePageEditor: React.FC = () => {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2.5 rounded text-xs font-mono flex items-center gap-2 transition-all cursor-pointer ${
+              className={`px-4 py-2.5 rounded text-xs font-medium flex items-center gap-2 transition-all cursor-pointer ${
                 isActive
                   ? 'bg-white text-black font-bold shadow-lg'
                   : 'bg-zinc-900/80 text-zinc-400 hover:text-white hover:bg-zinc-800'

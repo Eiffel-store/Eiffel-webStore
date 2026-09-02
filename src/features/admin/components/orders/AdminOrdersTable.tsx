@@ -96,7 +96,7 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
     <div className="bg-zinc-950 border border-zinc-800 overflow-x-auto shadow-xl rounded-xl">
       <table className="w-full text-left rtl:text-right border-collapse min-w-[750px]">
         <thead>
-          <tr className="border-b border-zinc-800 bg-zinc-900/60 text-[11px] font-mono uppercase tracking-wider text-zinc-400">
+          <tr className="border-b border-zinc-800 bg-zinc-900/60 text-[11px] font-medium uppercase tracking-wider text-zinc-400">
             <th className="py-3.5 px-4">{t.adminOrderId}</th>
             <th className="py-3.5 px-4">{t.adminCustomer}</th>
             <th className="py-3.5 px-4">{t.adminOrderItems}</th>
@@ -170,7 +170,7 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                         value={order.status}
                         disabled={isUpdating}
                         onChange={(e) => handleStatusChange(order.id, e.target.value as Order['status'])}
-                        className={`appearance-none text-xs font-bold font-mono pl-3 pr-7 py-1.5 rounded-lg border cursor-pointer transition-all focus:outline-none focus:ring-2 focus:ring-amber-400 ${currentConfig.color} ${
+                        className={`appearance-none text-xs font-bold pl-3 pr-7 py-1.5 rounded-lg border cursor-pointer transition-all focus:outline-none focus:ring-2 focus:ring-amber-400 ${currentConfig.color} ${
                           isUpdating ? 'opacity-50 animate-pulse' : ''
                         }`}
                       >

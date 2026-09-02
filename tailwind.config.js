@@ -70,8 +70,10 @@ export default {
         "bebas": ["Cairo", "Bebas Neue", "sans-serif"],
         "inter": ["Cairo", "Inter", "sans-serif"],
         "editorial": ["Cairo", "Bebas Neue", "sans-serif"],
+        "arabic": ["Cairo", "sans-serif"],
         "cairo": ["Cairo", "sans-serif"],
-        "sans": ["Cairo", "Inter", "sans-serif"]
+        "sans": ["Cairo", "Inter", "sans-serif"],
+        "mono": ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "'Liberation Mono'", "'Courier New'", "Cairo", "monospace"]
       },
     },
   },

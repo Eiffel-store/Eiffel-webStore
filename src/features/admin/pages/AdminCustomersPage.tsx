@@ -253,7 +253,7 @@ export const AdminCustomersPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setActiveMainTab('customers')}
-              className={`px-4 py-1.5 rounded text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`px-4 py-1.5 rounded text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                 activeMainTab === 'customers'
                   ? 'bg-amber-400 text-black shadow-md'
                   : 'text-zinc-400 hover:text-white'
@@ -266,7 +266,7 @@ export const AdminCustomersPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setActiveMainTab('team')}
-              className={`px-4 py-1.5 rounded text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`px-4 py-1.5 rounded text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                 activeMainTab === 'team'
                   ? 'bg-amber-400 text-black shadow-md'
                   : 'text-zinc-400 hover:text-white'

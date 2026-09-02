@@ -16,7 +16,7 @@ export const AdminQuickNav: React.FC = () => {
       >
         <ShoppingBag className="w-6 h-6 mx-auto mb-2 text-zinc-400 group-hover:text-white group-hover:scale-110 transition-transform" />
         <div className="text-xs font-bold text-zinc-200">{t.adminProducts}</div>
-        <div className="text-[10px] text-zinc-500 font-mono mt-0.5">{products.length} {t.items}</div>
+        <div className="text-[10px] text-zinc-500 mt-0.5">{products.length} {t.items}</div>
       </Link>
 
       <Link
@@ -25,7 +25,7 @@ export const AdminQuickNav: React.FC = () => {
       >
         <Plus className="w-6 h-6 mx-auto mb-2 text-emerald-400 group-hover:scale-110 transition-transform" />
         <div className="text-xs font-bold text-zinc-200">{t.adminAddProduct}</div>
-        <div className="text-[10px] text-zinc-500 font-mono mt-0.5">{t.newBadge}</div>
+        <div className="text-[10px] text-zinc-500 mt-0.5">{t.newBadge}</div>
       </Link>
 
       <Link
@@ -34,7 +34,7 @@ export const AdminQuickNav: React.FC = () => {
       >
         <LayoutTemplate className="w-6 h-6 mx-auto mb-2 text-amber-400 group-hover:scale-110 transition-transform" />
         <div className="text-xs font-bold text-zinc-200">{t.adminHomeBanners}</div>
-        <div className="text-[10px] text-zinc-500 font-mono mt-0.5">{t.adminCustomize}</div>
+        <div className="text-[10px] text-zinc-500 mt-0.5">{t.adminCustomize}</div>
       </Link>
 
       <Link
@@ -43,7 +43,7 @@ export const AdminQuickNav: React.FC = () => {
       >
         <Tag className="w-6 h-6 mx-auto mb-2 text-amber-400 group-hover:scale-110 transition-transform" />
         <div className="text-xs font-bold text-zinc-200">{t.adminOffers}</div>
-        <div className="text-[10px] text-zinc-500 font-mono mt-0.5">{offersCount} {t.activeSelection}</div>
+        <div className="text-[10px] text-zinc-500 mt-0.5">{offersCount} {t.activeSelection}</div>
       </Link>
 
       <Link
@@ -52,7 +52,7 @@ export const AdminQuickNav: React.FC = () => {
       >
         <MapPin className="w-6 h-6 mx-auto mb-2 text-red-400 group-hover:scale-110 transition-transform" />
         <div className="text-xs font-bold text-zinc-200">{t.adminBranches}</div>
-        <div className="text-[10px] text-zinc-500 font-mono mt-0.5">{stores.length} {t.adminLocationsCount}</div>
+        <div className="text-[10px] text-zinc-500 mt-0.5">{stores.length} {t.adminLocationsCount}</div>
       </Link>
 
       <Link
@@ -61,7 +61,7 @@ export const AdminQuickNav: React.FC = () => {
       >
         <Package className="w-6 h-6 mx-auto mb-2 text-blue-400 group-hover:scale-110 transition-transform" />
         <div className="text-xs font-bold text-zinc-200">{t.adminOrders}</div>
-        <div className="text-[10px] text-zinc-500 font-mono mt-0.5">{orders.length} {t.orders}</div>
+        <div className="text-[10px] text-zinc-500 mt-0.5">{orders.length} {t.orders}</div>
       </Link>
 
       <Link
@@ -70,7 +70,7 @@ export const AdminQuickNav: React.FC = () => {
       >
         <TrendingUp className="w-6 h-6 mx-auto mb-2 text-purple-400 group-hover:scale-110 transition-transform" />
         <div className="text-xs font-bold text-zinc-200">{t.adminSettings}</div>
-        <div className="text-[10px] text-zinc-500 font-mono mt-0.5">{t.adminAndBackup}</div>
+        <div className="text-[10px] text-zinc-500 mt-0.5">{t.adminAndBackup}</div>
       </Link>
     </div>
   );

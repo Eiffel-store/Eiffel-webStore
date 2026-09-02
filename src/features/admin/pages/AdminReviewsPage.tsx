@@ -115,7 +115,7 @@ export const AdminReviewsPage: React.FC = () => {
             <Star className="w-6 h-6 text-amber-400 fill-amber-400" />
             <span>{t.adminHeaderReviews}</span>
           </h1>
-          <p className="text-xs text-zinc-400 font-mono mt-1">
+          <p className="text-xs text-zinc-400 mt-1">
             {isRTL
               ? 'مراقبة تقييمات العملاء والتحكم في المراجعات المعروضة على المتجر'
               : 'Moderate customer ratings, verify genuine feedback and maintain store reputation'}
@@ -126,7 +126,7 @@ export const AdminReviewsPage: React.FC = () => {
           type="button"
           onClick={() => refetch()}
           disabled={isFetching}
-          className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-mono rounded flex items-center gap-2 transition-colors self-start sm:self-auto cursor-pointer"
+          className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-medium rounded flex items-center gap-2 transition-colors self-start sm:self-auto cursor-pointer"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-amber-400' : ''}`} />
           <span>{isRTL ? 'تحديث' : 'Refresh'}</span>
@@ -371,7 +371,7 @@ export const AdminReviewsPage: React.FC = () => {
                             status: e.target.value
                           })
                         }
-                        className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg border cursor-pointer focus:outline-none transition-all shadow-xs ${
+                        className={`text-xs font-bold px-2.5 py-1 rounded-lg border cursor-pointer focus:outline-none transition-all shadow-xs ${
                           currentStatus === 'APPROVED'
                             ? 'bg-emerald-950/80 border-emerald-700/80 text-emerald-300'
                             : currentStatus === 'PENDING'
@@ -500,7 +500,7 @@ export const AdminReviewsPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setReviewToDelete(null)}
-                className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-mono rounded cursor-pointer transition-colors"
+                className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium rounded cursor-pointer transition-colors"
               >
                 {t.cancel}
               </button>
@@ -508,7 +508,7 @@ export const AdminReviewsPage: React.FC = () => {
                 type="button"
                 onClick={() => deleteMutation.mutate(reviewToDelete.id)}
                 disabled={deleteMutation.isPending}
-                className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-bold font-mono rounded flex items-center gap-1.5 cursor-pointer transition-colors"
+                className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded flex items-center gap-1.5 cursor-pointer transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>{deleteMutation.isPending ? '...' : (isRTL ? 'حذف نهائياً' : 'Delete Permanently')}</span>

@@ -101,7 +101,7 @@ export const AdminReportsPage: React.FC = () => {
                 key={tab.id}
                 type="button"
                 onClick={() => setPeriod(tab.id)}
-                className={`px-3 py-1.5 rounded text-xs font-mono font-medium transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded text-xs font-medium transition-all cursor-pointer ${
                   period === tab.id
                     ? 'bg-amber-400 text-black shadow font-bold'
                     : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
@@ -116,7 +116,7 @@ export const AdminReportsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsExportModalOpen(true)}
-            className="px-3.5 py-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 hover:text-white rounded text-xs font-mono flex items-center gap-2 transition-colors cursor-pointer"
+            className="px-3.5 py-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 hover:text-white rounded text-xs font-medium flex items-center gap-2 transition-colors cursor-pointer"
             title={t.adminExportExcel}
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
@@ -127,7 +127,7 @@ export const AdminReportsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => window.print()}
-            className="px-3.5 py-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 hover:text-white rounded text-xs font-mono flex items-center gap-2 transition-colors cursor-pointer"
+            className="px-3.5 py-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 hover:text-white rounded text-xs font-medium flex items-center gap-2 transition-colors cursor-pointer"
             title={t.adminPrint}
           >
             <Printer className="w-4 h-4 text-zinc-400" />
@@ -147,7 +147,7 @@ export const AdminReportsPage: React.FC = () => {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as ReportTab)}
-              className={`px-4 py-2.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2.5 whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-4 py-2.5 rounded-lg text-xs font-medium flex items-center gap-2.5 whitespace-nowrap transition-all cursor-pointer ${
                 isActive
                   ? 'bg-amber-400 text-black font-bold shadow-lg shadow-amber-400/10'
                   : 'bg-zinc-900/60 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
