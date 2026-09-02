@@ -55,6 +55,9 @@ export interface ServerOrderRequest {
   paymentMethod?: string;
   customerNotes?: string;
   couponCode?: string;
+  pointsEarned?: number;
+  pointsRedeemed?: number;
+  pointsDiscount?: number;
 }
 
 // Convert ServerOrder to Frontend Order
@@ -162,7 +165,10 @@ export const mapClientOrderToServerRequest = (order: Partial<Order>): ServerOrde
     shippingCountry: address?.country || 'Egypt',
     paymentMethod: order.paymentMethod || 'Cash on Delivery (الدفع عند الاستلام)',
     customerNotes: order.customerNotes,
-    couponCode: order.couponCode
+    couponCode: order.couponCode,
+    pointsEarned: order.pointsEarned ?? 0,
+    pointsRedeemed: order.pointsRedeemed ?? 0,
+    pointsDiscount: order.pointsDiscount ?? 0
   };
 };
 
