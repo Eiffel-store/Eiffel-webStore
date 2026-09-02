@@ -228,11 +228,18 @@ export const AdminExchangesPage: React.FC = () => {
           <p className="text-xs font-mono">{t.loading}</p>
         </div>
       ) : filteredRequests.length === 0 ? (
-        <div className="py-16 text-center border border-dashed border-zinc-800 rounded-xl space-y-2 bg-zinc-950/40">
-          <RefreshCw className="w-8 h-8 text-zinc-600 mx-auto" />
-          <p className="text-xs font-mono text-zinc-400">
-            {isRTL ? 'لا توجد طلبات استبدال مطابقة للبحث' : 'No exchange requests found'}
-          </p>
+        <div className="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden shadow-sm">
+          <div className="p-12 text-center space-y-3">
+            <RefreshCw className="w-10 h-10 text-zinc-600 mx-auto" />
+            <h3 className="text-base font-bold text-white">
+              {isRTL ? 'لا توجد طلبات استبدال مطابقة' : 'No Exchange Requests Found'}
+            </h3>
+            <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+              {isRTL
+                ? 'لم يتم العثور على أي طلبات استبدال تطابق معايير البحث أو الفلاتر الحالية.'
+                : 'No exchange requests match your current search or filter criteria.'}
+            </p>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">
