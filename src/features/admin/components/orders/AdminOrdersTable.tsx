@@ -61,7 +61,7 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
   onUpdateStatus,
   onDeleteOrder
 }) => {
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
   const { formatPrice } = useCurrency();
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
@@ -76,9 +76,18 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
 
   if (orders.length === 0) {
     return (
-      <div className="bg-zinc-950 border border-zinc-800 p-12 text-center text-zinc-500 rounded-xl">
-        <Package className="w-10 h-10 mx-auto mb-3 opacity-30 text-amber-400" />
-        <p className="text-sm font-medium">{t.noMatchingPieces}</p>
+      <div className="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden shadow-sm">
+        <div className="p-12 text-center space-y-3">
+          <Package className="w-10 h-10 text-zinc-600 mx-auto" />
+          <h3 className="text-base font-bold text-white">
+            {isRTL ? 'لا توجد طلبات مطابقة' : 'No Orders Found'}
+          </h3>
+          <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+            {isRTL
+              ? 'لم يتم العثور على أي طلبات تطابق معايير البحث أو الفلاتر الحالية.'
+              : 'No customer orders match your current search or filter criteria.'}
+          </p>
+        </div>
       </div>
     );
   }

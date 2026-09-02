@@ -105,6 +105,8 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ onOpenSearch }) => {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/account" element={<AccountPage />} />
+          <Route path="/verify-account" element={<AccountPage />} />
+          <Route path="/activate" element={<AccountPage />} />
           <Route path="/stores" element={<StoreLocatorPage />} />
           <Route path="/help" element={<HelpCenterPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />

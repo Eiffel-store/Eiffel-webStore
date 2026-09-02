@@ -4,4 +4,5 @@ export * from './CustomerLoginForm';
 export * from './CustomerRegisterForm';
 export * from './AuthDemoAccountsBar';
 export * from './AccountActivationModal';
+export * from './CustomerVerifyForm';
 
