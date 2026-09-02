@@ -29,7 +29,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
   initialLat = 30.0444, // Default Cairo Center
   initialLng = 31.2357
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const [lat, setLat] = useState<number>(initialLat);
   const [lng, setLng] = useState<number>(initialLng);
@@ -66,7 +66,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
       setCustomStreet(data.street);
       setCustomGov(data.governorate);
     } catch {
-      setErrorMsg(isRTL ? 'تعذر قراءة العنوان تلقائياً، يمكنك كتابة تفاصيل الشارع أدناه.' : 'Failed to auto-resolve address details.');
+      setErrorMsg(t.gpsAutoAddressError);
     } finally {
       setIsResolvingAddress(false);
     }
@@ -91,7 +91,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
       setLng(coords.longitude);
       await fetchAddress(coords.latitude, coords.longitude);
     } catch (err: any) {
-      setErrorMsg(err?.message || (isRTL ? 'تعذر الوصول إلى الـ GPS. يمكنك اختيار منطقتك من القائمة السريعة أدناه.' : 'GPS location unavailable. Please select your region below.'));
+      setErrorMsg(err?.message || t.gpsUnavailableError);
     } finally {
       setIsDetectingGps(false);
     }
@@ -108,10 +108,10 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
       const results = await locationService.searchEgyptLocations(searchQuery);
       setSearchResults(results);
       if (results.length === 0) {
-        setErrorMsg(isRTL ? 'لم يتم العثور على نتائج، جرب كتابة اسم المحافظة أو الحي.' : 'No locations found. Try searching for city or street.');
+        setErrorMsg(t.noLocationsFoundSearch);
       }
     } catch {
-      setErrorMsg(isRTL ? 'حدث خطأ أثناء البحث.' : 'Error searching locations.');
+      setErrorMsg(t.locationSearchError);
     } finally {
       setIsSearching(false);
     }
@@ -144,11 +144,7 @@ export const GoogleMapsPickerModal: React.FC<GoogleMapsPickerModalProps> = ({
       setPastedUrl('');
       setErrorMsg(null);
     } else {
-      setErrorMsg(
-        isRTL
-          ? 'تعذر قراءة الإحداثيات من هذا الرابط. يرجى التأكد من نسخ رابط خرائط Google الذي يحتوي على إحداثيات (مثال: ?q=30.7126,31.2464 أو كتابة الإحداثيات مباشرة).'
-          : 'Could not parse coordinates from this link. Try copying full Google Maps link or coordinates.'
-      );
+      setErrorMsg(t.couldNotParseCoords);
     }
   };
 

@@ -31,7 +31,7 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
   isVip = false,
 }) => {
   const { formatPrice } = useCurrency();
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div className="sticky top-28 p-6 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 space-y-6 shadow-xl rounded-xl">

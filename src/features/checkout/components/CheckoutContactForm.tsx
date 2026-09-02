@@ -121,9 +121,7 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
     if (setMapUrl) setMapUrl(addr.mapUrl);
 
     setGpsSuccessNotice(
-      isRTL
-        ? `✓ تم تطبيق العنوان (${addr.street} - ${addr.city}) بنجاح`
-        : `✓ Selected address (${addr.street} - ${addr.city}) applied`
+      t.addressAppliedSuccess.replace('{address}', `${addr.street} - ${addr.city}`)
     );
     setTimeout(() => setGpsSuccessNotice(null), 4000);
   };
@@ -147,7 +145,7 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
     if (setMapUrl) setMapUrl(loc.mapUrl);
 
     setSelectedAddressId('new'); // marks as custom/geocoded
-    setGpsSuccessNotice(isRTL ? '✓ تم تحديد موقعك الجغرافي وتعبئة العنوان بنجاح' : '✓ Location verified and address filled via GPS');
+    setGpsSuccessNotice(t.gpsLocationSuccess);
     setTimeout(() => setGpsSuccessNotice(null), 4500);
   };
 

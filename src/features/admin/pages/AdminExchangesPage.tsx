@@ -45,14 +45,14 @@ export const AdminExchangesPage: React.FC = () => {
       exchangeService.updateStatus(id, status, adminNotes),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-exchanges'] });
-      toast.success(isRTL ? 'تم تحديث حالة طلب الاستبدال بنجاح' : 'Status updated successfully');
+      toast.success(t.adminExchangeStatusUpdatedSuccess);
       setActionModalOpen(false);
       setSelectedRequest(null);
       setSelectedStatus(null);
       setAdminNoteInput('');
     },
     onError: () => {
-      toast.error(isRTL ? 'حدث خطأ أثناء تحديث الحالة' : 'Failed to update status');
+      toast.error(t.adminExchangeStatusUpdateError);
     }
   });
 
@@ -102,35 +102,35 @@ export const AdminExchangesPage: React.FC = () => {
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
             <Clock className="w-3 h-3" />
-            <span>{isRTL ? 'قيد المراجعة' : 'Pending'}</span>
+            <span>{t.exchangeStatusPending}</span>
           </span>
         );
       case 'APPROVED':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/30">
             <CheckCircle2 className="w-3 h-3" />
-            <span>{isRTL ? 'تمت الموافقة' : 'Approved'}</span>
+            <span>{t.exchangeStatusApproved}</span>
           </span>
         );
       case 'IN_TRANSIT':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/30">
             <Truck className="w-3 h-3" />
-            <span>{isRTL ? 'جاري الاستبدال' : 'In Transit'}</span>
+            <span>{t.exchangeStatusInTransit}</span>
           </span>
         );
       case 'COMPLETED':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
             <CheckCircle2 className="w-3 h-3" />
-            <span>{isRTL ? 'مكتمل' : 'Completed'}</span>
+            <span>{t.exchangeStatusCompleted}</span>
           </span>
         );
       case 'REJECTED':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-500/10 text-red-400 border border-red-500/30">
             <XCircle className="w-3 h-3" />
-            <span>{isRTL ? 'مرفوض' : 'Rejected'}</span>
+            <span>{t.exchangeStatusRejected}</span>
           </span>
         );
       default:
@@ -141,13 +141,13 @@ export const AdminExchangesPage: React.FC = () => {
   const getTypeBadge = (type: string) => {
     switch (type) {
       case 'EXCHANGE_SIZE':
-        return <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 text-[10px] font-medium">{isRTL ? 'استبدال مقاس' : 'Size Exchange'}</span>;
+        return <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 text-[10px] font-medium">{t.exchangeTypeSize}</span>;
       case 'EXCHANGE_COLOR':
-        return <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 text-[10px] font-medium">{isRTL ? 'استبدال لون' : 'Color Exchange'}</span>;
+        return <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 text-[10px] font-medium">{t.exchangeTypeColor}</span>;
       case 'DEFECT':
-        return <span className="px-2 py-0.5 rounded bg-red-950/60 text-red-300 border border-red-800/40 text-[10px] font-medium">{isRTL ? 'عيب صناعة' : 'Defect'}</span>;
+        return <span className="px-2 py-0.5 rounded bg-red-950/60 text-red-300 border border-red-800/40 text-[10px] font-medium">{t.exchangeTypeDefect}</span>;
       case 'RETURN_REFUND':
-        return <span className="px-2 py-0.5 rounded bg-amber-950/60 text-amber-300 border border-amber-800/40 text-[10px] font-medium">{isRTL ? 'إرجاع واسترداد' : 'Return & Refund'}</span>;
+        return <span className="px-2 py-0.5 rounded bg-amber-950/60 text-amber-300 border border-amber-800/40 text-[10px] font-medium">{t.exchangeTypeRefund}</span>;
       default:
         return <span className="text-[10px] font-medium">{type}</span>;
     }
@@ -161,11 +161,11 @@ export const AdminExchangesPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <RefreshCw className="w-5 h-5 text-amber-400" />
             <h1 className="text-xl font-editorial font-bold uppercase tracking-wider text-white">
-              {isRTL ? 'إدارة طلبات الاستبدال والاسترجاع' : 'Exchanges & Returns Manager'}
+              {t.adminExchangesTitle}
             </h1>
           </div>
           <p className="text-xs text-zinc-400">
-            {isRTL ? 'متابعة وفحص طلبات استبدال المقاسات والألوان وإرجاع الطلبات' : 'Manage customer size/color exchanges and return requests'}
+            {t.adminExchangesSubtitle}
           </p>
         </div>
 
@@ -174,19 +174,19 @@ export const AdminExchangesPage: React.FC = () => {
           className="self-start sm:self-auto px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
         >
           <RefreshCw className="w-3.5 h-3.5" />
-          <span>{isRTL ? 'تحديث البيانات' : 'Refresh'}</span>
+          <span>{t.refresh}</span>
         </button>
       </div>
 
       {/* Stats / Status Filter Tabs */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {[
-          { key: 'ALL', labelAr: 'كل الطلبات', labelEn: 'All Requests', count: counts.all, color: 'text-white' },
-          { key: 'PENDING', labelAr: 'قيد المراجعة', labelEn: 'Pending Review', count: counts.pending, color: 'text-amber-400' },
-          { key: 'APPROVED', labelAr: 'تمت الموافقة', labelEn: 'Approved', count: counts.approved, color: 'text-blue-400' },
-          { key: 'IN_TRANSIT', labelAr: 'جاري الاستبدال', labelEn: 'In Transit', count: counts.inTransit, color: 'text-purple-400' },
-          { key: 'COMPLETED', labelAr: 'مكتمل', labelEn: 'Completed', count: counts.completed, color: 'text-emerald-400' },
-          { key: 'REJECTED', labelAr: 'مرفوض', labelEn: 'Rejected', count: counts.rejected, color: 'text-red-400' },
+          { key: 'ALL', label: t.exchangeStatusAll, count: counts.all, color: 'text-white' },
+          { key: 'PENDING', label: t.exchangeStatusPending, count: counts.pending, color: 'text-amber-400' },
+          { key: 'APPROVED', label: t.exchangeStatusApproved, count: counts.approved, color: 'text-blue-400' },
+          { key: 'IN_TRANSIT', label: t.exchangeStatusInTransit, count: counts.inTransit, color: 'text-purple-400' },
+          { key: 'COMPLETED', label: t.exchangeStatusCompleted, count: counts.completed, color: 'text-emerald-400' },
+          { key: 'REJECTED', label: t.exchangeStatusRejected, count: counts.rejected, color: 'text-red-400' },
         ].map((tab) => {
           const isActive = statusFilter === tab.key;
           return (
@@ -201,7 +201,7 @@ export const AdminExchangesPage: React.FC = () => {
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-medium text-zinc-400">{isRTL ? tab.labelAr : tab.labelEn}</span>
+                <span className="text-[11px] font-medium text-zinc-400">{tab.label}</span>
                 <span className={`text-base font-mono font-bold ${tab.color}`}>{tab.count}</span>
               </div>
             </button>
@@ -216,7 +216,7 @@ export const AdminExchangesPage: React.FC = () => {
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder={isRTL ? 'بحث برقم الطلب، اسم العميل، رقم الهاتف، أو اسم المنتج...' : 'Search by order #, customer, phone, product...'}
+          placeholder={t.adminSearchExchangesPlaceholder}
           className="w-full bg-transparent text-xs text-white placeholder:text-zinc-500 focus:outline-none"
         />
       </div>
@@ -232,12 +232,10 @@ export const AdminExchangesPage: React.FC = () => {
           <div className="p-12 text-center space-y-3">
             <RefreshCw className="w-10 h-10 text-zinc-600 mx-auto" />
             <h3 className="text-base font-bold text-white">
-              {isRTL ? 'لا توجد طلبات استبدال مطابقة' : 'No Exchange Requests Found'}
+              {t.adminNoExchangesFound}
             </h3>
             <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-              {isRTL
-                ? 'لم يتم العثور على أي طلبات استبدال تطابق معايير البحث أو الفلاتر الحالية.'
-                : 'No exchange requests match your current search or filter criteria.'}
+              {t.adminNoExchangesFoundDesc}
             </p>
           </div>
         </div>
@@ -274,7 +272,7 @@ export const AdminExchangesPage: React.FC = () => {
                     onClick={() => handleOpenActionModal(req)}
                     className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 hover:border-zinc-500 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
                   >
-                    <span>{isRTL ? 'تحديث ومراجعة الطلب' : 'Update Status'}</span>
+                    <span>{t.adminUpdateReviewRequest}</span>
                     <ChevronDown className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -291,12 +289,12 @@ export const AdminExchangesPage: React.FC = () => {
                     <h4 className="text-xs font-editorial font-bold text-white truncate">{req.productName}</h4>
                     <div className="text-[11px] font-mono text-zinc-400 space-y-0.5">
                       <div>
-                        <span>{isRTL ? 'القطعة الحالية:' : 'Current:'} </span>
+                        <span>{t.exchangeCurrentPiece} </span>
                         <strong className="text-zinc-200">{req.originalSize}</strong> {req.originalColor && `• ${req.originalColor}`}
                       </div>
                       <div className="text-amber-400 font-bold">
-                        <span>{isRTL ? 'المطلوب بدلاً منها:' : 'Requested:'} </span>
-                        <span>{req.requestedSize || req.requestedColor || (isRTL ? 'استرجاع المبلغ' : 'Refund')}</span>
+                        <span>{t.exchangeRequestedPiece} </span>
+                        <span>{req.requestedSize || req.requestedColor || t.exchangeRefundAmount}</span>
                       </div>
                     </div>
                   </div>
@@ -318,7 +316,7 @@ export const AdminExchangesPage: React.FC = () => {
                 {/* Reason & Notes (Cols 9-12) */}
                 <div className="md:col-span-3 space-y-2 text-xs">
                   <div className="bg-zinc-900/40 p-3 rounded-xl border border-zinc-850 space-y-1">
-                    <div className="text-[11px] font-mono text-zinc-500 font-bold">{isRTL ? 'السبب:' : 'Reason:'}</div>
+                    <div className="text-[11px] font-mono text-zinc-500 font-bold">{t.adminExchangeReason}</div>
                     <div className="text-zinc-300 text-xs">{req.reason}</div>
                     {req.customerNotes && (
                       <div className="text-[11px] text-zinc-400 italic pt-1 border-t border-zinc-800 mt-1">
@@ -336,7 +334,7 @@ export const AdminExchangesPage: React.FC = () => {
                       className="inline-flex items-center gap-1.5 text-[10px] font-mono text-amber-400 hover:underline"
                     >
                       <Eye className="w-3 h-3" />
-                      <span>{isRTL ? 'معاينة صورة القطعة المرفقة ↗' : 'View Uploaded Photo ↗'}</span>
+                      <span>{t.adminViewUploadedPhoto}</span>
                     </a>
                   )}
                 </div>
@@ -346,7 +344,7 @@ export const AdminExchangesPage: React.FC = () => {
               {req.adminNotes && (
                 <div className="p-2.5 bg-amber-950/20 border border-amber-500/30 rounded-lg text-xs font-mono text-amber-200 flex items-start gap-2">
                   <MessageSquare className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
-                  <span><strong>{isRTL ? 'ملاحظة الإدارة:' : 'Admin Note:'}</strong> {req.adminNotes}</span>
+                  <span><strong>{t.exchangeAdminNoteLabel}</strong> {req.adminNotes}</span>
                 </div>
               )}
             </div>
@@ -362,7 +360,7 @@ export const AdminExchangesPage: React.FC = () => {
             <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-900/60">
               <div>
                 <h3 className="text-base font-editorial font-bold text-white uppercase tracking-wider">
-                  {isRTL ? 'تحديث حالة طلب الاستبدال' : 'Update Exchange Status'}
+                  {t.adminUpdateExchangeStatusTitle}
                 </h3>
                 <p className="text-xs font-mono text-zinc-400 mt-0.5">
                   Order #{selectedRequest.orderId} • {selectedRequest.customerName}
@@ -381,7 +379,7 @@ export const AdminExchangesPage: React.FC = () => {
               {/* Select Status Cards */}
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-zinc-200 uppercase tracking-wider">
-                  {isRTL ? '1. اختر الحالة الجديدة للطلب:' : '1. Select New Status:'}
+                  {t.adminSelectNewStatus}
                 </label>
                 <div className="grid grid-cols-2 gap-2.5 font-mono">
                   {/* Approve */}
@@ -395,7 +393,7 @@ export const AdminExchangesPage: React.FC = () => {
                     }`}
                   >
                     <CheckCircle2 className="w-4 h-4 text-blue-400" />
-                    <span>{isRTL ? 'الموافقة على الطلب' : 'Approve'}</span>
+                    <span>{t.adminApproveStatus}</span>
                     {selectedStatus === 'APPROVED' && <Check className="w-3.5 h-3.5 ml-auto text-blue-300" />}
                   </button>
 
@@ -410,7 +408,7 @@ export const AdminExchangesPage: React.FC = () => {
                     }`}
                   >
                     <Truck className="w-4 h-4 text-purple-400" />
-                    <span>{isRTL ? 'جاري الاستبدال' : 'In Transit'}</span>
+                    <span>{t.adminInTransitStatus}</span>
                     {selectedStatus === 'IN_TRANSIT' && <Check className="w-3.5 h-3.5 ml-auto text-purple-300" />}
                   </button>
 
@@ -425,7 +423,7 @@ export const AdminExchangesPage: React.FC = () => {
                     }`}
                   >
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>{isRTL ? 'تم الاستبدال بنجاح' : 'Complete'}</span>
+                    <span>{t.adminCompleteStatus}</span>
                     {selectedStatus === 'COMPLETED' && <Check className="w-3.5 h-3.5 ml-auto text-emerald-300" />}
                   </button>
 
@@ -440,7 +438,7 @@ export const AdminExchangesPage: React.FC = () => {
                     }`}
                   >
                     <XCircle className="w-4 h-4 text-red-400" />
-                    <span>{isRTL ? 'رفض الطلب' : 'Reject'}</span>
+                    <span>{t.adminRejectStatus}</span>
                     {selectedStatus === 'REJECTED' && <Check className="w-3.5 h-3.5 ml-auto text-red-300" />}
                   </button>
                 </div>
@@ -449,7 +447,7 @@ export const AdminExchangesPage: React.FC = () => {
               {/* Admin Note Input */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-zinc-200 uppercase tracking-wider">
-                  {isRTL ? '2. ملاحظات وتوجيهات الإدارة (تظهر للعميل في حسابه):' : '2. Admin Notes (Visible to Customer):'}
+                  {t.adminNotesCustomerVisible}
                 </label>
                 <textarea
                   rows={3}
@@ -457,8 +455,8 @@ export const AdminExchangesPage: React.FC = () => {
                   onChange={(e) => setAdminNoteInput(e.target.value)}
                   placeholder={
                     selectedStatus === 'REJECTED'
-                      ? (isRTL ? 'يرجى كتابة سبب الرفض هنا ليظهر للعميل...' : 'Please write the reason for rejection...')
-                      : (isRTL ? 'اكتب أي ملاحظة أو موعد توجه المندوب للعميل...' : 'Write notes for the customer or courier instructions...')
+                      ? t.adminRejectionReasonPlaceholder
+                      : t.adminCourierInstructionsPlaceholder
                   }
                   className="w-full bg-zinc-900 border border-zinc-700 focus:border-amber-400 rounded-xl p-3 text-xs text-white placeholder:text-zinc-500 focus:outline-none"
                 />
@@ -472,7 +470,7 @@ export const AdminExchangesPage: React.FC = () => {
                 onClick={() => setActionModalOpen(false)}
                 className="px-4 py-2 text-xs font-bold text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors cursor-pointer"
               >
-                {isRTL ? 'إلغاء وإغلاق' : 'Close'}
+                {t.close}
               </button>
 
               <button
@@ -486,7 +484,7 @@ export const AdminExchangesPage: React.FC = () => {
                 ) : (
                   <Check className="w-4 h-4" />
                 )}
-                <span>{isRTL ? 'تأكيد وحفظ الحالة' : 'Confirm Update'}</span>
+                <span>{t.adminConfirmUpdateStatus}</span>
               </button>
             </div>
           </div>

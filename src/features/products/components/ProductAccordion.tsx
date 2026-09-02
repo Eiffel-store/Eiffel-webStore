@@ -14,7 +14,7 @@ export const ProductAccordion: React.FC<ProductAccordionProps> = ({
   activeAccordion,
   toggleAccordion,
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div className="divide-y divide-surface-container dark:divide-zinc-800 border-y border-surface-container dark:border-zinc-800">
@@ -51,7 +51,7 @@ export const ProductAccordion: React.FC<ProductAccordionProps> = ({
         {activeAccordion === 'fabric' && (
           <div className="pb-4 text-xs text-secondary dark:text-zinc-300 leading-relaxed font-light animate-fade-in space-y-2">
             <p><strong>{t.composition}</strong> {product.composition}</p>
-            <p><strong>{t.dyeingProcess}</strong> {isRTL ? 'صباغة تفاعلية منخفضة التأثير البيئي مع تثبيت بالمياه الباردة في ميلانو.' : 'Low-impact reactive dye with cold water fixation in Milan.'}</p>
+            <p><strong>{t.dyeingProcess}</strong> {t.dyeingProcessDesc}</p>
             <div>
               <strong>{t.garmentCare}</strong>
               <ul className="list-disc list-inside space-y-1 mt-1">

@@ -83,11 +83,11 @@ export const AccountOrdersTab: React.FC<AccountOrdersTabProps> = ({ orders = [] 
             {isPending && <Clock className="w-4 h-4 text-amber-400 shrink-0" />}
 
             <span className="font-bold">
-              {isApproved && (isRTL ? '✅ تمت الموافقة على طلب الاستبدال' : 'Exchange Approved')}
-              {isInTransit && (isRTL ? '🚚 مندوب الشحن في الطريق للاستبدال' : 'Out For Exchange Pickup')}
-              {isCompleted && (isRTL ? '🎉 تم الاستبدال بنجاح' : 'Exchange Completed')}
-              {isRejected && (isRTL ? '❌ تم رفض طلب الاستبدال' : 'Exchange Request Rejected')}
-              {isPending && (isRTL ? '🕒 طلب الاستبدال قيد المراجعة من الإدارة' : 'Exchange Pending Review')}
+              {isApproved && t.exchangeApproved}
+              {isInTransit && t.exchangeInTransit}
+              {isCompleted && t.exchangeCompleted}
+              {isRejected && t.exchangeRejected}
+              {isPending && t.exchangePendingReview}
             </span>
           </div>
 
@@ -102,9 +102,9 @@ export const AccountOrdersTab: React.FC<AccountOrdersTabProps> = ({ orders = [] 
         {/* Exchange details */}
         <div className="text-[11px] opacity-90 space-y-1">
           <div>
-            <span>{isRTL ? 'القطعة:' : 'Item:'} </span>
+            <span>{t.exchangeItem} </span>
             <strong className="text-white">{req.productName}</strong>
-            <span className="opacity-75"> ({req.originalSize} ⬅️ {req.requestedSize || req.requestedColor || (isRTL ? 'استرجاع' : 'Refund')})</span>
+            <span className="opacity-75"> ({req.originalSize} ⬅️ {req.requestedSize || req.requestedColor || t.exchangeRefund})</span>
           </div>
         </div>
 
@@ -113,7 +113,7 @@ export const AccountOrdersTab: React.FC<AccountOrdersTabProps> = ({ orders = [] 
           <div className="pt-2 border-t border-current/20 flex items-start gap-2 text-[11px]">
             <MessageSquare className="w-3.5 h-3.5 shrink-0 mt-0.5" />
             <div>
-              <strong>{isRTL ? 'رد الإدارة:' : 'Admin Note:'} </strong>
+              <strong>{t.exchangeAdminNote} </strong>
               <span>{req.adminNotes}</span>
             </div>
           </div>
@@ -129,7 +129,7 @@ export const AccountOrdersTab: React.FC<AccountOrdersTabProps> = ({ orders = [] 
               className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400 hover:underline"
             >
               <HelpCircle className="w-3 h-3" />
-              <span>{isRTL ? 'تواصل مع خدمة العملاء للاستفسار ↗' : 'Contact Support via WhatsApp ↗'}</span>
+              <span>{t.contactSupportWhatsApp}</span>
             </a>
           </div>
         )}
@@ -229,9 +229,7 @@ export const AccountOrdersTab: React.FC<AccountOrdersTabProps> = ({ orders = [] 
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                   <span>
-                    {hasActiveExchange
-                      ? (isRTL ? 'إدارة / تقديم طلب استبدال' : 'Manage Exchange')
-                      : (isRTL ? 'طلب استبدال / إرجاع' : 'Request Exchange / Return')}
+                    {hasActiveExchange ? t.manageExchange : t.requestExchangeReturn}
                   </span>
                 </button>
               </div>

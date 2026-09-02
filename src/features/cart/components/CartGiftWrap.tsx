@@ -17,7 +17,7 @@ export const CartGiftWrap: React.FC<CartGiftWrapProps> = ({
   setOrderNote,
 }) => {
   const { formatPrice } = useCurrency();
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div className="p-6 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 space-y-4">

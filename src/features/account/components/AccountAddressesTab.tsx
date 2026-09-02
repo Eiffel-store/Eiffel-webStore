@@ -16,7 +16,7 @@ export const AccountAddressesTab: React.FC<AccountAddressesTabProps> = ({
   onSetDefault,
   onDelete,
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const getAddressIcon = (type?: string) => {
     switch (type) {

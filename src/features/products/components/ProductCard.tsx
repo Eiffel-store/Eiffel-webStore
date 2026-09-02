@@ -19,7 +19,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
-  const { isRTL, t } = useLanguage();
+  const {  t } = useLanguage();
 
   if (!product) return null;
 
@@ -79,11 +79,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
           )}
           {(product.stock !== undefined ? product.stock : (product.inStock ? 20 : 0)) <= 0 ? (
             <span className="bg-rose-600 text-white font-label-bold text-[9px] sm:text-[10px] tracking-widest px-2 py-0.5 uppercase shadow-sm">
-              {isRTL ? 'نفدت الكمية' : 'OUT OF STOCK'}
+              {t.outOfStockBadge}
             </span>
           ) : (product.stock !== undefined ? product.stock : 20) <= 5 ? (
             <span className="bg-amber-500 text-black font-label-bold text-[9px] sm:text-[10px] tracking-widest px-2 py-0.5 uppercase shadow-sm animate-pulse">
-              {isRTL ? `متبقي ${product.stock} فقط` : `ONLY ${product.stock} LEFT`}
+              {t.onlyCountLeftBadge.replace('{count}', String(product.stock))}
             </span>
           ) : null}
         </div>
@@ -112,7 +112,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
             className="flex-1 py-2 sm:py-2.5 bg-white text-black font-label-bold text-[10px] sm:text-xs tracking-widest uppercase hover:bg-neutral-200 transition-colors flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             <ShoppingBag className="w-3.5 h-3.5" />
-            <span>{(product.stock !== undefined ? product.stock : (product.inStock ? 20 : 0)) <= 0 ? (isRTL ? 'نفدت الكمية' : 'Sold Out') : t.quickAdd}</span>
+            <span>{(product.stock !== undefined ? product.stock : (product.inStock ? 20 : 0)) <= 0 ? t.soldOut : t.quickAdd}</span>
           </button>
           {onQuickView && (
             <button

@@ -14,7 +14,7 @@ export const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({
   onViewAllOrders,
 }) => {
   const { formatPrice } = useCurrency();
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
   const { settings } = useStoreData();
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 

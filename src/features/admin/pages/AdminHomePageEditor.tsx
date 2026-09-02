@@ -36,7 +36,7 @@ export const AdminHomePageEditor: React.FC = () => {
     isBannersLoading
   } = useStoreData();
 
-  const { isRTL, t } = useLanguage();
+  const {  t } = useLanguage();
 
   const [activeTab, setActiveTab] = useState<BannerPlacement | 'SHOP_THE_LOOK'>('HERO_SLIDER');
   const [selectedBanner, setSelectedBanner] = useState<Partial<Banner> | null>(null);
@@ -215,25 +215,23 @@ export const AdminHomePageEditor: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-xs font-bold text-white block">
-                    {isRTL ? 'مدة تبديل السلايدر التلقائي' : 'Hero Slider Auto-Transition Speed'}
+                    {t.adminHeroSliderSpeedShort}
                   </span>
                   <span className="text-[11px] text-zinc-400 block mt-0.5">
-                    {isRTL
-                      ? 'حدد سرعة الانتقال بين البنرات عند وجود أكثر من بنر نشط.'
-                      : 'Configure transition duration when multiple active banners exist.'}
+                    {t.adminHeroSliderSpeedDesc}
                   </span>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
                 <label className="flex items-center gap-2 cursor-pointer select-none px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded text-xs text-zinc-300 font-mono hover:border-zinc-700">
-                  <span>{isRTL ? 'تفعيل التبديل' : 'Auto Play'}</span>
+                  <span>{t.adminEnableAutoPlay}</span>
                   <input
                     type="checkbox"
                     checked={settings?.heroAutoPlay !== false}
                     onChange={(e) => {
                       updateSettings({ heroAutoPlay: e.target.checked });
-                      showSuccess(isRTL ? 'تم حفظ إعدادات السلايدر' : 'Slider settings updated');
+                      showSuccess(t.sliderSettingsSaved);
                     }}
                     className="accent-amber-500 w-3.5 h-3.5 cursor-pointer"
                   />
@@ -247,7 +245,7 @@ export const AdminHomePageEditor: React.FC = () => {
                       type="button"
                       onClick={() => {
                         updateSettings({ heroSliderIntervalSeconds: sec });
-                        showSuccess(isRTL ? `تم ضبط السرعة إلى ${sec} ثوانٍ` : `Speed set to ${sec}s`);
+                        showSuccess(`${t.sliderSpeedSetPrefix} ${sec}${t.secondShort}`);
                       }}
                       className={`px-3 py-1.5 rounded text-xs font-mono transition-all cursor-pointer ${
                         isSelected
@@ -255,14 +253,14 @@ export const AdminHomePageEditor: React.FC = () => {
                           : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white'
                       }`}
                     >
-                      {sec} {isRTL ? 'ثوانٍ' : 's'}
+                      {sec} {t.secondsUnit}
                     </button>
                   );
                 })}
 
                 <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 px-2 py-1 rounded">
                   <span className="text-[11px] text-zinc-400 font-mono">
-                    {isRTL ? 'مخصص:' : 'Custom:'}
+                    {t.customColon}
                   </span>
                   <input
                     type="number"
@@ -276,7 +274,7 @@ export const AdminHomePageEditor: React.FC = () => {
                     className="w-12 bg-zinc-950 border border-zinc-700 px-1 py-0.5 text-xs text-white text-center font-mono rounded focus:border-amber-500 focus:outline-none"
                   />
                   <span className="text-[11px] text-zinc-400 font-mono">
-                    {isRTL ? 'ث' : 's'}
+                    {t.secondShort}
                   </span>
                 </div>
               </div>

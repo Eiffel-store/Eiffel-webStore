@@ -8,7 +8,7 @@ interface AccountHeaderProps {
 }
 
 export const AccountHeader: React.FC<AccountHeaderProps> = ({ user }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const isVip = Boolean(user.isVip) || user.tier === 'VIP' || user.tier === 'VIP_PLATINUM';
   const points = user.points ?? user.tierPoints ?? 0;

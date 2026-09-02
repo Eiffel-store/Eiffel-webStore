@@ -64,7 +64,7 @@ export const AdminReviewsPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
     },
     onError: () => {
-      toast.error(isRTL ? 'فشل حذف التقييم' : 'Failed to delete review');
+      toast.error(t.adminReviewDeleteFailed);
     }
   });
 
@@ -79,7 +79,7 @@ export const AdminReviewsPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
     },
     onError: () => {
-      toast.error(isRTL ? 'فشل تحديث حالة التقييم' : 'Failed to update review status');
+      toast.error(t.adminReviewStatusUpdateFailed);
     }
   });
 
@@ -116,9 +116,7 @@ export const AdminReviewsPage: React.FC = () => {
             <span>{t.adminHeaderReviews}</span>
           </h1>
           <p className="text-xs text-zinc-400 mt-1">
-            {isRTL
-              ? 'مراقبة تقييمات العملاء والتحكم في المراجعات المعروضة على المتجر'
-              : 'Moderate customer ratings, verify genuine feedback and maintain store reputation'}
+            {t.adminHeaderReviewsDesc}
           </p>
         </div>
 
@@ -129,7 +127,7 @@ export const AdminReviewsPage: React.FC = () => {
           className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-medium rounded flex items-center gap-2 transition-colors self-start sm:self-auto cursor-pointer"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-amber-400' : ''}`} />
-          <span>{isRTL ? 'تحديث' : 'Refresh'}</span>
+          <span>{t.refresh}</span>
         </button>
       </div>
 
@@ -145,7 +143,7 @@ export const AdminReviewsPage: React.FC = () => {
             {isStatsLoading ? '...' : totalReviewsCount}
           </div>
           <div className="text-[10px] text-zinc-500 font-mono">
-            {isRTL ? 'إجمالي المراجعات المسجلة' : 'Recorded product reviews'}
+            {t.adminTotalReviewsRecorded}
           </div>
         </div>
 
@@ -171,7 +169,7 @@ export const AdminReviewsPage: React.FC = () => {
             </div>
           </div>
           <div className="text-[10px] text-zinc-500 font-mono">
-            {isRTL ? 'المتوسط العام لكافة المنتجات' : 'Storewide average score'}
+            {t.adminStorewideAverageScore}
           </div>
         </div>
 
@@ -185,7 +183,7 @@ export const AdminReviewsPage: React.FC = () => {
             {isStatsLoading ? '...' : approvedCount}
           </div>
           <div className="text-[10px] text-zinc-500 font-mono">
-            {isRTL ? 'منشورة وظاهرة للعملاء' : 'Active and published'}
+            {t.adminPublishedVisible}
           </div>
         </div>
 
@@ -199,7 +197,7 @@ export const AdminReviewsPage: React.FC = () => {
             {isStatsLoading ? '...' : pendingCount}
           </div>
           <div className="text-[10px] text-zinc-500 font-mono">
-            {isRTL ? 'تحت التدقيق والمراجعة' : 'Awaiting moderation'}
+            {t.adminAwaitingModeration}
           </div>
         </div>
       </div>
@@ -213,11 +211,7 @@ export const AdminReviewsPage: React.FC = () => {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={
-              isRTL
-                ? 'البحث باسم العميل، الإيميل، أو نص التقييم...'
-                : 'Search by client name, email, or comment...'
-            }
+            placeholder={t.adminSearchReviewsPlaceholder}
             className="w-full bg-zinc-950 border border-zinc-700 pl-9 rtl:pl-3 rtl:pr-9 pr-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded focus:outline-none focus:border-amber-400"
           />
         </div>
@@ -237,7 +231,7 @@ export const AdminReviewsPage: React.FC = () => {
               className="bg-transparent text-xs text-white focus:outline-none cursor-pointer"
             >
               <option value="ALL" className="bg-zinc-900">
-                {isRTL ? 'كل النجوم' : 'All Stars'}
+                {t.adminAllStars}
               </option>
               <option value="5" className="bg-zinc-900">5 ★★★★★</option>
               <option value="4" className="bg-zinc-900">4 ★★★★☆</option>
@@ -256,16 +250,16 @@ export const AdminReviewsPage: React.FC = () => {
               className="bg-transparent text-xs text-white focus:outline-none cursor-pointer"
             >
               <option value="ALL" className="bg-zinc-900">
-                {isRTL ? 'كل الحالات' : 'All Status'}
+                {t.adminAllStatus}
               </option>
               <option value="APPROVED" className="bg-zinc-900">
-                {isRTL ? 'معتمدة (APPROVED)' : 'Approved'}
+                {t.adminStatusApproved}
               </option>
               <option value="PENDING" className="bg-zinc-900">
-                {isRTL ? 'معلقة (PENDING)' : 'Pending'}
+                {t.adminStatusPending}
               </option>
               <option value="REJECTED" className="bg-zinc-900">
-                {isRTL ? 'مرفوضة (REJECTED)' : 'Rejected'}
+                {t.adminStatusRejected}
               </option>
             </select>
           </div>
@@ -284,12 +278,10 @@ export const AdminReviewsPage: React.FC = () => {
           <div className="p-12 text-center space-y-3">
             <MessageSquare className="w-10 h-10 text-zinc-600 mx-auto" />
             <h3 className="text-base font-bold text-white">
-              {isRTL ? 'لا توجد تقييمات مطابقة' : 'No Reviews Found'}
+              {t.adminNoReviewsFound}
             </h3>
             <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-              {isRTL
-                ? 'لم يتم العثور على أي مراجعات تطابق معايير البحث أو الفلاتر الحالية.'
-                : 'No customer reviews match your current search or filter criteria.'}
+              {t.adminNoReviewsFoundDesc}
             </p>
           </div>
         ) : (
@@ -395,7 +387,7 @@ export const AdminReviewsPage: React.FC = () => {
                         type="button"
                         onClick={() => setReviewToDelete(rev)}
                         className="p-1.5 bg-zinc-900 hover:bg-red-950/60 text-zinc-500 hover:text-red-400 border border-zinc-800 hover:border-red-800 rounded-lg transition-colors cursor-pointer"
-                        title={isRTL ? 'حذف التقييم نهائياً' : 'Delete review'}
+                        title={t.adminDeleteReviewPermanently}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -427,7 +419,7 @@ export const AdminReviewsPage: React.FC = () => {
                         ) : null}
                         <div className="min-w-0 flex-1">
                           <span className="text-[11px] font-bold text-zinc-300 truncate block">
-                            {product?.name || (isRTL ? 'منتج رقم:' : 'Product:') + ' ' + rev.productId}
+                            {product?.name || `${t.adminProductPrefix} ${rev.productId}`}
                           </span>
                         </div>
                         <Link
@@ -436,7 +428,7 @@ export const AdminReviewsPage: React.FC = () => {
                           rel="noopener noreferrer"
                           className="text-[10px] font-mono text-amber-400 hover:underline flex items-center gap-1 shrink-0 ml-2 rtl:ml-0 rtl:mr-2"
                         >
-                          <span>{isRTL ? 'معاينة' : 'View'}</span>
+                          <span>{t.adminPreview}</span>
                           <ExternalLink className="w-2.5 h-2.5" />
                         </Link>
                       </div>
@@ -477,7 +469,7 @@ export const AdminReviewsPage: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-bold text-white text-base">
-                  {isRTL ? 'تأكيد حذف التقييم' : 'Confirm Delete Review'}
+                  {t.adminConfirmDeleteReview}
                 </h3>
                 <p className="text-xs text-zinc-400">
                   {t.adminDeleteReviewConfirm}
@@ -511,7 +503,7 @@ export const AdminReviewsPage: React.FC = () => {
                 className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded flex items-center gap-1.5 cursor-pointer transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>{deleteMutation.isPending ? '...' : (isRTL ? 'حذف نهائياً' : 'Delete Permanently')}</span>
+                <span>{deleteMutation.isPending ? '...' : t.adminDeletePermanentlyBtn}</span>
               </button>
             </div>
           </div>

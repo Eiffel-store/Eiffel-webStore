@@ -16,7 +16,7 @@ export const AddressModal: React.FC<AddressModalProps> = ({
   onClose,
   onAddAddress,
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
   const [newFirstName, setNewFirstName] = useState(user?.name.split(' ')[0] || '');
   const [newLastName, setNewLastName] = useState(user?.name.split(' ')[1] || '');
   const [addressType, setAddressType] = useState<'Home' | 'Work' | 'Other'>('Home');
@@ -44,11 +44,7 @@ export const AddressModal: React.FC<AddressModalProps> = ({
     setLongitude(loc.longitude);
     setMapUrl(loc.mapUrl);
 
-    setGpsSuccessNotice(
-      isRTL
-        ? '✓ تم تحديد العنوان الجغرافي من الخرائط وتعبئة البيانات بنجاح'
-        : '✓ Location verified and address filled from maps successfully'
-    );
+    setGpsSuccessNotice(t.mapsLocationSuccess);
     setTimeout(() => setGpsSuccessNotice(null), 5000);
   };
 

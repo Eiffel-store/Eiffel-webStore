@@ -25,7 +25,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   initialEmail = '',
   onSuccessLogin,
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const [step, setStep] = useState<FlowStep>('EMAIL');
   const [email, setEmail] = useState(initialEmail);

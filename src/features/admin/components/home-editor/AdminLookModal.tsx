@@ -275,7 +275,7 @@ export const AdminLookModal: React.FC<AdminLookModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.imageUrl) {
-      alert(isRTL ? 'يرجى رفع صورة الإطلالة أولاً' : 'Please upload a look image first');
+      alert(t.adminUploadLookImageFirst);
       return;
     }
     setIsSaving(true);
@@ -497,7 +497,7 @@ export const AdminLookModal: React.FC<AdminLookModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs text-zinc-400 font-mono mb-1">
-                    {isRTL ? 'الوصف الفرعي (عربي)' : 'Subtitle / Tag (Arabic)'}
+                    {t.adminSubtitleTagAr}
                   </label>
                   <input
                     type="text"
@@ -510,7 +510,7 @@ export const AdminLookModal: React.FC<AdminLookModalProps> = ({
 
                 <div>
                   <label className="block text-xs text-zinc-400 font-mono mb-1">
-                    {isRTL ? 'الوصف الفرعي (إنجليزي)' : 'Subtitle / Tag (English)'}
+                    {t.adminSubtitleTagEn}
                   </label>
                   <input
                     type="text"

@@ -13,7 +13,7 @@ export const CardModal: React.FC<CardModalProps> = ({
   onClose,
   onAddCard,
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
   const [newCardNumber, setNewCardNumber] = useState('');
   const [newCardExp, setNewCardExp] = useState('');
   const [newCardHolder, setNewCardHolder] = useState('');

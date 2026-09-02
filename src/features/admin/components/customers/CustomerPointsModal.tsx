@@ -16,7 +16,7 @@ export const CustomerPointsModal: React.FC<CustomerPointsModalProps> = ({
   onSave,
   isUpdating,
 }) => {
-  const { isRTL, t } = useLanguage();
+  const {  t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   const [pointsAction, setPointsAction] = useState<'add' | 'deduct'>('add');

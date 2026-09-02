@@ -15,29 +15,19 @@ export const CollectionBanner: React.FC<CollectionBannerProps> = ({
   subtitle,
   image,
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const defaultFallbackImage = `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`;
   const bannerSrc = image && image.trim() !== '' ? image : defaultFallbackImage;
 
   const getBreadcrumbCategory = () => {
     const cat = category.toLowerCase();
-    if (isRTL) {
-      if (cat === 'men') return 'الرجال';
-      if (cat === 'kids') return 'الأطفال';
-      if (cat === 'accessories') return 'الإكسسوارات';
-      if (cat === 'shoes' || cat === 'shoes-&-footwear') return 'الأحذية';
-      if (cat === 'offers') return 'العروض';
-      if (cat === 'new-arrivals') return 'أحدث الإصدارات';
-      return title || category;
-    } else {
-      if (cat === 'men') return 'MEN';
-      if (cat === 'kids') return 'KIDS';
-      if (cat === 'accessories') return 'ACCESSORIES';
-      if (cat === 'shoes' || cat === 'shoes-&-footwear') return 'SHOES';
-      if (cat === 'offers') return 'OFFERS';
-      if (cat === 'new-arrivals') return 'NEW ARRIVALS';
-      return (title || category).toUpperCase();
-    }
+    if (cat === 'men') return t.catBreadcrumbMen;
+    if (cat === 'kids') return t.catBreadcrumbKids;
+    if (cat === 'accessories') return t.catBreadcrumbAccessories;
+    if (cat === 'shoes' || cat === 'shoes-&-footwear') return t.catBreadcrumbShoes;
+    if (cat === 'offers') return t.catBreadcrumbOffers;
+    if (cat === 'new-arrivals') return t.newArrivalsTitle;
+    return title || category;
   };
 
   const isDuplicateSubtitle = subtitle && subtitle.toLowerCase().trim() === title.toLowerCase().trim();
@@ -58,7 +48,7 @@ export const CollectionBanner: React.FC<CollectionBannerProps> = ({
         <div className="flex items-center gap-2 text-xs font-mono tracking-widest text-zinc-400 mb-2">
           <Link to="/" className="hover:underline">EIFFEL</Link>
           <span>/</span>
-          <span>{isRTL ? 'التشكيلات' : 'COLLECTIONS'}</span>
+          <span>{t.collectionsTitle}</span>
           <span>/</span>
           <span className="text-white uppercase">{getBreadcrumbCategory()}</span>
         </div>

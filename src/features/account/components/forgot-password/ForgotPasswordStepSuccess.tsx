@@ -3,7 +3,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '@/shared';
 
 export const ForgotPasswordStepSuccess: React.FC = () => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <div className="py-6 text-center space-y-4">

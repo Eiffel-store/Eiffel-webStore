@@ -91,7 +91,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
     }
 
     if (!formComment.trim()) {
-      toast.error(isRTL ? 'يرجى كتابة تفاصيل تجربتك ورأيك' : 'Please provide your review details');
+      toast.error(t.reviewDetailsRequired);
       return;
     }
 
@@ -109,11 +109,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
       };
 
       await reviewService.addReview(product.id, input);
-      toast.success(
-        isRTL
-          ? 'تمت إضافة تقييمك بنجاح! شكراً لمشاركتنا تجربتك الفاخرة.'
-          : 'Thank you! Your review has been submitted successfully.'
-      );
+      toast.success(t.reviewSubmitSuccess);
       setIsModalOpen(false);
       setFormName('');
       setFormEmail('');
@@ -129,7 +125,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
         queryClient.invalidateQueries({ queryKey: ['products'] })
       ]);
     } catch (err) {
-      toast.error(isRTL ? 'فشل إرسال التقييم، يرجى المحاولة لاحقاً' : 'Failed to submit review');
+      toast.error(t.reviewSubmitFailed);
     } finally {
       setIsSubmitting(false);
     }
@@ -139,7 +135,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
   const totalReviews = summary?.totalReviews || 0;
   const recommendationRate = summary?.recommendationRate || 98;
   const distribution = summary?.ratingDistribution || { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-  const reviewsList = summary?.reviews?.content || [];
+  const reviewsList: Review[] = summary?.reviews?.content || [];
   const totalPages = summary?.reviews?.totalPages || 1;
   const totalElements = summary?.reviews?.totalElements || 0;
 
@@ -191,7 +187,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
           </div>
 
           <p className="text-xs font-mono text-secondary dark:text-zinc-400">
-            {isRTL ? `مبني على ${totalReviews} تقييم موثق` : `Based on ${totalReviews} verified reviews`}
+            {t.basedOnVerifiedReviews.replace('{count}', String(totalReviews))}
           </p>
 
           <div className="mt-3 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 dark:text-emerald-400 rounded-full text-[11px] font-mono font-bold flex items-center gap-1">
@@ -298,7 +294,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
       ) : (
         <div className="space-y-4">
           <div className="space-y-4">
-            {reviewsList.map((rev) => (
+            {reviewsList.map((rev: Review) => (
               <div
                 key={rev.id}
                 className="p-5 sm:p-6 bg-surface-container-lowest dark:bg-zinc-950 border border-surface-container dark:border-zinc-800 rounded-xl space-y-3 transition-colors hover:border-zinc-700"
@@ -510,7 +506,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
                     type="text"
                     value={formTitle}
                     onChange={(e) => setFormTitle(e.target.value)}
-                    placeholder={isRTL ? 'مثال: خامة فائقة وتطريز متقن' : 'e.g. Exquisite fabric & fit'}
+                    placeholder={t.reviewTitlePlaceholder}
                     className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-white focus:outline-none focus:border-amber-400"
                   />
                 </div>
@@ -525,11 +521,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({ pr
                     rows={4}
                     value={formComment}
                     onChange={(e) => setFormComment(e.target.value)}
-                    placeholder={
-                      isRTL
-                        ? 'شاركنا رأيك في جودة القماش، المقاس، تفاصيل الخياطة وسرعة التوصيل...'
-                        : 'Share your thoughts on the craftsmanship, fit, fabric quality and delivery...'
-                    }
+                    placeholder={t.reviewCommentPlaceholder}
                     className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-white focus:outline-none focus:border-amber-400 resize-none"
                   />
                 </div>

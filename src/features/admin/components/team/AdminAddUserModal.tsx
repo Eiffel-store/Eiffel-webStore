@@ -15,7 +15,7 @@ export const AdminAddUserModal: React.FC<AdminAddUserModalProps> = ({
   onClose,
   onUserCreated,
 }) => {
-  const { isRTL, t } = useLanguage();
+  const { t } = useLanguage();
 
   const [formData, setFormData] = useState<AdminUserData>({
     name: '',

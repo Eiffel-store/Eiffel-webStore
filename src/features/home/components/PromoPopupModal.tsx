@@ -5,7 +5,7 @@ import { useStoreData, useLanguage } from '@/shared';
 
 export const PromoPopupModal: React.FC = () => {
   const { activeBanners = [], trackBannerImpression, trackBannerClick } = useStoreData();
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
 
   const [isOpen, setIsOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
@@ -56,10 +56,11 @@ export const PromoPopupModal: React.FC = () => {
     }
   };
 
-  const title = isRTL ? (popupBanner.titleAr || popupBanner.titleEn) : (popupBanner.titleEn || popupBanner.titleAr);
-  const subtitle = isRTL ? (popupBanner.subtitleAr || popupBanner.subtitleEn) : (popupBanner.subtitleEn || popupBanner.subtitleAr);
-  const tag = isRTL ? (popupBanner.tagAr || popupBanner.tagEn) : (popupBanner.tagEn || popupBanner.tagAr);
-  const buttonText = isRTL ? (popupBanner.buttonTextAr || t.shopNow) : (popupBanner.buttonTextEn || t.shopNow);
+  const isArabic = language === 'ar';
+  const title = (isArabic ? popupBanner.titleAr : popupBanner.titleEn) || (isArabic ? popupBanner.titleEn : popupBanner.titleAr);
+  const subtitle = (isArabic ? popupBanner.subtitleAr : popupBanner.subtitleEn) || (isArabic ? popupBanner.subtitleEn : popupBanner.subtitleAr);
+  const tag = (isArabic ? popupBanner.tagAr : popupBanner.tagEn) || (isArabic ? popupBanner.tagEn : popupBanner.tagAr);
+  const buttonText = (isArabic ? popupBanner.buttonTextAr : popupBanner.buttonTextEn) || t.shopNow;
   const buttonLink = popupBanner.buttonLink || '/collections/men';
   const imgUrl = popupBanner.desktopImageUrl || popupBanner.mobileImageUrl || 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800&auto=format&fit=crop&q=80';
 

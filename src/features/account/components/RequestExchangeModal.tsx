@@ -30,7 +30,7 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const items = order?.items || [];
 
   const [existingRequests, setExistingRequests] = useState<ExchangeRequest[]>([]);
@@ -93,10 +93,10 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
       const res = await uploadService.uploadImage(file);
       if (res?.fileUrl) {
         setProofImageUrl(res.fileUrl);
-        toast.success(isRTL ? 'تم رفع الصورة بنجاح' : 'Image uploaded successfully');
+        toast.success(t.imageUploadedSuccess);
       }
     } catch {
-      toast.error(isRTL ? 'فشل رفع الصورة، يرجى المحاولة مرة أخرى' : 'Failed to upload image');
+      toast.error(t.imageUploadFailed);
     } finally {
       setIsUploading(false);
     }
@@ -106,26 +106,22 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
     e.preventDefault();
 
     if (!currentItem) {
-      toast.error(isRTL ? 'يرجى اختيار القطعة المراد استبدالها' : 'Please select an item');
+      toast.error(t.pleaseSelectItemToExchange);
       return;
     }
 
     if (isCurrentItemDisabled) {
-      toast.error(
-        isRTL
-          ? 'تم تقديم طلب لهذه القطعة مسبقاً. يرجى التواصل مع خدمة العملاء لأي استفسار.'
-          : 'A request has already been submitted for this item.'
-      );
+      toast.error(t.exchangeItemAlreadySubmitted);
       return;
     }
 
     if (requestType === 'EXCHANGE_SIZE' && !requestedSize.trim()) {
-      toast.error(isRTL ? 'يرجى تحديد المقاس البديل المطلوب' : 'Please select a replacement size');
+      toast.error(t.pleaseSelectReplacementSize);
       return;
     }
 
     if (!pickupAddress.trim() || !customerPhone.trim()) {
-      toast.error(isRTL ? 'يرجى تأكيد عنوان الاستلام ورقم الهاتف' : 'Please provide pickup address & phone');
+      toast.error(t.pleaseProvidePickupAddressPhone);
       return;
     }
 
@@ -152,17 +148,12 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
         status: 'PENDING',
       });
 
-      toast.success(
-        isRTL
-          ? 'تم إرسال طلب الاستبدال بنجاح! سيتواصل معك فريق خدمة العملاء.'
-          : 'Exchange request submitted successfully! We will contact you soon.'
-      );
+      toast.success(t.exchangeSubmittedSuccess);
       if (onSuccess) onSuccess();
       onClose();
     } catch (err: any) {
       toast.error(
-        err?.response?.data?.message ||
-          (isRTL ? 'حدث خطأ أثناء تقديم الطلب' : 'Failed to submit exchange request')
+        err?.response?.data?.message || t.exchangeSubmissionFailed
       );
     } finally {
       setIsSubmitting(false);
@@ -175,35 +166,35 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
         return (
           <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
             <Clock className="w-2.5 h-2.5" />
-            <span>{isRTL ? 'طلب قيد المراجعة' : 'Pending Review'}</span>
+            <span>{t.exchangeStatusPending}</span>
           </span>
         );
       case 'APPROVED':
         return (
           <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
             <CheckCircle2 className="w-2.5 h-2.5" />
-            <span>{isRTL ? 'تمت الموافقة' : 'Approved'}</span>
+            <span>{t.exchangeStatusApproved}</span>
           </span>
         );
       case 'IN_TRANSIT':
         return (
           <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-purple-500 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
             <Truck className="w-2.5 h-2.5" />
-            <span>{isRTL ? 'جاري الاستبدال' : 'In Transit'}</span>
+            <span>{t.exchangeStatusInTransit}</span>
           </span>
         );
       case 'COMPLETED':
         return (
           <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
             <CheckCircle2 className="w-2.5 h-2.5" />
-            <span>{isRTL ? 'تم الاستبدال بنجاح' : 'Completed'}</span>
+            <span>{t.exchangeStatusCompleted}</span>
           </span>
         );
       case 'REJECTED':
         return (
           <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">
             <XCircle className="w-2.5 h-2.5" />
-            <span>{isRTL ? 'تم رفض الطلب' : 'Rejected'}</span>
+            <span>{t.exchangeStatusRejected}</span>
           </span>
         );
       default:
@@ -222,10 +213,10 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
             </div>
             <div>
               <h3 className="font-editorial text-base sm:text-lg font-bold text-primary dark:text-white">
-                {isRTL ? 'طلب استبدال / إرجاع' : 'Request Exchange / Return'}
+                {t.requestExchangeReturn}
               </h3>
               <p className="text-xs font-mono text-secondary dark:text-zinc-400">
-                {isRTL ? `للطلب رقم #${order.id}` : `For Order #${order.id}`}
+                {`${t.requestExchangeOrderPrefix}${order.id}`}
               </p>
             </div>
           </div>
@@ -244,12 +235,10 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
               <AlertCircle className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
               <div>
                 <strong className="font-bold text-white block mb-0.5">
-                  {isRTL ? 'تم تقديم طلبات لجميع قطع هذا الطلب مسبقاً' : 'All Items Have Previous Requests'}
+                  {t.allOrderItemsRequested}
                 </strong>
                 <span className="text-zinc-400">
-                  {isRTL
-                    ? 'تم تسجيل طلبات استبدال/استرجاع لقطع هذا الطلب بالفعل. لا يمكن تقديم طلبات مكررة. للاستفسار أو طلب المساعدة، يرجى التواصل مع فريق خدمة العملاء.'
-                    : 'Exchange/return requests have already been submitted for all items in this order. For further inquiries, please contact support.'}
+                  {t.allOrderItemsRequestedDesc}
                 </span>
               </div>
             </div>
@@ -262,7 +251,7 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:underline"
               >
                 <HelpCircle className="w-3.5 h-3.5" />
-                <span>{isRTL ? 'التواصل مع خدمة العملاء عبر الواتساب ↗' : 'Contact Customer Support on WhatsApp ↗'}</span>
+                <span>{t.contactCustomerSupportWhatsApp}</span>
               </a>
             </div>
           </div>
@@ -273,7 +262,7 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
           {/* Step 1: Select Item to Exchange */}
           <div className="space-y-2">
             <label className="block text-xs font-label-bold uppercase tracking-wider text-primary dark:text-white">
-              {isRTL ? '1. اختر القطعة المراد استبدالها:' : '1. Select Item to Exchange:'}
+              {t.selectItemToExchange}
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {items.map((it, idx) => {
@@ -302,7 +291,7 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
                         {it?.product?.name || 'Product'}
                       </h5>
                       <p className="text-[11px] font-mono text-secondary dark:text-zinc-400 mt-0.5">
-                        {isRTL ? 'المقاس الحالي:' : 'Current:'} <strong className="text-primary dark:text-white">{it.selectedSize || 'M'}</strong>
+                        {t.currentSize} <strong className="text-primary dark:text-white">{it.selectedSize || 'M'}</strong>
                         {it.selectedColor ? ` • ${it.selectedColor}` : ''}
                       </p>
 
@@ -322,27 +311,27 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
           {/* Step 2: Request Type */}
           <div className="space-y-2">
             <label className="block text-xs font-label-bold uppercase tracking-wider text-primary dark:text-white">
-              {isRTL ? '2. نوع الطلب:' : '2. Request Type:'}
+              {t.exchangeRequestType}
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
               {[
-                { type: 'EXCHANGE_SIZE', labelAr: 'استبدال مقاس', labelEn: 'Change Size' },
-                { type: 'EXCHANGE_COLOR', labelAr: 'استبدال لون', labelEn: 'Change Color' },
-                { type: 'DEFECT', labelAr: 'عيب صناعة', labelEn: 'Defective Item' },
-                { type: 'RETURN_REFUND', labelAr: 'إرجاع واسترداد', labelEn: 'Return & Refund' },
-              ].map((t) => (
+                { type: 'EXCHANGE_SIZE', label: t.exchangeTypeSize },
+                { type: 'EXCHANGE_COLOR', label: t.exchangeTypeColor },
+                { type: 'DEFECT', label: t.exchangeTypeDefect },
+                { type: 'RETURN_REFUND', label: t.exchangeTypeRefund },
+              ].map((opt) => (
                 <button
-                  key={t.type}
+                  key={opt.type}
                   type="button"
                   disabled={allItemsDisabled || isCurrentItemDisabled}
-                  onClick={() => setRequestType(t.type as ExchangeType)}
+                  onClick={() => setRequestType(opt.type as ExchangeType)}
                   className={`py-2 px-3 rounded-lg border text-center font-bold transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
-                    requestType === t.type
+                    requestType === opt.type
                       ? 'bg-primary text-white dark:bg-white dark:text-black border-primary dark:border-white shadow-sm'
                       : 'border-surface-container dark:border-zinc-800 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white'
                   }`}
                 >
-                  {isRTL ? t.labelAr : t.labelEn}
+                  {opt.label}
                 </button>
               ))}
             </div>
@@ -352,7 +341,7 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
           {requestType === 'EXCHANGE_SIZE' && (
             <div className="p-4 bg-surface-container-lowest dark:bg-zinc-900/50 border border-surface-container dark:border-zinc-800 rounded-xl space-y-2">
               <label className="block text-xs font-label-bold text-primary dark:text-white">
-                {isRTL ? 'المقاس البديل المطلوب:' : 'Required Replacement Size:'}
+                {t.requiredReplacementSize}
               </label>
               <div className="flex flex-wrap gap-2">
                 {((product?.sizes as string[] | undefined) || ['S', 'M', 'L', 'XL', '2XL', '3XL']).map((sz: string) => (
@@ -377,14 +366,14 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
           {requestType === 'EXCHANGE_COLOR' && (
             <div className="p-4 bg-surface-container-lowest dark:bg-zinc-900/50 border border-surface-container dark:border-zinc-800 rounded-xl space-y-2">
               <label className="block text-xs font-label-bold text-primary dark:text-white">
-                {isRTL ? 'اللون البديل المطلوب:' : 'Required Replacement Color:'}
+                {t.requiredReplacementColor}
               </label>
               <input
                 type="text"
                 disabled={allItemsDisabled || isCurrentItemDisabled}
                 value={requestedColor}
                 onChange={(e) => setRequestedColor(e.target.value)}
-                placeholder={isRTL ? 'مثال: أسود، أزرق داكن، بيج...' : 'e.g. Navy, Black, Beige...'}
+                placeholder={t.replacementColorPlaceholder}
                 className="w-full bg-white dark:bg-zinc-900 border border-surface-container dark:border-zinc-700 rounded-lg p-2.5 text-xs text-primary dark:text-white focus:outline-none focus:border-primary dark:focus:border-white disabled:opacity-40 disabled:cursor-not-allowed"
               />
             </div>
@@ -394,7 +383,7 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
           <div className="space-y-3">
             <div>
               <label className="block text-xs font-label-bold uppercase tracking-wider text-primary dark:text-white mb-1.5">
-                {isRTL ? 'سبب الاستبدال / الإرجاع:' : 'Reason for Exchange / Return:'}
+                {t.exchangeReasonLabel}
               </label>
               <select
                 disabled={allItemsDisabled || isCurrentItemDisabled}
@@ -403,33 +392,33 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
                 className="w-full bg-white dark:bg-zinc-900 border border-surface-container dark:border-zinc-700 rounded-lg p-2.5 text-xs text-primary dark:text-white focus:outline-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <option value="المقاس غير ملائم (أصغر أو أكبر من المطلوب)">
-                  {isRTL ? 'المقاس غير ملائم (أصغر أو أكبر من المطلوب)' : 'Size does not fit (too small or too big)'}
+                  {t.exchangeReasonSize}
                 </option>
                 <option value="اللون أو الموديل مختلف عن التوقعات">
-                  {isRTL ? 'اللون أو الموديل مختلف عن التوقعات' : 'Color or style different from expectations'}
+                  {t.exchangeReasonColor}
                 </option>
                 <option value="يوجد عيب أو تلف في القطعة">
-                  {isRTL ? 'يوجد عيب أو تلف في القطعة' : 'Defect or damage found on item'}
+                  {t.exchangeReasonDefect}
                 </option>
                 <option value="تم استلام قطعة مختلفة عن الطلب">
-                  {isRTL ? 'تم استلام قطعة مختلفة عن الطلب' : 'Received incorrect item'}
+                  {t.exchangeReasonWrong}
                 </option>
                 <option value="أخرى">
-                  {isRTL ? 'سبب آخر (سأوضحه في الملاحظات)' : 'Other reason (detailed below)'}
+                  {t.exchangeReasonOther}
                 </option>
               </select>
             </div>
 
             <div>
               <label className="block text-xs font-label-bold text-secondary dark:text-zinc-400 mb-1">
-                {isRTL ? 'ملاحظات إضافية للتوضيح (اختياري):' : 'Additional Notes (Optional):'}
+                {t.additionalNotesOptional}
               </label>
               <textarea
                 rows={2}
                 disabled={allItemsDisabled || isCurrentItemDisabled}
                 value={customerNotes}
                 onChange={(e) => setCustomerNotes(e.target.value)}
-                placeholder={isRTL ? 'اكتب أي تفاصيل إضافية تود إبلاغ المندوب أو خدمة العملاء بها...' : 'Any details for customer support...'}
+                placeholder={t.additionalNotesPlaceholder}
                 className="w-full bg-white dark:bg-zinc-900 border border-surface-container dark:border-zinc-700 rounded-lg p-2.5 text-xs text-primary dark:text-white focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
               />
             </div>
@@ -440,12 +429,12 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
             <div className="flex items-center justify-between">
               <label className="text-xs font-label-bold text-primary dark:text-white flex items-center gap-1.5">
                 <Upload className="w-3.5 h-3.5 text-amber-500" />
-                <span>{isRTL ? 'صورة للقطعة مع التيكت (اختياري):' : 'Photo of Item with Tags (Optional):'}</span>
+                <span>{t.itemPhotoWithTagsOptional}</span>
               </label>
               {proofImageUrl && (
                 <span className="text-[10px] text-emerald-500 font-mono flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3" />
-                  {isRTL ? 'تم الرفع بنجاح' : 'Uploaded'}
+                  {t.uploadedSuccessNotice}
                 </span>
               )}
             </div>
@@ -453,7 +442,7 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
             <div className="flex items-center gap-3">
               <label className={`px-4 py-2 bg-surface-container dark:bg-zinc-800 hover:bg-surface-container-high text-primary dark:text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-2 ${allItemsDisabled || isCurrentItemDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
                 {isUploading ? <Loader2 className="w-4 h-4 animate-spin text-amber-500" /> : <Upload className="w-4 h-4" />}
-                <span>{isUploading ? (isRTL ? 'جاري الرفع...' : 'Uploading...') : (isRTL ? 'اختيار صورة' : 'Choose Photo')}</span>
+                <span>{isUploading ? t.uploadingStatus : t.choosePhoto}</span>
                 <input type="file" accept="image/*" onChange={handleFileUpload} disabled={isUploading || allItemsDisabled || isCurrentItemDisabled} className="hidden" />
               </label>
               {proofImageUrl && (
@@ -465,13 +454,13 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
           {/* Step 6: Pickup Address & Phone */}
           <div className="space-y-3 pt-2 border-t border-surface-container dark:border-zinc-800">
             <h4 className="text-xs font-label-bold uppercase tracking-wider text-primary dark:text-white">
-              {isRTL ? 'بيانات الاستلام والتسليم مع مندوب الشحن:' : 'Pickup & Exchange Contact Details:'}
+              {t.pickupDeliveryDetails}
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
                 <label className="block text-secondary dark:text-zinc-400 mb-1">
-                  {isRTL ? 'رقم الهاتف للتواصل:' : 'Contact Phone:'}
+                  {t.pickupPhone}
                 </label>
                 <input
                   type="tel"
@@ -485,7 +474,7 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
 
               <div>
                 <label className="block text-secondary dark:text-zinc-400 mb-1">
-                  {isRTL ? 'المدينة / المحافظة:' : 'City / Governorate:'}
+                  {t.pickupCityGov}
                 </label>
                 <input
                   type="text"
@@ -499,7 +488,7 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
 
               <div className="sm:col-span-2">
                 <label className="block text-secondary dark:text-zinc-400 mb-1">
-                  {isRTL ? 'عنوان تسليم واستلام القطعة:' : 'Pickup Street Address:'}
+                  {t.pickupAddress}
                 </label>
                 <input
                   type="text"
@@ -520,7 +509,7 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 text-xs font-bold text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white cursor-pointer"
             >
-              {isRTL ? 'إلغاء' : 'Cancel'}
+              {t.cancel}
             </button>
 
             <button
@@ -533,7 +522,7 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
               ) : (
                 <RefreshCw className="w-4 h-4" />
               )}
-              <span>{isRTL ? 'تأكيد وإرسال طلب الاستبدال' : 'Submit Exchange Request'}</span>
+              <span>{t.submitExchangeRequest}</span>
             </button>
           </div>
         </form>

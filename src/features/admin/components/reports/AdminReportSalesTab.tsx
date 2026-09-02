@@ -23,7 +23,7 @@ export const AdminReportSalesTab: React.FC<AdminReportSalesTabProps> = ({
   categories,
   coupons
 }) => {
-  const { isRTL, t } = useLanguage();
+  const { isRTL, t, language } = useLanguage();
   const { formatPrice } = useCurrency();
 
   const nonCancelledOrders = orders.filter((o) => o.status !== 'Cancelled');
@@ -149,7 +149,7 @@ export const AdminReportSalesTab: React.FC<AdminReportSalesTabProps> = ({
             {categorySales.map((cat, idx) => (
               <div key={`cat-sale-${idx}`} className="space-y-1.5">
                 <div className="flex justify-between items-center text-xs font-mono">
-                  <span className="text-zinc-200 font-medium">{isRTL ? cat.name : cat.nameEn}</span>
+                  <span className="text-zinc-200 font-medium">{language === 'ar' ? cat.name : cat.nameEn}</span>
                   <div className="flex items-center gap-3">
                     <span className="text-zinc-400">{cat.count} {t.items}</span>
                     <span className="text-white font-bold">{formatPrice(cat.revenue)}</span>
@@ -184,7 +184,7 @@ export const AdminReportSalesTab: React.FC<AdminReportSalesTabProps> = ({
             {orderTiers.map((tier, idx) => (
               <div key={`tier-${idx}`} className="space-y-1.5">
                 <div className="flex justify-between items-center text-xs font-mono">
-                  <span className="text-zinc-200 font-medium">{isRTL ? tier.labelAr : tier.labelEn}</span>
+                  <span className="text-zinc-200 font-medium">{language === 'ar' ? tier.labelAr : tier.labelEn}</span>
                   <div className="flex items-center gap-3">
                     <span className="text-zinc-400">{tier.count} {t.orders}</span>
                     <span className="text-purple-400 font-bold w-10 text-right">{tier.percent}%</span>

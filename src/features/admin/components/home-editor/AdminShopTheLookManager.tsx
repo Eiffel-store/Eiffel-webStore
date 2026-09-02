@@ -171,7 +171,7 @@ export const AdminShopTheLookManager: React.FC = () => {
                         : 'bg-zinc-800/90 text-zinc-400'
                     }`}>
                       {look.active ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-                      <span>{look.active ? (isRTL ? 'معروض' : 'Active') : (isRTL ? 'مسودة' : 'Draft')}</span>
+                      <span>{look.active ? t.statusActive : t.statusDraft}</span>
                     </span>
                   </div>
 

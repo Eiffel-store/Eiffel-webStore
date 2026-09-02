@@ -194,7 +194,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.titleAr && !formData.titleEn) {
-      toast.error(isRTL ? 'يرجى إدخال عنوان للبانر (بالعربي أو الإنجليزي)' : 'Please enter a headline for the banner');
+      toast.error(t.adminBannerHeadlineRequired);
       return;
     }
     setIsSaving(true);
@@ -203,7 +203,7 @@ export const AdminBannerModal: React.FC<AdminBannerModalProps> = ({
       onClose();
     } catch (err: any) {
       console.error('Failed to save banner:', err);
-      const errMsg = err?.response?.data?.message || err?.message || (isRTL ? 'فشل حفظ البانر، يرجى المحاولة مجدداً' : 'Failed to save banner');
+      const errMsg = err?.response?.data?.message || err?.message || t.adminBannerSaveFailed;
       toast.error(errMsg);
     } finally {
       setIsSaving(false);

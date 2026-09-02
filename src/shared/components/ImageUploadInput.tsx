@@ -22,7 +22,7 @@ export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
   required = false,
   helpText
 }) => {
-  const { isRTL } = useLanguage();
+  const { t } = useLanguage();
   const [isUploading, setIsUploading] = useState(false);
   const [urlInput, setUrlInput] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -107,7 +107,7 @@ export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
             }`}
           >
             <Upload className="w-3.5 h-3.5" />
-            <span>{isRTL ? 'رفع من الجهاز' : 'Upload File'}</span>
+            <span>{t.uploadFromDevice}</span>
           </button>
           <button
             type="button"
@@ -119,7 +119,7 @@ export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
             }`}
           >
             <LinkIcon className="w-3.5 h-3.5" />
-            <span>{isRTL ? 'رابط مباشر (URL)' : 'Direct URL'}</span>
+            <span>{t.directUrl}</span>
           </button>
         </div>
 
@@ -133,7 +133,7 @@ export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
               <div className="flex flex-col items-center gap-2 py-2">
                 <Loader2 className="w-6 h-6 text-amber-400 animate-spin" />
                 <span className="text-xs text-zinc-300 font-medium">
-                  {isRTL ? 'جاري رفع الصورة إلى السحابة...' : 'Uploading image...'}
+                  {t.uploadingImageCloud}
                 </span>
               </div>
             ) : (
@@ -142,10 +142,10 @@ export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
                   <Upload className="w-5 h-5" />
                 </div>
                 <span className="text-xs font-semibold text-zinc-200 group-hover:text-white mt-1">
-                  {isRTL ? 'اضغط لاختيار صورة من جهازك' : 'Click to browse image from device'}
+                  {t.clickToBrowseImage}
                 </span>
                 <span className="text-[11px] text-zinc-500">
-                  {isRTL ? 'يدعم صيغ JPG, PNG, WEBP حتى 20 ميجابايت' : 'PNG, JPG, WEBP up to 20MB'}
+                  {t.supportedFormatsUpTo20Mb}
                 </span>
               </div>
             )}
@@ -165,7 +165,7 @@ export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleApplyUrl())}
-                placeholder={placeholder || (isRTL ? 'ضع رابط الصورة https://...' : 'Paste image URL https://...')}
+                placeholder={placeholder || t.pasteImageUrlPlaceholder}
                 className="flex-1 min-w-0 bg-zinc-950 border border-zinc-700 px-3 py-2 text-xs text-white placeholder:text-zinc-500 rounded-lg focus:outline-none focus:border-amber-400 font-mono transition-colors"
               />
               <button
@@ -173,7 +173,7 @@ export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
                 onClick={() => handleApplyUrl()}
                 className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded-lg transition-colors shrink-0 cursor-pointer shadow-md"
               >
-                {isRTL ? 'تطبيق الرابط' : 'Apply'}
+                {t.applyUrl}
               </button>
             </div>
           </div>
@@ -200,10 +200,10 @@ export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
               type="button"
               onClick={() => onChange('')}
               className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-lg transition-transform active:scale-95 cursor-pointer flex items-center gap-1 text-[11px] font-bold"
-              title={isRTL ? 'حذف الصورة' : 'Remove image'}
+              title={t.removeImage}
             >
               <X className="w-3.5 h-3.5" />
-              <span>{isRTL ? 'حذف' : 'Remove'}</span>
+              <span>{t.remove}</span>
             </button>
           </div>
         </div>
@@ -211,4 +211,3 @@ export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
     </div>
   );
 };
-

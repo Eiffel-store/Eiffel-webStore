@@ -19,7 +19,7 @@ export const CheckoutPage: React.FC = () => {
   const { user, updateUserPoints } = useAuthStore();
   const { addOrder, settings } = useStoreData();
   const { formatPrice } = useCurrency();
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState<Order | null>(null);
@@ -164,7 +164,7 @@ export const CheckoutPage: React.FC = () => {
 
     // 1. Check Cart
     if (!cart || cart.length === 0) {
-      setFormAlert(isRTL ? 'سلة التسوق فارغة، يرجى إضافة منتجات أولاً قبل إتمام الطلب.' : 'Your shopping cart is empty.');
+      setFormAlert(t.cartEmptyOrderAlert);
       return;
     }
 
@@ -183,9 +183,7 @@ export const CheckoutPage: React.FC = () => {
     if (!isValid) {
       const missingFieldsCount = Object.keys(newErrors).length;
       setFormAlert(
-        isRTL
-          ? `يرجى استكمال الحقول الإلزامية المطلوبة (${missingFieldsCount} حقول بحاجة لتصحيح). الحقول المؤشرة باللون الأحمر مطلوبة.`
-          : `Please fill in all required delivery fields (${missingFieldsCount} missing fields highlighted in red).`
+        t.missingFieldsAlert.replace('{count}', String(missingFieldsCount))
       );
 
       // Focus first error field
@@ -222,16 +220,15 @@ export const CheckoutPage: React.FC = () => {
     let paymentMethodString = 'Cash on Delivery (الدفع عند الاستلام)';
     if (paymentMethod === 'points') {
       if (totalAmount === 0) {
-        paymentMethodString = isRTL ? 'الدفع بالنقاط بالكامل (Loyalty Points)' : 'Loyalty Points (Paid in Full)';
+        paymentMethodString = t.paidWithPointsFull;
       } else {
-        paymentMethodString = isRTL
-          ? `خصم بالنقاط (${pointsDiscountValue} ج.م) + دفع عند الاستلام (${totalAmount} ج.م)`
-          : `Points Discount (${pointsDiscountValue} PTS) + COD (${totalAmount} EGP)`;
+        paymentMethodString = t.pointsDiscountAndCod
+          .replace('{points}', pointsDiscountValue.toString())
+          .replace('{total}', totalAmount.toString());
       }
     } else if (pointsDiscountValue > 0) {
-      paymentMethodString = isRTL
-        ? `دفع عند الاستلام مع خصم بالنقاط (${pointsDiscountValue} ج.م)`
-        : `Cash on Delivery + Points Discount (${pointsDiscountValue} PTS)`;
+      paymentMethodString = t.codWithPointsDiscount
+        .replace('{points}', pointsDiscountValue.toString());
     }
 
     try {
@@ -286,7 +283,7 @@ export const CheckoutPage: React.FC = () => {
       }
 
       setFormAlert(
-        serverMessage || (isRTL ? 'حدث خطأ أثناء معالجة الطلب، يرجى المحاولة مرة أخرى أو مراجعة المخزون المتاح.' : 'An error occurred while processing your order.')
+        serverMessage || t.orderProcessingError
       );
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
@@ -329,7 +326,7 @@ export const CheckoutPage: React.FC = () => {
           <div className="mb-8 p-4 bg-red-950/60 border-2 border-red-500 text-red-200 text-xs sm:text-sm rounded-lg flex items-start gap-3 shadow-xl animate-fade-in">
             <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <span className="font-bold">{isRTL ? 'تنبيه إتمام الطلب:' : 'Checkout Validation Alert:'}</span>
+              <span className="font-bold">{t.checkoutValidationAlert}</span>
               <p className="leading-relaxed">{formAlert}</p>
             </div>
           </div>

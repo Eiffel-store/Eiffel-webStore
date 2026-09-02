@@ -8,7 +8,7 @@ export const PromoEditorial: React.FC = () => {
   const { products, homeSettings, activeBanners = [], trackBannerImpression, trackBannerClick } = useStoreData();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
 
   // Find active dynamic promo editorial banner
   const dynamicPromo = activeBanners.find(b => b.placement === 'PROMO_EDITORIAL' && b.isActive !== false);
@@ -33,27 +33,16 @@ export const PromoEditorial: React.FC = () => {
     return null;
   }
 
-  const badge = isRTL
-    ? (dynamicPromo?.tagAr || staticPromo?.badgeAr || t.promoCapsule)
-    : (dynamicPromo?.tagEn || staticPromo?.badgeEn || t.promoCapsule);
-
-  const title = isRTL
-    ? (dynamicPromo?.titleAr || staticPromo?.titleAr || featuredProduct?.name || 'EIFFEL CAPSULE')
-    : (dynamicPromo?.titleEn || staticPromo?.titleEn || featuredProduct?.name || 'EIFFEL CAPSULE');
-
-  const description = isRTL
-    ? (dynamicPromo?.subtitleAr || staticPromo?.descriptionAr || featuredProduct?.subtitle || t.promoDesc)
-    : (dynamicPromo?.subtitleEn || staticPromo?.descriptionEn || featuredProduct?.subtitle || t.promoDesc);
-
-  const buttonText = isRTL
-    ? (dynamicPromo?.buttonTextAr || staticPromo?.buttonTextAr || t.acquirePiece)
-    : (dynamicPromo?.buttonTextEn || staticPromo?.buttonTextEn || t.acquirePiece);
-
+  const isArabic = language === 'ar';
+  const badge = (isArabic ? (dynamicPromo?.tagAr || staticPromo?.badgeAr) : (dynamicPromo?.tagEn || staticPromo?.badgeEn)) || t.promoCapsule;
+  const title = (isArabic ? (dynamicPromo?.titleAr || staticPromo?.titleAr) : (dynamicPromo?.titleEn || staticPromo?.titleEn)) || featuredProduct?.name || 'EIFFEL CAPSULE';
+  const description = (isArabic ? (dynamicPromo?.subtitleAr || staticPromo?.descriptionAr) : (dynamicPromo?.subtitleEn || staticPromo?.descriptionEn)) || featuredProduct?.subtitle || t.promoDesc;
+  const buttonText = (isArabic ? (dynamicPromo?.buttonTextAr || staticPromo?.buttonTextAr) : (dynamicPromo?.buttonTextEn || staticPromo?.buttonTextEn)) || t.acquirePiece;
   const buttonLink = dynamicPromo?.buttonLink || staticPromo?.buttonLink || (featuredProduct ? `/product/${featuredProduct.id}` : '/collections/offers');
 
-  const discountBadge = isRTL
-    ? (dynamicPromo?.discountCode ? `كود الخصم: ${dynamicPromo.discountCode}` : staticPromo?.discountBadgeAr || t.promoTailoringNotice)
-    : (dynamicPromo?.discountCode ? `CODE: ${dynamicPromo.discountCode}` : staticPromo?.discountBadgeEn || t.promoTailoringNotice);
+  const discountBadge = dynamicPromo?.discountCode
+    ? t.discountCodeBadge.replace('{code}', dynamicPromo.discountCode)
+    : ((isArabic ? staticPromo?.discountBadgeAr : staticPromo?.discountBadgeEn) || t.promoTailoringNotice);
 
   const desktopImg = dynamicPromo?.desktopImageUrl || staticPromo?.imageUrl || featuredProduct?.images?.[0] || 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop';
   const mobileImg = dynamicPromo?.mobileImageUrl || desktopImg;

@@ -8,7 +8,7 @@ export const ShopTheLook: React.FC = () => {
   const { products = [], activeLooks = [] } = useStoreData();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
-  const { t, isRTL } = useLanguage();
+  const { t, language } = useLanguage();
 
   const [selectedLookIndex, setSelectedLookIndex] = useState(0);
   const [highlightedPinIndex, setHighlightedPinIndex] = useState<number | null>(null);
@@ -23,8 +23,9 @@ export const ShopTheLook: React.FC = () => {
   const currentLook = activeLooks[safeIndex];
   if (!currentLook || !currentLook.imageUrl) return null;
 
-  const title = isRTL ? (currentLook.titleAr || t.shopTheLook) : (currentLook.titleEn || t.shopTheLook);
-  const subtitle = isRTL ? (currentLook.subtitleAr || t.curatedEnsemble) : (currentLook.subtitleEn || t.curatedEnsemble);
+  const isArabic = language === 'ar';
+  const title = (isArabic ? currentLook.titleAr : currentLook.titleEn) || t.shopTheLook;
+  const subtitle = (isArabic ? currentLook.subtitleAr : currentLook.subtitleEn) || t.curatedEnsemble;
   const mainImage = currentLook.imageUrl;
 
   const hotspots = currentLook.hotspots || [];
@@ -34,8 +35,8 @@ export const ShopTheLook: React.FC = () => {
         if (matching) return matching;
         return {
           id: spot.productId || spot.id,
-          name: isRTL ? (spot.titleAr || spot.titleEn) : (spot.titleEn || spot.titleAr),
-          subtitle: isRTL ? spot.titleEn : spot.titleAr,
+          name: (isArabic ? spot.titleAr : spot.titleEn) || (isArabic ? spot.titleEn : spot.titleAr),
+          subtitle: isArabic ? spot.titleEn : spot.titleAr,
           price: spot.price || 0,
           images: [mainImage],
           category: currentLook.category || 'men',
@@ -73,7 +74,7 @@ export const ShopTheLook: React.FC = () => {
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none max-w-full">
             {activeLooks.map((look: any, idx: number) => {
               const isActive = idx === safeIndex;
-              const lookTabName = isRTL ? (look.categoryAr || look.titleAr || `إطلالة ${idx + 1}`) : (look.categoryEn || look.titleEn || `Look ${idx + 1}`);
+              const lookTabName = (isArabic ? (look.categoryAr || look.titleAr) : (look.categoryEn || look.titleEn)) || t.lookNumber.replace('{number}', String(idx + 1));
 
               return (
                 <button
@@ -130,7 +131,7 @@ export const ShopTheLook: React.FC = () => {
                 {/* Micro Tooltip */}
                 {isHighlighted && (
                   <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-black/95 text-white text-[11px] font-sans py-1.5 px-3 rounded shadow-2xl whitespace-nowrap pointer-events-none z-30 border border-zinc-800">
-                    <span className="font-semibold block">{isRTL ? (spot.titleAr || spot.titleEn) : (spot.titleEn || spot.titleAr)}</span>
+                    <span className="font-semibold block">{(isArabic ? spot.titleAr : spot.titleEn) || (isArabic ? spot.titleEn : spot.titleAr)}</span>
                     {spot.price && spot.price > 0 ? (
                       <span className="text-purple-400 font-mono font-bold">{formatPrice(spot.price)}</span>
                     ) : null}
@@ -146,10 +147,10 @@ export const ShopTheLook: React.FC = () => {
           <div className="lg:col-span-5 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-surface-container dark:border-zinc-800">
               <span className="text-xs font-label-bold uppercase tracking-widest text-secondary dark:text-zinc-400">
-                {t.piecesInThisLook || (isRTL ? 'القطع المكونة للإطلالة' : 'Pieces in this Look')}
+                {t.piecesInThisLook}
               </span>
               <span className="text-xs font-mono text-secondary dark:text-zinc-400">
-                {lookProducts.length} {isRTL ? 'قطع' : 'Items'}
+                {lookProducts.length} {t.items}
               </span>
             </div>
 

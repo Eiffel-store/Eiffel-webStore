@@ -12,7 +12,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
   store,
   onClose,
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
   const [appointmentDate, setAppointmentDate] = useState('');
   const [appointmentTime, setAppointmentTime] = useState('14:00');
   const [appointmentName, setAppointmentName] = useState('');
@@ -101,9 +101,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
             </div>
 
             <p className="text-[11px] text-secondary dark:text-zinc-400 font-light leading-relaxed">
-              {isRTL
-                ? 'أهلاً بك في فروعنا، فريقنا يسعد بمساعدتك في اختيار وتجربة وتنسيق أنسب المقاسات والملابس بكل راحة.'
-                : 'Welcome to our branches. Our store team is delighted to assist you in trying on and selecting the perfect sizes.'}
+              {t.appointmentModalDesc}
             </p>
 
             <div className="flex gap-3 pt-2">

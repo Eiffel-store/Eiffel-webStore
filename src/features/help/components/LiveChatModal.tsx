@@ -13,7 +13,7 @@ interface LiveChatModalProps {
 }
 
 export const LiveChatModal: React.FC<LiveChatModalProps> = ({ isOpen, onClose }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   const [chatMessages, setChatMessages] = useState<LiveChatMessage[]>([
     {

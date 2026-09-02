@@ -48,12 +48,12 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           </span>
           {product.isNew && (
             <span className="bg-primary text-white dark:bg-white dark:text-black text-[9px] font-label-bold px-2 py-0.5 uppercase tracking-widest">
-              {isRTL ? 'إصدار جديد' : 'NEW'}
+              {t.newBadge}
             </span>
           )}
           {product.isBestSeller && (
             <span className="bg-amber-500/20 text-amber-500 border border-amber-500/30 text-[9px] font-label-bold px-2 py-0.5 uppercase tracking-widest">
-              {isRTL ? 'الأكثر طلباً' : 'BEST SELLER'}
+              {t.bestSellerBadge}
             </span>
           )}
         </div>
@@ -160,17 +160,17 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
           {isOutOfStock ? (
             <div className="flex items-center gap-1.5 text-xs text-rose-500 font-bold bg-rose-500/10 p-2 rounded border border-rose-500/20">
               <AlertCircle className="w-4 h-4" />
-              <span>{isRTL ? '❌ نفدت الكمية من المخزون حالياً' : '❌ Currently Out of Stock'}</span>
+              <span>{t.outOfStockAlert}</span>
             </div>
           ) : isLowStock ? (
             <div className="flex items-center gap-1.5 text-xs text-amber-500 font-bold bg-amber-500/10 p-2 rounded border border-amber-500/30 animate-pulse">
               <Sparkles className="w-4 h-4" />
-              <span>{isRTL ? `⚠️ متبقي ${currentStock} قطع فقط في المخزون! اطلب قبل نفادها.` : `⚠️ Only ${currentStock} pieces left in stock! Order soon.`}</span>
+              <span>{t.lowStockUrgentAlert.replace('{count}', String(currentStock))}</span>
             </div>
           ) : (
             <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">
               <Check className="w-3.5 h-3.5" />
-              <span>{isRTL ? `✓ متوفر في المخزون (متبقي ${currentStock} قطعة جاهزة للشحن)` : `✓ In Stock (${currentStock} units ready to ship)`}</span>
+              <span>{t.inStockReadyToShipCount.replace('{count}', String(currentStock))}</span>
             </div>
           )}
         </div>
@@ -210,7 +210,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
                 <span>{t.addedToBag}</span>
               </>
             ) : isOutOfStock ? (
-              <span>{isRTL ? 'نفدت الكمية' : 'OUT OF STOCK'}</span>
+              <span>{t.outOfStockBadge}</span>
             ) : (
               <>
                 <ShoppingBag className="w-4 h-4" />

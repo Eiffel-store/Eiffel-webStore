@@ -12,7 +12,7 @@ export const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
   images,
   onChange
 }) => {
-  const { isRTL, t } = useLanguage();
+  const {  t } = useLanguage();
   const [imageUrlInput, setImageUrlInput] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);

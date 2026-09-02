@@ -54,7 +54,7 @@ export const AdminCustomersPage: React.FC = () => {
     };
 
     // First add real registered MongoDB users
-    backendCustomers.forEach((u) => {
+    backendCustomers.forEach((u: User) => {
       const emailKey = u.email ? u.email.trim().toLowerCase() : '';
       const cleanPhone = normalizePhone(u.phone);
       const primaryKey = emailKey || cleanPhone || String(u.id);
@@ -150,7 +150,7 @@ export const AdminCustomersPage: React.FC = () => {
 
     try {
       await customerService.toggleVip(customer.id, nextVip);
-      queryClient.setQueryData<User[]>(['admin', 'customers'], (old = []) =>
+      queryClient.setQueryData<User[]>(['admin', 'customers'], (old: User[] = []) =>
         old.map((c) => (c.id === customer.id ? { ...c, tier: nextVip ? 'VIP' : 'MEMBER', isVip: nextVip } : c))
       );
       toast.success(
@@ -171,7 +171,7 @@ export const AdminCustomersPage: React.FC = () => {
 
     try {
       await customerService.adjustPoints(selectedCustomerForPoints.id, delta);
-      queryClient.setQueryData<User[]>(['admin', 'customers'], (old = []) =>
+      queryClient.setQueryData<User[]>(['admin', 'customers'], (old: User[] = []) =>
         old.map((c) => {
           if (c.id === selectedCustomerForPoints.id) {
             const current = c.tierPoints || 0;

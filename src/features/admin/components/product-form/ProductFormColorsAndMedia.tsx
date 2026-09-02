@@ -24,7 +24,7 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
   onImagesChange,
   onSizesChange
 }) => {
-  const { isRTL, t } = useLanguage();
+  const { t } = useLanguage();
   const colorInputRef = useRef<HTMLInputElement>(null);
   const secondaryColorInputRef = useRef<HTMLInputElement>(null);
 
@@ -372,14 +372,14 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                   <div className="flex items-center justify-between text-[10px] text-zinc-400 px-1">
                     <span className="font-bold text-zinc-300">{t.adminFrontPhoto}</span>
                     {c.image && (
-                      <span className="text-[9px] font-mono text-emerald-400">✓ {isRTL ? 'تم الرفع' : 'Uploaded'}</span>
+                      <span className="text-[9px] font-mono text-emerald-400">✓ {t.uploadedStatus}</span>
                     )}
                   </div>
                   <div className="relative aspect-[3/4] bg-zinc-950 rounded-lg overflow-hidden border border-zinc-800 group flex items-center justify-center">
                     {uploadingCard?.index === idx && !uploadingCard.isBack ? (
                       <div className="flex flex-col items-center justify-center gap-1 p-2 text-center">
                         <Loader2 className="w-5 h-5 text-amber-400 animate-spin" />
-                        <span className="text-[9px] font-mono text-zinc-400">{isRTL ? 'جاري الرفع...' : 'Uploading...'}</span>
+                        <span className="text-[9px] font-mono text-zinc-400">{t.uploadingStatus}</span>
                       </div>
                     ) : c.image ? (
                       <>
@@ -430,14 +430,14 @@ export const ProductFormColorsAndMedia: React.FC<ProductFormColorsAndMediaProps>
                   <div className="flex items-center justify-between text-[10px] text-zinc-400 px-1">
                     <span className="font-bold text-zinc-300">{t.adminBackPhoto}</span>
                     {c.backImage && (
-                      <span className="text-[9px] font-mono text-emerald-400">✓ {isRTL ? 'تم الرفع' : 'Uploaded'}</span>
+                      <span className="text-[9px] font-mono text-emerald-400">✓ {t.uploadedStatus}</span>
                     )}
                   </div>
                   <div className="relative aspect-[3/4] bg-zinc-950 rounded-lg overflow-hidden border border-zinc-800 group flex items-center justify-center">
                     {uploadingCard?.index === idx && uploadingCard.isBack ? (
                       <div className="flex flex-col items-center justify-center gap-1 p-2 text-center">
                         <Loader2 className="w-5 h-5 text-amber-400 animate-spin" />
-                        <span className="text-[9px] font-mono text-zinc-400">{isRTL ? 'جاري الرفع...' : 'Uploading...'}</span>
+                        <span className="text-[9px] font-mono text-zinc-400">{t.uploadingStatus}</span>
                       </div>
                     ) : c.backImage ? (
                       <>

@@ -10,7 +10,7 @@ interface ChangePasswordModalProps {
 }
 
 export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, onClose }) => {
-  const { isRTL, t } = useLanguage();
+  const { t } = useLanguage();
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -25,9 +25,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
     setMessage(null);
 
     if (newPassword.length < 6) {
-      const msg = isRTL
-        ? 'كلمة المرور الجديدة يجب ألا تقل عن 6 أحرف أو أرقام.'
-        : 'New password must be at least 6 characters.';
+      const msg = t.passwordMinLength;
       setMessage({ type: 'error', text: msg });
       return;
     }
@@ -52,7 +50,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen
         setMessage(null);
       }, 1500);
     } catch (err: any) {
-      const errorMsg = err.message || (isRTL ? 'فشل تغيير كلمة المرور، يرجى التأكد من كلمة المرور الحالية.' : 'Failed to change password.');
+      const errorMsg = err.message || t.passwordChangeFailed;
       setMessage({ type: 'error', text: errorMsg });
       toast.error(errorMsg);
     } finally {

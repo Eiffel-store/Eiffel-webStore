@@ -5,7 +5,7 @@ import { useLanguage, useStoreData, preloadImages } from '@/shared';
 import { Banner } from '@/types';
 
 export const HeroSection: React.FC = () => {
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
   const { settings, activeBanners = [], isBannersLoading, trackBannerImpression, trackBannerClick } = useStoreData();
 
   // 1. Get active Hero Slider banners from dynamic campaigns
@@ -90,12 +90,13 @@ export const HeroSection: React.FC = () => {
     return null;
   }
 
-  const tag = isRTL ? (currentSlide?.tagAr || t.heroSeason) : (currentSlide?.tagEn || t.heroSeason);
-  const title = isRTL ? (currentSlide?.titleAr || t.heroTitle) : (currentSlide?.titleEn || t.heroTitle);
-  const subtitle = isRTL ? (currentSlide?.subtitleAr || t.heroSubtitle) : (currentSlide?.subtitleEn || t.heroSubtitle);
-  const buttonText = isRTL ? (currentSlide?.buttonTextAr || t.exploreCollection) : (currentSlide?.buttonTextEn || t.exploreCollection);
+  const isArabic = language === 'ar';
+  const tag = (isArabic ? currentSlide?.tagAr : currentSlide?.tagEn) || t.heroSeason;
+  const title = (isArabic ? currentSlide?.titleAr : currentSlide?.titleEn) || t.heroTitle;
+  const subtitle = (isArabic ? currentSlide?.subtitleAr : currentSlide?.subtitleEn) || t.heroSubtitle;
+  const buttonText = (isArabic ? currentSlide?.buttonTextAr : currentSlide?.buttonTextEn) || t.exploreCollection;
   const buttonLink = currentSlide?.buttonLink || '/collections/men';
-  const secondaryButtonText = isRTL ? (currentSlide?.secondaryButtonTextAr || t.viewLookbook) : (currentSlide?.secondaryButtonTextEn || t.viewLookbook);
+  const secondaryButtonText = (isArabic ? currentSlide?.secondaryButtonTextAr : currentSlide?.secondaryButtonTextEn) || t.viewLookbook;
   const secondaryButtonLink = currentSlide?.secondaryButtonLink || '/collections/new-arrivals';
 
   const desktopImg = currentSlide?.desktopImageUrl || currentSlide?.mobileImageUrl || '';
@@ -147,7 +148,7 @@ export const HeroSection: React.FC = () => {
             </span>
             {currentSlide.discountCode && (
               <span className="hidden sm:inline-block bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-mono px-2.5 py-0.5 rounded-full uppercase tracking-wider font-bold">
-                CODE: {currentSlide.discountCode}
+                {t.discountCodeBadge.replace('{code}', currentSlide.discountCode)}
               </span>
             )}
           </div>

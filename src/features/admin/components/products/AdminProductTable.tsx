@@ -15,7 +15,7 @@ export const AdminProductTable: React.FC<AdminProductTableProps> = ({
   onToggleStock,
   onDeletePrompt
 }) => {
-  const { isRTL, t, language } = useLanguage();
+  const {  t, language } = useLanguage();
   const { formatPrice } = useCurrency();
   const { categories } = useStoreData();
 

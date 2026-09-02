@@ -28,7 +28,7 @@ export const AdminReportExportModal: React.FC<AdminReportExportModalProps> = ({
   orders,
   products
 }) => {
-  const { isRTL, t } = useLanguage();
+  const {  t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   const [preset, setPreset] = useState<ReportPreset>('financial');

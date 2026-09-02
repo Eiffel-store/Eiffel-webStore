@@ -15,12 +15,13 @@ export const StoreCard: React.FC<StoreCardProps> = ({
   isSelected,
   onSelect,
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t, language } = useLanguage();
 
-  const displayName = isRTL ? store.name : (store.nameEn || store.name);
-  const displayCity = isRTL ? store.city : (store.cityEn || store.city);
-  const displayAddress = isRTL ? store.address : (store.addressEn || store.address);
-  const displayHours = isRTL ? store.hours : (store.hoursEn || store.hours);
+  const isArabic = language === 'ar';
+  const displayName = isArabic ? store.name : (store.nameEn || store.name);
+  const displayCity = isArabic ? store.city : (store.cityEn || store.city);
+  const displayAddress = isArabic ? store.address : (store.addressEn || store.address);
+  const displayHours = isArabic ? store.hours : (store.hoursEn || store.hours);
 
   return (
     <div
@@ -69,7 +70,7 @@ export const StoreCard: React.FC<StoreCardProps> = ({
               className="text-[11px] text-amber-500 hover:underline inline-flex items-center gap-1 font-mono"
             >
               <MapPin className="w-3 h-3" />
-              <span>{isRTL ? 'عرض الموقع على الخريطة' : 'View on Google Maps'} &rarr;</span>
+              <span>{t.viewOnGoogleMaps} &rarr;</span>
             </a>
           </p>
         )}

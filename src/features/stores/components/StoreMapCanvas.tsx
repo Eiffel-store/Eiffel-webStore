@@ -16,11 +16,12 @@ export const StoreMapCanvas: React.FC<StoreMapCanvasProps> = ({
   onSelectStore,
   onScheduleFitting,
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t, language } = useLanguage();
   const activeStores = stores.filter((s) => s.active !== false);
 
-  const activeName = isRTL ? selectedStore.name : (selectedStore.nameEn || selectedStore.name);
-  const activeAddress = isRTL ? selectedStore.address : (selectedStore.addressEn || selectedStore.address);
+  const isArabic = language === 'ar';
+  const activeName = isArabic ? selectedStore.name : (selectedStore.nameEn || selectedStore.name);
+  const activeAddress = isArabic ? selectedStore.address : (selectedStore.addressEn || selectedStore.address);
 
   return (
     <div className="lg:col-span-7 flex flex-col gap-4">
@@ -39,7 +40,7 @@ export const StoreMapCanvas: React.FC<StoreMapCanvasProps> = ({
         {/* Map Interactive Pins for all stores */}
         {activeStores.map((st) => {
           const isSelected = selectedStore.id === st.id;
-          const pinCity = isRTL ? st.city : (st.cityEn || st.city);
+          const pinCity = isArabic ? st.city : (st.cityEn || st.city);
           const pinX = st.coordinates?.x ?? 50;
           const pinY = st.coordinates?.y ?? 50;
 

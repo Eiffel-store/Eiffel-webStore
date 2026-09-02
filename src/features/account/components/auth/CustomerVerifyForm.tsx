@@ -137,7 +137,7 @@ export const CustomerVerifyForm: React.FC<CustomerVerifyFormProps> = ({
             onClick={onBackToRegister}
             className="text-[11px] text-amber-500 hover:text-amber-400 underline transition-colors cursor-pointer block mx-auto"
           >
-            {isRTL ? 'تعديل البريد الإلكتروني؟' : 'Change email address?'}
+            {t.changeEmailPrompt}
           </button>
         )}
       </div>
@@ -213,7 +213,7 @@ export const CustomerVerifyForm: React.FC<CustomerVerifyFormProps> = ({
               className="text-xs text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors flex items-center justify-center gap-1 mx-auto cursor-pointer"
             >
               {isRTL ? <ArrowRight className="w-3.5 h-3.5" /> : <ArrowLeft className="w-3.5 h-3.5" />}
-              <span>{t.signIn || 'العودة لتسجيل الدخول'}</span>
+              <span>{t.signIn}</span>
             </button>
           )}
         </div>

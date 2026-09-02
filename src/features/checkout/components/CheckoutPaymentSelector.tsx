@@ -17,7 +17,7 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
   totalBeforePoints = 0,
   pointsDiscountValue = 0,
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
   const { formatPrice } = useCurrency();
 
   const hasPoints = availablePoints > 0;
@@ -81,9 +81,7 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
           <div className="pt-2 border-t border-surface-container dark:border-zinc-800/80 text-xs text-secondary dark:text-zinc-400 font-light leading-relaxed flex items-start gap-2">
             <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <span>
-              {isRTL
-                ? 'الدفع نقداً للمندوب عند استلام ومعاينة الطلب في منزلك.'
-                : 'Pay in cash directly upon receiving and inspecting your pieces.'}
+              {t.codDescription}
             </span>
           </div>
         </div>
@@ -159,8 +157,8 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
             ) : (
               <span className="text-secondary dark:text-zinc-400 font-light font-sans">
                 {hasPoints
-                  ? (isRTL ? 'استخدم نقاطك المسجلة بحسابك لدفع قيمة الطلب فوراً أو تخفيضها.' : 'Redeem your loyalty points to cover all or part of your order total.')
-                  : (isRTL ? 'قم بالشراء واكسب 1% نقاط على كل طلب لتتمكن من استخدامها في مشترياتك القادمة.' : 'Earn 1% points on every order to redeem on future purchases.')}
+                  ? t.pointsRedeemDesc
+                  : t.pointsEarnDesc}
               </span>
             )}
           </div>

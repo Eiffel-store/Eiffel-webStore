@@ -44,11 +44,9 @@ export const CollectionsPage: React.FC = () => {
     if (catSlug === 'offers' || catSlug === 'sale') {
       return {
         id: 'offers',
-        name: isRTL ? 'العروض والتخفيضات الحصرية' : 'SPECIAL OFFERS & DEALS',
+        name: t.specialOffersDeals,
         nameEn: 'SPECIAL OFFERS & DEALS',
-        subtitle: isRTL
-          ? 'تخفيضات موسمية وباقات أطقم متكاملة بأسعار مميزة للشحن داخل مصر'
-          : 'Seasonal markdowns, bundled sets & special deals across Egypt',
+        subtitle: t.offersSubtitle,
         image: `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`,
         itemCount: '',
         subCategories: []
@@ -58,11 +56,9 @@ export const CollectionsPage: React.FC = () => {
     if (catSlug === 'new-arrivals') {
       return {
         id: 'new-arrivals',
-        name: isRTL ? 'أحدث الإصدارات' : 'NEW ARRIVALS',
+        name: t.newArrivalsTitle,
         nameEn: 'NEW ARRIVALS',
-        subtitle: isRTL
-          ? 'أحدث تشكيلات الموسم متوفرة للشحن الفوري لكافة المحافظات'
-          : 'Latest seasonal releases ready for express nationwide delivery',
+        subtitle: t.newArrivalsSubtitle,
         image: `${import.meta.env.BASE_URL}images/products/eiffel-cardigan-trio.jpg`,
         itemCount: '',
         subCategories: []
@@ -348,11 +344,11 @@ export const CollectionsPage: React.FC = () => {
           <EmptyState
             title={hasActiveFilters
               ? t.noPiecesFound
-              : (isRTL ? `لا توجد منتجات مضافة في قسم ${getCategoryTitle()} حالياً` : `No products currently available in ${getCategoryTitle()}`)}
+              : t.noProductsInCategoryNamed.replace('{category}', getCategoryTitle())}
             description={hasActiveFilters
               ? t.noPiecesFoundDesc
-              : (isRTL ? 'يتم تحضير وإضافة أحدث الموديلات والتشكيلات الجديدة لهذا القسم قريباً. تفضل باستكشاف تشكيلة الرجال أو العروض المتاحة.' : 'New pieces are being added soon. Explore our active collections.')}
-            actionText={hasActiveFilters ? t.resetFilters : (category !== 'men' ? (isRTL ? 'استكشف تشكيلة الرجال' : "Explore Men's Collection") : (isRTL ? 'العودة للرئيسية' : 'Back to Home'))}
+              : t.newPiecesComingSoon}
+            actionText={hasActiveFilters ? t.resetFilters : (category !== 'men' ? t.exploreMenCollection : t.backToHome)}
             onAction={hasActiveFilters ? clearFilters : undefined}
             actionLink={!hasActiveFilters ? (category !== 'men' ? '/collections/men' : '/') : undefined}
           />

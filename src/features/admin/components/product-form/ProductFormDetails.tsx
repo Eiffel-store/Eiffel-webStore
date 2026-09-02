@@ -43,7 +43,7 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
   subCategory,
   onChange
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
 
   // Helper to guess default category preset based on product subcategory/category
   const detectPresetCategory = (): PresetCategory => {
@@ -90,11 +90,11 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
     return currentList.some(i => i.trim().toLowerCase() === trimmed);
   };
 
-  const categoryTabs: Array<{ id: PresetCategory; labelAr: string; labelEn: string; icon: React.ComponentType<{ className?: string }> }> = [
-    { id: 'clothing', labelAr: '👕 ملابس', labelEn: '👕 Clothing', icon: Shirt },
-    { id: 'shoes', labelAr: '👟 أحذية وكوتشيات', labelEn: '👟 Shoes & Sneakers', icon: Footprints },
-    { id: 'bags', labelAr: '🎒 شنط وحقائب', labelEn: '🎒 Bags & Backpacks', icon: Briefcase },
-    { id: 'accessories', labelAr: '🕶️ إكسسوارات وجلديات', labelEn: '🕶️ Accessories', icon: Watch }
+  const categoryTabs: Array<{ id: PresetCategory; label: string; icon: React.ComponentType<{ className?: string }> }> = [
+    { id: 'clothing', label: t.tabClothingPreset, icon: Shirt },
+    { id: 'shoes', label: t.tabShoesPreset, icon: Footprints },
+    { id: 'bags', label: t.tabBagsPreset, icon: Briefcase },
+    { id: 'accessories', label: t.tabAccessoriesPreset, icon: Watch }
   ];
 
   return (
@@ -107,9 +107,7 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
             <span>{t.adminDetailsAndCareSection}</span>
           </h2>
           <p className="text-[11px] text-zinc-400 mt-0.5">
-            {isRTL
-              ? 'اختر نوع المنتج لعرض الخامات والمواصفات والقوالب المناسبة له بنقرة واحدة.'
-              : 'Select product type to load relevant materials, fits, and feature presets.'}
+            {t.adminProductTypePresetsDesc}
           </p>
         </div>
 
@@ -128,7 +126,7 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
                     : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
                 }`}
               >
-                <span>{isRTL ? tab.labelAr : tab.labelEn}</span>
+                <span>{tab.label}</span>
               </button>
             );
           })}
@@ -164,7 +162,7 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
           rows={3}
           value={description}
           onChange={(e) => onChange({ description: e.target.value })}
-          placeholder={isRTL ? "اكتب وصفاً واضحاً ومميزاً للقطعة ومميزاتها وتفاصيلها..." : "Write a clear, attractive description of the product..."}
+          placeholder={t.adminProductDescPlaceholder}
           className="w-full bg-zinc-900 border border-zinc-700 p-3 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-400 rounded-sm transition-colors"
         />
       </div>
@@ -175,11 +173,11 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
         <div className="space-y-2">
           <label className="block text-xs text-zinc-300 font-bold">
             {activeCategory === 'shoes'
-              ? (isRTL ? 'خامة الحذاء والنعل' : 'Shoe & Sole Material')
+              ? t.materialShoeSole
               : activeCategory === 'bags'
-              ? (isRTL ? 'خامة الشنطة والبطانة' : 'Bag & Lining Material')
+              ? t.materialBagLining
               : activeCategory === 'accessories'
-              ? (isRTL ? 'الخامة والمكونات' : 'Accessory Material')
+              ? t.materialAccessory
               : t.adminFabricComposition}
           </label>
           <input
@@ -188,12 +186,12 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
             onChange={(e) => onChange({ composition: e.target.value })}
             placeholder={
               activeCategory === 'shoes'
-                ? (isRTL ? 'مثال: جلد طبيعي 100% / نعل رابر ممتص للصدمات' : 'e.g. Genuine Leather / Anti-slip Rubber Sole')
+                ? t.materialShoePlaceholder
                 : activeCategory === 'bags'
-                ? (isRTL ? 'مثال: قماش وتربروف مقاوم للماء / جلد فاخر' : 'e.g. Water-resistant Oxford / Premium Leather')
+                ? t.materialBagPlaceholder
                 : activeCategory === 'accessories'
-                ? (isRTL ? 'مثال: جلد طبيعي 100% / إبزيم ستانلس ستيل' : 'e.g. 100% Genuine Leather / Stainless Steel')
-                : (isRTL ? 'مثال: 100% قطن طبيعي مريح' : 'e.g. 100% Pure Cotton')
+                ? t.materialAccessoryPlaceholder
+                : t.materialDefaultPlaceholder
             }
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-400 rounded-sm transition-colors"
           />
@@ -226,11 +224,11 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
             <Scissors className="w-3.5 h-3.5 text-zinc-400" />
             <span>
               {activeCategory === 'shoes'
-                ? (isRTL ? 'موديل ونوع الحذاء' : 'Shoe Model & Style')
+                ? t.modelShoe
                 : activeCategory === 'bags'
-                ? (isRTL ? 'نوع وتصميم الشنطة' : 'Bag Style & Shape')
+                ? t.modelBag
                 : activeCategory === 'accessories'
-                ? (isRTL ? 'الموديل والمقاس' : 'Model & Fit')
+                ? t.modelFit
                 : t.adminCutAndFit}
             </span>
           </label>
@@ -240,12 +238,12 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
             onChange={(e) => onChange({ fit: e.target.value })}
             placeholder={
               activeCategory === 'shoes'
-                ? (isRTL ? 'مثال: سنيكرز كاجوال رياضي / كوتشي لو-توب' : 'e.g. Casual Sport Sneakers')
+                ? t.modelShoePlaceholder
                 : activeCategory === 'bags'
-                ? (isRTL ? 'مثال: شنطة كروس بدي عملية / شنطة ظهر لابتوب' : 'e.g. Crossbody Bag / Laptop Backpack')
+                ? t.modelBagPlaceholder
                 : activeCategory === 'accessories'
-                ? (isRTL ? 'مثال: كاب بيسبول قابل للتعديل / حزام جلد كلاسيكي' : 'e.g. Adjustable Baseball Cap')
-                : (isRTL ? 'مثال: أوفر سايز واسع ومريح' : 'e.g. Oversized Fit')
+                ? t.modelAccessoryPlaceholder
+                : t.modelDefaultPlaceholder
             }
             className="w-full bg-zinc-900 border border-zinc-700 px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-400 rounded-sm transition-colors"
           />
@@ -293,10 +291,10 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
             onChange={(e) => onChange({ details: e.target.value.split('\n').filter(Boolean) })}
             placeholder={
               activeCategory === 'shoes'
-                ? (isRTL ? "نعل ممتص للصدمات\nفرش طبي مريح\nخامة مسامية تسمح بالتهوية" : "Shock-absorbing sole\nMemory foam insole\nBreathable mesh")
+                ? t.specsShoeDefault
                 : activeCategory === 'bags'
-                ? (isRTL ? "جيوب متعددة للتنظيم\nمقاومة لرذاذ الماء\nحزام مبطن مريح" : "Multi-compartment storage\nWater-resistant fabric\nPadded strap")
-                : (isRTL ? "خامة قطنية ناعمة ومريحة\nثبات عالي للألوان ومقاوم للبهتان\nتقفيل وخياطة مزدوجة متينة" : "100% Pure Soft Cotton\nFade-resistant color\nReinforced stitching")
+                ? t.specsBagDefault
+                : t.specsClothingDefault
             }
             className="w-full bg-zinc-900 border border-zinc-700 p-3 text-xs text-white font-mono placeholder:text-zinc-500 focus:outline-none focus:border-amber-400 rounded-sm"
           />
@@ -332,7 +330,7 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
               <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
               <span>
                 {activeCategory === 'shoes' || activeCategory === 'bags'
-                  ? (isRTL ? 'إرشادات العناية والتنظيف' : 'Care & Cleaning')
+                  ? t.careCleaning
                   : t.adminCareInstructions}
               </span>
             </label>
@@ -347,8 +345,8 @@ export const ProductFormDetails: React.FC<ProductFormDetailsProps> = ({
             onChange={(e) => onChange({ care: e.target.value.split('\n').filter(Boolean) })}
             placeholder={
               activeCategory === 'shoes'
-                ? (isRTL ? "تنظيف بقطعة قماش مبللة أو فرشاة ناعمة\nتجنب الغسيل في الغسالة الأوتوماتيك\nتجفيف هوائي بعيداً عن الشمس" : "Wipe clean with damp cloth\nDo not machine wash\nAir dry away from heat")
-                : (isRTL ? "غسيل في الغسالة بماء بارد 30° مئوية\nقلب القطعة على الظهر قبل الغسيل\nالكي على ظهر القطعة وبحرارة متوسطة" : "Machine wash cold\nDo not bleach\nIron inside-out")
+                ? t.careNonClothingDefault
+                : t.careClothingDefault
             }
             className="w-full bg-zinc-900 border border-zinc-700 p-3 text-xs text-white font-mono placeholder:text-zinc-500 focus:outline-none focus:border-amber-400 rounded-sm"
           />

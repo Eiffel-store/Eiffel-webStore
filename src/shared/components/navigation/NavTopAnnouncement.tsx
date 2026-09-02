@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import toast from 'react-hot-toast';
 
 export const NavTopAnnouncement: React.FC = () => {
-  const { language, isRTL, t } = useLanguage();
+  const { language, t } = useLanguage();
   const { role } = useAuthStore();
   const { activeBanners = [], settings } = useStoreData();
   const [copiedCode, setCopiedCode] = useState(false);
@@ -36,9 +36,7 @@ export const NavTopAnnouncement: React.FC = () => {
       navigator.clipboard.writeText(promoCode);
       setCopiedCode(true);
       toast.success(
-        isRTL
-          ? `تم نسخ كود الخصم (${promoCode})! 🎉`
-          : `Coupon code (${promoCode}) copied! 🎉`,
+        t.couponCodeCopiedToast.replace('{code}', promoCode),
         { id: 'promo-code-copy' }
       );
       setTimeout(() => setCopiedCode(false), 2000);

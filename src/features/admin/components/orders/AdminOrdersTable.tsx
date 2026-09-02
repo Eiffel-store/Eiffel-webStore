@@ -80,12 +80,10 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
         <div className="p-12 text-center space-y-3">
           <Package className="w-10 h-10 text-zinc-600 mx-auto" />
           <h3 className="text-base font-bold text-white">
-            {isRTL ? 'لا توجد طلبات مطابقة' : 'No Orders Found'}
+            {t.noOrdersFound}
           </h3>
           <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-            {isRTL
-              ? 'لم يتم العثور على أي طلبات تطابق معايير البحث أو الفلاتر الحالية.'
-              : 'No customer orders match your current search or filter criteria.'}
+            {t.noOrdersFoundDesc}
           </p>
         </div>
       </div>
