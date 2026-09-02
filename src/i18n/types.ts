@@ -1445,5 +1445,7 @@ export interface TranslationDictionary {
   reviewCommentPlaceholder: string;
   appointmentModalDesc: string;
   couponCodeCopiedToast: string;
+  saveAddressToProfile: string;
+  saveAddressToProfileDesc: string;
 }
 

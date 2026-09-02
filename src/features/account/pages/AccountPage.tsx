@@ -14,16 +14,13 @@ import { Link } from 'react-router-dom';
 import { Address, User, Order } from '@/types';
 
 export const AccountPage: React.FC = () => {
-  const { user, isAuthenticated, role, logout, fetchProfile, isLoading: isAuthLoading, isProfileLoading } = useAuthStore();
+  const { user, isAuthenticated, role, logout, fetchProfile, isLoading: isAuthLoading, isProfileLoading, addAddress, removeAddress, setDefaultAddress } = useAuthStore();
   const { t } = useLanguage();
   const { orders: localStoreOrders } = useStoreData();
   const { data: serverOrders = [], isLoading: isOrdersLoading } = useMyOrders(user?.email);
   const [activeTab, setActiveTab] = useState<AccountTabKey>('overview');
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [isInitialSyncing, setIsInitialSyncing] = useState(true);
-
-  // Local user state for addresses
-  const [userState, setUserState] = useState<User | null>(user);
 
   // Fetch fresh profile from server on mount
   React.useEffect(() => {
@@ -43,12 +40,7 @@ export const AccountPage: React.FC = () => {
     };
   }, [isAuthenticated, fetchProfile]);
 
-  // Keep state in sync with auth store
-  React.useEffect(() => {
-    if (user) {
-      setUserState(prev => prev ? { ...user, addresses: prev.addresses || user.addresses || [] } : user);
-    }
-  }, [user]);
+
 
   // Merge and deduplicate server orders and local store orders
   const userOrders = useMemo(() => {
@@ -106,24 +98,20 @@ export const AccountPage: React.FC = () => {
     points: user.points ?? user.tierPoints ?? 0,
     tierPoints: user.points ?? user.tierPoints ?? 0,
     orders: userOrders,
-    addresses: userState?.addresses || user.addresses || [],
+    addresses: user.addresses || [],
   };
 
   const handleAddAddress = (addr: Omit<Address, 'id'>) => {
-    const newAddr: Address = { ...addr, id: `addr-${Date.now()}` };
-    setUserState(prev => prev ? { ...prev, addresses: [...(prev.addresses || []), newAddr] } : null);
+    addAddress(addr);
     setShowAddressModal(false);
   };
 
   const handleDeleteAddress = (id: string) => {
-    setUserState(prev => prev ? { ...prev, addresses: (prev.addresses || []).filter(a => a.id !== id) } : null);
+    removeAddress(id);
   };
 
   const handleSetDefaultAddress = (id: string) => {
-    setUserState(prev => prev ? {
-      ...prev,
-      addresses: (prev.addresses || []).map(a => ({ ...a, isDefault: a.id === id }))
-    } : null);
+    setDefaultAddress(id);
   };
 
   return (

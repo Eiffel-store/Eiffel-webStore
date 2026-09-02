@@ -16,7 +16,7 @@ import { CheckoutOrderSummary } from '../components/CheckoutOrderSummary';
 export const CheckoutPage: React.FC = () => {
   const queryClient = useQueryClient();
   const { cart, subtotal, discountAmount, discountCode, clearCart } = useCart();
-  const { user, updateUserPoints } = useAuthStore();
+  const { user, updateUserPoints, addAddress } = useAuthStore();
   const { addOrder, settings } = useStoreData();
   const { formatPrice } = useCurrency();
   const { t } = useLanguage();
@@ -24,6 +24,7 @@ export const CheckoutPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState<Order | null>(null);
   const [formAlert, setFormAlert] = useState<string | null>(null);
+  const [saveAddressToAccount, setSaveAddressToAccount] = useState(true);
 
   // Form state - initialized with real logged-in user or empty strings for guests
   const [email, setEmail] = useState('');
@@ -266,6 +267,30 @@ export const CheckoutPage: React.FC = () => {
         }
       }
 
+      // If user is logged in and chose to save this address to their profile
+      if (user && saveAddressToAccount && street.trim()) {
+        const existingMatch = (user.addresses || []).find(
+          (a) => a.street.toLowerCase() === street.trim().toLowerCase() && a.city === city
+        );
+        if (!existingMatch) {
+          addAddress({
+            type: 'Home',
+            firstName: firstName.trim() || user.name?.split(' ')[0] || '',
+            lastName: lastName.trim() || user.name?.split(' ').slice(1).join(' ') || '',
+            street: street.trim(),
+            city: city.trim(),
+            postalCode: postalCode.trim(),
+            phone: phone.trim() || user.phone || '',
+            country: country || 'Egypt',
+            latitude,
+            longitude,
+            mapUrl,
+            state: city.trim(),
+            isDefault: (user.addresses || []).length === 0,
+          });
+        }
+      }
+
       clearCart();
       setOrderComplete(createdOrder);
     } catch (err: any) {
@@ -379,6 +404,9 @@ export const CheckoutPage: React.FC = () => {
                 errors={errors}
                 touched={touched}
                 onBlurField={handleBlurField}
+                isLoggedIn={Boolean(user)}
+                saveAddressToAccount={saveAddressToAccount}
+                setSaveAddressToAccount={setSaveAddressToAccount}
               />
 
               <CheckoutShippingSelector

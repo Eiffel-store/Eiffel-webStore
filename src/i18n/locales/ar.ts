@@ -1445,5 +1445,7 @@ export const ar: TranslationDictionary = {
   reviewCommentPlaceholder: "شاركنا رأيك في جودة القماش، المقاس، تفاصيل الخياطة وسرعة التوصيل...",
   appointmentModalDesc: "أهلاً بك في فروعنا، فريقنا يسعد بمساعدتك في اختيار وتجربة وتنسيق أنسب المقاسات والملابس بكل راحة.",
   couponCodeCopiedToast: "تم نسخ كود الخصم ({code})! 🎉",
+  saveAddressToProfile: "حفظ هذا العنوان في حسابي للطلبات القادمة",
+  saveAddressToProfileDesc: "لتتمكن من اختياره بضغطة زر واحدة في المرات القادمة",
 };
 

@@ -1430,5 +1430,7 @@ export const en: TranslationDictionary = {
   reviewCommentPlaceholder: "Share your thoughts on the craftsmanship, fit, fabric quality and delivery...",
   appointmentModalDesc: "Welcome to our branches. Our store team is delighted to assist you in trying on and selecting the perfect sizes.",
   couponCodeCopiedToast: "Coupon code ({code}) copied! 🎉",
+  saveAddressToProfile: "Save this address to my profile for future orders",
+  saveAddressToProfileDesc: "To easily select it with 1-click in your future orders",
 };
 

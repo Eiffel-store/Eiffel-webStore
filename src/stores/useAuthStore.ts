@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { User, LoginCredentials, RegisterData, AuthResult } from '../types';
+import { User, LoginCredentials, RegisterData, AuthResult, Address } from '../types';
 import { authService } from '../services/authService';
 
 interface AuthState {
@@ -22,6 +22,9 @@ interface AuthState {
   fetchProfile: () => Promise<void>;
   refreshSession: () => Promise<boolean>;
   updateUserPoints: (delta: number) => void;
+  addAddress: (address: Omit<Address, 'id'> | Address) => Address;
+  removeAddress: (id: string) => void;
+  setDefaultAddress: (id: string) => void;
   clearError: () => void;
 }
 
@@ -243,7 +246,7 @@ export const useAuthStore = create<AuthState>()(
                 points: rawPoints,
                 tierPoints: rawPoints,
                 phone: rawUser.phone || data.phone || state.user.phone,
-                addresses: rawUser.addresses || state.user.addresses || [],
+                addresses: (rawUser.addresses && rawUser.addresses.length > 0) ? rawUser.addresses : (state.user.addresses || []),
               } : {
                 id: String(rawUser.id || ''),
                 name: rawUser.name || data.name || '',
@@ -281,6 +284,63 @@ export const useAuthStore = create<AuthState>()(
             tierPoints: Math.max(0, (state.user.tierPoints || 0) + delta)
           } : null
         }));
+      },
+
+      addAddress: (address: Omit<Address, 'id'> | Address) => {
+        const currentUser = get().user;
+        const currentAddresses = currentUser?.addresses || [];
+        const isFirst = currentAddresses.length === 0;
+        const newAddress: Address = {
+          ...address,
+          id: (address as Address).id || `addr-${Date.now()}`,
+          isDefault: address.isDefault !== undefined ? address.isDefault : isFirst,
+        };
+
+        const updatedAddresses = newAddress.isDefault
+          ? [...currentAddresses.map((a) => ({ ...a, isDefault: false })), newAddress]
+          : [...currentAddresses, newAddress];
+
+        set((state) => ({
+          user: state.user
+            ? {
+                ...state.user,
+                addresses: updatedAddresses,
+              }
+            : null,
+        }));
+
+        return newAddress;
+      },
+
+      removeAddress: (id: string) => {
+        set((state) => {
+          if (!state.user) return {};
+          const remaining = (state.user.addresses || []).filter((a) => a.id !== id);
+          if (remaining.length > 0 && !remaining.some((a) => a.isDefault)) {
+            remaining[0].isDefault = true;
+          }
+          return {
+            user: {
+              ...state.user,
+              addresses: remaining,
+            },
+          };
+        });
+      },
+
+      setDefaultAddress: (id: string) => {
+        set((state) => {
+          if (!state.user) return {};
+          return {
+            user: {
+              ...state.user,
+              addresses: (state.user.addresses || []).map((a) => ({
+                ...a,
+                isDefault: a.id === id,
+              })),
+            },
+          };
+        });
       },
 
       clearError: () => set({ error: null }),

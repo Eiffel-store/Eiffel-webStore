@@ -63,6 +63,9 @@ interface CheckoutContactFormProps {
   errors: CheckoutFormErrors;
   touched: Record<string, boolean>;
   onBlurField: (field: string) => void;
+  isLoggedIn?: boolean;
+  saveAddressToAccount?: boolean;
+  setSaveAddressToAccount?: (val: boolean) => void;
 }
 
 export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
@@ -89,9 +92,12 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
   setMapUrl,
   errors,
   touched,
-  onBlurField
+  onBlurField,
+  isLoggedIn = false,
+  saveAddressToAccount = true,
+  setSaveAddressToAccount
 }) => {
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
   const [showMapModal, setShowMapModal] = useState(false);
   const [isInstantGpsLoading, setIsInstantGpsLoading] = useState(false);
   const [gpsSuccessNotice, setGpsSuccessNotice] = useState<string | null>(null);
@@ -103,6 +109,16 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
   const [selectedAddressId, setSelectedAddressId] = useState<string>(
     hasSavedAddresses && defaultAddress ? defaultAddress.id : 'new'
   );
+
+  // Automatically select default address when addresses are loaded
+  useEffect(() => {
+    if (addresses && addresses.length > 0 && selectedAddressId === 'new') {
+      const def = addresses.find(a => a.isDefault) || addresses[0];
+      if (def) {
+        handleSelectAddress(def);
+      }
+    }
+  }, [addresses]);
 
   // Handle choosing a saved address
   const handleSelectAddress = (addr: Address) => {
@@ -576,6 +592,28 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
             </p>
           )}
         </div>
+
+        {/* Save Address to Profile Checkbox (If logged in & entering new address) */}
+        {isLoggedIn && selectedAddressId === 'new' && setSaveAddressToAccount && (
+          <div className="sm:col-span-2 pt-1">
+            <label className="flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 transition-colors cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={saveAddressToAccount}
+                onChange={(e) => setSaveAddressToAccount(e.target.checked)}
+                className="mt-0.5 w-4 h-4 rounded border-zinc-700 text-amber-500 focus:ring-amber-400 bg-zinc-900 cursor-pointer"
+              />
+              <div className="space-y-0.5">
+                <span className="text-xs font-bold text-primary dark:text-zinc-200 block">
+                  {t.saveAddressToProfile}
+                </span>
+                <span className="text-[11px] text-secondary dark:text-zinc-400 block">
+                  {t.saveAddressToProfileDesc}
+                </span>
+              </div>
+            </label>
+          </div>
+        )}
       </div>
 
       {/* Google Maps Interactive Picker Modal */}
