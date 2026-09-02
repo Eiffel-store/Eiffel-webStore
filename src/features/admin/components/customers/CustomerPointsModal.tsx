@@ -102,7 +102,7 @@ export const CustomerPointsModal: React.FC<CustomerPointsModalProps> = ({
             <input
               type="number"
               min="1"
-              step="10"
+              step="1"
               required
               value={pointsInput}
               onChange={(e) => setPointsInput(Math.max(1, parseInt(e.target.value) || 0))}
