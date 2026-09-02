@@ -10,8 +10,10 @@ export const useSettingsData = (queryClient: QueryClient) => {
   const { data: serverSettings, isLoading: isSettingsLoading } = useQuery({
     queryKey: ['settings'],
     queryFn: () => settingsService.getSettings().catch(() => DEFAULT_SETTINGS),
-    staleTime: 1000 * 60 * 15,
+    staleTime: 0,
     gcTime: 1000 * 60 * 60,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
     retry: 1
   });
 
