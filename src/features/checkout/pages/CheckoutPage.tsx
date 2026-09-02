@@ -138,7 +138,6 @@ export const CheckoutPage: React.FC = () => {
 
   // Points & Loyalty Calculations
   const availablePoints = user?.tierPoints || 0;
-  const [redeemPoints, setRedeemPoints] = useState(false);
   const isVip = Boolean(user?.isVip) || user?.tier === 'VIP' || user?.tier === 'VIP_PLATINUM';
 
   const vipDiscountRate = isVip && settings?.vipDiscountPercentage ? (settings.vipDiscountPercentage / 100) : 0;
@@ -148,10 +147,19 @@ export const CheckoutPage: React.FC = () => {
   const shippingFee = isFreeShipping ? 0 : (shippingMethod === 'white-glove' ? 10 : 0);
   const totalBeforePoints = Math.max(0, subtotal - discountValue + shippingFee);
 
-  // Apply points if explicitly chosen as payment method OR checked in summary
-  const isUsingPoints = paymentMethod === 'points' || redeemPoints;
-  const maxPointsDiscount = Math.min(availablePoints, totalBeforePoints);
-  const pointsDiscountValue = isUsingPoints ? maxPointsDiscount : 0;
+  // Full points coverage rule: Payment with points is ONLY allowed if availablePoints covers 100% of order total
+  const isFullPointsCoverage = availablePoints >= totalBeforePoints && totalBeforePoints > 0;
+
+  // Auto-reset payment method to COD if user selected points but points become insufficient
+  useEffect(() => {
+    if (paymentMethod === 'points' && !isFullPointsCoverage) {
+      setPaymentMethod('cod');
+    }
+  }, [paymentMethod, isFullPointsCoverage]);
+
+  // Apply points ONLY if explicitly chosen as payment method AND covers 100% of order
+  const isUsingPoints = paymentMethod === 'points' && isFullPointsCoverage;
+  const pointsDiscountValue = isUsingPoints ? totalBeforePoints : 0;
   const totalAmount = Math.max(0, totalBeforePoints - pointsDiscountValue);
 
   // Dynamic Points to earn based on settings cashback rate (e.g. 5%)
@@ -219,17 +227,8 @@ export const CheckoutPage: React.FC = () => {
     };
 
     let paymentMethodString = 'Cash on Delivery (الدفع عند الاستلام)';
-    if (paymentMethod === 'points') {
-      if (totalAmount === 0) {
-        paymentMethodString = t.paidWithPointsFull;
-      } else {
-        paymentMethodString = t.pointsDiscountAndCod
-          .replace('{points}', pointsDiscountValue.toString())
-          .replace('{total}', totalAmount.toString());
-      }
-    } else if (pointsDiscountValue > 0) {
-      paymentMethodString = t.codWithPointsDiscount
-        .replace('{points}', pointsDiscountValue.toString());
+    if (paymentMethod === 'points' && isFullPointsCoverage) {
+      paymentMethodString = t.paidWithPointsFull;
     }
 
     try {
@@ -416,12 +415,7 @@ export const CheckoutPage: React.FC = () => {
 
               <CheckoutPaymentSelector
                 paymentMethod={paymentMethod}
-                setPaymentMethod={(method) => {
-                  setPaymentMethod(method);
-                  if (method === 'points') {
-                    setRedeemPoints(true);
-                  }
-                }}
+                setPaymentMethod={setPaymentMethod}
                 availablePoints={availablePoints}
                 totalBeforePoints={totalBeforePoints}
                 pointsDiscountValue={pointsDiscountValue}
@@ -454,8 +448,7 @@ export const CheckoutPage: React.FC = () => {
               shippingFee={shippingFee}
               totalAmount={totalAmount}
               availablePoints={availablePoints}
-              redeemPoints={redeemPoints}
-              onToggleRedeemPoints={setRedeemPoints}
+              redeemPoints={paymentMethod === 'points'}
               pointsDiscountValue={pointsDiscountValue}
               pointsToEarn={pointsToEarn}
               isVip={isVip}

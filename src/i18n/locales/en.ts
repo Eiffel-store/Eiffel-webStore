@@ -1432,5 +1432,8 @@ export const en: TranslationDictionary = {
   couponCodeCopiedToast: "Coupon code ({code}) copied! 🎉",
   saveAddressToProfile: "Save this address to my profile for future orders",
   saveAddressToProfileDesc: "To easily select it with 1-click in your future orders",
+  insufficientPointsForFullOrder: "Insufficient points to cover entire order (need {needed} more PTS)",
+  fullPointsCoverageAvailable: "✓ Your points balance fully covers this entire order (free purchase)",
+  pointsFullPaymentOnlyNotice: "Points payment is only available for 100% full order coverage without partial discounts.",
 };
 

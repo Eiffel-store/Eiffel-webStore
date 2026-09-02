@@ -22,7 +22,7 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
 
   const hasPoints = availablePoints > 0;
   const isFullPointsCoverage = availablePoints >= totalBeforePoints && totalBeforePoints > 0;
-  const remainingCash = Math.max(0, totalBeforePoints - availablePoints);
+  const pointsNeeded = Math.max(0, totalBeforePoints - availablePoints);
 
   return (
     <div className="space-y-4 pt-4">
@@ -86,15 +86,15 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
           </div>
         </div>
 
-        {/* Option 2: Pay with Loyalty Points */}
+        {/* Option 2: Pay with Loyalty Points (Full Coverage Only) */}
         <div
           onClick={() => {
-            if (hasPoints) {
+            if (isFullPointsCoverage) {
               setPaymentMethod('points');
             }
           }}
           className={`p-5 rounded-xl border-2 transition-all relative space-y-3 ${
-            !hasPoints
+            !isFullPointsCoverage
               ? 'opacity-50 cursor-not-allowed bg-zinc-950/40 border-zinc-800'
               : paymentMethod === 'points'
               ? 'bg-amber-950/20 dark:bg-amber-950/30 border-amber-400 shadow-lg shadow-amber-500/10 cursor-pointer'
@@ -107,7 +107,7 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0 transition-colors ${
                   paymentMethod === 'points'
                     ? 'bg-amber-400 text-black shadow-md'
-                    : hasPoints
+                    : isFullPointsCoverage
                     ? 'bg-amber-400/20 text-amber-400 border border-amber-400/40'
                     : 'bg-zinc-800 text-zinc-500'
                 }`}
@@ -124,9 +124,11 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
                   </span>
                 </div>
                 <p className="text-[11px] font-mono text-zinc-400 mt-0.5">
-                  {hasPoints
-                    ? `${formatPrice(availablePoints)} ${t.availablePointsDiscount}`
-                    : t.insufficientPoints}
+                  {isFullPointsCoverage
+                    ? t.fullPointsCoverageAvailable
+                    : availablePoints === 0
+                    ? t.insufficientPoints
+                    : t.insufficientPointsForFullOrder.replace('{needed}', pointsNeeded.toString())}
                 </p>
               </div>
             </div>
@@ -143,22 +145,14 @@ export const CheckoutPaymentSelector: React.FC<CheckoutPaymentSelectorProps> = (
           </div>
 
           <div className="pt-2 border-t border-surface-container dark:border-zinc-800/80 text-xs font-mono leading-relaxed">
-            {paymentMethod === 'points' ? (
-              <div className="space-y-1 text-amber-300">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>
-                    {isFullPointsCoverage
-                      ? t.fullPointsCoverage
-                      : `${formatPrice(pointsDiscountValue || availablePoints)} + ${formatPrice(remainingCash)} COD`}
-                  </span>
-                </div>
+            {isFullPointsCoverage ? (
+              <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{t.fullPointsCoverage}</span>
               </div>
             ) : (
-              <span className="text-secondary dark:text-zinc-400 font-light font-sans">
-                {hasPoints
-                  ? t.pointsRedeemDesc
-                  : t.pointsEarnDesc}
+              <span className="text-secondary dark:text-zinc-400 font-light font-sans text-[11px]">
+                {t.pointsFullPaymentOnlyNotice}
               </span>
             )}
           </div>

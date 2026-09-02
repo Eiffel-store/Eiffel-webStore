@@ -1447,5 +1447,8 @@ export const ar: TranslationDictionary = {
   couponCodeCopiedToast: "تم نسخ كود الخصم ({code})! 🎉",
   saveAddressToProfile: "حفظ هذا العنوان في حسابي للطلبات القادمة",
   saveAddressToProfileDesc: "لتتمكن من اختياره بضغطة زر واحدة في المرات القادمة",
+  insufficientPointsForFullOrder: "رصيد نقاطك غير كافٍ لشراء هذا الطلب بالكامل (تحتاج {needed} نقطة إضافية)",
+  fullPointsCoverageAvailable: "✓ رصيد نقاطك يغطي كامل قيمة الطلب (شراء مجاني بالنقاط)",
+  pointsFullPaymentOnlyNotice: "الدفع بالنقاط متاح فقط عند تغطية كامل قيمة الطلب بدون خصم جزئي.",
 };
 

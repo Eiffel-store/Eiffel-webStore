@@ -1447,5 +1447,8 @@ export interface TranslationDictionary {
   couponCodeCopiedToast: string;
   saveAddressToProfile: string;
   saveAddressToProfileDesc: string;
+  insufficientPointsForFullOrder: string;
+  fullPointsCoverageAvailable: string;
+  pointsFullPaymentOnlyNotice: string;
 }
 
