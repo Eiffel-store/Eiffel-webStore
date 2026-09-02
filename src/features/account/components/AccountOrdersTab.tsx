@@ -35,7 +35,7 @@ export const AccountOrdersTab: React.FC<AccountOrdersTabProps> = ({ orders = [] 
   // Group exchanges by orderId
   const exchangesByOrder = useMemo(() => {
     const map = new Map<string, ExchangeRequest[]>();
-    (myExchanges || []).forEach((req) => {
+    (myExchanges || []).forEach((req: ExchangeRequest) => {
       if (!req.orderId) return;
       const list = map.get(req.orderId) || [];
       list.push(req);
