@@ -42,32 +42,51 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
   const totalInventoryValue = products.reduce((sum, p) => sum + (p.price || 0) * (p.stock !== undefined ? p.stock : 20), 0);
 
   // Group daily revenue for chart
-  const timelineData = React.useMemo(() => {
-    const daysMap: Record<string, { label: string; revenue: number; ordersCount: number }> = {};
-    const now = new Date();
+  const getLocalDateKey = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
-    // Init last 7 slots
+  const timelineData = React.useMemo(() => {
+    const daysMap: Record<string, { label: string; dateStr: string; isToday: boolean; revenue: number; ordersCount: number }> = {};
+    const now = new Date();
+    const todayKey = getLocalDateKey(now);
+
+    // Init last 7 slots in local time
     for (let i = 6; i >= 0; i--) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
-      const dateKey = d.toISOString().slice(0, 10);
+      const dateKey = getLocalDateKey(d);
       const dayLabel = d.toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { weekday: 'short' });
-      daysMap[dateKey] = { label: dayLabel, revenue: 0, ordersCount: 0 };
+      const dayMonth = d.toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { day: 'numeric', month: 'short' });
+      daysMap[dateKey] = {
+        label: dayLabel,
+        dateStr: dayMonth,
+        isToday: dateKey === todayKey,
+        revenue: 0,
+        ordersCount: 0
+      };
     }
 
     orders.forEach((o) => {
       if (o.status === 'Cancelled') return;
-      const orderDate = new Date(o.createdAt || o.date || Date.now()).toISOString().slice(0, 10);
-      if (daysMap[orderDate]) {
-        daysMap[orderDate].revenue += o.total || o.subtotal || 0;
-        daysMap[orderDate].ordersCount += 1;
+      const rawDate = o.date || o.createdAt;
+      if (!rawDate) return;
+      const parsed = new Date(rawDate);
+      if (isNaN(parsed.getTime())) return;
+      const orderDateKey = getLocalDateKey(parsed);
+      if (daysMap[orderDateKey]) {
+        daysMap[orderDateKey].revenue += o.total || o.subtotal || 0;
+        daysMap[orderDateKey].ordersCount += 1;
       }
     });
 
     return Object.values(daysMap);
   }, [orders, isRTL]);
 
-  const maxRevenue = Math.max(...timelineData.map((d) => d.revenue), 1000);
+  const maxRevenue = Math.max(...timelineData.map((d) => d.revenue), 500);
 
   return (
     <div className="space-y-6">
@@ -164,32 +183,79 @@ export const AdminReportOverviewTab: React.FC<AdminReportOverviewTabProps> = ({
           </div>
 
           {/* Bar Chart Visualizer */}
-          <div className="h-64 flex items-end justify-between gap-3 pt-6 px-2">
-            {timelineData.map((item, idx) => {
-              const heightPercent = Math.max(8, Math.round((item.revenue / maxRevenue) * 100));
-              return (
-                <div key={`timeline-${idx}`} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-                  {/* Tooltip / Value on Hover */}
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-zinc-900 border border-zinc-700 text-white px-2 py-1 rounded text-[10px] font-mono text-center shadow-lg pointer-events-none mb-1">
-                    <p className="text-amber-400 font-bold">{formatPrice(item.revenue)}</p>
-                    <p className="text-zinc-400">{item.ordersCount} {t.orders}</p>
-                  </div>
+          <div className="relative pt-6 pb-2">
+            {/* Horizontal Grid Guidelines */}
+            <div className="absolute inset-0 top-6 bottom-14 flex flex-col justify-between pointer-events-none opacity-25">
+              <div className="border-b border-dashed border-zinc-700 w-full flex justify-between text-[10px] font-mono text-zinc-500 pb-0.5">
+                <span>{formatPrice(maxRevenue)}</span>
+              </div>
+              <div className="border-b border-dashed border-zinc-700 w-full flex justify-between text-[10px] font-mono text-zinc-500 pb-0.5">
+                <span>{formatPrice(Math.round(maxRevenue / 2))}</span>
+              </div>
+              <div className="border-b border-zinc-800 w-full flex justify-between text-[10px] font-mono text-zinc-500 pb-0.5">
+                <span>0</span>
+              </div>
+            </div>
 
-                  {/* Visual Bar Column */}
-                  <div className="w-full max-w-[48px] bg-zinc-900/80 rounded-t-md overflow-hidden relative border-t border-x border-zinc-800 flex items-end">
-                    <div
-                      className="w-full bg-gradient-to-t from-amber-500/30 via-amber-400/70 to-amber-400 rounded-t transition-all duration-500 group-hover:brightness-125 shadow-lg shadow-amber-500/10"
-                      style={{ height: `${heightPercent}%` }}
-                    />
-                  </div>
+            {/* Bars Column Container */}
+            <div className="relative z-10 h-64 flex items-end justify-between gap-2 sm:gap-4 px-1 sm:px-3">
+              {timelineData.map((item, idx) => {
+                const heightPercent = item.revenue > 0
+                  ? Math.max(12, Math.min(100, Math.round((item.revenue / maxRevenue) * 100)))
+                  : 6;
 
-                  {/* Day Label */}
-                  <span className="text-[11px] font-mono text-zinc-400 group-hover:text-amber-400 transition-colors">
-                    {item.label}
-                  </span>
-                </div>
-              );
-            })}
+                return (
+                  <div
+                    key={`timeline-${idx}`}
+                    className="flex-1 flex flex-col items-center justify-end h-full group cursor-pointer"
+                  >
+                    {/* Amount / Orders Pill Above Bar */}
+                    <div className="mb-2 text-center transition-all duration-200">
+                      <span className={`text-[10px] font-mono font-bold block ${item.revenue > 0 ? 'text-amber-400' : 'text-zinc-600'}`}>
+                        {item.revenue > 0 ? (item.revenue >= 1000 ? `${(item.revenue / 1000).toFixed(1)}k` : item.revenue) : '-'}
+                      </span>
+                    </div>
+
+                    {/* Bar Track & Filled Column with Fixed Height h-40 */}
+                    <div className="w-full max-w-[48px] h-40 bg-zinc-900/60 rounded-t-lg relative border-t border-x border-zinc-800 flex items-end p-0.5 group-hover:border-amber-500/50 transition-colors">
+                      <div
+                        className={`w-full rounded-t transition-all duration-700 relative overflow-hidden ${
+                          item.revenue > 0
+                            ? 'bg-gradient-to-t from-amber-600 via-amber-400 to-yellow-300 shadow-lg shadow-amber-500/20 group-hover:brightness-110'
+                            : 'bg-zinc-800/40'
+                        }`}
+                        style={{ height: `${heightPercent}%` }}
+                      >
+                        {item.revenue > 0 && (
+                          <div className="absolute top-0 inset-x-0 h-1 bg-white/60 rounded-t" />
+                        )}
+                      </div>
+
+                      {/* Hover Tooltip Card */}
+                      <div className="absolute -top-16 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-zinc-950 border border-amber-500/40 text-white px-3 py-1.5 rounded-lg text-[11px] font-mono text-center shadow-2xl pointer-events-none whitespace-nowrap z-30">
+                        <p className="text-amber-400 font-bold">{formatPrice(item.revenue)}</p>
+                        <p className="text-zinc-400 text-[10px]">{item.ordersCount} {t.orders}</p>
+                        <p className="text-zinc-500 text-[9px]">{item.dateStr}</p>
+                      </div>
+                    </div>
+
+                    {/* Day & Date Labels */}
+                    <div className="mt-2 text-center">
+                      <span className={`text-xs font-mono block transition-colors ${
+                        item.isToday
+                          ? 'text-amber-400 font-bold'
+                          : 'text-zinc-400 group-hover:text-zinc-200'
+                      }`}>
+                        {item.label}
+                      </span>
+                      <span className="text-[9px] font-mono text-zinc-500 block">
+                        {item.dateStr}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
