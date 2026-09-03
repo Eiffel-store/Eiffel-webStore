@@ -61,7 +61,7 @@ export const CheckoutPage: React.FC = () => {
       }
     }
   }, [user]);
-console.log("urpu",settings?.loyaltyCashbackRate)
+
   // Validate single field or whole form
   const validateField = (field: string, val: string): string | undefined => {
     switch (field) {
@@ -165,7 +165,7 @@ console.log("urpu",settings?.loyaltyCashbackRate)
   // Dynamic Points to earn based on settings cashback rate (e.g. 5%)
   const cashbackRate = typeof settings?.loyaltyCashbackRate === 'number' ? settings.loyaltyCashbackRate : 0.05;
   const pointsToEarn = Math.max(1, Math.round(totalAmount * cashbackRate));
-console.log("pointsToEarn",pointsToEarn)
+
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSubmitting) return;

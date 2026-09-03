@@ -7,6 +7,13 @@ import { ScrollToTop } from '@/shared';
 import { AppProviders } from '@/providers';
 import { AppRoutes, SearchModal } from '@/routes';
 
+import { useOrderRealtimeSync } from '@/hooks/useOrderRealtimeSync';
+
+const OrderRealtimeSyncManager: React.FC = () => {
+  useOrderRealtimeSync();
+  return null;
+};
+
 export const App: React.FC = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const { token, isAuthenticated, fetchProfile } = useAuthStore();
@@ -25,6 +32,7 @@ export const App: React.FC = () => {
     <AppProviders>
       <Router basename={import.meta.env.BASE_URL}>
         <ScrollToTop />
+        <OrderRealtimeSyncManager />
 
         {/* Centralized Application Route Tree */}
         <AppRoutes onOpenSearch={() => setSearchOpen(true)} />

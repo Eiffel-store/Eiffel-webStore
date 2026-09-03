@@ -1435,5 +1435,17 @@ export const en: TranslationDictionary = {
   insufficientPointsForFullOrder: "Insufficient points to cover entire order (need {needed} more PTS)",
   fullPointsCoverageAvailable: "✓ Your points balance fully covers this entire order (free purchase)",
   pointsFullPaymentOnlyNotice: "Points payment is only available for 100% full order coverage without partial discounts.",
+  orderLiveUpdate: "Live Order Status Update",
+  orderStatusConfirmedTitle: "Your Order is Confirmed!",
+  orderStatusConfirmedDesc: "Your order has been verified and confirmed by Eiffel Concierge and is being carefully prepared.",
+  orderStatusShippedTitle: "Your Order is On the Way!",
+  orderStatusShippedDesc: "Your pieces have been handed to the courier and are en route to your address.",
+  orderStatusDeliveredTitle: "Your Order Has Been Delivered",
+  orderStatusDeliveredDesc: "Thank you for choosing Maison Eiffel. We hope you love your pieces!",
+  orderStatusCancelledTitle: "Order Cancelled",
+  orderStatusCancelledDesc: "Your order has been cancelled. Please reach out to customer support for any assistance.",
+  pointsEarnedOnDeliveryBadge: "🎉 +{points} Loyalty Cashback PTS credited to your account!",
+  viewOrderInAccount: "View Order Details",
+  orderStatusAwaitingConfirmationDesc: "Your order is currently under review and confirmation by our team.",
 };
 

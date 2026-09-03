@@ -1,5 +1,7 @@
 export type Language = 'en' | 'ar';
 
+export type TranslationKeys = keyof TranslationDictionary;
+
 export interface TranslationDictionary {
   // Auth & Client Portal
   signIn: string;
@@ -1450,5 +1452,17 @@ export interface TranslationDictionary {
   insufficientPointsForFullOrder: string;
   fullPointsCoverageAvailable: string;
   pointsFullPaymentOnlyNotice: string;
+  orderLiveUpdate: string;
+  orderStatusConfirmedTitle: string;
+  orderStatusConfirmedDesc: string;
+  orderStatusShippedTitle: string;
+  orderStatusShippedDesc: string;
+  orderStatusDeliveredTitle: string;
+  orderStatusDeliveredDesc: string;
+  orderStatusCancelledTitle: string;
+  orderStatusCancelledDesc: string;
+  pointsEarnedOnDeliveryBadge: string;
+  viewOrderInAccount: string;
+  orderStatusAwaitingConfirmationDesc: string;
 }
 

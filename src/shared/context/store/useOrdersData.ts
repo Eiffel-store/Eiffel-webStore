@@ -24,6 +24,27 @@ export const useOrdersData = (queryClient: QueryClient, isAdminOrStaff: boolean)
       );
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['orders', 'my-orders'] });
+      
+      // Instant cross-tab broadcast (0ms local sync)
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const bc = new BroadcastChannel('eiffel-sync');
+          bc.postMessage({
+            type: 'ORDER_STATUS_CHANGED',
+            payload: {
+              orderId: updatedOrder.id,
+              status: updatedOrder.status,
+              pointsEarned: updatedOrder.pointsEarned,
+              total: updatedOrder.total,
+              customerEmail: updatedOrder.customerEmail,
+            },
+          });
+          bc.close();
+        }
+      } catch {
+        // broadcast error ignore
+      }
+
       toast.success('تم تحديث حالة الطلب');
     },
     onError: (err: any) => {

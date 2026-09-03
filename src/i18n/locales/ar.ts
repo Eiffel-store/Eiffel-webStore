@@ -1450,5 +1450,17 @@ export const ar: TranslationDictionary = {
   insufficientPointsForFullOrder: "رصيد نقاطك غير كافٍ لشراء هذا الطلب بالكامل (تحتاج {needed} نقطة إضافية)",
   fullPointsCoverageAvailable: "✓ رصيد نقاطك يغطي كامل قيمة الطلب (شراء مجاني بالنقاط)",
   pointsFullPaymentOnlyNotice: "الدفع بالنقاط متاح فقط عند تغطية كامل قيمة الطلب بدون خصم جزئي.",
+  orderLiveUpdate: "تحديث مباشر لحالة طلبك",
+  orderStatusConfirmedTitle: "تم تأكيد طلبك بنجاح",
+  orderStatusConfirmedDesc: "تمت مراجعة طلبك وتأكيده من قِبل إدارة إيفل، وجارٍ تجهيزه بعناية للشحن.",
+  orderStatusShippedTitle: "طلبك في الطريق إليك!",
+  orderStatusShippedDesc: "تم تسليم طلبك لمندوب الشحن وجارٍ توصيله إلى عنوانك المسجل.",
+  orderStatusDeliveredTitle: "تم توصيل طلبك بنجاح",
+  orderStatusDeliveredDesc: "شكراً لتسوقك من دار أزياء إيفل، نتمنى أن تنال إعجابك!",
+  orderStatusCancelledTitle: "تم إلغاء الطلب",
+  orderStatusCancelledDesc: "تم إلغاء طلبك، يمكنك التواصل مع الدعم الفني للاستفسار.",
+  pointsEarnedOnDeliveryBadge: "🎉 تمت إضافة {points} نقطة كاش باك إلى رصيدك!",
+  viewOrderInAccount: "عرض تفاصيل الطلب",
+  orderStatusAwaitingConfirmationDesc: "طلبك قيد المراجعة والتأكيد من قِبل فريق العمل.",
 };
 
