@@ -74,8 +74,8 @@ export const StoreMapCanvas: React.FC<StoreMapCanvasProps> = ({
           );
         })}
 
-        {/* Selected Store Active Overlay Card */}
-        <div className="absolute bottom-6 left-6 right-6 p-6 bg-black/85 backdrop-blur-md border border-zinc-700 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Selected Store Active Overlay Card (Desktop) */}
+        <div className="hidden sm:flex absolute bottom-4 left-4 right-4 p-4 sm:p-5 bg-black/85 backdrop-blur-md border border-zinc-700 text-white flex-col sm:flex-row sm:items-center justify-between gap-4 z-20">
           <div>
             <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest">
               {t.activeSelection} {selectedStore.type}
@@ -90,11 +90,33 @@ export const StoreMapCanvas: React.FC<StoreMapCanvasProps> = ({
 
           <button
             onClick={onScheduleFitting}
-            className="py-3 px-6 bg-white text-black font-label-bold text-xs tracking-widest uppercase hover:bg-zinc-200 transition-colors whitespace-nowrap"
+            className="py-2.5 px-5 bg-white text-black font-label-bold text-xs tracking-widest uppercase hover:bg-zinc-200 transition-colors whitespace-nowrap cursor-pointer shadow-sm"
           >
             {t.scheduleFitting}
           </button>
         </div>
+      </div>
+
+      {/* Mobile-Only Selected Store Card (Cleanly docked below map canvas to prevent pin collision) */}
+      <div className="sm:hidden p-4 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 rounded-xl space-y-3 shadow-lg">
+        <div>
+          <span className="font-mono text-[10px] text-secondary dark:text-zinc-400 uppercase tracking-widest">
+            {t.activeSelection} {selectedStore.type}
+          </span>
+          <h3 className="font-editorial text-2xl text-primary dark:text-white mt-0.5">
+            {activeName}
+          </h3>
+          <p className="text-xs text-secondary dark:text-zinc-400 font-light mt-1">
+            {activeAddress}
+          </p>
+        </div>
+
+        <button
+          onClick={onScheduleFitting}
+          className="w-full py-3 px-4 bg-primary text-white dark:bg-white dark:text-black font-label-bold text-xs tracking-widest uppercase hover:opacity-90 active:scale-95 transition-all text-center rounded-lg shadow-md cursor-pointer"
+        >
+          {t.scheduleFitting}
+        </button>
       </div>
     </div>
   );
