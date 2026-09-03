@@ -16,7 +16,7 @@ export const CollectionsPage: React.FC = () => {
   const { category = 'men' } = useParams<{ category: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchKeyword = searchParams.get('search') || '';
-  const { t, isRTL } = useLanguage();
+  const { t, language } = useLanguage();
   const { products, categories, isProductsLoading } = useStoreData();
 
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('All');
@@ -98,10 +98,10 @@ export const CollectionsPage: React.FC = () => {
       itemCount: '',
       subCategories: []
     };
-  }, [categories, category, isRTL]);
+  }, [categories, category, language]);
 
   const getCategoryTitle = () => {
-    if (isRTL) {
+    if (language === 'ar') {
       return currentCategoryObj.name || category;
     }
     return currentCategoryObj.nameEn || currentCategoryObj.name || category.toUpperCase();

@@ -19,6 +19,7 @@ export interface OrderRealtimePayload {
   total?: number;
   trackingNumber?: string;
   timestamp?: number;
+  customerEmail?: string;
 }
 
 interface OrderRealtimeNotificationProps {

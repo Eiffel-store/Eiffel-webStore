@@ -57,6 +57,11 @@ export const useAdminOrderRealtimeSync = () => {
         }
       });
 
+      eventSource.addEventListener('admin-order-updated', () => {
+        // Silently refresh admin orders table and status badges
+        queryClient.invalidateQueries({ queryKey: ['orders'] });
+      });
+
       eventSource.onerror = () => {
         if (eventSource) {
           eventSource.close();

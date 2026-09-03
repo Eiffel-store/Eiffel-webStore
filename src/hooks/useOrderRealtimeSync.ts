@@ -12,7 +12,7 @@ import { Order } from '@/types';
 export const useOrderRealtimeSync = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { user, token, fetchProfile } = useAuthStore();
+  const { user, token, role, fetchProfile } = useAuthStore();
   const { t } = useLanguage();
   const lastProcessedRef = useRef<{ [key: string]: number }>({});
 
@@ -30,6 +30,27 @@ export const useOrderRealtimeSync = () => {
 
     const handleOrderEvent = (payload: OrderRealtimePayload) => {
       if (!payload || !payload.orderId) return;
+
+      // STRICT RECIPIENT VALIDATION:
+      // 1. If payload has a customer email, verify it matches the currently logged in user
+      if (payload.customerEmail && user?.email) {
+        if (payload.customerEmail.trim().toLowerCase() !== user.email.trim().toLowerCase()) {
+          return; // Ignore: notification belongs to another customer
+        }
+      }
+
+      // 2. If current user is Admin/Staff and NOT the specific customer who owns this order,
+      // never show the customer toast to them!
+      const isStaffOrAdmin = role === 'ROLE_ADMIN' || role === 'ROLE_STAFF';
+      if (isStaffOrAdmin) {
+        const isOwner = payload.customerEmail && user?.email &&
+          payload.customerEmail.trim().toLowerCase() === user.email.trim().toLowerCase();
+        if (!isOwner) {
+          // Invalidate React Query silently so tables refresh without showing customer popup
+          queryClient.invalidateQueries({ queryKey: ['orders'] });
+          return;
+        }
+      }
 
       // Prevent duplicate toasts within 2 seconds for same order and status
       const dedupeKey = `${payload.orderId}-${payload.status}`;
@@ -104,6 +125,12 @@ export const useOrderRealtimeSync = () => {
         broadcastChannel = new BroadcastChannel('eiffel-sync');
         broadcastChannel.onmessage = (event) => {
           if (event?.data?.type === 'ORDER_STATUS_CHANGED' && event.data.payload) {
+            const payloadEmail = event.data.payload.customerEmail;
+            if (payloadEmail && user?.email) {
+              if (payloadEmail.trim().toLowerCase() !== user.email.trim().toLowerCase()) {
+                return; // Discard cross-tab broadcast meant for another user
+              }
+            }
             handleOrderEvent(event.data.payload);
           }
         };
@@ -123,5 +150,5 @@ export const useOrderRealtimeSync = () => {
         clearTimeout(reconnectTimeout);
       }
     };
-  }, [user, token, queryClient, navigate, t, fetchProfile]);
+  }, [user, token, role, queryClient, navigate, t, fetchProfile]);
 };
