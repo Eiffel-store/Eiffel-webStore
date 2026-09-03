@@ -3,7 +3,7 @@ import { X, ShoppingBag, Heart } from 'lucide-react';
 import { Product } from '@/types';
 import { useCart } from '@/features/cart';
 import { useWishlist } from '@/features/wishlist';
-import { useCurrency, resolveColorImage, getColorBackgroundStyle } from '@/shared';
+import { useCurrency, resolveColorImage, getColorBackgroundStyle, useStoreData } from '@/shared';
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -26,11 +26,14 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose
   const sizes = product.sizes || ['48 (M)', '50 (L)', '52 (XL)'];
   const colors = product.colors || [{ name: 'Noir', hex: '#000' }];
 
+  const { settings } = useStoreData();
+  const minAllowed = Math.max(1, settings?.minPiecesPerItem ?? 1);
+
   const activeColor = selectedColor || colors[0]?.name || 'Standard';
   const activeSize = selectedSize || sizes[0] || 'M';
 
   const handleAddToCart = () => {
-    addToCart(product, activeSize, activeColor, 1);
+    addToCart(product, activeSize, activeColor, minAllowed);
     onClose();
   };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShoppingBag, Check, ArrowRight, Ruler, Truck, RotateCcw, ShieldCheck, AlertCircle, Sparkles, Star } from 'lucide-react';
 import { Product } from '@/types';
-import { useCurrency, useLanguage } from '@/shared';
+import { useCurrency, useLanguage, useStoreData } from '@/shared';
 import { getColorBackgroundStyle } from '@/shared/utils/productUtils';
 
 interface ProductInfoProps {
@@ -33,10 +33,22 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
 }) => {
   const { formatPrice } = useCurrency();
   const { t, isRTL } = useLanguage();
+  const { settings } = useStoreData();
+
+  const minAllowed = Math.max(1, settings?.minPiecesPerItem ?? 1);
+  const maxAllowed = Math.max(minAllowed, settings?.maxPiecesPerItem ?? 3);
 
   const currentStock = product.stock !== undefined ? product.stock : (product.inStock ? 20 : 0);
+  const effectiveMax = Math.min(currentStock, maxAllowed);
   const isOutOfStock = currentStock <= 0;
   const isLowStock = currentStock > 0 && currentStock <= 5;
+
+  // Ensure current quantity is within [minAllowed, effectiveMax]
+  React.useEffect(() => {
+    if (!isOutOfStock && quantity < minAllowed) {
+      setQuantity(minAllowed);
+    }
+  }, [minAllowed, isOutOfStock]);
 
   return (
     <div className="flex flex-col justify-start">
@@ -181,8 +193,8 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
         <div className="flex gap-2.5 sm:gap-3">
           <div className={`flex items-center border border-surface-container dark:border-zinc-700 bg-surface-container-low dark:bg-zinc-900 px-2 sm:px-3 ${isOutOfStock ? 'opacity-50 pointer-events-none' : ''}`}>
             <button
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              disabled={isOutOfStock || quantity <= 1}
+              onClick={() => setQuantity(Math.max(minAllowed, quantity - 1))}
+              disabled={isOutOfStock || quantity <= minAllowed}
               className="text-primary dark:text-white px-2 py-2 sm:py-3 hover:opacity-60 text-base font-bold disabled:opacity-30 cursor-pointer"
             >
               -
@@ -191,8 +203,8 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               {quantity}
             </span>
             <button
-              onClick={() => setQuantity(Math.min(Math.min(currentStock, 3), quantity + 1))}
-              disabled={isOutOfStock || quantity >= Math.min(currentStock, 3)}
+              onClick={() => setQuantity(Math.min(effectiveMax, quantity + 1))}
+              disabled={isOutOfStock || quantity >= effectiveMax}
               className="text-primary dark:text-white px-2 py-2 sm:py-3 hover:opacity-60 text-base font-bold disabled:opacity-30 cursor-pointer"
             >
               +

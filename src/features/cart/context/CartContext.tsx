@@ -32,7 +32,7 @@ const FREE_SHIPPING_THRESHOLD = 1500; // EGP in Egypt
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const store = useCartStore();
-  const { products = [], coupons = [], decrementStock, incrementStock } = useStoreData();
+  const { products = [], coupons = [], decrementStock, incrementStock, settings } = useStoreData();
 
   const subtotal = store.getSubtotal();
   const totalItems = store.getItemCount();
@@ -57,8 +57,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const selectedSize = size || (currentProd.sizes && currentProd.sizes[0]) || 'M';
     const selectedColor = color || (currentProd.colors && currentProd.colors[0]?.name) || 'Standard';
 
-    // Anti-Spam Inventory Protection: Max 3 pieces per item per order
-    const MAX_ALLOWED_PER_ITEM = 3;
+    // Anti-Spam Inventory Protection: Dynamic per-item limits from settings
+    const minAllowed = Math.max(1, settings?.minPiecesPerItem ?? 1);
+    const maxAllowed = Math.max(minAllowed, settings?.maxPiecesPerItem ?? 3);
+
     const existing = store.items.find(
       (item) =>
         item.product.id === product.id &&
@@ -67,9 +69,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
     const currentQtyInCart = existing ? existing.quantity : 0;
 
-    if (currentQtyInCart + quantity > MAX_ALLOWED_PER_ITEM) {
+    if (quantity < minAllowed) {
       toast.error(
-        `الحد الأقصى المسموح به هو ${MAX_ALLOWED_PER_ITEM} قطع من نفس القطعة للطلب الواحد للحفاظ على توفر المخزون.`,
+        `أقل عدد مسموح بطلبه هو ${minAllowed} قطعة من هذا المنتج.`,
+        { id: `min-qty-limit-${product.id}` }
+      );
+      return false;
+    }
+
+    if (currentQtyInCart + quantity > maxAllowed) {
+      toast.error(
+        `الحد الأقصى المسموح به هو ${maxAllowed} قطع من نفس القطعة للطلب الواحد للحفاظ على توفر المخزون.`,
         { id: `max-qty-limit-${product.id}` }
       );
       return false;
@@ -124,9 +134,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    const MAX_ALLOWED_PER_ITEM = 3;
-    if (newQuantity > MAX_ALLOWED_PER_ITEM) {
-      toast.error(`الحد الأقصى المسموح به هو ${MAX_ALLOWED_PER_ITEM} قطع من نفس الموديل للطلب الواحد.`);
+    const minAllowed = Math.max(1, settings?.minPiecesPerItem ?? 1);
+    const maxAllowed = Math.max(minAllowed, settings?.maxPiecesPerItem ?? 3);
+
+    if (newQuantity < minAllowed) {
+      toast.error(`أقل عدد مسموح به هو ${minAllowed} قطعة من نفس الموديل.`);
+      return;
+    }
+
+    if (newQuantity > maxAllowed) {
+      toast.error(`الحد الأقصى المسموح به هو ${maxAllowed} قطع من نفس الموديل للطلب الواحد.`);
       return;
     }
 

@@ -177,6 +177,10 @@ export interface StoreSettings {
   loyaltyCashbackRate?: number;
   vipFreeShipping?: boolean;
 
+  // Purchase & Inventory Quantity Controls
+  maxPiecesPerItem?: number;
+  minPiecesPerItem?: number;
+
   // Home Page Section Visibility Toggles
   showHero?: boolean;
   showCategories?: boolean;

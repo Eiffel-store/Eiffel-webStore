@@ -6,6 +6,7 @@ import { AdminContactSettingsForm } from '../components/settings/AdminContactSet
 import { AdminAnnouncementSettingsForm } from '../components/settings/AdminAnnouncementSettingsForm';
 import { AdminLoyaltyVIPSettingsForm } from '../components/settings/AdminLoyaltyVIPSettingsForm';
 import { AdminHomePageSectionsForm } from '../components/settings/AdminHomePageSectionsForm';
+import { AdminOrderQuantityLimitsForm } from '../components/settings/AdminOrderQuantityLimitsForm';
 import { AdminDataBackupCard } from '../components/settings/AdminDataBackupCard';
 
 export const AdminSettingsPage: React.FC = () => {
@@ -76,6 +77,11 @@ export const AdminSettingsPage: React.FC = () => {
         />
 
         <AdminHomePageSectionsForm
+          settings={formSettings}
+          onChange={(updates) => setFormSettings(prev => ({ ...prev, ...updates }))}
+        />
+
+        <AdminOrderQuantityLimitsForm
           settings={formSettings}
           onChange={(updates) => setFormSettings(prev => ({ ...prev, ...updates }))}
         />
