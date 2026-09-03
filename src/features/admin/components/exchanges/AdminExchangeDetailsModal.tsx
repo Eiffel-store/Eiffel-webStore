@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   Phone,
@@ -138,7 +139,6 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
       icon: FileText,
       iconColor: 'text-blue-400',
       url: invoicePhotoUrl,
-      required: request.requestType === 'RETURN_REFUND',
     },
     {
       type: 'tag',
@@ -146,7 +146,6 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
       icon: Tag,
       iconColor: 'text-amber-400',
       url: tagPhotoUrl,
-      required: true,
     },
     {
       type: 'defect',
@@ -154,18 +153,17 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
       icon: AlertTriangle,
       iconColor: 'text-red-400',
       url: defectPhotoUrl,
-      required: request.requestType === 'DEFECT',
     },
   ];
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="relative bg-zinc-950 border border-zinc-800 w-[96vw] max-w-7xl h-[92vh] max-h-[92vh] flex flex-col shadow-2xl rounded-2xl my-auto text-white overflow-hidden">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto">
+      <div className="relative bg-zinc-950 border border-zinc-800 w-full max-w-6xl shadow-2xl rounded-2xl my-auto text-white overflow-hidden flex flex-col max-h-[96vh]">
         {/* Top Gold Accent Bar */}
         <div className="h-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 shrink-0" />
 
         {/* Modal Header */}
-        <div className="p-5 sm:p-6 pb-4 flex items-start justify-between border-b border-zinc-800 shrink-0">
+        <div className="px-5 sm:px-6 py-4 flex items-center justify-between border-b border-zinc-800 shrink-0">
           <div>
             <div className="flex items-center gap-2">
               <span className="font-mono text-[11px] font-bold text-amber-400 uppercase tracking-wider">
@@ -182,7 +180,7 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
                 })}
               </span>
             </div>
-            <div className="flex flex-wrap items-center gap-2.5 mt-1.5">
+            <div className="flex flex-wrap items-center gap-2.5 mt-1">
               <h2 className="text-xl sm:text-2xl font-bold font-editorial text-white tracking-tight">
                 #{request.orderId}
               </h2>
@@ -200,16 +198,16 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
           </button>
         </div>
 
-        {/* 2-Column Responsive Dashboard Layout */}
-        <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Modal Body - 2 Columns */}
+        <div className="p-5 sm:p-6 overflow-y-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
             {/* LEFT COLUMN: Customer + Product + Reason (7 Cols) */}
-            <div className="lg:col-span-7 space-y-5">
+            <div className="lg:col-span-7 space-y-4">
               
               {/* Customer Info Card */}
-              <div className="p-3.5 bg-zinc-900/70 border border-zinc-800/80 rounded-xl space-y-2.5 text-xs font-mono">
-                <div className="flex items-center justify-between pb-2 border-b border-zinc-800/60">
+              <div className="p-4 bg-zinc-900/70 border border-zinc-800/80 rounded-xl space-y-3 text-xs font-mono">
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-2.5 border-b border-zinc-800/60">
                   <div>
                     <span className="font-bold text-sm text-white block">{customerName}</span>
                     {request.customerEmail && (
@@ -217,52 +215,52 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
                     )}
                   </div>
                   {phone && (
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                       <a
                         href={`tel:${phone}`}
-                        className="p-1.5 bg-zinc-800 hover:bg-zinc-700 text-emerald-400 border border-zinc-700 rounded-lg transition-colors"
-                        title="اتصال"
+                        className="px-2.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 rounded-lg text-xs flex items-center gap-1.5 font-bold transition-colors"
                       >
-                        <Phone className="w-3.5 h-3.5" />
+                        <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>{phone}</span>
                       </a>
                       <a
                         href={`https://wa.me/${waPhone}?text=${waMessage}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-2.5 py-1.5 bg-emerald-950 text-emerald-300 border border-emerald-700/80 hover:bg-emerald-900 rounded-lg text-xs flex items-center gap-1.5 font-bold transition-colors"
+                        className="px-3 py-1.5 bg-emerald-950 text-emerald-300 border border-emerald-700/80 hover:bg-emerald-900 rounded-lg text-xs flex items-center gap-1.5 font-bold transition-colors"
                       >
                         <MessageSquare className="w-3.5 h-3.5" />
-                        <span>واتساب</span>
+                        <span>{t.adminDirectWhatsAppContact}</span>
                       </a>
                     </div>
                   )}
                 </div>
 
-                <div className="flex items-start gap-2 text-zinc-300 text-[11px]">
-                  <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                <div className="flex items-start gap-2 text-zinc-300 text-xs">
+                  <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                   <div className="space-y-0.5">
                     <strong className="text-white block">{request.pickupCity || 'القاهرة'}</strong>
-                    <span className="text-zinc-400 block">{request.pickupAddress || 'عنوان الشحن'}</span>
+                    <span className="text-zinc-400 block">{request.pickupAddress || 'عنوان الشحن المستلم'}</span>
                   </div>
                 </div>
               </div>
 
               {/* Exchanged Item & Replacement Details */}
-              <div className="p-3.5 bg-zinc-900/70 border border-zinc-800/80 rounded-xl space-y-2.5">
+              <div className="p-4 bg-zinc-900/70 border border-zinc-800/80 rounded-xl space-y-3">
                 <span className="text-[11px] font-mono font-bold text-amber-400 uppercase tracking-wider block">
                   {t.exchangeItem}
                 </span>
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3.5 min-w-0">
                     {request.productImage && (
                       <img
                         src={request.productImage}
                         alt={request.productName}
-                        className="w-14 h-16 object-cover rounded-lg border border-zinc-800 shrink-0"
+                        className="w-16 h-20 object-cover rounded-xl border border-zinc-800 shrink-0"
                       />
                     )}
-                    <div className="space-y-0.5 min-w-0">
-                      <h4 className="text-sm font-editorial font-bold text-white truncate">
+                    <div className="space-y-1 min-w-0">
+                      <h4 className="text-base font-editorial font-bold text-white truncate">
                         {request.productName}
                       </h4>
                       <div className="text-xs font-mono text-zinc-400">
@@ -274,10 +272,10 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
                   </div>
 
                   {/* Required Replacement */}
-                  <div className="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center gap-2 shrink-0">
-                    <ArrowRightLeft className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center gap-2.5 shrink-0">
+                    <ArrowRightLeft className="w-4 h-4 text-amber-400 shrink-0" />
                     <div>
-                      <span className="text-[9px] font-mono text-zinc-500 uppercase block">
+                      <span className="text-[10px] font-mono text-zinc-500 uppercase block">
                         {t.exchangeRequestedPiece}
                       </span>
                       <strong className="text-xs font-mono font-bold text-amber-400">
@@ -289,13 +287,13 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
               </div>
 
               {/* Reason & Customer Notes */}
-              <div className="p-3.5 bg-zinc-900/70 border border-zinc-800/80 rounded-xl space-y-1.5">
+              <div className="p-4 bg-zinc-900/70 border border-zinc-800/80 rounded-xl space-y-2">
                 <span className="text-[11px] font-mono font-bold text-zinc-400 uppercase tracking-wider block">
                   {t.adminExchangeReason}
                 </span>
                 <p className="text-xs text-zinc-200 font-medium">{request.reason}</p>
                 {request.customerNotes && (
-                  <div className="mt-2 p-2 bg-zinc-950/80 rounded-lg border border-zinc-800/80 text-xs text-zinc-300 italic">
+                  <div className="mt-2 p-2.5 bg-zinc-950/80 rounded-lg border border-zinc-800/80 text-xs text-zinc-300 italic">
                     "{request.customerNotes}"
                   </div>
                 )}
@@ -305,8 +303,8 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
             {/* RIGHT COLUMN: 3 Proof Photo Cards + Status Action (5 Cols) */}
             <div className="lg:col-span-5 space-y-4">
               
-              {/* Attached Proof Images Gallery (All 3 slots explicitly displayed) */}
-              <div className="p-3.5 bg-zinc-900/70 border border-zinc-800/80 rounded-xl space-y-3">
+              {/* Attached Proof Images Gallery */}
+              <div className="p-4 bg-zinc-900/70 border border-zinc-800/80 rounded-xl space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-mono font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                     <Eye className="w-3.5 h-3.5" />
@@ -358,62 +356,62 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
               </div>
 
               {/* Direct Status Update & Admin Notes Panel */}
-              <div className="p-3.5 bg-zinc-900/90 border border-zinc-700/80 rounded-xl space-y-3">
+              <div className="p-4 bg-zinc-900/90 border border-zinc-700/80 rounded-xl space-y-3">
                 <span className="text-[11px] font-mono font-bold text-white uppercase tracking-wider block">
                   {t.adminUpdateExchangeStatusTitle}
                 </span>
 
                 {/* Status Pills */}
-                <div className="grid grid-cols-2 gap-1.5">
+                <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setSelectedStatus('APPROVED')}
-                    className={`p-2 rounded-lg border text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                    className={`p-2 rounded-xl border text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       selectedStatus === 'APPROVED'
-                        ? 'bg-blue-600 text-white border-blue-500 shadow-sm'
+                        ? 'bg-blue-600 text-white border-blue-500 shadow-md ring-1 ring-blue-400'
                         : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white hover:border-zinc-700'
                     }`}
                   >
-                    <CheckCircle2 className="w-3 h-3 text-blue-400" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
                     <span>{t.adminApproveStatus}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setSelectedStatus('IN_TRANSIT')}
-                    className={`p-2 rounded-lg border text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                    className={`p-2 rounded-xl border text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       selectedStatus === 'IN_TRANSIT'
-                        ? 'bg-purple-600 text-white border-purple-500 shadow-sm'
+                        ? 'bg-purple-600 text-white border-purple-500 shadow-md ring-1 ring-purple-400'
                         : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white hover:border-zinc-700'
                     }`}
                   >
-                    <Truck className="w-3 h-3 text-purple-400" />
+                    <Truck className="w-3.5 h-3.5 text-purple-400" />
                     <span>{t.adminInTransitStatus}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setSelectedStatus('COMPLETED')}
-                    className={`p-2 rounded-lg border text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                    className={`p-2 rounded-xl border text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       selectedStatus === 'COMPLETED'
-                        ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm'
+                        ? 'bg-emerald-600 text-white border-emerald-500 shadow-md ring-1 ring-emerald-400'
                         : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white hover:border-zinc-700'
                     }`}
                   >
-                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                     <span>{t.adminCompleteStatus}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setSelectedStatus('REJECTED')}
-                    className={`p-2 rounded-lg border text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                    className={`p-2 rounded-xl border text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       selectedStatus === 'REJECTED'
-                        ? 'bg-red-600 text-white border-red-500 shadow-sm'
+                        ? 'bg-red-600 text-white border-red-500 shadow-md ring-1 ring-red-400'
                         : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white hover:border-zinc-700'
                     }`}
                   >
-                    <XCircle className="w-3 h-3 text-red-400" />
+                    <XCircle className="w-3.5 h-3.5 text-red-400" />
                     <span>{t.adminRejectStatus}</span>
                   </button>
                 </div>
@@ -425,7 +423,7 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
                     value={adminNotes}
                     onChange={(e) => setAdminNotes(e.target.value)}
                     placeholder={t.adminCourierInstructionsPlaceholder}
-                    className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
                   />
                 </div>
 
@@ -434,7 +432,7 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
                   type="button"
                   onClick={handleSaveStatus}
                   disabled={isUpdating}
-                  className="w-full py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black rounded-xl text-xs font-mono font-bold shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black rounded-xl text-xs font-mono font-bold shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                   <span>{t.adminConfirmUpdateStatus}</span>
@@ -448,7 +446,7 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
       {/* Fullscreen Image Lightbox Overlay */}
       {activeLightboxImg && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/95 backdrop-blur-lg animate-fade-in"
+          className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/95 backdrop-blur-lg animate-fade-in"
           onClick={() => setActiveLightboxImg(null)}
         >
           <div
@@ -482,6 +480,7 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
           </div>
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   );
 };
