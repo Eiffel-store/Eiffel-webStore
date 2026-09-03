@@ -82,7 +82,7 @@ export const ProductDetailPage: React.FC = () => {
   ).slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-background text-on-surface pb-20 sm:pb-0">
+    <div className="min-h-screen bg-background text-on-surface pb-28 sm:pb-0">
       {/* Breadcrumb Navigation */}
       <div className="max-w-[1440px] mx-auto px-3 sm:px-8 md:px-12 py-3 sm:py-4 border-b border-surface-container dark:border-zinc-800 text-[11px] sm:text-xs font-mono text-secondary dark:text-zinc-400">
         <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap scrollbar-none">
@@ -173,7 +173,7 @@ export const ProductDetailPage: React.FC = () => {
       )}
 
       {/* Sticky Bottom Mobile Bar for Quick Purchase */}
-      <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-surface-container-lowest/95 dark:bg-zinc-950/95 backdrop-blur-md p-3 border-t border-surface-container dark:border-zinc-800 shadow-2xl flex items-center justify-between gap-3 animate-fade-in">
+      <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-surface-container-lowest/95 dark:bg-zinc-950/95 backdrop-blur-md px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] border-t border-surface-container dark:border-zinc-800 shadow-2xl flex items-center justify-between gap-3 animate-fade-in">
         <div className="min-w-0">
           <p className="font-editorial text-sm text-primary dark:text-white truncate">{product.name}</p>
           <span className="font-mono text-xs font-bold text-primary dark:text-white">{formatPrice(product.price)}</span>

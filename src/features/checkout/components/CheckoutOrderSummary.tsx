@@ -34,7 +34,7 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
   const { t } = useLanguage();
 
   return (
-    <div className="sticky top-28 p-6 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 space-y-6 shadow-xl rounded-xl">
+    <div className="static lg:sticky lg:top-28 p-4 sm:p-6 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 space-y-4 sm:space-y-6 shadow-xl rounded-xl">
       <div className="flex items-center justify-between pb-3 border-b border-surface-container dark:border-zinc-800">
         <h3 className="font-editorial text-2xl text-primary dark:text-white tracking-wider">
           {t.bagSummary} ({cart.length})

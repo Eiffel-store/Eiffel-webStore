@@ -18,14 +18,14 @@ export const NavActionButtons: React.FC<NavActionButtonsProps> = ({ onOpenSearch
   const { user, isAuthenticated } = useAuthStore();
 
   return (
-    <div className="flex items-center gap-1.5 sm:gap-2.5 xl:gap-3">
+    <div className="flex items-center gap-1 min-[360px]:gap-1.5 sm:gap-2.5 xl:gap-3">
       {/* Language Switcher */}
       <NavLanguageDropdown />
 
-      {/* Dark/Light Mode Toggle */}
+      {/* Dark/Light Mode Toggle (Hidden on < 380px to save space for search/cart, accessible in mobile drawer) */}
       <button
         onClick={toggleTheme}
-        className="p-1.5 sm:p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors cursor-pointer"
+        className="hidden min-[380px]:flex p-1.5 sm:p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors cursor-pointer"
         aria-label="Toggle theme"
       >
         {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -34,7 +34,7 @@ export const NavActionButtons: React.FC<NavActionButtonsProps> = ({ onOpenSearch
       {/* Search Trigger */}
       <button
         onClick={onOpenSearch}
-        className="p-1.5 sm:p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors cursor-pointer"
+        className="p-1 min-[360px]:p-1.5 sm:p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors cursor-pointer"
         aria-label="Search"
       >
         <Search className="w-4 h-4" />
@@ -43,7 +43,7 @@ export const NavActionButtons: React.FC<NavActionButtonsProps> = ({ onOpenSearch
       {/* Wishlist Link */}
       <Link
         to="/wishlist"
-        className="relative p-1.5 sm:p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors cursor-pointer"
+        className="relative p-1 min-[360px]:p-1.5 sm:p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors cursor-pointer"
         aria-label="Wishlist"
       >
         <Heart className="w-4 h-4" />
@@ -76,7 +76,7 @@ export const NavActionButtons: React.FC<NavActionButtonsProps> = ({ onOpenSearch
       {/* Cart Trigger */}
       <button
         onClick={openCart}
-        className="relative flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-primary text-white dark:bg-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors px-2.5 sm:px-3 py-1.5 sm:py-2 font-label-bold text-xs tracking-wider cursor-pointer"
+        className="relative flex items-center gap-1 sm:gap-2 bg-primary text-white dark:bg-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors px-2 min-[360px]:px-2.5 sm:px-3 py-1.5 sm:py-2 font-label-bold text-xs tracking-wider cursor-pointer"
         aria-label="Shopping Bag"
       >
         <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

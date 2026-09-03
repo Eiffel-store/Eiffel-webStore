@@ -115,7 +115,7 @@ export const AccountPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-surface py-12 px-4 sm:px-8 md:px-12">
+    <div className="min-h-screen bg-background text-on-surface py-6 sm:py-12 px-3 sm:px-8 md:px-12 pb-safe">
       <div className="max-w-[1440px] mx-auto">
         {/* Admin Quick Jump If Staff/Admin */}
         {(role === 'ROLE_ADMIN' || role === 'ROLE_STAFF') && (

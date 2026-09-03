@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { useLanguage } from '@/shared';
 import { useStoreData } from '@/shared';
 import { FacebookIcon, WhatsAppIcon } from './SocialIcons';
@@ -6,6 +7,14 @@ import { FacebookIcon, WhatsAppIcon } from './SocialIcons';
 export const FloatingContactButtons: React.FC = () => {
   const { t, isRTL } = useLanguage();
   const { settings } = useStoreData();
+  const location = useLocation();
+
+  // Hide on checkout for 100% distraction-free completion
+  if (location.pathname === '/checkout') {
+    return null;
+  }
+
+  const isProductPage = location.pathname.startsWith('/product/');
 
   const facebookUrl = settings.facebookUrl || 'https://www.facebook.com/profile.php?id=100093268017929';
   const cleanPhone = settings.whatsappNumber.replace(/[^0-9]/g, '');
@@ -13,7 +22,11 @@ export const FloatingContactButtons: React.FC = () => {
 
   return (
     <div
-      className={`fixed bottom-6 ${isRTL ? 'left-6' : 'right-6'} z-40 flex flex-col gap-2.5 items-end rtl:items-start animate-fade-in`}
+      className={`fixed ${
+        isProductPage
+          ? 'bottom-[calc(5.25rem+env(safe-area-inset-bottom))] sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))]'
+          : 'bottom-[calc(1.5rem+env(safe-area-inset-bottom))]'
+      } ${isRTL ? 'left-4 sm:left-6' : 'right-4 sm:right-6'} z-40 flex flex-col gap-2.5 items-end rtl:items-start animate-fade-in transition-all duration-300`}
     >
       {/* WhatsApp Button */}
       <a

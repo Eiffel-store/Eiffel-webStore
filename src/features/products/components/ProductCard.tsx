@@ -61,28 +61,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
 
 
         {/* Badges: New, Sale, Limited */}
-        <div className="absolute top-2.5 left-2.5 rtl:left-auto rtl:right-2.5 flex flex-col gap-1 z-10 pointer-events-none">
+        <div className="absolute top-2 left-2 min-[360px]:top-2.5 min-[360px]:left-2.5 rtl:left-auto rtl:right-2 rtl:min-[360px]:right-2.5 flex flex-col gap-1 z-10 pointer-events-none">
           {product.isNew && (
-            <span className="bg-primary text-white dark:bg-white dark:text-black font-label-bold text-[9px] sm:text-[10px] tracking-widest px-2 py-0.5 uppercase shadow-sm">
+            <span className="bg-primary text-white dark:bg-white dark:text-black font-label-bold text-[8px] min-[360px]:text-[9px] sm:text-[10px] tracking-widest px-1.5 min-[360px]:px-2 py-0.5 uppercase shadow-sm">
               NEW
             </span>
           )}
           {product.originalPrice && product.originalPrice > product.price && (
-            <span className="bg-amber-600 text-white font-label-bold text-[9px] sm:text-[10px] tracking-widest px-2 py-0.5 uppercase shadow-sm">
+            <span className="bg-amber-600 text-white font-label-bold text-[8px] min-[360px]:text-[9px] sm:text-[10px] tracking-widest px-1.5 min-[360px]:px-2 py-0.5 uppercase shadow-sm">
               SALE
             </span>
           )}
           {product.isLimited && (
-            <span className="bg-zinc-900/90 text-zinc-200 border border-zinc-700 font-mono text-[9px] tracking-wider px-2 py-0.5 uppercase">
+            <span className="bg-zinc-900/90 text-zinc-200 border border-zinc-700 font-mono text-[8px] min-[360px]:text-[9px] tracking-wider px-1.5 min-[360px]:px-2 py-0.5 uppercase">
               LIMITED
             </span>
           )}
           {(product.stock !== undefined ? product.stock : (product.inStock ? 20 : 0)) <= 0 ? (
-            <span className="bg-rose-600 text-white font-label-bold text-[9px] sm:text-[10px] tracking-widest px-2 py-0.5 uppercase shadow-sm">
+            <span className="bg-rose-600 text-white font-label-bold text-[8px] min-[360px]:text-[9px] sm:text-[10px] tracking-widest px-1.5 min-[360px]:px-2 py-0.5 uppercase shadow-sm">
               {t.outOfStockBadge}
             </span>
           ) : (product.stock !== undefined ? product.stock : 20) <= 5 ? (
-            <span className="bg-amber-500 text-black font-label-bold text-[9px] sm:text-[10px] tracking-widest px-2 py-0.5 uppercase shadow-sm animate-pulse">
+            <span className="bg-amber-500 text-black font-label-bold text-[8px] min-[360px]:text-[9px] sm:text-[10px] tracking-widest px-1.5 min-[360px]:px-2 py-0.5 uppercase shadow-sm animate-pulse">
               {t.onlyCountLeftBadge.replace('{count}', String(product.stock))}
             </span>
           ) : null}
@@ -94,7 +94,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
             e.preventDefault();
             toggleWishlist(product);
           }}
-          className={`absolute top-2.5 right-2.5 rtl:right-auto rtl:left-2.5 p-2 rounded-full transition-all duration-200 z-10 ${
+          className={`absolute top-2 right-2 min-[360px]:top-2.5 min-[360px]:right-2.5 rtl:right-auto rtl:left-2 rtl:min-[360px]:left-2.5 p-1.5 sm:p-2 rounded-full transition-all duration-200 z-10 ${
             inWishlist
               ? 'bg-primary text-white dark:bg-white dark:text-black shadow-md'
               : 'bg-white/80 dark:bg-black/60 text-secondary hover:text-primary dark:text-zinc-300 dark:hover:text-white backdrop-blur-sm opacity-90 sm:opacity-0 group-hover:opacity-100'

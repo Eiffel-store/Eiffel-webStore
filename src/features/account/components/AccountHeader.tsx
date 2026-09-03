@@ -24,13 +24,13 @@ export const AccountHeader: React.FC<AccountHeaderProps> = ({ user }) => {
         </h1>
       </div>
 
-      <div className="flex items-center justify-between sm:justify-start gap-4 p-3 sm:p-4 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 rounded-xl shadow-lg">
+      <div className="flex items-center justify-between sm:justify-start gap-2.5 sm:gap-4 p-2.5 sm:p-4 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 rounded-xl shadow-lg w-full sm:w-auto">
         {/* Tier Badge */}
-        <div className="flex items-center gap-3">
-          <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center shrink-0 ${
             isVip ? 'bg-amber-400/20 text-amber-400 border border-amber-400/30' : 'bg-zinc-800 text-zinc-400'
           }`}>
-            {isVip ? <Crown className="w-5 h-5" /> : <Sparkles className="w-5 h-5 text-amber-400" />}
+            {isVip ? <Crown className="w-4 h-4 sm:w-5 sm:h-5" /> : <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />}
           </div>
           <div>
             <div className="text-[9px] sm:text-[10px] font-mono text-secondary dark:text-zinc-400 uppercase tracking-wider">
@@ -40,7 +40,7 @@ export const AccountHeader: React.FC<AccountHeaderProps> = ({ user }) => {
               {isVip ? (
                 <span className="text-amber-400 font-bold flex items-center gap-1">
                   <span>VIP 👑</span>
-                  <span className="text-[11px] text-zinc-400 font-sans">({t.vipExclusiveClient})</span>
+                  <span className="text-[10px] sm:text-[11px] text-zinc-400 font-sans">({t.vipExclusiveClient})</span>
                 </span>
               ) : (
                 <span className="text-zinc-300">
@@ -52,7 +52,7 @@ export const AccountHeader: React.FC<AccountHeaderProps> = ({ user }) => {
         </div>
 
         {/* Points Display */}
-        <div className="border-l rtl:border-l-0 rtl:border-r border-surface-container dark:border-zinc-800 pl-4 rtl:pl-0 rtl:pr-4">
+        <div className="border-l rtl:border-l-0 rtl:border-r border-surface-container dark:border-zinc-800 pl-3 sm:pl-4 rtl:pl-0 rtl:pr-3 sm:rtl:pr-4 shrink-0">
           <div className="text-[9px] sm:text-[10px] font-mono text-secondary dark:text-zinc-400 uppercase tracking-wider">
             {t.availableLoyaltyPoints}
           </div>

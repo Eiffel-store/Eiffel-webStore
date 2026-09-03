@@ -1466,5 +1466,6 @@ export const ar: TranslationDictionary = {
   adminNewOrderReceivedDesc: "تم تسجيل طلب جديد بقيمة {total} ج.م من قِبل {customer}.",
   adminViewOrderAction: "معاينة الطلب في الإدارة",
   adminPiecesCountLabel: "قطع",
+  theme: "المظهر",
 };
 

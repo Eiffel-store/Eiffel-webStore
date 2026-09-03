@@ -33,9 +33,9 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="p-6 rounded-xl bg-zinc-950 border border-zinc-800 shadow-lg">
+      <div className="p-3 sm:p-6 rounded-xl bg-zinc-950 border border-zinc-800 shadow-lg">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full text-left text-xs min-w-[640px]">
             <thead className="bg-zinc-900/60 border-b border-zinc-800 text-zinc-400">
               <tr>
                 <th className={`p-3.5 ${isRTL ? 'text-right' : 'text-left'}`}>{t.customer}</th>

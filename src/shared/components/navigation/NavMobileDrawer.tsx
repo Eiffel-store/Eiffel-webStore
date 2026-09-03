@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { X, LogOut, Sparkles } from 'lucide-react';
+import { X, LogOut, Sparkles, Sun, Moon } from 'lucide-react';
 import { Logo } from '../Logo';
-import { useLanguage, useStoreData } from '@/shared';
+import { useLanguage, useStoreData, useTheme } from '@/shared';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { NavLinkItem } from './NavDesktopLinks';
 
@@ -18,6 +18,7 @@ export const NavMobileDrawer: React.FC<NavMobileDrawerProps> = ({
   links,
 }) => {
   const { t } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const { settings } = useStoreData();
   const { user, isAuthenticated, role, logout } = useAuthStore();
 
@@ -102,8 +103,34 @@ export const NavMobileDrawer: React.FC<NavMobileDrawerProps> = ({
           </div>
         </div>
 
-        <div className="pt-6 border-t border-surface-container dark:border-zinc-800 text-xs text-zinc-400 font-mono">
-          EIFFEL LUXURY MENSWEAR • CAIRO, EG
+        <div className="pt-6 pb-2 border-t border-surface-container dark:border-zinc-800 space-y-3">
+          {/* Quick Preferences Bar (Theme & Language in Mobile Drawer) */}
+          <div className="flex items-center justify-between py-2 border-y border-zinc-850">
+            <span className="text-xs font-mono text-secondary dark:text-zinc-400 uppercase tracking-wider">
+              {t.theme || 'THEME'}
+            </span>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 text-xs font-mono text-primary dark:text-white"
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span>LIGHT</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-blue-400" />
+                  <span>DARK</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <div className="text-[11px] text-zinc-500 font-mono tracking-wider">
+            EIFFEL LUXURY MENSWEAR • CAIRO, EG
+          </div>
         </div>
       </div>
     </div>

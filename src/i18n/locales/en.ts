@@ -1451,5 +1451,6 @@ export const en: TranslationDictionary = {
   adminNewOrderReceivedDesc: "A new order was placed for {total} EGP by {customer}.",
   adminViewOrderAction: "View in Orders Manager",
   adminPiecesCountLabel: "pcs",
+  theme: "Theme",
 };
 

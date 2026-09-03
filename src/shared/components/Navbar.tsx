@@ -76,9 +76,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
           isScrolled ? 'h-[64px] sm:h-[72px] shadow-sm' : 'h-[70px] sm:h-[82px]'
         }`}
       >
-        <div className="w-full h-full px-4 sm:px-8 md:px-10 lg:px-12 flex items-center justify-between gap-4">
+        <div className="w-full h-full px-2.5 min-[360px]:px-4 sm:px-8 md:px-10 lg:px-12 flex items-center justify-between gap-2 min-[360px]:gap-4">
           {/* Left: Mobile Menu Button & Brand Logo */}
-          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+          <div className="flex items-center gap-1.5 min-[360px]:gap-3 sm:gap-4 shrink-0">
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="lg:hidden p-1.5 -ml-1.5 rtl:-ml-0 rtl:-mr-1.5 text-primary dark:text-white hover:opacity-70 transition-opacity cursor-pointer"
@@ -90,10 +90,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
             {/* Brand Logo & Store Name */}
             <Link
               to="/"
-              className="hover:opacity-90 transition-opacity flex items-center gap-2.5 py-1"
+              className="hover:opacity-90 transition-opacity flex items-center gap-1.5 min-[360px]:gap-2.5 py-1"
             >
               <Logo size="md" />
-              <span className="font-editorial text-base sm:text-xl font-bold tracking-widest text-primary dark:text-white uppercase whitespace-nowrap">
+              <span className="font-editorial text-sm min-[360px]:text-base sm:text-xl font-bold tracking-widest text-primary dark:text-white uppercase whitespace-nowrap">
                 {settings?.storeName || 'EIFFEL'}
               </span>
             </Link>

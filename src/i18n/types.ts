@@ -1468,5 +1468,6 @@ export interface TranslationDictionary {
   adminNewOrderReceivedDesc: string;
   adminViewOrderAction: string;
   adminPiecesCountLabel: string;
+  theme: string;
 }
 

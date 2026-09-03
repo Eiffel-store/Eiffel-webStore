@@ -91,7 +91,7 @@ export const AdminCouponsManager: React.FC = () => {
 
       {/* Coupons Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-left rtl:text-right text-xs">
+        <table className="w-full text-left rtl:text-right text-xs min-w-[580px]">
           <thead>
             <tr className="border-b border-zinc-800 text-zinc-500 font-mono uppercase text-[11px]">
               <th className="py-3 px-3">{t.adminCouponsPromoCodes}</th>

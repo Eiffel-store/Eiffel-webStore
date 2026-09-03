@@ -350,27 +350,27 @@ export const CheckoutPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-on-surface py-12 px-4 sm:px-8 md:px-12">
+    <div className="min-h-screen bg-background text-on-surface py-6 sm:py-12 px-3 sm:px-8 md:px-12 pb-safe">
       <div className="max-w-[1440px] mx-auto">
         {/* Top Header */}
-        <div className="flex items-center justify-between pb-6 border-b border-surface-container dark:border-zinc-800 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 sm:pb-6 border-b border-surface-container dark:border-zinc-800 mb-6 sm:mb-8 gap-3">
           <div>
-            <span className="text-xs font-mono text-secondary dark:text-zinc-400 uppercase">
+            <span className="text-[10px] sm:text-xs font-mono text-secondary dark:text-zinc-400 uppercase">
               {t.checkoutSecurityNotice}
             </span>
-            <h1 className="font-editorial text-4xl sm:text-5xl text-primary dark:text-white mt-1 uppercase">
+            <h1 className="font-editorial text-3xl sm:text-5xl text-primary dark:text-white mt-0.5 sm:mt-1 uppercase">
               {t.proceedToCheckout}
             </h1>
           </div>
-          <div className="flex items-center gap-2 text-xs font-mono text-secondary">
-            <Lock className="w-4 h-4" />
+          <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono text-secondary">
+            <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>256-BIT SECURE (EGYPT)</span>
           </div>
         </div>
 
         {/* Global Validation Alert Banner */}
         {formAlert && (
-          <div className="mb-8 p-4 bg-red-950/60 border-2 border-red-500 text-red-200 text-xs sm:text-sm rounded-lg flex items-start gap-3 shadow-xl animate-fade-in">
+          <div className="mb-6 sm:mb-8 p-3.5 sm:p-4 bg-red-950/60 border-2 border-red-500 text-red-200 text-xs sm:text-sm rounded-lg flex items-start gap-3 shadow-xl animate-fade-in">
             <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
             <div className="space-y-1">
               <span className="font-bold">{t.checkoutValidationAlert}</span>
@@ -379,9 +379,9 @@ export const CheckoutPage: React.FC = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12">
           {/* Main Checkout Form (7 cols) */}
-          <div className="lg:col-span-7 space-y-8">
+          <div className="lg:col-span-7 space-y-6 sm:space-y-8">
             <form onSubmit={handlePlaceOrder} noValidate className="space-y-8">
               <CheckoutContactForm
                 addresses={user?.addresses}

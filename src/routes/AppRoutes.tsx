@@ -42,9 +42,9 @@ import {
 
 export const StorefrontLayout: React.FC<{ onOpenSearch: () => void }> = ({ onOpenSearch }) => {
   return (
-    <div className="flex flex-col min-h-screen bg-background text-on-surface transition-colors duration-200">
+    <div className="flex flex-col min-h-screen w-full min-w-0 overflow-x-hidden bg-background text-on-surface transition-colors duration-200">
       <Navbar onOpenSearch={onOpenSearch} />
-      <div className="flex-1">
+      <div className="flex-1 w-full min-w-0">
         <Outlet />
       </div>
       <Footer />
