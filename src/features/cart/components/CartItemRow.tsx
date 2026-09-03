@@ -38,7 +38,12 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item, onUpdateQuantity
               <Minus className="w-3 h-3" />
             </button>
             <span className="px-2 font-mono text-xs text-primary dark:text-white">{quantity}</span>
-            <button onClick={() => onUpdateQuantity(quantity + 1)} className="p-1 sm:p-1.5 hover:bg-zinc-800 text-zinc-300">
+            <button
+              onClick={() => onUpdateQuantity(quantity + 1)}
+              disabled={quantity >= 3}
+              className="p-1 sm:p-1.5 hover:bg-zinc-800 text-zinc-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+              title={quantity >= 3 ? 'الحد الأقصى 3 قطع' : undefined}
+            >
               <Plus className="w-3 h-3" />
             </button>
           </div>

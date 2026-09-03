@@ -12,6 +12,7 @@ import {
   showCustomerExchangeToast
 } from '@/shared/components/notifications/ExchangeRealtimeNotification';
 import { Order } from '@/types';
+import { getApiBaseUrl } from '@/services/apiClient';
 
 export const useOrderRealtimeSync = () => {
   const queryClient = useQueryClient();
@@ -25,7 +26,7 @@ export const useOrderRealtimeSync = () => {
     if (!user || !user.email) return;
 
     const userEmail = user.email.trim().toLowerCase();
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
+    const apiUrl = getApiBaseUrl();
     const sseUrl = `${apiUrl}/orders/stream?email=${encodeURIComponent(userEmail)}${
       token ? `&token=${encodeURIComponent(token)}` : ''
     }`;

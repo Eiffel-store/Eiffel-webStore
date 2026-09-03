@@ -1,10 +1,26 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '../stores/useAuthStore';
+import { getDeviceFingerprint } from '@/shared/utils/deviceFingerprint';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
+export const getApiBaseUrl = (): string => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  const isBrowser = typeof window !== 'undefined' && !!window.location.hostname;
+  const isRemoteDevice = isBrowser && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+
+  if (isRemoteDevice) {
+    if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+      return envUrl;
+    }
+    return `http://${window.location.hostname}:8080/api/v1`;
+  }
+
+  return envUrl || 'http://localhost:8080/api/v1';
+};
+
+export const BASE_URL = getApiBaseUrl();
 
 export const apiClient = axios.create({
-  baseURL: BASE_URL,
+  baseURL: getApiBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
@@ -23,9 +39,29 @@ const setAuthHeader = (config: InternalAxiosRequestConfig, token: string) => {
   }
 };
 
-// Request Interceptor: Automatically attach JWT Bearer token
+// Request Interceptor: Automatically attach JWT Bearer token and Device Fingerprint
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // Dynamically adjust baseURL to current hostname (computer vs mobile phone)
+    config.baseURL = getApiBaseUrl();
+
+    if (!config.headers) {
+      config.headers = new axios.AxiosHeaders();
+    }
+    // Attach device fingerprint header on non-GET requests (e.g. order placement)
+    const method = (config.method || 'get').toLowerCase();
+    if (method !== 'get' && method !== 'head') {
+      try {
+        const deviceFp = getDeviceFingerprint();
+        if (typeof config.headers.set === 'function') {
+          config.headers.set('X-Device-Fingerprint', deviceFp);
+        } else {
+          config.headers['X-Device-Fingerprint'] = deviceFp;
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
     // If Authorization header is already set (e.g., from retry with fresh token), keep it
     const existingAuth = typeof config.headers?.get === 'function'
       ? config.headers.get('Authorization')

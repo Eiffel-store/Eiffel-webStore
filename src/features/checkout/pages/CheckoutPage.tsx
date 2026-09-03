@@ -12,6 +12,7 @@ import { CheckoutContactForm, CheckoutFormErrors } from '../components/CheckoutC
 import { CheckoutShippingSelector } from '../components/CheckoutShippingSelector';
 import { CheckoutPaymentSelector } from '../components/CheckoutPaymentSelector';
 import { CheckoutOrderSummary } from '../components/CheckoutOrderSummary';
+import { getDeviceFingerprint } from '@/shared/utils/deviceFingerprint';
 
 export const CheckoutPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -43,24 +44,8 @@ export const CheckoutPage: React.FC = () => {
   const [errors, setErrors] = useState<CheckoutFormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  // Sync user info if authenticated
-  useEffect(() => {
-    if (user) {
-      if (user.email) setEmail(user.email);
-      if (user.name) {
-        const parts = user.name.split(' ');
-        setFirstName(parts[0] || '');
-        setLastName(parts.slice(1).join(' ') || '');
-      }
-      if (user.phone) setPhone(user.phone);
-      if (user.addresses && user.addresses.length > 0) {
-        const defAddr = user.addresses.find(a => a.isDefault) || user.addresses[0];
-        if (defAddr.street) setStreet(defAddr.street);
-        if (defAddr.city) setCity(defAddr.city);
-        if (defAddr.postalCode) setPostalCode(defAddr.postalCode);
-      }
-    }
-  }, [user]);
+  // Fields start empty as requested to allow fresh input
+  // (User can choose to fill details fresh)
 
   // Validate single field or whole form
   const validateField = (field: string, val: string): string | undefined => {
@@ -95,11 +80,15 @@ export const CheckoutPage: React.FC = () => {
   };
 
   const validateAll = (): { isValid: boolean; newErrors: CheckoutFormErrors } => {
+    const isUserLoggedIn = Boolean(user && user.email);
+    const hasUserPhone = Boolean(user?.phone && user.phone.trim().length >= 10);
+    const hasUserName = Boolean(user?.name && user.name.trim().length >= 2);
+
     const newErrors: CheckoutFormErrors = {
-      email: validateField('email', email),
-      firstName: validateField('firstName', firstName),
-      lastName: validateField('lastName', lastName),
-      phone: validateField('phone', phone),
+      email: isUserLoggedIn ? undefined : validateField('email', email),
+      firstName: (isUserLoggedIn && hasUserName) ? undefined : validateField('firstName', firstName),
+      lastName: (isUserLoggedIn && hasUserName) ? undefined : validateField('lastName', lastName),
+      phone: (isUserLoggedIn && hasUserPhone) ? undefined : validateField('phone', phone),
       city: validateField('city', city),
       street: validateField('street', street),
     };
@@ -209,17 +198,23 @@ export const CheckoutPage: React.FC = () => {
 
     setIsSubmitting(true);
 
+    const finalEmail = (user?.email || email).trim().toLowerCase();
+    const finalPhone = (user?.phone || phone).trim();
+    const finalFirstName = user?.name ? (user.name.trim().split(' ')[0] || '') : firstName.trim();
+    const finalLastName = user?.name ? (user.name.trim().split(' ').slice(1).join(' ') || '') : lastName.trim();
+    const finalName = (user?.name || `${firstName.trim()} ${lastName.trim()}`).trim();
+
     const shippingAddress: Address = {
       id: `addr-${Date.now()}`,
       type: 'Home',
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
+      firstName: finalFirstName,
+      lastName: finalLastName,
       street: street.trim(),
       city: city.trim(),
       state: city.trim(),
       postalCode: postalCode.trim(),
       country,
-      phone: phone.trim(),
+      phone: finalPhone,
       latitude,
       longitude,
       mapUrl: mapUrl || (latitude && longitude ? `https://maps.google.com/?q=${latitude},${longitude}` : undefined),
@@ -239,18 +234,19 @@ export const CheckoutPage: React.FC = () => {
         discount: discountValue + pointsDiscountValue,
         tax: 0,
         total: totalAmount,
-        customerName: `${firstName.trim()} ${lastName.trim()}`.trim(),
-        customerEmail: email.trim() || user?.email || '',
-        customerPhone: phone.trim(),
+        customerName: finalName,
+        customerEmail: finalEmail,
+        customerPhone: finalPhone,
         shippingAddress: {
           ...shippingAddress,
-          email: email.trim() || user?.email || '',
+          email: finalEmail,
         } as any,
         paymentMethod: paymentMethodString,
         pointsEarned: pointsToEarn,
         pointsRedeemed: pointsDiscountValue,
         pointsDiscount: pointsDiscountValue,
-        couponCode: discountCode || undefined
+        couponCode: discountCode || undefined,
+        deviceFingerprint: getDeviceFingerprint(),
       };
 
       const createdOrder = await orderService.create(orderPayload);
@@ -385,6 +381,7 @@ export const CheckoutPage: React.FC = () => {
             <form onSubmit={handlePlaceOrder} noValidate className="space-y-8">
               <CheckoutContactForm
                 addresses={user?.addresses}
+                currentUser={user}
                 email={email}
                 setEmail={(v) => {
                   setEmail(v);

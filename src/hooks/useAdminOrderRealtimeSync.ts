@@ -11,6 +11,7 @@ import {
   AdminExchangePayload,
   showAdminExchangeToast
 } from '@/shared/components/notifications/ExchangeRealtimeNotification';
+import { getApiBaseUrl } from '@/services/apiClient';
 
 export const useAdminOrderRealtimeSync = () => {
   const queryClient = useQueryClient();
@@ -24,7 +25,7 @@ export const useAdminOrderRealtimeSync = () => {
     const isStaffOrAdmin = role === 'ROLE_ADMIN' || role === 'ROLE_STAFF';
     if (!isStaffOrAdmin) return;
 
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
+    const apiUrl = getApiBaseUrl();
     const sseUrl = `${apiUrl}/orders/stream?admin=true${
       token ? `&token=${encodeURIComponent(token)}` : ''
     }${user?.email ? `&email=${encodeURIComponent(user.email)}` : ''}`;

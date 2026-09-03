@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Users, Crown, RefreshCw } from 'lucide-react';
+import { Users, Crown, RefreshCw, ShieldAlert } from 'lucide-react';
 import { useStoreData, useLanguage, AdminTableSkeleton, EmptyState } from '@/shared';
 import toast from 'react-hot-toast';
 import { customerService } from '@/services/customerService';
@@ -11,12 +11,13 @@ import {
   CustomerFiltersBar,
   CustomerTable,
   CustomerPointsModal,
+  AdminBlacklistTab,
 } from '../components/customers';
 
 export const AdminCustomersPage: React.FC = () => {
-  const [activeMainTab, setActiveMainTab] = useState<'customers' | 'team'>('customers');
+  const [activeMainTab, setActiveMainTab] = useState<'customers' | 'team' | 'blacklist'>('customers');
   const { orders, isOrdersLoading, settings } = useStoreData();
-  const { isRTL, t } = useLanguage();
+  const { isRTL, language, t } = useLanguage();
   const queryClient = useQueryClient();
 
   // 1. Fetch real customer accounts with React Query Cache
@@ -275,6 +276,19 @@ export const AdminCustomersPage: React.FC = () => {
               <Crown className="w-3.5 h-3.5" />
               <span>{t.adminTeamAndStaffTab}</span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveMainTab('blacklist')}
+              className={`px-4 py-1.5 rounded text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeMainTab === 'blacklist'
+                  ? 'bg-red-600 text-white shadow-md'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <ShieldAlert className="w-3.5 h-3.5" />
+              <span>{language === 'ar' ? 'قائمة الحظر والأمان' : 'Security Blacklist'}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -282,6 +296,8 @@ export const AdminCustomersPage: React.FC = () => {
       {/* Main View Router */}
       {activeMainTab === 'team' ? (
         <AdminTeamTab />
+      ) : activeMainTab === 'blacklist' ? (
+        <AdminBlacklistTab />
       ) : (
         <>
           {/* 2. Customer Summary Statistics Cards */}

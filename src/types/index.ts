@@ -144,6 +144,20 @@ export interface Order {
   pointsRedeemed?: number;
   pointsDiscount?: number;
   couponCode?: string;
+  deviceFingerprint?: string;
+  clientIp?: string;
+}
+
+export interface BlacklistEntry {
+  id: string;
+  phone?: string;
+  email?: string;
+  ip?: string;
+  deviceFingerprint?: string;
+  customerName?: string;
+  reason?: string;
+  orderId?: string;
+  createdAt?: string;
 }
 
 export interface StoreSettings {
@@ -421,5 +435,3 @@ export interface ExchangeRequest {
   createdAt: string;
   updatedAt: string;
 }
-
-

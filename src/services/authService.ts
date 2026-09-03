@@ -1,5 +1,5 @@
 import { apiClient } from './apiClient';
-import { ApiResponse, LoginCredentials, RegisterData, AuthResult } from '../types';
+import { ApiResponse, LoginCredentials, RegisterData, AuthResult, Address } from '../types';
 
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<AuthResult> => {
@@ -24,6 +24,11 @@ export const authService = {
 
   getProfile: async (): Promise<AuthResult> => {
     const response = await apiClient.get<ApiResponse<AuthResult>>('/auth/me');
+    return response.data.data;
+  },
+
+  updateProfile: async (data: { name?: string; phone?: string; addresses?: Address[] }): Promise<any> => {
+    const response = await apiClient.put<ApiResponse<any>>('/auth/profile', data);
     return response.data.data;
   },
 

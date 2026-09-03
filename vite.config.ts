@@ -11,6 +11,10 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    host: true, // Listen on all network addresses (0.0.0.0) so mobile can connect
+    port: 5173,
+  },
   build: {
     rollupOptions: {
       output: {

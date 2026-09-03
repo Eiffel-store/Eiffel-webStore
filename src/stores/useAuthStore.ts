@@ -50,6 +50,10 @@ export const useAuthStore = create<AuthState>()(
           const accessToken = data.accessToken || data.token;
           const refreshToken = data.refreshToken || null;
 
+          const existingAddresses = (get().user?.addresses || []).filter((a: any) => a && a.street);
+          const serverAddresses = (rawUser.addresses || []).filter((a: any) => a && a.street);
+          const finalAddresses = serverAddresses.length > 0 ? serverAddresses : existingAddresses;
+
           const user: User = {
             id: String(rawUser.id || data.id || Date.now()),
             name: rawUser.name || data.name || credentials.email.split('@')[0],
@@ -61,7 +65,7 @@ export const useAuthStore = create<AuthState>()(
             tierPoints: rawPoints,
             phone: rawUser.phone || data.phone || '',
             memberSince: '2026',
-            addresses: rawUser.addresses || [],
+            addresses: finalAddresses,
             paymentMethods: [],
             orders: [],
           };
@@ -77,6 +81,11 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
           });
+
+          // Sync local addresses to MongoDB if server had none stored yet
+          if (serverAddresses.length === 0 && existingAddresses.length > 0) {
+            authService.updateProfile({ addresses: existingAddresses }).catch(() => {});
+          }
 
           return data;
         } catch (err: any) {
@@ -234,6 +243,14 @@ export const useAuthStore = create<AuthState>()(
             const rawUser = (data as any).user || (data as any);
             const rawPoints = rawUser.points ?? rawUser.tierPoints ?? (data as any).tierPoints ?? 0;
             const isVip = Boolean(rawUser.isVip ?? (data as any).isVip ?? (rawUser.tier === 'VIP' || rawUser.tier === 'VIP_PLATINUM'));
+            const existingAddresses = (get().user?.addresses || []).filter((a: any) => a && a.street);
+            const serverAddresses = (rawUser.addresses || []).filter((a: any) => a && a.street);
+            const finalAddresses = serverAddresses.length > 0 ? serverAddresses : existingAddresses;
+
+            if (serverAddresses.length === 0 && existingAddresses.length > 0) {
+              authService.updateProfile({ addresses: existingAddresses }).catch(() => {});
+            }
+
             set((state) => ({
               user: state.user ? {
                 ...state.user,
@@ -246,7 +263,7 @@ export const useAuthStore = create<AuthState>()(
                 points: rawPoints,
                 tierPoints: rawPoints,
                 phone: rawUser.phone || data.phone || state.user.phone,
-                addresses: (rawUser.addresses && rawUser.addresses.length > 0) ? rawUser.addresses : (state.user.addresses || []),
+                addresses: finalAddresses,
               } : {
                 id: String(rawUser.id || ''),
                 name: rawUser.name || data.name || '',
@@ -258,7 +275,7 @@ export const useAuthStore = create<AuthState>()(
                 tierPoints: rawPoints,
                 phone: rawUser.phone || data.phone || '',
                 memberSince: '2026',
-                addresses: rawUser.addresses || [],
+                addresses: finalAddresses,
                 paymentMethods: [],
                 orders: [],
               },
@@ -309,38 +326,64 @@ export const useAuthStore = create<AuthState>()(
             : null,
         }));
 
+        // Persist permanently to MongoDB
+        if (get().isAuthenticated) {
+          authService.updateProfile({ addresses: updatedAddresses }).catch((err) => {
+            console.warn('Failed to sync addresses to backend:', err);
+          });
+        }
+
         return newAddress;
       },
 
       removeAddress: (id: string) => {
-        set((state) => {
-          if (!state.user) return {};
-          const remaining = (state.user.addresses || []).filter((a) => a.id !== id);
-          if (remaining.length > 0 && !remaining.some((a) => a.isDefault)) {
-            remaining[0].isDefault = true;
-          }
-          return {
-            user: {
-              ...state.user,
-              addresses: remaining,
-            },
-          };
-        });
+        const currentUser = get().user;
+        if (!currentUser) return;
+        const remaining = (currentUser.addresses || []).filter((a) => a.id !== id);
+        if (remaining.length > 0 && !remaining.some((a) => a.isDefault)) {
+          remaining[0].isDefault = true;
+        }
+
+        set((state) => ({
+          user: state.user
+            ? {
+                ...state.user,
+                addresses: remaining,
+              }
+            : null,
+        }));
+
+        // Persist deletion permanently to MongoDB
+        if (get().isAuthenticated) {
+          authService.updateProfile({ addresses: remaining }).catch((err) => {
+            console.warn('Failed to sync address removal to backend:', err);
+          });
+        }
       },
 
       setDefaultAddress: (id: string) => {
-        set((state) => {
-          if (!state.user) return {};
-          return {
-            user: {
-              ...state.user,
-              addresses: (state.user.addresses || []).map((a) => ({
-                ...a,
-                isDefault: a.id === id,
-              })),
-            },
-          };
-        });
+        const currentUser = get().user;
+        if (!currentUser) return;
+        const updated = (currentUser.addresses || []).map((a) => ({
+          ...a,
+          isDefault: a.id === id,
+        }));
+
+        set((state) => ({
+          user: state.user
+            ? {
+                ...state.user,
+                addresses: updated,
+              }
+            : null,
+        }));
+
+        // Persist default address permanently to MongoDB
+        if (get().isAuthenticated) {
+          authService.updateProfile({ addresses: updated }).catch((err) => {
+            console.warn('Failed to sync default address to backend:', err);
+          });
+        }
       },
 
       clearError: () => set({ error: null }),

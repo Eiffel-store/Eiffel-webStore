@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/shared';
 import { locationService, GeocodedAddress } from '@/services/locationService';
-import { Address } from '@/types';
+import { Address, UserProfile } from '@/types';
 
 // Lazy-Loaded Google Maps & Coordinates Picker Modal
 const GoogleMapsPickerModal = lazy(() => import('./GoogleMapsPickerModal').then(m => ({ default: m.GoogleMapsPickerModal })));
@@ -40,6 +40,7 @@ export interface CheckoutFormErrors {
 
 interface CheckoutContactFormProps {
   addresses?: Address[];
+  currentUser?: UserProfile | null;
   email: string;
   setEmail: (val: string) => void;
   firstName: string;
@@ -70,6 +71,7 @@ interface CheckoutContactFormProps {
 
 export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
   addresses = [],
+  currentUser,
   email,
   setEmail,
   firstName,
@@ -97,7 +99,7 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
   saveAddressToAccount = true,
   setSaveAddressToAccount
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [showMapModal, setShowMapModal] = useState(false);
   const [isInstantGpsLoading, setIsInstantGpsLoading] = useState(false);
   const [gpsSuccessNotice, setGpsSuccessNotice] = useState<string | null>(null);
@@ -357,149 +359,237 @@ export const CheckoutContactForm: React.FC<CheckoutContactFormProps> = ({
         </div>
       )}
 
-      {/* Contact & Address Fields */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Email */}
-        <div className="sm:col-span-2">
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-zinc-400" />
-              <span>{t.emailLabel}</span>
-              <span className="text-red-500 font-bold">* ({t.required})</span>
-            </label>
-            {touched.email && !errors.email && email && (
-              <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
-                <Check className="w-3 h-3" /> {t.valid}
-              </span>
-            )}
+      {/* Contact Information: Verified Recipient Card (Logged-in) or Inputs (Guest) */}
+      {isLoggedIn && currentUser ? (
+        <div className="p-4 sm:p-5 bg-gradient-to-r from-zinc-900/90 via-zinc-900/60 to-zinc-950 border border-zinc-800 rounded-xl space-y-3.5 shadow-lg">
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-white flex items-center gap-2">
+                  <span>{language === 'ar' ? 'بيانات المستلم المعتمدة بحسابك' : 'Verified Recipient Profile'}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/70 text-emerald-400 border border-emerald-800/60 font-mono">
+                    {language === 'ar' ? 'حساب موثق ✓' : 'Verified ✓'}
+                  </span>
+                </h4>
+                <p className="text-[11px] text-zinc-400 mt-0.5">
+                  {language === 'ar' ? 'سيتم إصدار الفاتورة وتتبع الشحنة والتواصل مع المندوب بهذه البيانات:' : 'Order updates and courier contact will use these details:'}
+                </p>
+              </div>
+            </div>
           </div>
-          <input
-            id="checkout-email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onBlur={() => onBlurField('email')}
-            placeholder="name@example.com"
-            className={`w-full bg-surface-container-lowest dark:bg-zinc-950 border p-3 text-xs text-primary dark:text-white font-mono focus:outline-none transition-colors ${
-              touched.email && errors.email
-                ? 'border-red-500 bg-red-950/10 focus:border-red-500 ring-1 ring-red-500/30'
-                : 'border-surface-container dark:border-zinc-700 focus:border-primary dark:focus:border-white'
-            }`}
-          />
-          {touched.email && errors.email && (
-            <p className="text-[11px] text-red-400 mt-1.5 flex items-center gap-1 animate-fade-in font-medium">
-              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-              <span>{errors.email}</span>
-            </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+            <div className="flex items-center gap-2.5 bg-zinc-950/70 p-2.5 rounded-lg border border-zinc-800/80">
+              <User className="w-4 h-4 text-amber-400/80 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] text-zinc-500 block">{language === 'ar' ? 'الاسم' : 'Name'}</span>
+                <span className="font-bold text-white truncate block text-xs">{currentUser.name || 'عميل إيفل'}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 bg-zinc-950/70 p-2.5 rounded-lg border border-zinc-800/80 font-mono">
+              <Phone className="w-4 h-4 text-amber-400/80 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] text-zinc-500 block font-sans">{language === 'ar' ? 'الموبايل' : 'Phone'}</span>
+                <span className="font-bold text-amber-300 truncate block text-xs">
+                  {currentUser.phone || phone || (language === 'ar' ? 'يرجى كتابة الرقم بالأسفل' : 'Please provide below')}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 bg-zinc-950/70 p-2.5 rounded-lg border border-zinc-800/80 font-mono">
+              <Mail className="w-4 h-4 text-amber-400/80 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] text-zinc-500 block font-sans">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</span>
+                <span className="font-medium text-zinc-300 truncate block text-[11px]">{currentUser.email || '—'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* If user profile has no valid phone yet, prompt for delivery phone */}
+          {(!currentUser.phone || currentUser.phone.trim().length < 10) && (
+            <div className="pt-2">
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[11px] font-label-bold text-amber-300 uppercase flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{language === 'ar' ? 'رقم الموبايل المصري (لتواصل المندوب وتأكيد الشحنة)' : 'Mobile Phone (for delivery)'}</span>
+                  <span className="text-red-400 font-bold">* ({t.required})</span>
+                </label>
+              </div>
+              <input
+                id="checkout-phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                onBlur={() => onBlurField('phone')}
+                placeholder="010XXXXXXXX"
+                className={`w-full bg-zinc-950 border p-3 text-xs font-mono text-white rounded focus:outline-none transition-colors ${
+                  touched.phone && errors.phone
+                    ? 'border-red-500 bg-red-950/10 focus:border-red-500 ring-1 ring-red-500/30'
+                    : 'border-zinc-700 focus:border-amber-400'
+                }`}
+              />
+              {touched.phone && errors.phone && (
+                <p className="text-[11px] text-red-400 mt-1.5 flex items-center gap-1 font-medium">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{errors.phone}</span>
+                </p>
+              )}
+            </div>
           )}
         </div>
-
-        {/* First Name */}
-        <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-zinc-400" />
-              <span>{t.firstNameLabel}</span>
-              <span className="text-red-500 font-bold">* ({t.required})</span>
-            </label>
-            {touched.firstName && !errors.firstName && firstName && (
-              <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
-                <Check className="w-3 h-3" /> {t.valid}
-              </span>
-            )}
-          </div>
-          <input
-            id="checkout-firstname"
-            type="text"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            onBlur={() => onBlurField('firstName')}
-            placeholder={t.firstNameLabel}
-            className={`w-full bg-surface-container-lowest dark:bg-zinc-950 border p-3 text-xs text-primary dark:text-white focus:outline-none transition-colors ${
-              touched.firstName && errors.firstName
-                ? 'border-red-500 bg-red-950/10 focus:border-red-500 ring-1 ring-red-500/30'
-                : 'border-surface-container dark:border-zinc-700 focus:border-primary dark:focus:border-white'
-            }`}
-          />
-          {touched.firstName && errors.firstName && (
-            <p className="text-[11px] text-red-400 mt-1.5 flex items-center gap-1 animate-fade-in font-medium">
-              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-              <span>{errors.firstName}</span>
-            </p>
-          )}
-        </div>
-
-        {/* Last Name */}
-        <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-zinc-400" />
-              <span>{t.lastNameLabel}</span>
-              <span className="text-red-500 font-bold">* ({t.required})</span>
-            </label>
-            {touched.lastName && !errors.lastName && lastName && (
-              <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
-                <Check className="w-3 h-3" /> {t.valid}
-              </span>
-            )}
-          </div>
-          <input
-            id="checkout-lastname"
-            type="text"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            onBlur={() => onBlurField('lastName')}
-            placeholder={t.lastNameLabel}
-            className={`w-full bg-surface-container-lowest dark:bg-zinc-950 border p-3 text-xs text-primary dark:text-white focus:outline-none transition-colors ${
-              touched.lastName && errors.lastName
-                ? 'border-red-500 bg-red-950/10 focus:border-red-500 ring-1 ring-red-500/30'
-                : 'border-surface-container dark:border-zinc-700 focus:border-primary dark:focus:border-white'
-            }`}
-          />
-          {touched.lastName && errors.lastName && (
-            <p className="text-[11px] text-red-400 mt-1.5 flex items-center gap-1 animate-fade-in font-medium">
-              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-              <span>{errors.lastName}</span>
-            </p>
-          )}
-        </div>
-
-        {/* Phone */}
-        <div className="sm:col-span-2">
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-zinc-400" />
-              <span>{t.phoneLabel}</span>
-              <span className="text-red-500 font-bold">* ({t.required})</span>
-            </label>
-            {touched.phone && !errors.phone && phone && (
-              <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
-                <Check className="w-3 h-3" /> {t.valid}
-              </span>
-            )}
-          </div>
-          <div className="relative">
+      ) : (
+        /* Guest Inputs */
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Email */}
+          <div className="sm:col-span-2">
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-zinc-400" />
+                <span>{t.emailLabel}</span>
+                <span className="text-red-500 font-bold">* ({t.required})</span>
+              </label>
+              {touched.email && !errors.email && email && (
+                <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                  <Check className="w-3 h-3" /> {t.valid}
+                </span>
+              )}
+            </div>
             <input
-              id="checkout-phone"
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              onBlur={() => onBlurField('phone')}
-              placeholder="01012345678"
-              className={`w-full bg-surface-container-lowest dark:bg-zinc-950 border p-3 text-xs font-mono text-primary dark:text-white focus:outline-none transition-colors ${
-                touched.phone && errors.phone
+              id="checkout-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onBlur={() => onBlurField('email')}
+              placeholder="name@example.com"
+              className={`w-full bg-surface-container-lowest dark:bg-zinc-950 border p-3 text-xs text-primary dark:text-white font-mono focus:outline-none transition-colors ${
+                touched.email && errors.email
                   ? 'border-red-500 bg-red-950/10 focus:border-red-500 ring-1 ring-red-500/30'
                   : 'border-surface-container dark:border-zinc-700 focus:border-primary dark:focus:border-white'
               }`}
             />
+            {touched.email && errors.email && (
+              <p className="text-[11px] text-red-400 mt-1.5 flex items-center gap-1 animate-fade-in font-medium">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{errors.email}</span>
+              </p>
+            )}
           </div>
-          {touched.phone && errors.phone && (
-            <p className="text-[11px] text-red-400 mt-1.5 flex items-center gap-1 animate-fade-in font-medium">
-              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-              <span>{errors.phone}</span>
-            </p>
-          )}
+
+          {/* First Name */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-zinc-400" />
+                <span>{t.firstNameLabel}</span>
+                <span className="text-red-500 font-bold">* ({t.required})</span>
+              </label>
+              {touched.firstName && !errors.firstName && firstName && (
+                <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                  <Check className="w-3 h-3" /> {t.valid}
+                </span>
+              )}
+            </div>
+            <input
+              id="checkout-firstname"
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              onBlur={() => onBlurField('firstName')}
+              placeholder={t.firstNameLabel}
+              className={`w-full bg-surface-container-lowest dark:bg-zinc-950 border p-3 text-xs text-primary dark:text-white focus:outline-none transition-colors ${
+                touched.firstName && errors.firstName
+                  ? 'border-red-500 bg-red-950/10 focus:border-red-500 ring-1 ring-red-500/30'
+                  : 'border-surface-container dark:border-zinc-700 focus:border-primary dark:focus:border-white'
+              }`}
+            />
+            {touched.firstName && errors.firstName && (
+              <p className="text-[11px] text-red-400 mt-1.5 flex items-center gap-1 animate-fade-in font-medium">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{errors.firstName}</span>
+              </p>
+            )}
+          </div>
+
+          {/* Last Name */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-zinc-400" />
+                <span>{t.lastNameLabel}</span>
+                <span className="text-red-500 font-bold">* ({t.required})</span>
+              </label>
+              {touched.lastName && !errors.lastName && lastName && (
+                <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                  <Check className="w-3 h-3" /> {t.valid}
+                </span>
+              )}
+            </div>
+            <input
+              id="checkout-lastname"
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              onBlur={() => onBlurField('lastName')}
+              placeholder={t.lastNameLabel}
+              className={`w-full bg-surface-container-lowest dark:bg-zinc-950 border p-3 text-xs text-primary dark:text-white focus:outline-none transition-colors ${
+                touched.lastName && errors.lastName
+                  ? 'border-red-500 bg-red-950/10 focus:border-red-500 ring-1 ring-red-500/30'
+                  : 'border-surface-container dark:border-zinc-700 focus:border-primary dark:focus:border-white'
+              }`}
+            />
+            {touched.lastName && errors.lastName && (
+              <p className="text-[11px] text-red-400 mt-1.5 flex items-center gap-1 animate-fade-in font-medium">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{errors.lastName}</span>
+              </p>
+            )}
+          </div>
+
+          {/* Phone */}
+          <div className="sm:col-span-2">
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-[11px] font-label-bold text-primary dark:text-zinc-200 uppercase flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-zinc-400" />
+                <span>{t.phoneLabel}</span>
+                <span className="text-red-500 font-bold">* ({t.required})</span>
+              </label>
+              {touched.phone && !errors.phone && phone && (
+                <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                  <Check className="w-3 h-3" /> {t.valid}
+                </span>
+              )}
+            </div>
+            <div className="relative">
+              <input
+                id="checkout-phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                onBlur={() => onBlurField('phone')}
+                placeholder="01012345678"
+                className={`w-full bg-surface-container-lowest dark:bg-zinc-950 border p-3 text-xs font-mono text-primary dark:text-white focus:outline-none transition-colors ${
+                  touched.phone && errors.phone
+                    ? 'border-red-500 bg-red-950/10 focus:border-red-500 ring-1 ring-red-500/30'
+                    : 'border-surface-container dark:border-zinc-700 focus:border-primary dark:focus:border-white'
+                }`}
+              />
+            </div>
+            {touched.phone && errors.phone && (
+              <p className="text-[11px] text-red-400 mt-1.5 flex items-center gap-1 animate-fade-in font-medium">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{errors.phone}</span>
+              </p>
+            )}
+          </div>
         </div>
+      )}
+
+      {/* Delivery Address Fields */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
         {/* Governorate / City */}
         <div>

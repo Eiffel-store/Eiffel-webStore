@@ -204,4 +204,11 @@ export const orderService = {
     });
     return mapServerOrderToClient(response.data.data);
   },
+
+  cancelAndBlacklist: async (id: string, reason?: string): Promise<Order> => {
+    const response = await apiClient.post<ApiResponse<ServerOrder>>(`/orders/${id}/cancel-and-blacklist`, {
+      reason: reason || 'طلب وهمي / سبام'
+    });
+    return mapServerOrderToClient(response.data.data);
+  },
 };

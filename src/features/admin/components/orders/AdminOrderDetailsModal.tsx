@@ -1,7 +1,9 @@
 import React from 'react';
-import { X, Phone, MessageSquare, MapPin, CreditCard, User, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { X, Phone, MessageSquare, MapPin, CreditCard, User, ExternalLink, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { Order } from '@/types';
 import { useCurrency, useLanguage } from '@/shared';
+import { orderService } from '@/services/orderService';
+import toast from 'react-hot-toast';
 
 interface AdminOrderDetailsModalProps {
   order: Order | null;
@@ -15,9 +17,28 @@ export const AdminOrderDetailsModal: React.FC<AdminOrderDetailsModalProps> = ({
   onUpdateStatus,
 }) => {
   const { formatPrice } = useCurrency();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   if (!order) return null;
+
+  const handleCancelAndBlacklist = async () => {
+    const phone = order.customerPhone || order.shippingAddress?.phone || '';
+    const isAr = language === 'ar';
+    if (!window.confirm(isAr 
+      ? `هل أنت متأكد من حظر الرقم (${phone}) وعنوان الجهاز وإلغاء الطلب وإرجاع المخزون؟` 
+      : `Are you sure you want to blacklist (${phone}) and cancel the order?`)) {
+      return;
+    }
+
+    try {
+      await orderService.cancelAndBlacklist(order.id, isAr ? 'طلب وهمي / محاولة استنزاف مخزون' : 'Spam order / inventory hijacking');
+      toast.success(isAr ? 'تم حظر الرقم والجهاز وإلغاء الطلب بنجاح' : 'Order cancelled and blacklisted');
+      onUpdateStatus(order.id, 'Cancelled');
+      onClose();
+    } catch (err: any) {
+      toast.error(err?.message || (isAr ? 'فشل حظر الرقم' : 'Failed to blacklist'));
+    }
+  };
 
   const phone = order.customerPhone || order.shippingAddress?.phone || '';
   const cleanPhone = phone.replace(/[^0-9]/g, '');
@@ -123,15 +144,29 @@ export const AdminOrderDetailsModal: React.FC<AdminOrderDetailsModalProps> = ({
             </select>
           </div>
 
-          {order.status !== 'Confirmed' && order.status !== 'Shipped' && order.status !== 'Delivered' && (
-            <button
-              onClick={() => onUpdateStatus(order.id, 'Confirmed' as any)}
-              className="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded text-xs flex items-center justify-center gap-1.5 transition-colors shadow-lg cursor-pointer"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>{t.adminConfirmOrderAndShip}</span>
-            </button>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {order.status !== 'Confirmed' && order.status !== 'Shipped' && order.status !== 'Delivered' && (
+              <button
+                onClick={() => onUpdateStatus(order.id, 'Confirmed' as any)}
+                className="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded text-xs flex items-center justify-center gap-1.5 transition-colors shadow-lg cursor-pointer"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>{t.adminConfirmOrderAndShip}</span>
+              </button>
+            )}
+
+            {order.status !== 'Cancelled' && (
+              <button
+                type="button"
+                onClick={handleCancelAndBlacklist}
+                className="px-3 py-1.5 bg-red-950/60 hover:bg-red-900 border border-red-800/80 text-red-300 font-bold rounded text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                title={language === 'ar' ? 'حظر الرقم والـ IP وإلغاء الطلب واسترجاع المخزون' : 'Blacklist and cancel order'}
+              >
+                <ShieldAlert className="w-4 h-4" />
+                <span>{language === 'ar' ? 'حظر الرقم وإلغاء الطلب' : 'Ban & Cancel'}</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Ordered Items */}

@@ -125,7 +125,9 @@ export const CartDrawer: React.FC = () => {
                           <span className="px-2 text-xs font-mono text-white">{item.quantity}</span>
                           <button
                             onClick={() => prod && updateQuantity(prod.id, item.selectedSize, item.selectedColor, item.quantity + 1)}
-                            className="px-2 py-0.5 text-zinc-400 hover:text-white text-xs"
+                            disabled={item.quantity >= 3}
+                            className="px-2 py-0.5 text-zinc-400 hover:text-white text-xs disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                            title={item.quantity >= 3 ? 'الحد الأقصى 3 قطع' : undefined}
                           >
                             +
                           </button>

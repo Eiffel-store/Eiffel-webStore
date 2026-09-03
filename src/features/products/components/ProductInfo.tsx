@@ -191,8 +191,8 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({
               {quantity}
             </span>
             <button
-              onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
-              disabled={isOutOfStock || quantity >= currentStock}
+              onClick={() => setQuantity(Math.min(Math.min(currentStock, 3), quantity + 1))}
+              disabled={isOutOfStock || quantity >= Math.min(currentStock, 3)}
               className="text-primary dark:text-white px-2 py-2 sm:py-3 hover:opacity-60 text-base font-bold disabled:opacity-30 cursor-pointer"
             >
               +

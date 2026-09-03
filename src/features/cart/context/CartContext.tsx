@@ -54,10 +54,29 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
 
-    // 3. Cap quantity to available stock
-    const validQuantity = Math.min(quantity, availableStock);
     const selectedSize = size || (currentProd.sizes && currentProd.sizes[0]) || 'M';
     const selectedColor = color || (currentProd.colors && currentProd.colors[0]?.name) || 'Standard';
+
+    // Anti-Spam Inventory Protection: Max 3 pieces per item per order
+    const MAX_ALLOWED_PER_ITEM = 3;
+    const existing = store.items.find(
+      (item) =>
+        item.product.id === product.id &&
+        item.selectedColor === selectedColor &&
+        item.selectedSize === selectedSize
+    );
+    const currentQtyInCart = existing ? existing.quantity : 0;
+
+    if (currentQtyInCart + quantity > MAX_ALLOWED_PER_ITEM) {
+      toast.error(
+        `الحد الأقصى المسموح به هو ${MAX_ALLOWED_PER_ITEM} قطع من نفس القطعة للطلب الواحد للحفاظ على توفر المخزون.`,
+        { id: `max-qty-limit-${product.id}` }
+      );
+      return false;
+    }
+
+    // 3. Cap quantity to available stock
+    const validQuantity = Math.min(quantity, availableStock);
 
     // 4. Add to cart store
     store.addToCart(currentProd, validQuantity, selectedColor, selectedSize);
@@ -102,6 +121,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (newQuantity <= 0) {
       removeFromCart(productId, selectedSize, selectedColor);
+      return;
+    }
+
+    const MAX_ALLOWED_PER_ITEM = 3;
+    if (newQuantity > MAX_ALLOWED_PER_ITEM) {
+      toast.error(`الحد الأقصى المسموح به هو ${MAX_ALLOWED_PER_ITEM} قطع من نفس الموديل للطلب الواحد.`);
       return;
     }
 
