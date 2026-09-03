@@ -16,9 +16,11 @@ import {
   Trash2,
   Camera
 } from 'lucide-react';
-import { Order, CartItem, ExchangeType, ExchangeRequest, ProductColor } from '@/types';
+import { Order, CartItem, ExchangeType, ExchangeRequest, ProductColor, Product } from '@/types';
 import { useLanguage } from '@/shared';
+import { useQuery } from '@tanstack/react-query';
 import { exchangeService } from '@/services/exchangeService';
+import { productService } from '@/services/productService';
 import { uploadService } from '@/services/uploadService';
 import toast from 'react-hot-toast';
 
@@ -98,27 +100,45 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
   const product = currentItem?.product;
   const isCurrentItemDisabled = currentItem ? allRequestsMap.has(currentItem.product?.id) : false;
 
+  // Fetch full live product from backend catalog to get its genuine sizes & colors
+  const { data: liveProduct } = useQuery<Product>({
+    queryKey: ['product-details', currentItem?.product?.id],
+    queryFn: () => productService.getById(currentItem!.product.id),
+    enabled: Boolean(isOpen && currentItem?.product?.id),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const activeProduct = liveProduct || product;
+
   // Filter out the purchased size and purchased color
   const purchasedSize = (currentItem?.selectedSize || '').trim().toUpperCase();
-  const rawSizes = (product?.sizes && product.sizes.length > 0)
-    ? product.sizes
+
+  // If product sizes has more than 1 item, use them; otherwise fallback to full standard size chart
+  const availableProductSizes = (activeProduct?.sizes && activeProduct.sizes.length > 1)
+    ? activeProduct.sizes
     : ['S', 'M', 'L', 'XL', '2XL', '3XL'];
-  const suggestedSizes = rawSizes.filter(
+
+  const suggestedSizes = availableProductSizes.filter(
     (sz) => sz.trim().toUpperCase() !== purchasedSize
   );
 
   const purchasedColor = (currentItem?.selectedColor || '').trim().toLowerCase();
-  const rawColors: ProductColor[] = (product?.colors && product.colors.length > 0)
-    ? product.colors
-    : [
-        { name: 'أسود', hex: '#0a0a0a' },
-        { name: 'أبيض', hex: '#f8fafc' },
-        { name: 'بيج', hex: '#d4b996' },
-        { name: 'رمادي', hex: '#64748b' },
-        { name: 'كحلي', hex: '#1e293b' },
-        { name: 'زيتي', hex: '#3f4f38' },
-      ];
-  const suggestedColors = rawColors.filter((c) => {
+
+  const defaultColors: ProductColor[] = [
+    { name: 'أسود', hex: '#0a0a0a' },
+    { name: 'أبيض', hex: '#f8fafc' },
+    { name: 'بيج', hex: '#d4b996' },
+    { name: 'رمادي', hex: '#64748b' },
+    { name: 'كحلي', hex: '#1e293b' },
+    { name: 'زيتي', hex: '#3f4f38' },
+    { name: 'هافان', hex: '#8B4513' },
+  ];
+
+  const availableProductColors: ProductColor[] = (activeProduct?.colors && activeProduct.colors.length > 1)
+    ? activeProduct.colors
+    : defaultColors;
+
+  const suggestedColors = availableProductColors.filter((c) => {
     const cName = (c.name || '').trim().toLowerCase();
     return cName !== purchasedColor;
   });
