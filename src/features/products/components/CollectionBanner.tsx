@@ -33,7 +33,7 @@ export const CollectionBanner: React.FC<CollectionBannerProps> = ({
   const isDuplicateSubtitle = subtitle && subtitle.toLowerCase().trim() === title.toLowerCase().trim();
 
   return (
-    <section className="relative h-64 sm:h-80 md:h-96 w-full bg-zinc-950 flex items-end overflow-hidden border-b border-surface-container dark:border-zinc-800">
+    <section className="relative min-h-[220px] h-56 sm:h-80 md:h-96 w-full bg-zinc-950 flex items-end overflow-hidden border-b border-surface-container dark:border-zinc-800">
       <img
         src={bannerSrc}
         alt={title}
@@ -44,8 +44,8 @@ export const CollectionBanner: React.FC<CollectionBannerProps> = ({
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
-      <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 pb-10 w-full text-white">
-        <div className="flex items-center gap-2 text-xs font-mono tracking-widest text-zinc-400 mb-2">
+      <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 pb-6 sm:pb-10 w-full text-white">
+        <div className="flex items-center gap-2 text-[11px] sm:text-xs font-mono tracking-widest text-zinc-400 mb-2 overflow-x-auto whitespace-nowrap scrollbar-none">
           <Link to="/" className="hover:underline">EIFFEL</Link>
           <span>/</span>
           <span>{t.collectionsTitle}</span>
@@ -53,11 +53,11 @@ export const CollectionBanner: React.FC<CollectionBannerProps> = ({
           <span className="text-white uppercase">{getBreadcrumbCategory()}</span>
         </div>
 
-        <h1 className="font-editorial text-4xl sm:text-6xl md:text-7xl text-white tracking-tight uppercase">
+        <h1 className="font-editorial text-3xl sm:text-5xl md:text-6xl text-white tracking-tight uppercase leading-tight">
           {title}
         </h1>
         {subtitle && !isDuplicateSubtitle && (
-          <p className="text-xs sm:text-sm text-zinc-300 max-w-xl font-light mt-1 leading-relaxed">
+          <p className="text-xs sm:text-sm text-zinc-300 max-w-xl font-light mt-1 leading-relaxed line-clamp-2 sm:line-clamp-none">
             {subtitle}
           </p>
         )}

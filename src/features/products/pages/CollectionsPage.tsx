@@ -322,7 +322,7 @@ export const CollectionsPage: React.FC = () => {
       />
 
       {/* 3. PRODUCT CATALOG GRID (Starts from the exact same vertical guide line) */}
-      <section className="py-8 sm:py-12 px-4 sm:px-8 md:px-12 max-w-[1440px] mx-auto w-full">
+      <section className="py-6 sm:py-12 px-3 sm:px-8 md:px-12 max-w-[1440px] mx-auto w-full">
         {/* Active Filter Tags */}
         {hasActiveFilters && (
           <ActiveFilters
@@ -355,7 +355,7 @@ export const CollectionsPage: React.FC = () => {
         ) : (
           <>
             <div
-              className={`grid gap-3 sm:gap-6 ${
+              className={`grid gap-2.5 sm:gap-6 ${
                 gridCols === 1
                   ? 'grid-cols-1 max-w-md mx-auto sm:max-w-none sm:grid-cols-2 lg:grid-cols-4'
                   : gridCols === 2

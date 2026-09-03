@@ -17,7 +17,7 @@ export const NavMobileDrawer: React.FC<NavMobileDrawerProps> = ({
   onClose,
   links,
 }) => {
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const { settings } = useStoreData();
   const { user, isAuthenticated, role, logout } = useAuthStore();
@@ -104,28 +104,62 @@ export const NavMobileDrawer: React.FC<NavMobileDrawerProps> = ({
         </div>
 
         <div className="pt-6 pb-2 border-t border-surface-container dark:border-zinc-800 space-y-3">
-          {/* Quick Preferences Bar (Theme & Language in Mobile Drawer) */}
-          <div className="flex items-center justify-between py-2 border-y border-zinc-850">
-            <span className="text-xs font-mono text-secondary dark:text-zinc-400 uppercase tracking-wider">
-              {t.theme || 'THEME'}
-            </span>
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 text-xs font-mono text-primary dark:text-white"
-            >
-              {theme === 'dark' ? (
-                <>
-                  <Sun className="w-3.5 h-3.5 text-amber-400" />
-                  <span>LIGHT</span>
-                </>
-              ) : (
-                <>
-                  <Moon className="w-3.5 h-3.5 text-blue-400" />
-                  <span>DARK</span>
-                </>
-              )}
-            </button>
+          {/* Quick Preferences Bar (Language & Theme in Mobile Drawer) */}
+          <div className="space-y-3 py-3 border-y border-surface-container dark:border-zinc-800">
+            {/* Language Switcher */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono text-secondary dark:text-zinc-400 uppercase tracking-wider">
+                {language === 'ar' ? 'اللغة' : 'LANGUAGE'}
+              </span>
+              <div className="flex items-center gap-1 bg-surface-container dark:bg-zinc-900 p-1 rounded-lg border border-surface-container dark:border-zinc-800 text-xs font-mono">
+                <button
+                  type="button"
+                  onClick={() => setLanguage('ar')}
+                  className={`px-3 py-1 rounded transition-colors ${
+                    language === 'ar'
+                      ? 'bg-primary text-white dark:bg-white dark:text-black font-bold shadow-sm'
+                      : 'text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white'
+                  }`}
+                >
+                  العربية
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage('en')}
+                  className={`px-3 py-1 rounded transition-colors ${
+                    language === 'en'
+                      ? 'bg-primary text-white dark:bg-white dark:text-black font-bold shadow-sm'
+                      : 'text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white'
+                  }`}
+                >
+                  English
+                </button>
+              </div>
+            </div>
+
+            {/* Theme Toggle */}
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-xs font-mono text-secondary dark:text-zinc-400 uppercase tracking-wider">
+                {t.theme || 'THEME'}
+              </span>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 text-xs font-mono text-primary dark:text-white"
+              >
+                {theme === 'dark' ? (
+                  <>
+                    <Sun className="w-3.5 h-3.5 text-amber-400" />
+                    <span>LIGHT</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="w-3.5 h-3.5 text-blue-400" />
+                    <span>DARK</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
           <div className="text-[11px] text-zinc-500 font-mono tracking-wider">

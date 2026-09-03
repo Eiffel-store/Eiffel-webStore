@@ -18,14 +18,16 @@ export const NavActionButtons: React.FC<NavActionButtonsProps> = ({ onOpenSearch
   const { user, isAuthenticated } = useAuthStore();
 
   return (
-    <div className="flex items-center gap-1 min-[360px]:gap-1.5 sm:gap-2.5 xl:gap-3">
-      {/* Language Switcher */}
-      <NavLanguageDropdown />
+    <div className="flex items-center gap-1.5 sm:gap-2.5 xl:gap-3 shrink-0">
+      {/* Language Switcher (Visible on md+ desktop, accessible in mobile drawer on phones) */}
+      <div className="hidden md:block">
+        <NavLanguageDropdown />
+      </div>
 
-      {/* Dark/Light Mode Toggle (Hidden on < 380px to save space for search/cart, accessible in mobile drawer) */}
+      {/* Dark/Light Mode Toggle (Visible on md+ desktop, accessible in mobile drawer on phones) */}
       <button
         onClick={toggleTheme}
-        className="hidden min-[380px]:flex p-1.5 sm:p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors cursor-pointer"
+        className="hidden md:flex p-1.5 sm:p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors cursor-pointer"
         aria-label="Toggle theme"
       >
         {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
