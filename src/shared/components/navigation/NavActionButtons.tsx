@@ -56,10 +56,10 @@ export const NavActionButtons: React.FC<NavActionButtonsProps> = ({ onOpenSearch
         )}
       </Link>
 
-      {/* Account Link (Desktop) */}
+      {/* Account Link */}
       <Link
         to="/account"
-        className="hidden sm:flex items-center gap-1.5 p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors cursor-pointer"
+        className="flex items-center gap-1.5 p-1 min-[360px]:p-1.5 sm:p-2 text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white transition-colors cursor-pointer"
         aria-label="Account"
       >
         <div className="relative">
@@ -69,7 +69,7 @@ export const NavActionButtons: React.FC<NavActionButtonsProps> = ({ onOpenSearch
           )}
         </div>
         {isAuthenticated && user && (
-          <span className="text-xs font-label-bold tracking-wider max-w-[80px] truncate">
+          <span className="hidden sm:inline text-xs font-label-bold tracking-wider max-w-[80px] truncate">
             {(user.name || user.email || 'User').split(' ')[0]}
           </span>
         )}

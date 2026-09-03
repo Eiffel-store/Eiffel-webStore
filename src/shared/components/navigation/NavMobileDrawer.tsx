@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { X, LogOut, Sparkles, Sun, Moon } from 'lucide-react';
+import { X, LogOut, Sparkles, Sun, Moon, ChevronRight, User as UserIcon } from 'lucide-react';
 import { Logo } from '../Logo';
 import { useLanguage, useStoreData, useTheme } from '@/shared';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -48,25 +48,51 @@ export const NavMobileDrawer: React.FC<NavMobileDrawerProps> = ({
           {/* User Bar in Mobile Menu */}
           <div className="py-4 border-b border-surface-container dark:border-zinc-800">
             {isAuthenticated && user ? (
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-bold text-primary dark:text-white">
-                    {user.name || user.email || 'User'}
-                  </p>
-                  <p className="text-[10px] text-zinc-400 font-mono">{user.email}</p>
-                </div>
-                <button
-                  onClick={logout}
-                  className="p-1.5 text-red-500 hover:bg-red-500/10 rounded text-xs flex items-center gap-1 cursor-pointer"
+              <div className="p-3 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 rounded-xl space-y-2.5">
+                <Link
+                  to="/account"
+                  onClick={onClose}
+                  className="flex items-center justify-between group cursor-pointer"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
-                </button>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-9 h-9 rounded-full bg-primary text-white dark:bg-white dark:text-black flex items-center justify-center font-bold text-sm shrink-0">
+                      {(user.name || user.email || 'U')[0].toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-primary dark:text-white truncate group-hover:text-amber-500 transition-colors">
+                        {user.name || user.email || 'User'}
+                      </p>
+                      <p className="text-[10px] text-secondary dark:text-zinc-400 font-mono truncate">
+                        {t.clientDashboard || 'الملف الشخصي والطلبات'}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:text-primary dark:group-hover:text-white transition-transform rtl:rotate-180" />
+                </Link>
+
+                <div className="pt-2 border-t border-surface-container dark:border-zinc-800/80 flex items-center justify-between text-xs">
+                  <Link
+                    to="/account"
+                    onClick={onClose}
+                    className="text-[11px] font-mono text-amber-500 hover:underline flex items-center gap-1"
+                  >
+                    <UserIcon className="w-3.5 h-3.5" />
+                    <span>{t.clientDashboard || 'عرض الحساب'}</span>
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="p-1 text-red-500 hover:bg-red-500/10 rounded text-[11px] flex items-center gap-1 cursor-pointer font-mono"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>{t.signOut}</span>
+                  </button>
+                </div>
               </div>
             ) : (
               <Link
                 to="/account"
                 onClick={onClose}
-                className="block text-center py-2 bg-primary text-white dark:bg-white dark:text-black text-xs font-bold uppercase tracking-wider rounded"
+                className="block text-center py-2.5 bg-primary text-white dark:bg-white dark:text-black text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm"
               >
                 {t.signIn} / {t.register}
               </Link>
