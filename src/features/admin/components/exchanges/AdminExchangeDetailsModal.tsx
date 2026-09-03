@@ -159,13 +159,13 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="relative bg-zinc-950 border border-zinc-800 w-full max-w-4xl shadow-2xl rounded-2xl my-auto text-white overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto">
+      <div className="relative bg-zinc-950 border border-zinc-800 w-[96vw] max-w-7xl h-[92vh] max-h-[92vh] flex flex-col shadow-2xl rounded-2xl my-auto text-white overflow-hidden">
         {/* Top Gold Accent Bar */}
-        <div className="h-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600" />
+        <div className="h-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 shrink-0" />
 
         {/* Modal Header */}
-        <div className="p-4 sm:p-5 pb-3 flex items-start justify-between border-b border-zinc-800">
+        <div className="p-5 sm:p-6 pb-4 flex items-start justify-between border-b border-zinc-800 shrink-0">
           <div>
             <div className="flex items-center gap-2">
               <span className="font-mono text-[11px] font-bold text-amber-400 uppercase tracking-wider">
@@ -182,7 +182,7 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
                 })}
               </span>
             </div>
-            <div className="flex flex-wrap items-center gap-2.5 mt-1">
+            <div className="flex flex-wrap items-center gap-2.5 mt-1.5">
               <h2 className="text-xl sm:text-2xl font-bold font-editorial text-white tracking-tight">
                 #{request.orderId}
               </h2>
@@ -194,18 +194,18 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+            className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* 2-Column Responsive Dashboard Layout */}
-        <div className="p-4 sm:p-5 max-h-[82vh] overflow-y-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             {/* LEFT COLUMN: Customer + Product + Reason (7 Cols) */}
-            <div className="lg:col-span-7 space-y-4">
+            <div className="lg:col-span-7 space-y-5">
               
               {/* Customer Info Card */}
               <div className="p-3.5 bg-zinc-900/70 border border-zinc-800/80 rounded-xl space-y-2.5 text-xs font-mono">
