@@ -21,6 +21,7 @@ import { exchangeService } from '@/services/exchangeService';
 import { ExchangeRequest, ExchangeStatus } from '@/types';
 import { useLanguage } from '@/shared';
 import { AdminExchangeDetailsModal } from '../components/exchanges/AdminExchangeDetailsModal';
+import { AdminExchangesOverviewCards } from '../components/exchanges/AdminExchangesOverviewCards';
 import toast from 'react-hot-toast';
 
 export const AdminExchangesPage: React.FC = () => {
@@ -396,6 +397,15 @@ export const AdminExchangesPage: React.FC = () => {
             </div>
           ))}
         </div>
+      )}
+
+      {/* Operational Overview & Analytical Summary Cards */}
+      {requests.length > 0 && (
+        <AdminExchangesOverviewCards
+          requests={requests}
+          onStatusFilter={setStatusFilter}
+          activeStatus={statusFilter}
+        />
       )}
 
       {/* Structured Update Status Modal with Confirm and Cancel Buttons */}

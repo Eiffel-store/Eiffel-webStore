@@ -4,6 +4,7 @@ import { Order } from '@/types';
 import { AdminOrderFilterBar } from '../components/orders/AdminOrderFilterBar';
 import { AdminOrdersTable } from '../components/orders/AdminOrdersTable';
 import { AdminOrderDetailsModal } from '../components/orders/AdminOrderDetailsModal';
+import { AdminOrdersOverviewCards } from '../components/orders/AdminOrdersOverviewCards';
 
 export const AdminOrdersPage: React.FC = () => {
   const { orders, updateOrderStatus, deleteOrder, isOrdersLoading } = useStoreData();
@@ -118,6 +119,15 @@ export const AdminOrdersPage: React.FC = () => {
             />
           )}
         </div>
+      )}
+
+      {/* Operational Performance & Summary Cards */}
+      {orders.length > 0 && (
+        <AdminOrdersOverviewCards
+          orders={orders}
+          onStatusFilter={setStatusFilter}
+          activeStatus={statusFilter}
+        />
       )}
 
       {/* Order Details & Printing Modal */}
