@@ -16,7 +16,7 @@ import {
   Trash2,
   Camera
 } from 'lucide-react';
-import { Order, CartItem, ExchangeType, ExchangeRequest } from '@/types';
+import { Order, CartItem, ExchangeType, ExchangeRequest, ProductColor } from '@/types';
 import { useLanguage } from '@/shared';
 import { exchangeService } from '@/services/exchangeService';
 import { uploadService } from '@/services/uploadService';
@@ -81,6 +81,12 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
     }
   }, [isOpen, order?.id, items]);
 
+  // Reset selected size / color when switching item or type
+  useEffect(() => {
+    setRequestedSize('');
+    setRequestedColor('');
+  }, [selectedItemIndex, requestType]);
+
   if (!isOpen) return null;
 
   // Map of all previous requests (Pending, Approved, In Transit, Completed, Rejected)
@@ -91,6 +97,31 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
   const currentItem: CartItem | undefined = items[selectedItemIndex] || items[0];
   const product = currentItem?.product;
   const isCurrentItemDisabled = currentItem ? allRequestsMap.has(currentItem.product?.id) : false;
+
+  // Filter out the purchased size and purchased color
+  const purchasedSize = (currentItem?.selectedSize || '').trim().toUpperCase();
+  const rawSizes = (product?.sizes && product.sizes.length > 0)
+    ? product.sizes
+    : ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+  const suggestedSizes = rawSizes.filter(
+    (sz) => sz.trim().toUpperCase() !== purchasedSize
+  );
+
+  const purchasedColor = (currentItem?.selectedColor || '').trim().toLowerCase();
+  const rawColors: ProductColor[] = (product?.colors && product.colors.length > 0)
+    ? product.colors
+    : [
+        { name: 'أسود', hex: '#0a0a0a' },
+        { name: 'أبيض', hex: '#f8fafc' },
+        { name: 'بيج', hex: '#d4b996' },
+        { name: 'رمادي', hex: '#64748b' },
+        { name: 'كحلي', hex: '#1e293b' },
+        { name: 'زيتي', hex: '#3f4f38' },
+      ];
+  const suggestedColors = rawColors.filter((c) => {
+    const cName = (c.name || '').trim().toLowerCase();
+    return cName !== purchasedColor;
+  });
 
   const handleSlotUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -387,43 +418,100 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
 
           {/* Step 3: Requested Size / Color based on type */}
           {requestType === 'EXCHANGE_SIZE' && (
-            <div className="p-4 bg-surface-container-lowest dark:bg-zinc-900/50 border border-surface-container dark:border-zinc-800 rounded-xl space-y-2">
-              <label className="block text-xs font-label-bold text-primary dark:text-white">
-                {t.requiredReplacementSize}
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {((product?.sizes as string[] | undefined) || ['S', 'M', 'L', 'XL', '2XL', '3XL']).map((sz: string) => (
-                  <button
-                    key={sz}
-                    type="button"
-                    disabled={allItemsDisabled || isCurrentItemDisabled}
-                    onClick={() => setRequestedSize(sz)}
-                    className={`w-10 h-10 rounded-lg border font-mono text-xs font-bold transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
-                      requestedSize === sz
-                        ? 'bg-amber-500 text-white border-amber-500 shadow'
-                        : 'border-surface-container dark:border-zinc-700 text-primary dark:text-white hover:border-amber-400'
-                    }`}
-                  >
-                    {sz}
-                  </button>
-                ))}
+            <div className="p-4 bg-surface-container-lowest dark:bg-zinc-900/50 border border-surface-container dark:border-zinc-800 rounded-xl space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <label className="block text-xs font-label-bold text-primary dark:text-white">
+                  {t.requiredReplacementSize}
+                </label>
+                {purchasedSize && (
+                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                    {t.currentSizeExcluded}: <strong className="text-amber-500 font-bold">{purchasedSize}</strong>
+                  </span>
+                )}
               </div>
+
+              {suggestedSizes.length === 0 ? (
+                <p className="text-xs font-mono text-zinc-500 py-2">
+                  {t.noAlternativeSizesAvailable}
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {suggestedSizes.map((sz: string) => (
+                    <button
+                      key={sz}
+                      type="button"
+                      disabled={allItemsDisabled || isCurrentItemDisabled}
+                      onClick={() => setRequestedSize(sz)}
+                      className={`min-w-[2.75rem] h-10 px-3 rounded-lg border font-mono text-xs font-bold transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                        requestedSize === sz
+                          ? 'bg-amber-500 text-white border-amber-500 shadow-md ring-2 ring-amber-500/30'
+                          : 'border-surface-container dark:border-zinc-700 bg-white dark:bg-zinc-900 text-primary dark:text-white hover:border-amber-400'
+                      }`}
+                    >
+                      {sz}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
           {requestType === 'EXCHANGE_COLOR' && (
-            <div className="p-4 bg-surface-container-lowest dark:bg-zinc-900/50 border border-surface-container dark:border-zinc-800 rounded-xl space-y-2">
-              <label className="block text-xs font-label-bold text-primary dark:text-white">
-                {t.requiredReplacementColor}
-              </label>
-              <input
-                type="text"
-                disabled={allItemsDisabled || isCurrentItemDisabled}
-                value={requestedColor}
-                onChange={(e) => setRequestedColor(e.target.value)}
-                placeholder={t.replacementColorPlaceholder}
-                className="w-full bg-white dark:bg-zinc-900 border border-surface-container dark:border-zinc-700 rounded-lg p-2.5 text-xs text-primary dark:text-white focus:outline-none focus:border-primary dark:focus:border-white disabled:opacity-40 disabled:cursor-not-allowed"
-              />
+            <div className="p-4 bg-surface-container-lowest dark:bg-zinc-900/50 border border-surface-container dark:border-zinc-800 rounded-xl space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <label className="block text-xs font-label-bold text-primary dark:text-white">
+                  {t.requiredReplacementColor}
+                </label>
+                {currentItem?.selectedColor && (
+                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                    {t.currentColorExcluded}: <strong className="text-amber-500 font-bold">{currentItem.selectedColor}</strong>
+                  </span>
+                )}
+              </div>
+
+              {/* Color chips */}
+              {suggestedColors.length === 0 ? (
+                <p className="text-xs font-mono text-zinc-500 py-2">
+                  {t.noAlternativeColorsAvailable}
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {suggestedColors.map((col, idx) => {
+                    const isSelected = requestedColor === col.name;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        disabled={allItemsDisabled || isCurrentItemDisabled}
+                        onClick={() => setRequestedColor(col.name)}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-mono font-bold transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                          isSelected
+                            ? 'bg-amber-500/15 border-amber-500 text-amber-500 dark:text-amber-400 shadow-sm ring-1 ring-amber-500/40'
+                            : 'bg-white dark:bg-zinc-900 border-surface-container dark:border-zinc-700 text-primary dark:text-zinc-300 hover:border-zinc-500'
+                        }`}
+                      >
+                        <span
+                          className="w-3.5 h-3.5 rounded-full border border-black/20 dark:border-white/20 shadow-inner shrink-0"
+                          style={{ backgroundColor: col.hex }}
+                        />
+                        <span>{col.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Optional custom color input */}
+              <div className="pt-2 border-t border-surface-container dark:border-zinc-800/80">
+                <input
+                  type="text"
+                  disabled={allItemsDisabled || isCurrentItemDisabled}
+                  value={requestedColor}
+                  onChange={(e) => setRequestedColor(e.target.value)}
+                  placeholder={t.orTypeCustomColor}
+                  className="w-full bg-white dark:bg-zinc-900 border border-surface-container dark:border-zinc-700 rounded-lg p-2.5 text-xs text-primary dark:text-white focus:outline-none focus:border-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
+                />
+              </div>
             </div>
           )}
 

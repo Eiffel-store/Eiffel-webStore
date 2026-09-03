@@ -1324,6 +1324,11 @@ export interface TranslationDictionary {
   pleaseUploadInvoicePhoto: string;
   pleaseUploadTagPhoto: string;
   pleaseUploadDefectPhoto: string;
+  currentSizeExcluded: string;
+  currentColorExcluded: string;
+  noAlternativeSizesAvailable: string;
+  noAlternativeColorsAvailable: string;
+  orTypeCustomColor: string;
   adminReviewDeleteFailed: string;
   adminReviewStatusUpdateFailed: string;
   adminTotalReviewsRecorded: string;
