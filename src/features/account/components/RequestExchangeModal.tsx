@@ -174,9 +174,11 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
       if (onSuccess) onSuccess();
       onClose();
     } catch (err: any) {
-      toast.error(
-        err?.response?.data?.message || t.exchangeSubmissionFailed
-      );
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.message ||
+        t.exchangeSubmissionFailed;
+      toast.error(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
