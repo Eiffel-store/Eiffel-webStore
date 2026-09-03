@@ -1462,5 +1462,9 @@ export const ar: TranslationDictionary = {
   pointsEarnedOnDeliveryBadge: "🎉 تمت إضافة {points} نقطة كاش باك إلى رصيدك!",
   viewOrderInAccount: "عرض تفاصيل الطلب",
   orderStatusAwaitingConfirmationDesc: "طلبك قيد المراجعة والتأكيد من قِبل فريق العمل.",
+  adminNewOrderReceivedTitle: "طلب جديد وارد! 🔔",
+  adminNewOrderReceivedDesc: "تم تسجيل طلب جديد بقيمة {total} ج.م من قِبل {customer}.",
+  adminViewOrderAction: "معاينة الطلب في الإدارة",
+  adminPiecesCountLabel: "قطع",
 };
 

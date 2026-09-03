@@ -258,6 +258,29 @@ export const CheckoutPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['orders', 'my-orders'] });
 
+      // Broadcast order creation to open Admin tabs
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const bc = new BroadcastChannel('eiffel-sync');
+          bc.postMessage({
+            type: 'ORDER_CREATED',
+            payload: {
+              orderId: createdOrder.id,
+              total: createdOrder.total,
+              customerName: orderPayload.customerName || orderPayload.customerEmail || 'عميل جديد',
+              customerPhone: orderPayload.customerPhone || '',
+              customerEmail: orderPayload.customerEmail,
+              itemsCount: createdOrder.items?.length || 1,
+              status: createdOrder.status,
+              timestamp: Date.now(),
+            },
+          });
+          bc.close();
+        }
+      } catch {
+        // ignore
+      }
+
       // Deduct points from user balance if points were redeemed
       if (pointsDiscountValue > 0 && user) {
         updateUserPoints(-pointsDiscountValue);

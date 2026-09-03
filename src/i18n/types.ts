@@ -1464,5 +1464,9 @@ export interface TranslationDictionary {
   pointsEarnedOnDeliveryBadge: string;
   viewOrderInAccount: string;
   orderStatusAwaitingConfirmationDesc: string;
+  adminNewOrderReceivedTitle: string;
+  adminNewOrderReceivedDesc: string;
+  adminViewOrderAction: string;
+  adminPiecesCountLabel: string;
 }
 

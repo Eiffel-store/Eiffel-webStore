@@ -23,8 +23,12 @@ import {
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useStoreData } from '@/shared';
 import { useLanguage } from '@/shared';
+import { useAdminOrderRealtimeSync } from '@/hooks/useAdminOrderRealtimeSync';
 
 export const AdminLayout: React.FC = () => {
+  // Real-time live order notifications & auto-updating orders table
+  useAdminOrderRealtimeSync();
+
   const { logoutAdmin } = useAdminAuth();
   const { orders, products } = useStoreData();
   const { language, setLanguage, isRTL, t } = useLanguage();

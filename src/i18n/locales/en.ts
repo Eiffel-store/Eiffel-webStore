@@ -1447,5 +1447,9 @@ export const en: TranslationDictionary = {
   pointsEarnedOnDeliveryBadge: "🎉 +{points} Loyalty Cashback PTS credited to your account!",
   viewOrderInAccount: "View Order Details",
   orderStatusAwaitingConfirmationDesc: "Your order is currently under review and confirmation by our team.",
+  adminNewOrderReceivedTitle: "New Order Received! 🔔",
+  adminNewOrderReceivedDesc: "A new order was placed for {total} EGP by {customer}.",
+  adminViewOrderAction: "View in Orders Manager",
+  adminPiecesCountLabel: "pcs",
 };
 
