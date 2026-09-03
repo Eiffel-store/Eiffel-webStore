@@ -1329,6 +1329,12 @@ export interface TranslationDictionary {
   noAlternativeSizesAvailable: string;
   noAlternativeColorsAvailable: string;
   orTypeCustomColor: string;
+  adminCouponUsageLimit: string;
+  adminCouponUsageLimitPlaceholder: string;
+  adminCouponUsageCount: string;
+  adminCouponExhausted: string;
+  adminCouponUnlimited: string;
+  couponMaxUsageReached: string;
   adminReviewDeleteFailed: string;
   adminReviewStatusUpdateFailed: string;
   adminTotalReviewsRecorded: string;

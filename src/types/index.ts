@@ -67,6 +67,8 @@ export interface Coupon {
   minOrderAmount?: number;
   isActive: boolean;
   expiryDate?: string;
+  usageLimit?: number | null;
+  timesUsed?: number;
 }
 
 export interface StoreLocation {

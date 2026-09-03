@@ -85,6 +85,7 @@ export const useCouponsData = (queryClient: QueryClient) => {
     const cleanCode = code.trim().toUpperCase();
     const found = coupons.find((c) => c.code.toUpperCase() === cleanCode && c.isActive);
     if (!found) return null;
+    if (found.usageLimit && (found.timesUsed || 0) >= found.usageLimit) return null;
     if (found.minOrderAmount && subtotal < found.minOrderAmount) return null;
     return found;
   };

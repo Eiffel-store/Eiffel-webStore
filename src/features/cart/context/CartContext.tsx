@@ -149,16 +149,32 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: true, message: `تم تطبيق كود الخصم (${validated.code}) بنجاح (${validated.discountPercentage}%)` };
       }
     } catch (err: any) {
+      const serverMsg = err?.response?.data?.message || err?.message || '';
+      if (serverMsg.toLowerCase().includes('maximum usage limit') || serverMsg.toLowerCase().includes('limit')) {
+        return {
+          success: false,
+          message: 'عذراً، هذا الكوبون انتهى بالفعل بعد استنفاد الحد الأقصى لعدد مرات الاستخدام المسموح بها.'
+        };
+      }
       // Check in cached coupons list
-      const matched = (coupons || []).find(c => c.code.toUpperCase() === clean && c.isActive);
+      const matched = (coupons || []).find(c => c.code.toUpperCase() === clean);
       if (matched) {
+        if (matched.usageLimit && (matched.timesUsed || 0) >= matched.usageLimit) {
+          return {
+            success: false,
+            message: 'عذراً، هذا الكوبون انتهى بالفعل بعد استنفاد الحد الأقصى لعدد مرات الاستخدام المسموح بها.'
+          };
+        }
+        if (!matched.isActive) {
+          return { success: false, message: 'عذراً، هذا الكوبون غير نشط أو منتهي الصلاحية.' };
+        }
         if (matched.minOrderAmount && subtotal < matched.minOrderAmount) {
           return { success: false, message: `الحد الأدنى لتطبيق هذا الكوبون هو ${matched.minOrderAmount} ج.م` };
         }
         store.applyCoupon(matched);
         return { success: true, message: `تم تطبيق كود الخصم (${matched.code}) بنجاح (${matched.discountPercentage}%)` };
       }
-      return { success: false, message: err?.message || 'كود الخصم غير صالح أو منتهي الصلاحية' };
+      return { success: false, message: serverMsg || 'كود الخصم غير صالح أو منتهي الصلاحية' };
     }
     return { success: false, message: 'كود الخصم غير صالح أو منتهي الصلاحية' };
   };
