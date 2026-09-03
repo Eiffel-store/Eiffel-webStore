@@ -35,27 +35,7 @@ export const OrderRealtimeNotification: React.FC<OrderRealtimeNotificationProps>
   t,
   onViewOrder,
 }) => {
-  const [progress, setProgress] = useState(100);
   const normalizedStatus = (payload.status || '').toLowerCase().replace(/_/g, ' ');
-
-  useEffect(() => {
-    const totalDuration = 7000;
-    const intervalTime = 50;
-    const step = (intervalTime / totalDuration) * 100;
-
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev <= 0) {
-          clearInterval(timer);
-          toast.dismiss(tId);
-          return 0;
-        }
-        return Math.max(0, prev - step);
-      });
-    }, intervalTime);
-
-    return () => clearInterval(timer);
-  }, [tId]);
 
   // Determine status configuration
   let StatusIcon = Clock;
@@ -173,11 +153,17 @@ export const OrderRealtimeNotification: React.FC<OrderRealtimeNotificationProps>
       )}
 
       {/* Auto-Dismiss Countdown Progress Line */}
-      <div className="absolute bottom-0 inset-x-0 h-0.5 bg-zinc-900">
+      <div className="absolute bottom-0 inset-x-0 h-0.5 bg-zinc-900 overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-amber-500 to-amber-300 transition-all duration-75 ease-linear"
-          style={{ width: `${progress}%` }}
+          className="h-full bg-gradient-to-r from-amber-500 to-amber-300 origin-left animate-shrink-progress"
+          style={{ animation: 'shrinkProgress 7s linear forwards' }}
         />
+        <style>{`
+          @keyframes shrinkProgress {
+            from { width: 100%; }
+            to { width: 0%; }
+          }
+        `}</style>
       </div>
     </div>
   );

@@ -28,29 +28,10 @@ export const AdminOrderNotification: React.FC<AdminOrderNotificationProps> = ({
   t,
   onViewOrder,
 }) => {
-  const [progress, setProgress] = useState(100);
-
   useEffect(() => {
     // Play warm luxury chime once when notification is rendered
     playLuxuryOrderChime();
-
-    const totalDuration = 9000;
-    const intervalTime = 50;
-    const step = (intervalTime / totalDuration) * 100;
-
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev <= 0) {
-          clearInterval(timer);
-          toast.dismiss(tId);
-          return 0;
-        }
-        return Math.max(0, prev - step);
-      });
-    }, intervalTime);
-
-    return () => clearInterval(timer);
-  }, [tId]);
+  }, []);
 
   const customerDisplay = payload.customerName || payload.customerEmail || 'عميل جديد';
   const descText = t.adminNewOrderReceivedDesc
@@ -137,11 +118,17 @@ export const AdminOrderNotification: React.FC<AdminOrderNotificationProps> = ({
       )}
 
       {/* Progress Bar */}
-      <div className="absolute bottom-0 inset-x-0 h-0.5 bg-zinc-900">
+      <div className="absolute bottom-0 inset-x-0 h-0.5 bg-zinc-900 overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-amber-500 to-yellow-300 transition-all duration-75 ease-linear"
-          style={{ width: `${progress}%` }}
+          className="h-full bg-gradient-to-r from-amber-500 to-yellow-300 origin-left"
+          style={{ animation: 'adminProgressShrink 9s linear forwards' }}
         />
+        <style>{`
+          @keyframes adminProgressShrink {
+            from { width: 100%; }
+            to { width: 0%; }
+          }
+        `}</style>
       </div>
     </div>
   );

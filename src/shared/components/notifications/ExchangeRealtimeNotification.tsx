@@ -44,28 +44,9 @@ export const AdminExchangeNotification: React.FC<AdminExchangeToastProps> = ({
   t,
   onView,
 }) => {
-  const [progress, setProgress] = useState(100);
-
   useEffect(() => {
     playLuxuryOrderChime();
-
-    const totalDuration = 8000;
-    const intervalTime = 50;
-    const step = (intervalTime / totalDuration) * 100;
-
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev <= 0) {
-          clearInterval(timer);
-          toast.dismiss(tId);
-          return 0;
-        }
-        return Math.max(0, prev - step);
-      });
-    }, intervalTime);
-
-    return () => clearInterval(timer);
-  }, [tId]);
+  }, []);
 
   return (
     <div className="relative w-full max-w-md bg-zinc-950/95 backdrop-blur-2xl border border-indigo-500/40 rounded-2xl p-4 shadow-2xl shadow-black/90 ring-1 ring-indigo-400/20 text-white overflow-hidden animate-slide-in transition-all">
@@ -139,11 +120,17 @@ export const AdminExchangeNotification: React.FC<AdminExchangeToastProps> = ({
       </div>
 
       {/* Progress Bar */}
-      <div className="absolute bottom-0 inset-x-0 h-0.5 bg-zinc-800">
+      <div className="absolute bottom-0 inset-x-0 h-0.5 bg-zinc-800 overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-indigo-400 to-purple-400 transition-all duration-75 ease-linear"
-          style={{ width: `${progress}%` }}
+          className="h-full bg-gradient-to-r from-indigo-400 to-purple-400 origin-left"
+          style={{ animation: 'exchangeShrink 8s linear forwards' }}
         />
+        <style>{`
+          @keyframes exchangeShrink {
+            from { width: 100%; }
+            to { width: 0%; }
+          }
+        `}</style>
       </div>
     </div>
   );
@@ -186,28 +173,9 @@ export const CustomerExchangeNotification: React.FC<CustomerExchangeToastProps> 
   t,
   onView,
 }) => {
-  const [progress, setProgress] = useState(100);
-
   useEffect(() => {
     playLuxuryOrderChime();
-
-    const totalDuration = 8000;
-    const intervalTime = 50;
-    const step = (intervalTime / totalDuration) * 100;
-
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev <= 0) {
-          clearInterval(timer);
-          toast.dismiss(tId);
-          return 0;
-        }
-        return Math.max(0, prev - step);
-      });
-    }, intervalTime);
-
-    return () => clearInterval(timer);
-  }, [tId]);
+  }, []);
 
   const isApproved = payload.status === 'APPROVED';
   const isRejected = payload.status === 'REJECTED';
@@ -302,16 +270,16 @@ export const CustomerExchangeNotification: React.FC<CustomerExchangeToastProps> 
       </div>
 
       {/* Progress Bar */}
-      <div className="absolute bottom-0 inset-x-0 h-0.5 bg-zinc-800">
+      <div className="absolute bottom-0 inset-x-0 h-0.5 bg-zinc-800 overflow-hidden">
         <div
-          className={`h-full transition-all duration-75 ease-linear ${
+          className={`h-full origin-left ${
             isApproved
               ? 'bg-emerald-400'
               : isRejected
               ? 'bg-red-400'
               : 'bg-amber-400'
           }`}
-          style={{ width: `${progress}%` }}
+          style={{ animation: 'exchangeShrink 8s linear forwards' }}
         />
       </div>
     </div>
