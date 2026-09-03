@@ -222,7 +222,7 @@ export const useAuthStore = create<AuthState>()(
 
       fetchProfile: async () => {
         const storedToken = localStorage.getItem('token') || localStorage.getItem('eiffel_auth_token');
-        if (!storedToken) {
+        if (!storedToken || storedToken === 'undefined' || storedToken === 'null' || storedToken.trim().length < 10) {
           get().logout();
           return;
         }

@@ -23,7 +23,14 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token') || localStorage.getItem('eiffel_auth_token');
-    if (storedToken || token || isAuthenticated) {
+    const isValidStoredToken = Boolean(
+      storedToken &&
+      storedToken !== 'undefined' &&
+      storedToken !== 'null' &&
+      storedToken.trim().length > 10
+    );
+
+    if (isValidStoredToken || (isAuthenticated && token)) {
       fetchProfile();
     }
   }, [token, isAuthenticated, fetchProfile]);
