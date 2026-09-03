@@ -142,7 +142,7 @@ export const AdminExchangesOverviewCards: React.FC<AdminExchangesOverviewCardsPr
   }, [requests, isRTL]);
 
   return (
-    <div className="mt-8 pt-6 border-t border-zinc-800/80 space-y-4">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="flex items-center gap-2">

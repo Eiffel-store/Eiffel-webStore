@@ -202,6 +202,15 @@ export const AdminExchangesPage: React.FC = () => {
         </button>
       </div>
 
+      {/* Operational Overview & Analytical Summary Cards at Top */}
+      {requests.length > 0 && (
+        <AdminExchangesOverviewCards
+          requests={requests}
+          onStatusFilter={setStatusFilter}
+          activeStatus={statusFilter}
+        />
+      )}
+
       {/* Stats / Status Filter Tabs */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {[
@@ -397,15 +406,6 @@ export const AdminExchangesPage: React.FC = () => {
             </div>
           ))}
         </div>
-      )}
-
-      {/* Operational Overview & Analytical Summary Cards */}
-      {requests.length > 0 && (
-        <AdminExchangesOverviewCards
-          requests={requests}
-          onStatusFilter={setStatusFilter}
-          activeStatus={statusFilter}
-        />
       )}
 
       {/* Structured Update Status Modal with Confirm and Cancel Buttons */}

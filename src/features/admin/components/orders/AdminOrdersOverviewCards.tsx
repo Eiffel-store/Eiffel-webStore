@@ -118,7 +118,7 @@ export const AdminOrdersOverviewCards: React.FC<AdminOrdersOverviewCardsProps> =
   }, [orders]);
 
   return (
-    <div className="mt-8 pt-6 border-t border-zinc-800/80 space-y-4">
+    <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />

@@ -68,6 +68,15 @@ export const AdminOrdersPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Operational Performance & Summary Cards (Top Overview) */}
+      {orders.length > 0 && (
+        <AdminOrdersOverviewCards
+          orders={orders}
+          onStatusFilter={setStatusFilter}
+          activeStatus={statusFilter}
+        />
+      )}
+
       {/* Filter Bar */}
       <AdminOrderFilterBar
         searchQuery={searchQuery}
@@ -119,15 +128,6 @@ export const AdminOrdersPage: React.FC = () => {
             />
           )}
         </div>
-      )}
-
-      {/* Operational Performance & Summary Cards */}
-      {orders.length > 0 && (
-        <AdminOrdersOverviewCards
-          orders={orders}
-          onStatusFilter={setStatusFilter}
-          activeStatus={statusFilter}
-        />
       )}
 
       {/* Order Details & Printing Modal */}
