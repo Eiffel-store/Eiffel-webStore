@@ -31,10 +31,6 @@ export const CollectionsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
 
-  if (isProductsLoading && products.length === 0) {
-    return <CollectionsPageSkeleton />;
-  }
-
 
   // Dynamic 100% Data-Driven Category Resolution
   const currentCategoryObj = useMemo(() => {
@@ -297,6 +293,10 @@ export const CollectionsPage: React.FC = () => {
   };
 
   const hasActiveFilters = selectedSubCategory !== 'All' || selectedSize !== 'All' || selectedColor !== 'All' || searchKeyword !== '';
+
+  if (isProductsLoading && products.length === 0) {
+    return <CollectionsPageSkeleton />;
+  }
 
   return (
     <div className="min-h-screen bg-background text-on-surface">
