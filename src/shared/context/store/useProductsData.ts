@@ -37,6 +37,23 @@ export const useProductsData = (queryClient: QueryClient) => {
         (old || []).map((p: Product) => (p.id === updatedProd.id ? updatedProd : p))
       );
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      if (updatedProd?.id) {
+        queryClient.invalidateQueries({ queryKey: ['product', updatedProd.id] });
+      }
+      try {
+        const bc = new BroadcastChannel('eiffel-sync');
+        bc.postMessage({
+          type: 'STOCK_UPDATED',
+          payload: {
+            productId: updatedProd?.id,
+            stock: updatedProd?.stock,
+            inStock: updatedProd?.inStock,
+          },
+        });
+        bc.close();
+      } catch {
+        // ignore
+      }
       toast.success('تم تحديث المنتج بنجاح');
     },
     onError: (err: any) => {

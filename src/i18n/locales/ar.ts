@@ -214,6 +214,14 @@ export const ar: TranslationDictionary = {
   viewInClientPortal: "متابعة الطلب في حسابي",
   continueShopping: "متابعة التسوق",
   
+  // Live Exchanges & Realtime Notifications
+  newExchangeTitle: "طلب استبدال / استرجاع جديد وارد",
+  newExchangeOrder: "للطلب رقم #",
+  viewExchanges: "عرض تفاصيل الطلب",
+  exchangeStatusUpdated: "تحديث في طلب الاستبدال",
+  stockDepletedLive: "نفدت الكمية المتاحة للتو!",
+  onlyPiecesLeftLive: "متبقي فقط {count} قطع في المخزون",
+  
   // Wishlist
   wishlistTitle: "قائمة الأمنيات",
   savedSilhouettes: "قطع محفوظة",

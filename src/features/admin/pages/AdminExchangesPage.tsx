@@ -43,8 +43,25 @@ export const AdminExchangesPage: React.FC = () => {
   const updateStatusMutation = useMutation({
     mutationFn: ({ id, status, adminNotes }: { id: string; status: string; adminNotes?: string }) =>
       exchangeService.updateStatus(id, status, adminNotes),
-    onSuccess: () => {
+    onSuccess: (updatedReq) => {
       queryClient.invalidateQueries({ queryKey: ['admin-exchanges'] });
+      try {
+        const bc = new BroadcastChannel('eiffel-sync');
+        bc.postMessage({
+          type: 'EXCHANGE_STATUS_CHANGED',
+          payload: {
+            id: updatedReq?.id,
+            orderId: updatedReq?.orderId,
+            customerEmail: updatedReq?.customerEmail,
+            productName: updatedReq?.productName,
+            status: updatedReq?.status,
+            adminNotes: updatedReq?.adminNotes,
+          },
+        });
+        bc.close();
+      } catch {
+        // ignore
+      }
       toast.success(t.adminExchangeStatusUpdatedSuccess);
       setActionModalOpen(false);
       setSelectedRequest(null);

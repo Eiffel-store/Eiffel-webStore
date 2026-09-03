@@ -216,6 +216,14 @@ export interface TranslationDictionary {
   viewInClientPortal: string;
   continueShopping: string;
   
+  // Live Exchanges & Realtime Notifications
+  newExchangeTitle: string;
+  newExchangeOrder: string;
+  viewExchanges: string;
+  exchangeStatusUpdated: string;
+  stockDepletedLive: string;
+  onlyPiecesLeftLive: string;
+  
   // Wishlist
   wishlistTitle: string;
   savedSilhouettes: string;

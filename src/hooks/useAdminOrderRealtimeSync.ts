@@ -7,6 +7,10 @@ import {
   AdminOrderCreatedPayload, 
   showAdminNewOrderToast 
 } from '@/shared/components/notifications/AdminOrderNotification';
+import {
+  AdminExchangePayload,
+  showAdminExchangeToast
+} from '@/shared/components/notifications/ExchangeRealtimeNotification';
 
 export const useAdminOrderRealtimeSync = () => {
   const queryClient = useQueryClient();
@@ -14,6 +18,7 @@ export const useAdminOrderRealtimeSync = () => {
   const { user, token, role } = useAuthStore();
   const { t } = useLanguage();
   const lastOrderProcessedRef = useRef<{ [key: string]: number }>({});
+  const lastExchangeProcessedRef = useRef<{ [key: string]: number }>({});
 
   useEffect(() => {
     const isStaffOrAdmin = role === 'ROLE_ADMIN' || role === 'ROLE_STAFF';
@@ -44,6 +49,23 @@ export const useAdminOrderRealtimeSync = () => {
       showAdminNewOrderToast(payload, t, () => navigate('/admin/orders'));
     };
 
+    const handleNewExchange = (payload: AdminExchangePayload) => {
+      if (!payload || !payload.id) return;
+
+      const now = Date.now();
+      if (lastExchangeProcessedRef.current[payload.id] && now - lastExchangeProcessedRef.current[payload.id] < 3000) {
+        return;
+      }
+      lastExchangeProcessedRef.current[payload.id] = now;
+
+      // Invalidate admin exchanges queries
+      queryClient.invalidateQueries({ queryKey: ['admin-exchanges'] });
+      queryClient.invalidateQueries({ queryKey: ['exchanges'] });
+
+      // Show luxury admin exchange notification
+      showAdminExchangeToast(payload, t, () => navigate('/admin/exchanges'));
+    };
+
     // 1. Setup Server-Sent Events (SSE) Stream for Admin
     try {
       eventSource = new EventSource(sseUrl);
@@ -60,6 +82,33 @@ export const useAdminOrderRealtimeSync = () => {
       eventSource.addEventListener('admin-order-updated', () => {
         // Silently refresh admin orders table and status badges
         queryClient.invalidateQueries({ queryKey: ['orders'] });
+      });
+
+      eventSource.addEventListener('admin-exchange-created', (event: MessageEvent) => {
+        try {
+          const data: AdminExchangePayload = JSON.parse(event.data);
+          handleNewExchange(data);
+        } catch {
+          // ignore parsing error
+        }
+      });
+
+      eventSource.addEventListener('admin-exchange-updated', () => {
+        queryClient.invalidateQueries({ queryKey: ['admin-exchanges'] });
+        queryClient.invalidateQueries({ queryKey: ['exchanges'] });
+      });
+
+      eventSource.addEventListener('stock-updated', (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+          queryClient.invalidateQueries({ queryKey: ['products'] });
+          if (data?.productId) {
+            queryClient.invalidateQueries({ queryKey: ['product', data.productId] });
+          }
+        } catch {
+          // ignore
+        }
       });
 
       eventSource.onerror = () => {
@@ -82,6 +131,14 @@ export const useAdminOrderRealtimeSync = () => {
         broadcastChannel.onmessage = (event) => {
           if (event?.data?.type === 'ORDER_CREATED' && event.data.payload) {
             handleNewOrder(event.data.payload);
+          } else if (event?.data?.type === 'EXCHANGE_CREATED' && event.data.payload) {
+            handleNewExchange(event.data.payload);
+          } else if (event?.data?.type === 'STOCK_UPDATED') {
+            queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+            if (event.data.payload?.productId) {
+              queryClient.invalidateQueries({ queryKey: ['product', event.data.payload.productId] });
+            }
           }
         };
       }

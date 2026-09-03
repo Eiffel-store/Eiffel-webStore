@@ -204,6 +204,14 @@ export const en: TranslationDictionary = {
   viewInClientPortal: "VIEW IN CLIENT PORTAL",
   continueShopping: "CONTINUE EXPLORING",
   
+  // Live Exchanges & Realtime Notifications
+  newExchangeTitle: "NEW EXCHANGE / RETURN REQUEST",
+  newExchangeOrder: "For Order #",
+  viewExchanges: "VIEW DETAILS",
+  exchangeStatusUpdated: "EXCHANGE REQUEST STATUS UPDATED",
+  stockDepletedLive: "Just sold out!",
+  onlyPiecesLeftLive: "Only {count} pieces remaining in stock",
+  
   wishlistTitle: "WISHLIST",
   savedSilhouettes: "SAVED SILHOUETTES",
   noSavedPieces: "NO SAVED PIECES YET",

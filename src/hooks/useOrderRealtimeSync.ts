@@ -7,6 +7,10 @@ import {
   OrderRealtimePayload, 
   showOrderRealtimeToast 
 } from '@/shared/components/notifications/OrderRealtimeNotification';
+import {
+  CustomerExchangePayload,
+  showCustomerExchangeToast
+} from '@/shared/components/notifications/ExchangeRealtimeNotification';
 import { Order } from '@/types';
 
 export const useOrderRealtimeSync = () => {
@@ -15,6 +19,7 @@ export const useOrderRealtimeSync = () => {
   const { user, token, role, fetchProfile } = useAuthStore();
   const { t } = useLanguage();
   const lastProcessedRef = useRef<{ [key: string]: number }>({});
+  const lastExchangeProcessedRef = useRef<{ [key: string]: number }>({});
 
   useEffect(() => {
     if (!user || !user.email) return;
@@ -92,6 +97,31 @@ export const useOrderRealtimeSync = () => {
       showOrderRealtimeToast(payload, t, () => navigate('/account'));
     };
 
+    const handleExchangeEvent = (payload: CustomerExchangePayload) => {
+      if (!payload || !payload.id) return;
+
+      if (payload.customerEmail && user?.email) {
+        if (payload.customerEmail.trim().toLowerCase() !== user.email.trim().toLowerCase()) {
+          return;
+        }
+      }
+
+      const dedupeKey = `exchange-${payload.id}-${payload.status}`;
+      const now = Date.now();
+      if (lastExchangeProcessedRef.current[dedupeKey] && now - lastExchangeProcessedRef.current[dedupeKey] < 2000) {
+        return;
+      }
+      lastExchangeProcessedRef.current[dedupeKey] = now;
+
+      // Invalidate customer queries
+      queryClient.invalidateQueries({ queryKey: ['my-exchanges'] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['orders', 'my-orders'] });
+
+      // Show toast
+      showCustomerExchangeToast(payload, t, () => navigate('/account'));
+    };
+
     // 1. Setup Server-Sent Events (SSE) stream
     try {
       eventSource = new EventSource(sseUrl);
@@ -102,6 +132,27 @@ export const useOrderRealtimeSync = () => {
           handleOrderEvent(data);
         } catch {
           // ignore parsing error
+        }
+      });
+
+      eventSource.addEventListener('exchange-status-updated', (event: MessageEvent) => {
+        try {
+          const data: CustomerExchangePayload = JSON.parse(event.data);
+          handleExchangeEvent(data);
+        } catch {
+          // ignore parsing error
+        }
+      });
+
+      eventSource.addEventListener('stock-updated', (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          queryClient.invalidateQueries({ queryKey: ['products'] });
+          if (data?.productId) {
+            queryClient.invalidateQueries({ queryKey: ['product', data.productId] });
+          }
+        } catch {
+          // ignore
         }
       });
 
@@ -132,6 +183,13 @@ export const useOrderRealtimeSync = () => {
               }
             }
             handleOrderEvent(event.data.payload);
+          } else if (event?.data?.type === 'EXCHANGE_STATUS_CHANGED' && event.data.payload) {
+            handleExchangeEvent(event.data.payload);
+          } else if (event?.data?.type === 'STOCK_UPDATED') {
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+            if (event.data.payload?.productId) {
+              queryClient.invalidateQueries({ queryKey: ['product', event.data.payload.productId] });
+            }
           }
         };
       }

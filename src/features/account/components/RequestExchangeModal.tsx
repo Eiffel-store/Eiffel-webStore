@@ -127,7 +127,7 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
 
     setIsSubmitting(true);
     try {
-      await exchangeService.create({
+      const created = await exchangeService.create({
         orderId: order.id,
         customerName: order.customerName || 'Customer',
         customerEmail: order.customerEmail || '',
@@ -147,6 +147,28 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
         pickupCity: pickupCity.trim(),
         status: 'PENDING',
       });
+
+      try {
+        const bc = new BroadcastChannel('eiffel-sync');
+        bc.postMessage({
+          type: 'EXCHANGE_CREATED',
+          payload: {
+            id: created?.id,
+            orderId: order.id,
+            customerName: order.customerName,
+            customerEmail: order.customerEmail,
+            customerPhone: customerPhone.trim(),
+            productName: product?.name,
+            reason: reason.trim(),
+            type: requestType,
+            requestedSize,
+            status: 'PENDING',
+          },
+        });
+        bc.close();
+      } catch {
+        // ignore
+      }
 
       toast.success(t.exchangeSubmittedSuccess);
       if (onSuccess) onSuccess();
