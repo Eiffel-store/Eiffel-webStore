@@ -409,6 +409,9 @@ export interface ExchangeRequest {
   reason: string;
   customerNotes?: string;
   proofImageUrl?: string;
+  invoiceImageUrl?: string;
+  tagImageUrl?: string;
+  defectImageUrl?: string;
   pickupAddress?: string;
   pickupCity?: string;
   status: ExchangeStatus;

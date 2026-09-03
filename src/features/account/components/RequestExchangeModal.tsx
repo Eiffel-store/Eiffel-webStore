@@ -9,7 +9,12 @@ import {
   Clock,
   XCircle,
   Truck,
-  HelpCircle
+  HelpCircle,
+  FileText,
+  Tag,
+  AlertTriangle,
+  Trash2,
+  Camera
 } from 'lucide-react';
 import { Order, CartItem, ExchangeType, ExchangeRequest } from '@/types';
 import { useLanguage } from '@/shared';
@@ -42,7 +47,10 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
   const [reason, setReason] = useState<string>('المقاس غير ملائم (أصغر أو أكبر من المطلوب)');
   const [customerNotes, setCustomerNotes] = useState<string>('');
   const [proofImageUrl, setProofImageUrl] = useState<string>('');
-  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [invoiceImageUrl, setInvoiceImageUrl] = useState<string>('');
+  const [tagImageUrl, setTagImageUrl] = useState<string>('');
+  const [defectImageUrl, setDefectImageUrl] = useState<string>('');
+  const [uploadingSlot, setUploadingSlot] = useState<'invoice' | 'tag' | 'defect' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [pickupAddress, setPickupAddress] = useState<string>(
@@ -84,22 +92,35 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
   const product = currentItem?.product;
   const isCurrentItemDisabled = currentItem ? allRequestsMap.has(currentItem.product?.id) : false;
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSlotUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    slot: 'invoice' | 'tag' | 'defect'
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
+    setUploadingSlot(slot);
     try {
       const res = await uploadService.uploadImage(file);
       if (res?.fileUrl) {
+        if (slot === 'invoice') setInvoiceImageUrl(res.fileUrl);
+        if (slot === 'tag') setTagImageUrl(res.fileUrl);
+        if (slot === 'defect') setDefectImageUrl(res.fileUrl);
+        // also keep proofImageUrl synced
         setProofImageUrl(res.fileUrl);
         toast.success(t.imageUploadedSuccess);
       }
     } catch {
       toast.error(t.imageUploadFailed);
     } finally {
-      setIsUploading(false);
+      setUploadingSlot(null);
     }
+  };
+
+  const handleRemoveSlot = (slot: 'invoice' | 'tag' | 'defect') => {
+    if (slot === 'invoice') setInvoiceImageUrl('');
+    if (slot === 'tag') setTagImageUrl('');
+    if (slot === 'defect') setDefectImageUrl('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -142,7 +163,10 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
         requestType,
         reason: reason.trim(),
         customerNotes: customerNotes.trim(),
-        proofImageUrl,
+        proofImageUrl: tagImageUrl || invoiceImageUrl || defectImageUrl || proofImageUrl,
+        invoiceImageUrl: invoiceImageUrl || undefined,
+        tagImageUrl: tagImageUrl || undefined,
+        defectImageUrl: defectImageUrl || undefined,
         pickupAddress: pickupAddress.trim(),
         pickupCity: pickupCity.trim(),
         status: 'PENDING',
@@ -448,30 +472,204 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
             </div>
           </div>
 
-          {/* Step 5: Proof Photo (Optional) */}
-          <div className="p-4 bg-surface-container-lowest dark:bg-zinc-900/50 border border-dashed border-surface-container dark:border-zinc-800 rounded-xl space-y-2">
+          {/* Step 5: Proof Photos (Invoice, Tag, Defect) */}
+          <div className="space-y-3 pt-1">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-label-bold text-primary dark:text-white flex items-center gap-1.5">
-                <Upload className="w-3.5 h-3.5 text-amber-500" />
-                <span>{t.itemPhotoWithTagsOptional}</span>
-              </label>
-              {proofImageUrl && (
-                <span className="text-[10px] text-emerald-500 font-mono flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" />
-                  {t.uploadedSuccessNotice}
-                </span>
-              )}
+              <div>
+                <label className="text-xs font-label-bold uppercase tracking-wider text-primary dark:text-white flex items-center gap-1.5">
+                  <Camera className="w-4 h-4 text-amber-500" />
+                  <span>{t.adminExchangeProofGallery}</span>
+                </label>
+                <p className="text-[11px] text-secondary dark:text-zinc-400 font-mono mt-0.5">
+                  {t.tagPhotoDesc}
+                </p>
+              </div>
+              {/* Counter badge */}
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
+                {[invoiceImageUrl, tagImageUrl, defectImageUrl].filter(Boolean).length}/3 {t.uploadedStatus || 'مرفوعة'}
+              </span>
             </div>
 
-            <div className="flex items-center gap-3">
-              <label className={`px-4 py-2 bg-surface-container dark:bg-zinc-800 hover:bg-surface-container-high text-primary dark:text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-2 ${allItemsDisabled || isCurrentItemDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
-                {isUploading ? <Loader2 className="w-4 h-4 animate-spin text-amber-500" /> : <Upload className="w-4 h-4" />}
-                <span>{isUploading ? t.uploadingStatus : t.choosePhoto}</span>
-                <input type="file" accept="image/*" onChange={handleFileUpload} disabled={isUploading || allItemsDisabled || isCurrentItemDisabled} className="hidden" />
-              </label>
-              {proofImageUrl && (
-                <img src={proofImageUrl} alt="Proof" className="w-10 h-10 object-cover rounded-lg border border-zinc-700" />
-              )}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Slot 1: Invoice Photo */}
+              <div className="p-3 bg-surface-container-lowest dark:bg-zinc-900/60 border border-dashed border-surface-container dark:border-zinc-800 rounded-xl flex flex-col justify-between space-y-2 hover:border-zinc-600 transition-all">
+                <div className="flex items-start justify-between gap-1">
+                  <div className="min-w-0">
+                    <span className="text-xs font-bold text-primary dark:text-white flex items-center gap-1.5 truncate">
+                      <FileText className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                      <span>{t.invoicePhoto}</span>
+                    </span>
+                    <p className="text-[10px] text-secondary dark:text-zinc-500 font-mono mt-0.5 line-clamp-1">
+                      {t.invoicePhotoDesc}
+                    </p>
+                  </div>
+                  {invoiceImageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSlot('invoice')}
+                      className="p-1 text-zinc-400 hover:text-red-400 transition-colors cursor-pointer"
+                      title={t.removePhoto}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {invoiceImageUrl ? (
+                  <div className="relative group rounded-lg overflow-hidden border border-zinc-700 aspect-video bg-black/40">
+                    <img src={invoiceImageUrl} alt="Invoice" className="w-full h-full object-cover" />
+                    <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 text-[11px] font-bold text-white transition-opacity cursor-pointer">
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>{t.changePhoto}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleSlotUpload(e, 'invoice')}
+                        disabled={uploadingSlot !== null || allItemsDisabled || isCurrentItemDisabled}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <label className={`w-full py-4 border border-dashed border-zinc-700/80 hover:border-amber-500/60 rounded-lg flex flex-col items-center justify-center gap-1.5 text-xs text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white bg-zinc-950/40 transition-all ${allItemsDisabled || isCurrentItemDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
+                    {uploadingSlot === 'invoice' ? (
+                      <Loader2 className="w-5 h-5 animate-spin text-amber-500" />
+                    ) : (
+                      <Upload className="w-5 h-5 text-zinc-500" />
+                    )}
+                    <span className="text-[11px] font-mono font-bold">
+                      {uploadingSlot === 'invoice' ? t.uploadingStatus : t.choosePhoto}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleSlotUpload(e, 'invoice')}
+                      disabled={uploadingSlot !== null || allItemsDisabled || isCurrentItemDisabled}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+
+              {/* Slot 2: Product with Tag Photo */}
+              <div className="p-3 bg-surface-container-lowest dark:bg-zinc-900/60 border border-dashed border-surface-container dark:border-zinc-800 rounded-xl flex flex-col justify-between space-y-2 hover:border-zinc-600 transition-all">
+                <div className="flex items-start justify-between gap-1">
+                  <div className="min-w-0">
+                    <span className="text-xs font-bold text-primary dark:text-white flex items-center gap-1.5 truncate">
+                      <Tag className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span>{t.tagPhoto}</span>
+                    </span>
+                    <p className="text-[10px] text-secondary dark:text-zinc-500 font-mono mt-0.5 line-clamp-1">
+                      {t.tagPhotoDesc}
+                    </p>
+                  </div>
+                  {tagImageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSlot('tag')}
+                      className="p-1 text-zinc-400 hover:text-red-400 transition-colors cursor-pointer"
+                      title={t.removePhoto}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {tagImageUrl ? (
+                  <div className="relative group rounded-lg overflow-hidden border border-zinc-700 aspect-video bg-black/40">
+                    <img src={tagImageUrl} alt="Tag" className="w-full h-full object-cover" />
+                    <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 text-[11px] font-bold text-white transition-opacity cursor-pointer">
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>{t.changePhoto}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleSlotUpload(e, 'tag')}
+                        disabled={uploadingSlot !== null || allItemsDisabled || isCurrentItemDisabled}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <label className={`w-full py-4 border border-dashed border-zinc-700/80 hover:border-amber-500/60 rounded-lg flex flex-col items-center justify-center gap-1.5 text-xs text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white bg-zinc-950/40 transition-all ${allItemsDisabled || isCurrentItemDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
+                    {uploadingSlot === 'tag' ? (
+                      <Loader2 className="w-5 h-5 animate-spin text-amber-500" />
+                    ) : (
+                      <Upload className="w-5 h-5 text-zinc-500" />
+                    )}
+                    <span className="text-[11px] font-mono font-bold">
+                      {uploadingSlot === 'tag' ? t.uploadingStatus : t.choosePhoto}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleSlotUpload(e, 'tag')}
+                      disabled={uploadingSlot !== null || allItemsDisabled || isCurrentItemDisabled}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+
+              {/* Slot 3: Defect Photo (Enhanced for DEFECT requestType) */}
+              <div className={`p-3 bg-surface-container-lowest dark:bg-zinc-900/60 border border-dashed rounded-xl flex flex-col justify-between space-y-2 transition-all ${requestType === 'DEFECT' ? 'border-amber-500/50 ring-1 ring-amber-500/20' : 'border-surface-container dark:border-zinc-800 hover:border-zinc-600'}`}>
+                <div className="flex items-start justify-between gap-1">
+                  <div className="min-w-0">
+                    <span className="text-xs font-bold text-primary dark:text-white flex items-center gap-1.5 truncate">
+                      <AlertTriangle className={`w-3.5 h-3.5 shrink-0 ${requestType === 'DEFECT' ? 'text-amber-400 animate-pulse' : 'text-zinc-400'}`} />
+                      <span>{t.defectPhoto}</span>
+                    </span>
+                    <p className="text-[10px] text-secondary dark:text-zinc-500 font-mono mt-0.5 line-clamp-1">
+                      {t.defectPhotoDesc}
+                    </p>
+                  </div>
+                  {defectImageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSlot('defect')}
+                      className="p-1 text-zinc-400 hover:text-red-400 transition-colors cursor-pointer"
+                      title={t.removePhoto}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {defectImageUrl ? (
+                  <div className="relative group rounded-lg overflow-hidden border border-zinc-700 aspect-video bg-black/40">
+                    <img src={defectImageUrl} alt="Defect" className="w-full h-full object-cover" />
+                    <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 text-[11px] font-bold text-white transition-opacity cursor-pointer">
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>{t.changePhoto}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleSlotUpload(e, 'defect')}
+                        disabled={uploadingSlot !== null || allItemsDisabled || isCurrentItemDisabled}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <label className={`w-full py-4 border border-dashed border-zinc-700/80 hover:border-amber-500/60 rounded-lg flex flex-col items-center justify-center gap-1.5 text-xs text-secondary dark:text-zinc-400 hover:text-primary dark:hover:text-white bg-zinc-950/40 transition-all ${allItemsDisabled || isCurrentItemDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
+                    {uploadingSlot === 'defect' ? (
+                      <Loader2 className="w-5 h-5 animate-spin text-amber-500" />
+                    ) : (
+                      <Upload className="w-5 h-5 text-zinc-500" />
+                    )}
+                    <span className="text-[11px] font-mono font-bold">
+                      {uploadingSlot === 'defect' ? t.uploadingStatus : t.choosePhoto}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleSlotUpload(e, 'defect')}
+                      disabled={uploadingSlot !== null || allItemsDisabled || isCurrentItemDisabled}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
             </div>
           </div>
 
@@ -538,7 +736,7 @@ export const RequestExchangeModal: React.FC<RequestExchangeModalProps> = ({
 
             <button
               type="submit"
-              disabled={isSubmitting || isUploading || allItemsDisabled || isCurrentItemDisabled}
+              disabled={isSubmitting || uploadingSlot !== null || allItemsDisabled || isCurrentItemDisabled}
               className="px-6 py-2.5 bg-primary text-white dark:bg-white dark:text-black hover:opacity-90 rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (

@@ -20,6 +20,7 @@ import {
 import { exchangeService } from '@/services/exchangeService';
 import { ExchangeRequest, ExchangeStatus } from '@/types';
 import { useLanguage } from '@/shared';
+import { AdminExchangeDetailsModal } from '../components/exchanges/AdminExchangeDetailsModal';
 import toast from 'react-hot-toast';
 
 export const AdminExchangesPage: React.FC = () => {
@@ -32,6 +33,9 @@ export const AdminExchangesPage: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<ExchangeStatus | null>(null);
   const [adminNoteInput, setAdminNoteInput] = useState<string>('');
   const [actionModalOpen, setActionModalOpen] = useState<boolean>(false);
+
+  const [viewingRequest, setViewingRequest] = useState<ExchangeRequest | null>(null);
+  const [detailsModalOpen, setDetailsModalOpen] = useState<boolean>(false);
 
   // Fetch all exchange requests
   const { data: requests = [], isLoading, refetch } = useQuery<ExchangeRequest[]>({
@@ -67,6 +71,8 @@ export const AdminExchangesPage: React.FC = () => {
       setSelectedRequest(null);
       setSelectedStatus(null);
       setAdminNoteInput('');
+      setDetailsModalOpen(false);
+      setViewingRequest(null);
     },
     onError: () => {
       toast.error(t.adminExchangeStatusUpdateError);
@@ -261,12 +267,16 @@ export const AdminExchangesPage: React.FC = () => {
           {filteredRequests.map((req: ExchangeRequest) => (
             <div
               key={req.id}
-              className="bg-zinc-950 border border-zinc-800 hover:border-zinc-700 rounded-xl p-4 sm:p-6 space-y-4 transition-all shadow-md"
+              onClick={() => {
+                setViewingRequest(req);
+                setDetailsModalOpen(true);
+              }}
+              className="bg-zinc-950 border border-zinc-800 hover:border-zinc-600 rounded-xl p-4 sm:p-6 space-y-4 transition-all shadow-md cursor-pointer hover:shadow-xl group"
             >
               {/* Top Row: Order #, Customer & Status */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-zinc-800/80 gap-3">
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                  <span className="font-mono text-sm font-bold text-white bg-zinc-900 px-2.5 py-1 rounded border border-zinc-800">
+                  <span className="font-mono text-sm font-bold text-white bg-zinc-900 px-2.5 py-1 rounded border border-zinc-800 group-hover:border-amber-500/40 transition-colors">
                     #{req.orderId}
                   </span>
                   {getTypeBadge(req.requestType)}
@@ -282,12 +292,28 @@ export const AdminExchangesPage: React.FC = () => {
                   </span>
                 </div>
 
-                {/* Action Button */}
+                {/* Action Buttons */}
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => handleOpenActionModal(req)}
-                    className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 hover:border-zinc-500 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setViewingRequest(req);
+                      setDetailsModalOpen(true);
+                    }}
+                    className="px-3.5 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:border-amber-500/50 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>{t.adminViewExchangeDetails}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenActionModal(req);
+                    }}
+                    className="px-3 py-2 bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 hover:border-zinc-500 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
                   >
                     <span>{t.adminUpdateReviewRequest}</span>
                     <ChevronDown className="w-3.5 h-3.5" />
@@ -343,16 +369,19 @@ export const AdminExchangesPage: React.FC = () => {
                   </div>
 
                   {/* Proof Photo thumbnail */}
-                  {req.proofImageUrl && (
-                    <a
-                      href={req.proofImageUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-[10px] font-mono text-amber-400 hover:underline"
+                  {(req.proofImageUrl || req.invoiceImageUrl || req.tagImageUrl || req.defectImageUrl) && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setViewingRequest(req);
+                        setDetailsModalOpen(true);
+                      }}
+                      className="inline-flex items-center gap-1.5 text-[10px] font-mono text-amber-400 hover:underline cursor-pointer"
                     >
                       <Eye className="w-3 h-3" />
                       <span>{t.adminViewUploadedPhoto}</span>
-                    </a>
+                    </button>
                   )}
                 </div>
               </div>
@@ -507,6 +536,24 @@ export const AdminExchangesPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Rich Exchange Details Modal (Similar to Orders) */}
+      <AdminExchangeDetailsModal
+        request={viewingRequest}
+        isOpen={detailsModalOpen}
+        onClose={() => {
+          setDetailsModalOpen(false);
+          setViewingRequest(null);
+        }}
+        onUpdateStatus={(id, status, notes) => {
+          updateStatusMutation.mutate({
+            id,
+            status,
+            adminNotes: notes,
+          });
+        }}
+        isUpdating={updateStatusMutation.isPending}
+      />
     </div>
   );
 };
