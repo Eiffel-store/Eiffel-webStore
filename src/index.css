@@ -366,3 +366,14 @@ a:active:not(:disabled),
   content: '';
 }
 
+@keyframes slider-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.animate-slider-progress {
+  animation-name: slider-progress;
+  animation-fill-mode: forwards;
+}
+
+

@@ -44,16 +44,16 @@ export const HeroSection: React.FC = () => {
     }
   }, [currentSlide, trackBannerImpression]);
 
-  // Dynamic Autoplay timer based on customized interval
+  // Dynamic Autoplay timer based on customized interval (resets on slide change)
   useEffect(() => {
     if (slides.length <= 1 || isPaused || !isAutoPlay) return;
 
-    const interval = setInterval(() => {
+    const timer = setInterval(() => {
       setCurrentSlideIndex(prev => (prev + 1) % slides.length);
     }, intervalMs);
 
-    return () => clearInterval(interval);
-  }, [slides.length, isPaused, isAutoPlay, intervalMs]);
+    return () => clearInterval(timer);
+  }, [slides.length, isPaused, isAutoPlay, intervalMs, safeIndex]);
 
   const handlePrev = () => {
     setCurrentSlideIndex(prev => (prev - 1 + slides.length) % slides.length);
@@ -105,8 +105,6 @@ export const HeroSection: React.FC = () => {
   return (
     <section
       className="relative w-full min-h-[82vh] sm:min-h-[88vh] flex items-center justify-center overflow-hidden bg-zinc-950 text-white select-none"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
     >
       {/* Background Responsive Media with Crossfade */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -201,9 +199,13 @@ export const HeroSection: React.FC = () => {
             <div className="hidden sm:block">{t.heroLocation}</div>
           </div>
 
-          {/* Slider Pagination Controls */}
+          {/* Slider Pagination Controls with Visual Duration Fill */}
           {slides.length > 1 && (
-            <div className="flex items-center gap-3 self-end sm:self-auto">
+            <div
+              className="flex items-center gap-3 self-end sm:self-auto"
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+            >
               <button
                 onClick={handlePrev}
                 aria-label="Previous slide"
@@ -212,17 +214,39 @@ export const HeroSection: React.FC = () => {
                 <ChevronLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
               </button>
 
-              <div className="flex items-center gap-1.5 px-2">
-                {slides.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentSlideIndex(idx)}
-                    aria-label={`Slide ${idx + 1}`}
-                    className={`h-1.5 transition-all rounded-full cursor-pointer ${
-                      idx === safeIndex ? 'w-6 bg-white' : 'w-2 bg-white/40 hover:bg-white/70'
-                    }`}
-                  />
-                ))}
+              <div className="flex items-center gap-2 px-2">
+                {slides.map((_, idx) => {
+                  const isCurrent = idx === safeIndex;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentSlideIndex(idx)}
+                      aria-label={`Slide ${idx + 1}`}
+                      className="relative h-1.5 rounded-full overflow-hidden transition-all duration-300 cursor-pointer"
+                      style={{ width: isCurrent ? '38px' : '10px' }}
+                    >
+                      {/* Base Track */}
+                      <span className="absolute inset-0 bg-white/25 rounded-full" />
+                      
+                      {/* Active Progress Filling Bar */}
+                      {isCurrent && isAutoPlay && (
+                        <span
+                          key={`prog-${safeIndex}-${intervalSeconds}-${isPaused}`}
+                          className={`absolute inset-y-0 left-0 bg-gradient-to-r from-amber-400 via-yellow-200 to-white rounded-full ${
+                            isPaused ? '' : 'animate-slider-progress'
+                          }`}
+                          style={{
+                            animationDuration: `${intervalMs}ms`,
+                            animationTimingFunction: 'linear'
+                          }}
+                        />
+                      )}
+                      {isCurrent && !isAutoPlay && (
+                        <span className="absolute inset-0 bg-white rounded-full" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
 
               <button
