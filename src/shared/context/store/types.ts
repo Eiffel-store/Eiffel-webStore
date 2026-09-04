@@ -57,8 +57,8 @@ export interface StoreDataContextType {
   deleteOrder: (orderId: string) => void;
 
   // Settings
-  updateSettings: (updates: Partial<StoreSettings>) => void;
-  updateHomeSettings: (updates: Partial<HomePageSettings>) => void;
+  updateSettings: (updates: Partial<StoreSettings>, options?: { successMessage?: string; toastId?: string; showToast?: boolean }) => Promise<StoreSettings | void>;
+  updateHomeSettings: (updates: Partial<HomePageSettings>, options?: { successMessage?: string; toastId?: string; showToast?: boolean }) => Promise<StoreSettings | void>;
 
   // Banners & Campaigns CMS
   banners: Banner[];

@@ -15,7 +15,7 @@ export const AdminAnnouncementSettingsForm: React.FC<AdminAnnouncementSettingsFo
   const { t } = useLanguage();
 
   return (
-    <div className="space-y-4 pt-4 border-t border-zinc-800">
+    <div className="space-y-4">
       <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2 pb-2 border-b border-zinc-800">
         <DollarSign className="w-4 h-4 text-amber-400" />
         <span>{t.adminAnnouncementSection}</span>

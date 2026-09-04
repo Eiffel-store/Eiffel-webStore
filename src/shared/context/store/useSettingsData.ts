@@ -33,20 +33,34 @@ export const useSettingsData = (queryClient: QueryClient) => {
     onSuccess: (data) => {
       queryClient.setQueryData(['settings'], data);
       queryClient.invalidateQueries({ queryKey: ['settings'] });
-      toast.success('تم حفظ الإعدادات بنجاح');
     },
     onError: (err: any) => {
-      toast.error(err?.message || 'فشل حفظ الإعدادات');
+      toast.error(err?.response?.data?.message || err?.message || 'فشل حفظ الإعدادات', { id: 'store-settings-error' });
     }
   });
 
-  const updateSettings = (updates: Partial<StoreSettings>) => {
-    const payload = { ...settings, ...updates };
-    updateSettingsMutation.mutate(payload);
+  const updateSettings = async (
+    updates: Partial<StoreSettings>,
+    options?: { successMessage?: string; toastId?: string; showToast?: boolean }
+  ) => {
+    try {
+      const data = await updateSettingsMutation.mutateAsync(updates);
+      if (options?.showToast !== false) {
+        toast.success(options?.successMessage || 'تم حفظ الإعدادات بنجاح', {
+          id: options?.toastId || 'store-settings-save'
+        });
+      }
+      return data;
+    } catch (err) {
+      throw err;
+    }
   };
 
-  const updateHomeSettings = (updates: Partial<StoreSettings>) => {
-    updateSettings(updates);
+  const updateHomeSettings = (
+    updates: Partial<StoreSettings>,
+    options?: { successMessage?: string; toastId?: string; showToast?: boolean }
+  ) => {
+    return updateSettings(updates, options);
   };
 
   return {

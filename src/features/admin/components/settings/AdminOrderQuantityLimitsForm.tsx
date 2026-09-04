@@ -18,7 +18,7 @@ export const AdminOrderQuantityLimitsForm: React.FC<AdminOrderQuantityLimitsForm
   const currentMax = settings.maxPiecesPerItem ?? 3;
 
   return (
-    <div className="space-y-4 pt-4 border-t border-zinc-800">
+    <div className="space-y-4">
       <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
         <h2 className="text-sm font-label-bold uppercase tracking-wider text-white flex items-center gap-2">
           <Package className="w-4 h-4 text-amber-400" />

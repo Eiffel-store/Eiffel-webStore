@@ -58,7 +58,7 @@ export const AdminHomePageSectionsForm: React.FC<AdminHomePageSectionsFormProps>
   ];
 
   return (
-    <div className="space-y-4 pt-6 border-t border-zinc-800">
+    <div className="space-y-4">
       {/* Header matching Loyalty VIP Form */}
       <div className="flex items-center gap-2.5">
         <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
