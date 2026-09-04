@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, Eye, Trash2, Check, Clock, Truck, CheckCircle2, XCircle, Phone } from 'lucide-react';
+import { Package, Eye, Trash2, Check, Clock, Truck, CheckCircle2, XCircle, Phone, MessageCircle } from 'lucide-react';
 import { Order } from '@/types';
 import { useLanguage, useCurrency } from '@/shared';
 
@@ -204,6 +204,39 @@ export const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                 {/* Action Buttons */}
                 <td className="py-3.5 px-4 text-right rtl:text-left">
                   <div className="flex items-center justify-end rtl:justify-start gap-1.5">
+                    {/* 1-Click Quick Confirm Button */}
+                    {(order.status === 'Awaiting_Confirmation' || order.status === 'Pending') && (
+                      <button
+                        onClick={() => handleStatusChange(order.id, 'Confirmed')}
+                        disabled={isUpdating}
+                        className="px-2.5 py-1.5 bg-emerald-500/15 hover:bg-emerald-500 text-emerald-400 hover:text-black border border-emerald-500/30 rounded-lg transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
+                        title={t.adminQuickConfirmTooltip}
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                        <span className="hidden xl:inline text-[11px] whitespace-nowrap">تأكيد سريع</span>
+                      </button>
+                    )}
+
+                    {/* Direct WhatsApp Message Button */}
+                    {(() => {
+                      const customerPhone = order.customerPhone || order.shippingAddress?.phone;
+                      if (!customerPhone) return null;
+                      return (
+                        <button
+                          onClick={() => {
+                            const cleanPhone = customerPhone.replace(/[^0-9]/g, '');
+                            const targetNumber = cleanPhone.startsWith('0') ? `2${cleanPhone}` : cleanPhone;
+                            const chatMsg = `مرحباً أستاذ ${order.customerName || 'العميل'} 👋، بخصوص طلبك رقم #${order.id} من متجر إيفل بقيمة ${formatPrice(order.total)}...`;
+                            window.open(`https://wa.me/${targetNumber}?text=${encodeURIComponent(chatMsg)}`, '_blank', 'noopener,noreferrer');
+                          }}
+                          className="p-2 bg-zinc-900 hover:bg-emerald-950 text-emerald-400 hover:text-emerald-300 border border-zinc-700 hover:border-emerald-700 rounded-lg transition-colors cursor-pointer shadow"
+                          title={t.adminQuickWhatsappTooltip}
+                        >
+                          <MessageCircle className="w-3.5 h-3.5" />
+                        </button>
+                      );
+                    })()}
+
                     <button
                       onClick={() => onSelectOrder(order)}
                       className="p-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700 rounded-lg transition-colors cursor-pointer shadow"

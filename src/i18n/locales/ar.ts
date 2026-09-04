@@ -792,6 +792,21 @@ export const ar: TranslationDictionary = {
   adminRestoreUpload: "استعادة البيانات من ملف (JSON)",
   adminSettingsSavedSuccess: "تم حفظ الإعدادات بنجاح",
 
+  // WhatsApp Order Confirmation & Quick Admin Actions
+  whatsappConfirmCardTitle: "تسريع شحن وتجهيز طلبك فوراً",
+  whatsappConfirmCardDesc: "أرسل تأكيد طلبك عبر تطبيق الواتساب مباشرة بضغطة زر واحدة لتخرج شحنتك في أول دورة شحن صباحية.",
+  whatsappConfirmButton: "تأكيد طلبي عبر الواتساب الآن",
+  whatsappSentNotice: "تم فتح تطبيق الواتساب! يُرجى الضغط على زر (إرسال / Send) في المحادثة لإتمام تأكيد شحنتك فوراً.",
+  whatsappMessageGreeting: "مرحباً متجر إيفل 👋",
+  whatsappMessageOrderNumber: "رقم الطلب",
+  whatsappMessageCustomer: "اسم العميل",
+  whatsappMessageTotal: "المبلغ الإجمالي",
+  whatsappMessageDestination: "عنوان الشحن",
+  whatsappMessageReady: "أود تأكيد طلبي للشحن فوراً وأنا جاهز للاستلام ✅",
+  adminQuickConfirmTooltip: "تأكيد الطلب بضغطة واحدة",
+  adminQuickWhatsappTooltip: "مراسلة العميل فوراً عبر الواتساب",
+  adminOrderQuickConfirmedSuccess: "تم تأكيد الطلب بنجاح وهو الآن جاهز للتجهيز والشحن",
+
   // Admin Portal - Auth & Login
   adminLoginTitle: "بوابة الإدارة العليا",
   adminLoginSubtitle: "سجل الدخول بحساب الأدمن أو الموظف المصرح له",

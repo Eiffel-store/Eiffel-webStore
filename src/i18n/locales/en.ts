@@ -777,6 +777,21 @@ export const en: TranslationDictionary = {
   adminRestoreUpload: "Restore Data from File",
   adminSettingsSavedSuccess: "Settings saved successfully",
 
+  // WhatsApp Order Confirmation & Quick Admin Actions
+  whatsappConfirmCardTitle: "Expedite Order Fulfillment via WhatsApp",
+  whatsappConfirmCardDesc: "Send your order confirmation directly via WhatsApp with one click to prioritize shipping in the earliest dispatch batch.",
+  whatsappConfirmButton: "Confirm My Order on WhatsApp",
+  whatsappSentNotice: "WhatsApp has been opened! Please tap (Send) in the chat to finalize your order confirmation immediately.",
+  whatsappMessageGreeting: "Hello Eiffel Store 👋",
+  whatsappMessageOrderNumber: "Order Number",
+  whatsappMessageCustomer: "Customer Name",
+  whatsappMessageTotal: "Total Amount",
+  whatsappMessageDestination: "Shipping Address",
+  whatsappMessageReady: "I would like to confirm my order for expedited shipping and I am ready to receive it ✅",
+  adminQuickConfirmTooltip: "Quick 1-Click Order Confirmation",
+  adminQuickWhatsappTooltip: "Direct WhatsApp chat with customer",
+  adminOrderQuickConfirmedSuccess: "Order confirmed successfully and scheduled for fulfillment",
+
   // Admin Portal - Auth & Login
   adminLoginTitle: "Master Control Portal",
   adminLoginSubtitle: "Sign in with your authorized Admin or Staff credentials",

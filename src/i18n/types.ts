@@ -794,6 +794,21 @@ export interface TranslationDictionary {
   adminRestoreUpload: string;
   adminSettingsSavedSuccess: string;
 
+  // WhatsApp Order Confirmation & Quick Admin Actions
+  whatsappConfirmCardTitle: string;
+  whatsappConfirmCardDesc: string;
+  whatsappConfirmButton: string;
+  whatsappSentNotice: string;
+  whatsappMessageGreeting: string;
+  whatsappMessageOrderNumber: string;
+  whatsappMessageCustomer: string;
+  whatsappMessageTotal: string;
+  whatsappMessageDestination: string;
+  whatsappMessageReady: string;
+  adminQuickConfirmTooltip: string;
+  adminQuickWhatsappTooltip: string;
+  adminOrderQuickConfirmedSuccess: string;
+
   // Admin Portal - Auth & Login
   adminLoginTitle: string;
   adminLoginSubtitle: string;

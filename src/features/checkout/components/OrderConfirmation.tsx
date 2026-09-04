@@ -1,9 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle2, Smartphone } from 'lucide-react';
-import { useCurrency } from '@/shared';
-import { useLanguage } from '@/shared';
-import { Logo } from '@/shared';
+import { useCurrency, useLanguage, useStoreData, Logo } from '@/shared';
 import { Order } from '@/types';
 
 interface OrderConfirmationProps {
@@ -21,6 +19,32 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
 }) => {
   const { formatPrice } = useCurrency();
   const { t } = useLanguage();
+  const { settings } = useStoreData();
+  const [hasClickedWhatsApp, setHasClickedWhatsApp] = React.useState(false);
+
+  // Clean WhatsApp phone number
+  const rawWhatsapp = settings?.whatsappNumber || '+201009326801';
+  const cleanWhatsappNumber = rawWhatsapp.replace(/[^0-9]/g, '');
+
+  const customerName =
+    order.customerName ||
+    `${order.shippingAddress?.firstName || ''} ${order.shippingAddress?.lastName || ''}`.trim() ||
+    'عميل إيفل';
+
+  // Format pre-filled WhatsApp message
+  const messageText = `${t.whatsappMessageGreeting}
+${t.whatsappMessageReady}
+📦 ${t.whatsappMessageOrderNumber}: #${order.id}
+👤 ${t.whatsappMessageCustomer}: ${customerName}
+💵 ${t.whatsappMessageTotal}: ${formatPrice(order.total)}
+📍 ${t.whatsappMessageDestination}: ${street}, ${city}`;
+
+  const whatsappDeepLink = `https://wa.me/${cleanWhatsappNumber}?text=${encodeURIComponent(messageText)}`;
+
+  const handleOpenWhatsApp = () => {
+    setHasClickedWhatsApp(true);
+    window.open(whatsappDeepLink, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <div className="min-h-screen bg-background text-on-surface py-16 px-4 sm:px-8 md:px-12 flex items-center justify-center">
@@ -43,6 +67,36 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           <p className="text-xs sm:text-sm text-secondary dark:text-zinc-400 mt-2 font-light max-w-md mx-auto">
             {t.receiptNotice}
           </p>
+        </div>
+
+        {/* WhatsApp Instant Confirmation Card */}
+        <div className="p-6 bg-gradient-to-b from-emerald-950/40 to-zinc-900/50 border border-emerald-500/30 rounded-xl space-y-4 text-center shadow-lg relative overflow-hidden">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-mono font-bold tracking-wider">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span>{t.whatsappConfirmCardTitle}</span>
+          </div>
+
+          <p className="text-xs text-zinc-300 max-w-md mx-auto leading-relaxed">
+            {t.whatsappConfirmCardDesc}
+          </p>
+
+          <div className="pt-1">
+            <button
+              onClick={handleOpenWhatsApp}
+              type="button"
+              className="w-full sm:w-auto px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-black font-label-bold text-xs uppercase tracking-wider rounded-lg shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2.5 mx-auto transition-all transform hover:scale-[1.02] cursor-pointer"
+            >
+              <Smartphone className="w-4 h-4 text-black shrink-0" />
+              <span>{t.whatsappConfirmButton}</span>
+            </button>
+          </div>
+
+          {hasClickedWhatsApp && (
+            <div className="p-3 bg-emerald-950/70 border border-emerald-500/40 rounded-lg text-emerald-300 text-xs flex items-center justify-center gap-2 animate-fade-in font-mono">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>{t.whatsappSentNotice}</span>
+            </div>
+          )}
         </div>
 
         <div className="p-6 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 text-xs font-mono text-left rtl:text-right space-y-2.5">
