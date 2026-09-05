@@ -61,11 +61,13 @@ export const App: React.FC = () => {
             style: {
               background: '#09090b',
               color: '#f4f4f5',
-              border: '1px solid rgba(251, 191, 36, 0.25)',
+              border: '1px solid rgba(251, 191, 36, 0.35)',
               borderRadius: '0.75rem',
               padding: '12px 18px',
               fontSize: '0.8125rem',
-              fontFamily: 'inherit',
+              fontFamily: 'Cairo, sans-serif',
+              direction: 'rtl',
+              textAlign: 'right',
               boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6)',
             },
             success: {

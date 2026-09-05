@@ -118,7 +118,7 @@ export const AdminSettingsPage: React.FC = () => {
           vipFreeShipping: formSettings.vipFreeShipping,
         },
         {
-          successMessage: isRTL ? 'تم حفظ إعدادات برنامج الولاء والـ VIP بنجاح' : 'VIP & Loyalty settings saved',
+          successMessage: isRTL ? 'تم حفظ إعدادات تحويشة إيفل والـ VIP بنجاح' : 'VIP & Loyalty settings saved',
           toastId: 'save-loyalty-settings',
         }
       );
@@ -359,7 +359,7 @@ export const AdminSettingsPage: React.FC = () => {
             ) : (
               <>
                 <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{isRTL ? 'حفظ برنامج الولاء والـ VIP' : 'Save VIP & Loyalty'}</span>
+                <span>{isRTL ? 'حفظ تحويشة إيفل والـ VIP' : 'Save VIP & Loyalty'}</span>
               </>
             )}
           </button>

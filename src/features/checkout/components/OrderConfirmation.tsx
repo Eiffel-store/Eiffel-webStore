@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle2, Smartphone } from 'lucide-react';
+import { CheckCircle2, Smartphone, Crown, Sparkles, MessageCircle } from 'lucide-react';
 import { useCurrency, useLanguage, useStoreData, Logo } from '@/shared';
 import { Order } from '@/types';
 
@@ -31,15 +31,30 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
     `${order.shippingAddress?.firstName || ''} ${order.shippingAddress?.lastName || ''}`.trim() ||
     'عميل إيفل';
 
-  // Format pre-filled WhatsApp message
-  const messageText = `${t.whatsappMessageGreeting}
-${t.whatsappMessageReady}
-📦 ${t.whatsappMessageOrderNumber}: #${order.id}
-👤 ${t.whatsappMessageCustomer}: ${customerName}
-💵 ${t.whatsappMessageTotal}: ${formatPrice(order.total)}
-📍 ${t.whatsappMessageDestination}: ${street}, ${city}`;
+  const isOrderConfirmed = order.status === 'Confirmed';
 
-  const whatsappDeepLink = `https://wa.me/${cleanWhatsappNumber}?text=${encodeURIComponent(messageText)}`;
+  // Pre-filled WhatsApp message for unconfirmed orders
+  const messageText = 
+    `مرحباً خدمة عملاء دار أزياء إيفل 👋\n` +
+    `أود تأكيد طلبي للشحن والتجهيز فوراً، وأنا جاهز للاستلام ✅\n\n` +
+    `📋 *بيانات الطلب:*\n` +
+    `• رقم الطلب: *#${order.id}*\n` +
+    `• الاسم: *${customerName}*\n` +
+    `• إجمالي الفاتورة: *${formatPrice(order.total)}*\n` +
+    `• عنوان التوصيل: *${street}, ${city}*\n\n` +
+    `برجاء إدراج الطلب في أسرع دورة شحن وتسليم. شكراً لكم ✨`;
+
+  const whatsappDeepLink = `https://api.whatsapp.com/send/?phone=${cleanWhatsappNumber}&text=${encodeURIComponent(messageText)}`;
+
+  // Pre-filled WhatsApp message for VIP concierge inquiry
+  const vipInquiryText = 
+    `مرحباً خدمة عملاء دار أزياء إيفل 👑\n` +
+    `معكم العميل VIP: *${customerName}*\n\n` +
+    `بخصوص طلبي المعتمد رقم: *#${order.id}* بقيمة *${formatPrice(order.total)}* 🛍️\n` +
+    `أود الاستفسار والمتابعة بخصوص موعد وصول الشحنة 🚚\n\n` +
+    `شكراً لكم ولمجهودكم ✨`;
+
+  const vipWhatsAppDeepLink = `https://api.whatsapp.com/send/?phone=${cleanWhatsappNumber}&text=${encodeURIComponent(vipInquiryText)}`;
 
   const handleOpenWhatsApp = () => {
     setHasClickedWhatsApp(true);
@@ -69,35 +84,64 @@ ${t.whatsappMessageReady}
           </p>
         </div>
 
-        {/* WhatsApp Instant Confirmation Card */}
-        <div className="p-6 bg-gradient-to-b from-emerald-950/40 to-zinc-900/50 border border-emerald-500/30 rounded-xl space-y-4 text-center shadow-lg relative overflow-hidden">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-mono font-bold tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span>{t.whatsappConfirmCardTitle}</span>
-          </div>
-
-          <p className="text-xs text-zinc-300 max-w-md mx-auto leading-relaxed">
-            {t.whatsappConfirmCardDesc}
-          </p>
-
-          <div className="pt-1">
-            <button
-              onClick={handleOpenWhatsApp}
-              type="button"
-              className="w-full sm:w-auto px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-black font-label-bold text-xs uppercase tracking-wider rounded-lg shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2.5 mx-auto transition-all transform hover:scale-[1.02] cursor-pointer"
-            >
-              <Smartphone className="w-4 h-4 text-black shrink-0" />
-              <span>{t.whatsappConfirmButton}</span>
-            </button>
-          </div>
-
-          {hasClickedWhatsApp && (
-            <div className="p-3 bg-emerald-950/70 border border-emerald-500/40 rounded-lg text-emerald-300 text-xs flex items-center justify-center gap-2 animate-fade-in font-mono">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>{t.whatsappSentNotice}</span>
+        {/* Dynamic Card: VIP Auto-Confirmed vs New Customer WhatsApp Verification */}
+        {isOrderConfirmed ? (
+          <div className="p-6 bg-gradient-to-b from-amber-950/30 via-zinc-900/60 to-emerald-950/30 border border-amber-500/40 rounded-xl space-y-4 text-center shadow-2xl relative overflow-hidden">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-mono font-bold tracking-wider">
+              <Crown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>{t.vipAutoConfirmBadge}</span>
+              <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
             </div>
-          )}
-        </div>
+
+            <h3 className="font-editorial text-xl sm:text-2xl text-amber-200">
+              {t.vipAutoConfirmTitle}
+            </h3>
+
+            <p className="text-xs sm:text-sm text-zinc-300 max-w-lg mx-auto leading-relaxed">
+              {t.vipAutoConfirmDesc}
+            </p>
+
+            <div className="pt-1">
+              <button
+                onClick={() => window.open(vipWhatsAppDeepLink, '_blank', 'noopener,noreferrer')}
+                type="button"
+                className="w-full sm:w-auto px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-amber-300 hover:text-amber-200 border border-amber-500/30 font-label-bold text-xs uppercase tracking-wider rounded-lg shadow-lg flex items-center justify-center gap-2 mx-auto transition-all cursor-pointer"
+              >
+                <MessageCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>{t.vipConciergeButton}</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="p-6 bg-gradient-to-b from-emerald-950/40 to-zinc-900/50 border border-emerald-500/30 rounded-xl space-y-4 text-center shadow-lg relative overflow-hidden">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-mono font-bold tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>{t.whatsappConfirmCardTitle}</span>
+            </div>
+
+            <p className="text-xs text-zinc-300 max-w-md mx-auto leading-relaxed">
+              {t.whatsappConfirmCardDesc}
+            </p>
+
+            <div className="pt-1">
+              <button
+                onClick={handleOpenWhatsApp}
+                type="button"
+                className="w-full sm:w-auto px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-black font-label-bold text-xs uppercase tracking-wider rounded-lg shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2.5 mx-auto transition-all transform hover:scale-[1.02] cursor-pointer"
+              >
+                <Smartphone className="w-4 h-4 text-black shrink-0" />
+                <span>{t.whatsappConfirmButton}</span>
+              </button>
+            </div>
+
+            {hasClickedWhatsApp && (
+              <div className="p-3 bg-emerald-950/70 border border-emerald-500/40 rounded-lg text-emerald-300 text-xs flex items-center justify-center gap-2 animate-fade-in font-mono">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{t.whatsappSentNotice}</span>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="p-6 bg-surface-container-low dark:bg-zinc-900 border border-surface-container dark:border-zinc-800 text-xs font-mono text-left rtl:text-right space-y-2.5">
           <div className="flex justify-between">

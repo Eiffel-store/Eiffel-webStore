@@ -791,6 +791,10 @@ export const en: TranslationDictionary = {
   adminQuickConfirmTooltip: "Quick 1-Click Order Confirmation",
   adminQuickWhatsappTooltip: "Direct WhatsApp chat with customer",
   adminOrderQuickConfirmedSuccess: "Order confirmed successfully and scheduled for fulfillment",
+  vipAutoConfirmTitle: "Your Order is Automatically Confirmed 👑",
+  vipAutoConfirmBadge: "Trusted VIP • Instant Fulfillment",
+  vipAutoConfirmDesc: "As a valued and trusted VIP customer, your order has been instantly confirmed and prioritized for fulfillment without requiring manual verification.",
+  vipConciergeButton: "Contact VIP Concierge (WhatsApp)",
 
   // Admin Portal - Auth & Login
   adminLoginTitle: "Master Control Portal",

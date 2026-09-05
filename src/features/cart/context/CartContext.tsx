@@ -10,7 +10,7 @@ interface CartContextType {
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
-  addToCart: (product: Product, selectedSize?: string, selectedColor?: string, quantity?: number) => boolean;
+  addToCart: (product: Product, selectedSize?: string, selectedColor?: string, quantity?: number, silent?: boolean) => boolean;
   removeFromCart: (productId: string, selectedSize: string, selectedColor: string) => void;
   updateQuantity: (productId: string, selectedSize: string, selectedColor: string, quantity: number) => void;
   clearCart: () => void;
@@ -43,7 +43,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const freeShippingRemaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
   const freeShippingProgress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
 
-  const addToCart = (product: Product, size?: string, color?: string, quantity: number = 1): boolean => {
+  const addToCart = (product: Product, size?: string, color?: string, quantity: number = 1, silent: boolean = false): boolean => {
     // 1. Get latest real-time stock
     const currentProd = products.find(p => p.id === product.id) || product;
     const availableStock = currentProd.stock !== undefined ? currentProd.stock : (currentProd.inStock ? 20 : 0);
@@ -94,11 +94,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // 5. Decrement inventory stock across app & backend
     decrementStock(currentProd.id, validQuantity);
 
-    const prodTitle = currentProd.nameAr || currentProd.nameEn || currentProd.name || 'القطعة';
-    toast.success(`تمت إضافة ${prodTitle} إلى حقيبة التسوق`, {
-      icon: '🛍️',
-      id: `cart-add-${currentProd.id}`
-    });
+    if (!silent) {
+      const prodTitle = currentProd.nameAr || currentProd.nameEn || currentProd.name || 'القطعة';
+      toast.success(`تمت إضافة ${prodTitle} إلى حقيبة التسوق`, {
+        icon: '🛍️',
+        id: `cart-add-${currentProd.id}`
+      });
+    }
 
     return true;
   };

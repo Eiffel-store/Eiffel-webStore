@@ -808,6 +808,10 @@ export interface TranslationDictionary {
   adminQuickConfirmTooltip: string;
   adminQuickWhatsappTooltip: string;
   adminOrderQuickConfirmedSuccess: string;
+  vipAutoConfirmTitle: string;
+  vipAutoConfirmBadge: string;
+  vipAutoConfirmDesc: string;
+  vipConciergeButton: string;
 
   // Admin Portal - Auth & Login
   adminLoginTitle: string;

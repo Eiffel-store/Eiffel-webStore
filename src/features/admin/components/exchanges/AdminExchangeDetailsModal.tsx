@@ -59,11 +59,17 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
     ? cleanPhone
     : `20${cleanPhone}`;
 
-  const customerName = request.customerName || 'عميل إيفل';
-  const waMessage = encodeURIComponent(
-    `أهلاً بك يا ${customerName}، معك إدارة دار أزياء إيفل (EIFFEL).\n` +
-    `بخصوص طلب الاستبدال/الاسترجاع للطلب رقم (#${request.orderId}) بخصوص القطعة (${request.productName})...\n`
-  );
+  const customerName = request.customerName || 'عميلنا العزيز';
+  const waMessageText = 
+    `أهلاً بك أستاذ *${customerName}* 👋\n` +
+    `معك فريق خدمة عملاء *دار أزياء إيفل* ✨\n\n` +
+    `بخصوص طلب الاستبدال/الاسترجاع للطلب رقم: *#${request.orderId}* 📦\n` +
+    `• القطعة: *${request.productName}*\n` +
+    `• نوع الطلب: *${request.requestType === 'EXCHANGE_SIZE' ? 'استبدال مقاس' : 'استرجاع'}*\n\n` +
+    `يسعدنا خدمتك وتنسيق موعد مع مندوب الشحن لإتمام طلبك في أسرع وقت ممكن 🚚\n` +
+    `شكراً لاختيارك دار إيفل 👑`;
+  const waMessage = encodeURIComponent(waMessageText);
+  const waLink = `https://api.whatsapp.com/send/?phone=${waPhone}&text=${waMessage}`;
 
   const getStatusBadge = (status: ExchangeStatus) => {
     switch (status) {
@@ -224,7 +230,7 @@ export const AdminExchangeDetailsModal: React.FC<AdminExchangeDetailsModalProps>
                         <span>{phone}</span>
                       </a>
                       <a
-                        href={`https://wa.me/${waPhone}?text=${waMessage}`}
+                        href={waLink}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="px-3 py-1.5 bg-emerald-950 text-emerald-300 border border-emerald-700/80 hover:bg-emerald-900 rounded-lg text-xs flex items-center gap-1.5 font-bold transition-colors"

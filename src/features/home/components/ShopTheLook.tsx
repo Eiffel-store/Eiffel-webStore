@@ -103,13 +103,15 @@ export const ShopTheLook: React.FC = () => {
     inStockPieces.forEach(product => {
       const size = product.sizes?.[0] || 'M';
       const color = product.colors?.[0]?.name || 'Standard';
-      const success = addToCart(product, size, color, 1);
+      const success = addToCart(product, size, color, 1, true);
       if (success) addedCount++;
     });
 
     if (addedCount > 0) {
       setAddedEntireLook(true);
       setTimeout(() => setAddedEntireLook(false), 2500);
+
+      toast.dismiss();
 
       toast.success(
         hasOutOfStockPiece

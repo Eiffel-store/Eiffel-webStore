@@ -44,13 +44,32 @@ export const AdminOrderDetailsModal: React.FC<AdminOrderDetailsModalProps> = ({
   const cleanPhone = phone.replace(/[^0-9]/g, '');
   const waPhone = cleanPhone.startsWith('0') ? `2${cleanPhone}` : (cleanPhone.startsWith('20') ? cleanPhone : `20${cleanPhone}`);
 
-  const customerName = order.customerName || `${order.shippingAddress?.firstName || ''} ${order.shippingAddress?.lastName || ''}`.trim() || 'Valued Customer';
-  const waMessage = encodeURIComponent(
-    `أهلاً بك يا ${customerName}، معك دار أزياء إيفل (EIFFEL Haute Couture).\n` +
-    `نود تأكيد شحن طلبكم رقم (#${order.id}) بقيمة ${order.total || 0} ج.م.\n` +
-    `العنوان: ${order.shippingAddress?.city || ''} - ${order.shippingAddress?.street || ''}.\n\n` +
-    `يرجى الرد بتأكيد الشحن لتسليم الطلب لمندوب التوصيل فوراً.`
-  );
+  const customerName = order.customerName || `${order.shippingAddress?.firstName || ''} ${order.shippingAddress?.lastName || ''}`.trim() || 'عميلنا العزيز';
+  const addressParts = [
+    order.shippingAddress?.city,
+    order.shippingAddress?.street
+  ].filter(Boolean).join(' - ') || 'العنوان المسجل';
+
+  const itemsDetails = order.items && order.items.length > 0
+    ? order.items.map(it => `• ${it.product?.name || 'منتج إيفل'} (مقاس: ${it.selectedSize || 'قياسي'}${it.selectedColor ? ` | لون: ${it.selectedColor}` : ''}) × ${it.quantity}`).join('\n')
+    : '';
+
+  const waMessageText = 
+    `أهلاً بك أستاذ *${customerName}* 👋\n` +
+    `معك فريق خدمة عملاء *دار أزياء إيفل* ✨\n\n` +
+    `يسعدنا إبلاغك أن طلبك رقم: *#${order.id}* جاهز للتجهيز والشحن 🚚\n\n` +
+    `📋 *تفاصيل الطلب:*\n` +
+    (itemsDetails ? `${itemsDetails}\n` : '') +
+    `💰 إجمالي الفاتورة: *${formatPrice(order.total || 0)}*\n` +
+    `💳 طريقة الدفع: *${order.paymentMethod || 'الدفع عند الاستلام'}*\n` +
+    `📍 عنوان التوصيل: *${addressParts}*\n\n` +
+    `لتأكيد الشحن فوراً وتجهيز الأوردر، يرجى الرد بكلمة:\n` +
+    `*(تأكيد)* ✅\n\n` +
+    `أو إرسال أي تعديل مطلوب على المقاس أو العنوان في أي وقت.\n` +
+    `شكراً لثقتك واختيارك دار إيفل للأزياء 👑`;
+
+  const waMessage = encodeURIComponent(waMessageText);
+  const waLink = `https://api.whatsapp.com/send/?phone=${waPhone}&text=${waMessage}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
@@ -83,7 +102,7 @@ export const AdminOrderDetailsModal: React.FC<AdminOrderDetailsModalProps> = ({
                   <span>{phone}</span>
                 </a>
                 <a
-                  href={`https://wa.me/${waPhone}?text=${waMessage}`}
+                  href={waLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3 py-1 bg-emerald-950 text-emerald-400 border border-emerald-800 rounded text-xs flex items-center gap-1.5 font-bold hover:bg-emerald-900 transition-colors"
