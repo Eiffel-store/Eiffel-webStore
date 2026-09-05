@@ -20,18 +20,50 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   const { settings } = useStoreData();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
+    let prevY = window.scrollY;
+    let ticking = false;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentY = window.scrollY;
+
+          // Compact header style threshold
+          setIsScrolled(currentY > 20);
+
+          // Smart Show / Hide (Headroom luxury behavior)
+          if (currentY <= 60) {
+            // Near the very top: always fully visible
+            setIsVisible(true);
+          } else {
+            const diff = currentY - prevY;
+            if (diff > 8) {
+              // Scrolling DOWN: glide up smoothly
+              setIsVisible(false);
+            } else if (diff < -8) {
+              // Scrolling UP: reveal instantly with smooth slide-down
+              setIsVisible(true);
+            }
+          }
+
+          prevY = currentY;
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
     setMobileMenuOpen(false);
+    setIsVisible(true);
   }, [location.pathname]);
 
   // Core Static Navigation Links (Linked to i18n Dictionary)
@@ -70,10 +102,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
       {/* Top Banner Announcement */}
       <NavTopAnnouncement />
 
-      {/* Main Sticky Header */}
+      {/* Main Sticky Header with Smart Hide/Show */}
       <header
-        className={`sticky top-0 z-50 w-full bg-white dark:bg-zinc-950 border-b border-surface-container dark:border-zinc-850 transition-all duration-200 ${
-          isScrolled ? 'h-[64px] sm:h-[72px] shadow-sm' : 'h-[70px] sm:h-[82px]'
+        className={`sticky top-0 z-50 w-full border-b border-surface-container dark:border-zinc-850 transition-all duration-300 ease-in-out ${
+          isVisible || mobileMenuOpen
+            ? 'translate-y-0 opacity-100'
+            : '-translate-y-full opacity-0 pointer-events-none'
+        } ${
+          isScrolled
+            ? 'h-[64px] sm:h-[72px] bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md shadow-md'
+            : 'h-[70px] sm:h-[82px] bg-white dark:bg-zinc-950 shadow-none'
         }`}
       >
         <div className="w-full h-full px-2.5 min-[360px]:px-4 sm:px-8 md:px-10 lg:px-12 flex items-center justify-between gap-2 min-[360px]:gap-4">
